@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Course {
   id: string;
@@ -145,7 +145,9 @@ export default function CourseDetailPage() {
   };
 
   const handleDelete = async (exam: Exam) => {
-    if (!confirm(`"${exam.name}" (${exam.exam_number}회차)를 삭제하시겠습니까?\n관련된 재시험 정보도 함께 삭제됩니다.`)) {
+    if (
+      !confirm(`"${exam.name}" (${exam.exam_number}회차)를 삭제하시겠습니까?\n관련된 재시험 정보도 함께 삭제됩니다.`)
+    ) {
       return;
     }
 
@@ -176,23 +178,21 @@ export default function CourseDetailPage() {
 
   return (
     <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         {/* 헤더 */}
         <div className="mb-spacing-700">
-          <Link href="/courses" className="text-body text-core-accent hover:underline mb-spacing-400 inline-block">
+          <Link href="/courses" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 수업 목록으로 돌아가기
           </Link>
           {course && (
-            <div className="flex justify-between items-end">
+            <div className="flex items-end justify-between">
               <div>
-                <h1 className="text-title font-bold text-content-standard-primary mb-spacing-200">{course.name}</h1>
-                <p className="text-body text-content-standard-secondary">
-                  총 {exams.length}개의 시험
-                </p>
+                <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{course.name}</h1>
+                <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-opacity">
+                className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
                 + 시험 생성
               </button>
             </div>
@@ -201,64 +201,70 @@ export default function CourseDetailPage() {
 
         {/* 시험 목록 */}
         {loading ? (
-          <div className="text-center py-spacing-900 text-content-standard-tertiary">로딩중...</div>
+          <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
         ) : exams.length === 0 ? (
-          <div className="text-center py-spacing-900">
+          <div className="py-spacing-900 text-center">
             <p className="text-body text-content-standard-tertiary">시험이 없습니다.</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="mt-spacing-500 px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-opacity">
+              className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
               첫 시험 만들기
             </button>
           </div>
         ) : (
-          <div className="bg-components-fill-standard-primary rounded-radius-400 border border-line-outline">
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
             <table className="w-full rounded-radius-400">
               <thead className="bg-components-fill-standard-secondary">
                 <tr>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">시험명</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">회차</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary w-24"></th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    시험명
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    회차
+                  </th>
+                  <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
                 </tr>
               </thead>
               <tbody>
                 {exams.map((exam) => (
-                  <tr key={exam.id} className="border-t border-line-divider hover:bg-components-interactive-hover transition-colors">
+                  <tr
+                    key={exam.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
                     <td className="px-spacing-500 py-spacing-400">
-                      <div className="text-body font-medium text-content-standard-primary">{exam.name}</div>
+                      <div className="font-medium text-body text-content-standard-primary">{exam.name}</div>
                     </td>
                     <td className="px-spacing-500 py-spacing-400">
-                      <span className="px-spacing-300 py-spacing-100 bg-solid-translucent-blue text-solid-blue rounded-radius-200 text-footnote font-semibold">
+                      <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                         {exam.exam_number}회차
                       </span>
                     </td>
-                    <td className="px-spacing-500 py-spacing-400 relative">
+                    <td className="relative px-spacing-500 py-spacing-400">
                       <button
                         onClick={() => setOpenMenuId(openMenuId === exam.id ? null : exam.id)}
-                        className="px-spacing-300 py-spacing-200 hover:bg-components-fill-standard-secondary rounded-radius-200 transition-colors">
-                        <svg className="w-5 h-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
+                        className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
+                        <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                         </svg>
                       </button>
                       {openMenuId === exam.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                          <div className="absolute right-0 top-full mt-spacing-100 bg-components-fill-standard-primary border border-line-outline rounded-radius-300 shadow-lg py-spacing-200 z-20 min-w-[120px]">
+                          <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
                             <button
                               onClick={() => {
                                 setOpenMenuId(null);
                                 openEditModal(exam);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                               수정
                             </button>
-                            <div className="my-spacing-100 border-t border-line-divider" />
+                            <div className="my-spacing-100 border-line-divider border-t" />
                             <button
                               onClick={() => {
                                 setOpenMenuId(null);
                                 handleDelete(exam);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative hover:bg-solid-translucent-red transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
                               삭제
                             </button>
                           </div>
@@ -274,18 +280,20 @@ export default function CourseDetailPage() {
 
         {/* 생성 모달 */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowCreateModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-heading font-bold text-content-standard-primary">시험 생성</h2>
-                {course && (
-                  <p className="text-label text-content-standard-secondary mt-spacing-100">{course.name}</p>
-                )}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowCreateModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">시험 생성</h2>
+                {course && <p className="mt-spacing-100 text-content-standard-secondary text-label">{course.name}</p>}
               </div>
 
-              <div className="p-spacing-600 space-y-spacing-400">
+              <div className="space-y-spacing-400 p-spacing-600">
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     회차 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -294,12 +302,12 @@ export default function CourseDetailPage() {
                     onChange={(e) => setExamNumber(e.target.value)}
                     placeholder="예: 1"
                     min="1"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     시험 이름 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -307,25 +315,25 @@ export default function CourseDetailPage() {
                     value={examName}
                     onChange={(e) => setExamName(e.target.value)}
                     placeholder="예: 중간고사"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
               </div>
 
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
                     setExamNumber("");
                     setExamName("");
                   }}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleCreate}
                   disabled={saving || !examNumber || !examName.trim()}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-core-accent text-solid-white rounded-radius-300 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "생성 중..." : "생성"}
                 </button>
               </div>
@@ -335,15 +343,19 @@ export default function CourseDetailPage() {
 
         {/* 수정 모달 */}
         {showEditModal && selectedExam && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowEditModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-heading font-bold text-content-standard-primary">시험 수정</h2>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowEditModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">시험 수정</h2>
               </div>
 
-              <div className="p-spacing-600 space-y-spacing-400">
+              <div className="space-y-spacing-400 p-spacing-600">
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     회차 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -351,33 +363,33 @@ export default function CourseDetailPage() {
                     value={examNumber}
                     onChange={(e) => setExamNumber(e.target.value)}
                     min="1"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     시험 이름 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
                     type="text"
                     value={examName}
                     onChange={(e) => setExamName(e.target.value)}
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
               </div>
 
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleEdit}
                   disabled={saving || !examNumber || !examName.trim()}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-core-accent text-solid-white rounded-radius-300 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "저장 중..." : "저장"}
                 </button>
               </div>

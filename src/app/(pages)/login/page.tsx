@@ -128,24 +128,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-spacing-600">
+    <div className="flex min-h-screen items-center justify-center p-spacing-600">
       <div className="w-full max-w-md">
-        <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline p-spacing-800">
+        <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-800">
           {/* 헤더 */}
-          <div className="text-center mb-spacing-800">
-            <h1 className="text-title font-bold text-content-standard-primary mb-spacing-200">티노트</h1>
+          <div className="mb-spacing-800 text-center">
+            <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">티노트</h1>
             <p className="text-body text-content-standard-secondary">학생 관리 서비스</p>
           </div>
 
           {/* 탭 */}
-          <div className="flex gap-spacing-300 mb-spacing-600">
+          <div className="mb-spacing-600 flex gap-spacing-300">
             <button
               onClick={() => {
                 setTab("teacher");
                 setError("");
                 setWorkspaceId("");
               }}
-              className={`flex-1 py-spacing-400 rounded-radius-400 text-body font-semibold transition-all ${
+              className={`flex-1 rounded-radius-400 py-spacing-400 font-semibold text-body transition-all ${
                 tab === "teacher"
                   ? "bg-core-accent text-solid-white"
                   : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
@@ -157,7 +157,7 @@ export default function LoginPage() {
                 setTab("student");
                 setError("");
               }}
-              className={`flex-1 py-spacing-400 rounded-radius-400 text-body font-semibold transition-all ${
+              className={`flex-1 rounded-radius-400 py-spacing-400 font-semibold text-body transition-all ${
                 tab === "student"
                   ? "bg-core-accent text-solid-white"
                   : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
@@ -172,7 +172,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="workspace"
-                  className="block text-body font-semibold text-content-standard-primary mb-spacing-300">
+                  className="mb-spacing-300 block font-semibold text-body text-content-standard-primary">
                   워크스페이스
                 </label>
                 <select
@@ -180,7 +180,7 @@ export default function LoginPage() {
                   value={workspaceId}
                   onChange={(e) => setWorkspaceId(e.target.value)}
                   required
-                  className="w-full px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary border border-line-outline rounded-radius-400 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={loading}>
                   <option value="">워크스페이스를 선택하세요</option>
                   {workspaces.map((workspace) => (
@@ -196,7 +196,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="phoneNumber"
-                className="block text-body font-semibold text-content-standard-primary mb-spacing-300">
+                className="mb-spacing-300 block font-semibold text-body text-content-standard-primary">
                 전화번호
               </label>
               <input
@@ -206,7 +206,7 @@ export default function LoginPage() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="01012345678"
                 required
-                className="w-full px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary border border-line-outline rounded-radius-400 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={loading}
               />
             </div>
@@ -215,7 +215,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-body font-semibold text-content-standard-primary mb-spacing-300">
+                className="mb-spacing-300 block font-semibold text-body text-content-standard-primary">
                 비밀번호
               </label>
               <input
@@ -225,14 +225,14 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비밀번호를 입력하세요"
                 required
-                className="w-full px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary border border-line-outline rounded-radius-400 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={loading}
               />
             </div>
 
             {/* 에러 메시지 */}
             {error && (
-              <div className="bg-solid-translucent-red text-core-status-negative px-spacing-500 py-spacing-400 rounded-radius-400 text-body font-medium border border-core-status-negative/20">
+              <div className="rounded-radius-400 border border-core-status-negative/20 bg-solid-translucent-red px-spacing-500 py-spacing-400 font-medium text-body text-core-status-negative">
                 {error}
               </div>
             )}
@@ -241,7 +241,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-core-accent text-solid-white py-spacing-500 rounded-radius-400 text-body font-bold hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              className="w-full rounded-radius-400 bg-core-accent py-spacing-500 font-bold text-body text-solid-white transition-all hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-50">
               {loading ? "로그인 중..." : "로그인"}
             </button>
 
@@ -250,7 +250,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowRegisterModal(true)}
-                className="w-full text-body text-core-accent hover:underline font-medium">
+                className="w-full font-medium text-body text-core-accent hover:underline">
                 계정이 없으신가요? 회원가입
               </button>
             )}
@@ -258,7 +258,7 @@ export default function LoginPage() {
         </div>
 
         {/* 푸터 */}
-        <p className="text-center text-label text-content-standard-tertiary mt-spacing-600">
+        <p className="mt-spacing-600 text-center text-content-standard-tertiary text-label">
           © 2026 Tnote. 교사를 위한 학생 관리 서비스.
         </p>
       </div>
@@ -266,15 +266,15 @@ export default function LoginPage() {
       {/* 회원가입 모달 */}
       {showRegisterModal && (
         <div
-          className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
           onClick={() => setShowRegisterModal(false)}>
           <div
-            className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full overflow-hidden flex flex-col"
+            className="flex w-full max-w-md flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
             onClick={(e) => e.stopPropagation()}>
             {/* 모달 헤더 */}
-            <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-              <h2 className="text-heading font-bold text-content-standard-primary">선생님 회원가입</h2>
-              <p className="text-label text-content-standard-secondary mt-spacing-100">
+            <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+              <h2 className="font-bold text-content-standard-primary text-heading">선생님 회원가입</h2>
+              <p className="mt-spacing-100 text-content-standard-secondary text-label">
                 계정과 함께 새로운 워크스페이스가 만들어집니다.
               </p>
             </div>
@@ -284,7 +284,7 @@ export default function LoginPage() {
               <div className="space-y-spacing-400">
                 {/* 이름 */}
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     이름 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -292,13 +292,13 @@ export default function LoginPage() {
                     value={registerForm.name}
                     onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
                     required
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 {/* 워크스페이스 이름 */}
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     워크스페이스 이름 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -307,13 +307,13 @@ export default function LoginPage() {
                     onChange={(e) => setRegisterForm({ ...registerForm, workspaceName: e.target.value })}
                     required
                     placeholder="예: 홍길동 학원"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 {/* 전화번호 */}
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     전화번호 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -322,13 +322,13 @@ export default function LoginPage() {
                     onChange={(e) => setRegisterForm({ ...registerForm, phoneNumber: e.target.value })}
                     required
                     placeholder="01012345678"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 {/* 비밀번호 */}
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     비밀번호 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -337,13 +337,13 @@ export default function LoginPage() {
                     onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
                     required
                     placeholder="최소 8자 이상"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 {/* 비밀번호 확인 */}
                 <div>
-                  <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     비밀번호 확인 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -352,33 +352,33 @@ export default function LoginPage() {
                     onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
                     required
                     placeholder="비밀번호를 다시 입력하세요"
-                    className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 {/* 에러 메시지 */}
                 {error && (
-                  <div className="bg-solid-translucent-red text-core-status-negative px-spacing-400 py-spacing-300 rounded-radius-300 text-label font-medium border border-core-status-negative/20">
+                  <div className="rounded-radius-300 border border-core-status-negative/20 bg-solid-translucent-red px-spacing-400 py-spacing-300 font-medium text-core-status-negative text-label">
                     {error}
                   </div>
                 )}
               </div>
 
               {/* 모달 푸터 */}
-              <div className="flex gap-spacing-300 mt-spacing-600">
+              <div className="mt-spacing-600 flex gap-spacing-300">
                 <button
                   type="button"
                   onClick={() => {
                     setShowRegisterModal(false);
                     setError("");
                   }}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={registering}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-core-accent text-solid-white rounded-radius-300 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {registering ? "가입 중..." : "회원가입"}
                 </button>
               </div>

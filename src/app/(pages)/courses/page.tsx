@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface Course {
   id: string;
@@ -212,41 +212,35 @@ export default function CoursesPage() {
   };
 
   const getUnenrolledStudents = () => {
-    return allStudents.filter(
-      (student) => !enrolledStudents.find((enrolled) => enrolled.id === student.id)
-    );
+    return allStudents.filter((student) => !enrolledStudents.find((enrolled) => enrolled.id === student.id));
   };
 
   const getFilteredEnrolledStudents = () => {
-    return enrolledStudents.filter((student) =>
-      student.name.toLowerCase().includes(enrolledSearchQuery.toLowerCase())
-    );
+    return enrolledStudents.filter((student) => student.name.toLowerCase().includes(enrolledSearchQuery.toLowerCase()));
   };
 
   const getFilteredUnenrolledStudents = () => {
     return getUnenrolledStudents().filter((student) =>
-      student.name.toLowerCase().includes(unenrolledSearchQuery.toLowerCase())
+      student.name.toLowerCase().includes(unenrolledSearchQuery.toLowerCase()),
     );
   };
 
   return (
     <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         {/* 헤더 */}
         <div className="mb-spacing-700">
-          <Link href="/" className="text-body text-core-accent hover:underline mb-spacing-400 inline-block">
+          <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 홈으로 돌아가기
           </Link>
-          <div className="flex justify-between items-end">
+          <div className="flex items-end justify-between">
             <div>
-              <h1 className="text-title font-bold text-content-standard-primary mb-spacing-200">수업 관리</h1>
-              <p className="text-body text-content-standard-secondary">
-                전체 {courses.length}개 수업
-              </p>
+              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">수업 관리</h1>
+              <p className="text-body text-content-standard-secondary">전체 {courses.length}개 수업</p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-opacity">
+              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
               + 수업 생성
             </button>
           </div>
@@ -254,83 +248,91 @@ export default function CoursesPage() {
 
         {/* 코스 목록 */}
         {loading ? (
-          <div className="text-center py-spacing-900 text-content-standard-tertiary">로딩중...</div>
+          <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
         ) : courses.length === 0 ? (
-          <div className="text-center py-spacing-900">
+          <div className="py-spacing-900 text-center">
             <p className="text-body text-content-standard-tertiary">수업이 없습니다.</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="mt-spacing-500 px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-opacity">
+              className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
               첫 수업 만들기
             </button>
           </div>
         ) : (
-          <div className="bg-components-fill-standard-primary rounded-radius-400 border border-line-outline">
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
             <table className="w-full rounded-radius-400">
               <thead className="bg-components-fill-standard-secondary">
                 <tr>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">수업명</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">학생 수</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">관리</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary w-24"></th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    수업명
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    학생 수
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    관리
+                  </th>
+                  <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
                 </tr>
               </thead>
               <tbody>
                 {courses.map((course) => (
-                  <tr key={course.id} className="border-t border-line-divider hover:bg-components-interactive-hover transition-colors">
+                  <tr
+                    key={course.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
                     <td className="px-spacing-500 py-spacing-400">
                       <Link href={`/courses/${course.id}`}>
-                        <div className="text-body font-medium text-content-standard-primary hover:text-core-accent transition-colors cursor-pointer">
+                        <div className="cursor-pointer font-medium text-body text-content-standard-primary transition-colors hover:text-core-accent">
                           {course.name}
                         </div>
                       </Link>
                     </td>
                     <td className="px-spacing-500 py-spacing-400">
-                      <span className="px-spacing-300 py-spacing-100 bg-solid-translucent-blue text-solid-blue rounded-radius-200 text-footnote font-semibold">
+                      <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                         {course.student_count || 0}명
                       </span>
                     </td>
                     <td className="px-spacing-500 py-spacing-400">
                       <div className="flex gap-spacing-200">
                         <Link href={`/courses/${course.id}`}>
-                          <button className="px-spacing-400 py-spacing-200 bg-core-accent text-solid-white rounded-radius-300 text-footnote font-medium hover:opacity-90 transition-opacity">
+                          <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
                             시험 관리
                           </button>
                         </Link>
                         <button
                           onClick={() => openEnrollModal(course)}
-                          className="px-spacing-400 py-spacing-200 bg-solid-translucent-blue text-solid-blue rounded-radius-300 text-footnote font-medium hover:bg-solid-translucent-indigo transition-colors">
+                          className="rounded-radius-300 bg-solid-translucent-blue px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-blue transition-colors hover:bg-solid-translucent-indigo">
                           학생 관리
                         </button>
                       </div>
                     </td>
-                    <td className="px-spacing-500 py-spacing-400 relative">
+                    <td className="relative px-spacing-500 py-spacing-400">
                       <button
                         onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)}
-                        className="px-spacing-300 py-spacing-200 hover:bg-components-fill-standard-secondary rounded-radius-200 transition-colors">
-                        <svg className="w-5 h-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
+                        className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
+                        <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                         </svg>
                       </button>
                       {openMenuId === course.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                          <div className="absolute right-0 top-full mt-spacing-100 bg-components-fill-standard-primary border border-line-outline rounded-radius-300 shadow-lg py-spacing-200 z-20 min-w-[120px]">
+                          <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
                             <button
                               onClick={() => {
                                 setOpenMenuId(null);
                                 openEditModal(course);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                               수정
                             </button>
-                            <div className="my-spacing-100 border-t border-line-divider" />
+                            <div className="my-spacing-100 border-line-divider border-t" />
                             <button
                               onClick={() => {
                                 setOpenMenuId(null);
                                 handleDelete(course);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative hover:bg-solid-translucent-red transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
                               삭제
                             </button>
                           </div>
@@ -346,14 +348,18 @@ export default function CoursesPage() {
 
         {/* 생성 모달 */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowCreateModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-heading font-bold text-content-standard-primary">수업 생성</h2>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowCreateModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">수업 생성</h2>
               </div>
 
               <div className="p-spacing-600">
-                <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                   수업 이름 <span className="text-core-status-negative">*</span>
                 </label>
                 <input
@@ -361,23 +367,23 @@ export default function CoursesPage() {
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
                   placeholder="예: 웹 프로그래밍 기초"
-                  className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                 />
               </div>
 
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
                     setCourseName("");
                   }}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleCreate}
                   disabled={saving || !courseName.trim()}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-core-accent text-solid-white rounded-radius-300 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "생성 중..." : "생성"}
                 </button>
               </div>
@@ -387,34 +393,38 @@ export default function CoursesPage() {
 
         {/* 수정 모달 */}
         {showEditModal && selectedCourse && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowEditModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-heading font-bold text-content-standard-primary">수업 수정</h2>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowEditModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">수업 수정</h2>
               </div>
 
               <div className="p-spacing-600">
-                <label className="block text-label font-semibold text-content-standard-primary mb-spacing-200">
+                <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                   수업 이름 <span className="text-core-status-negative">*</span>
                 </label>
                 <input
                   type="text"
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
-                  className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                 />
               </div>
 
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleEdit}
                   disabled={saving || !courseName.trim()}
-                  className="flex-1 px-spacing-500 py-spacing-300 bg-core-accent text-solid-white rounded-radius-300 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "저장 중..." : "저장"}
                 </button>
               </div>
@@ -424,21 +434,25 @@ export default function CoursesPage() {
 
         {/* 학생 관리 모달 */}
         {showEnrollModal && selectedCourse && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowEnrollModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-heading font-bold text-content-standard-primary mb-spacing-100">학생 관리</h2>
-                <p className="text-label text-content-standard-secondary">{selectedCourse.name}</p>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowEnrollModal(false)}>
+            <div
+              className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-100 font-bold text-content-standard-primary text-heading">학생 관리</h2>
+                <p className="text-content-standard-secondary text-label">{selectedCourse.name}</p>
               </div>
 
               <div className="flex-1 overflow-y-auto p-spacing-600">
                 {/* 등록된 학생 */}
                 <div className="mb-spacing-600">
-                  <h3 className="text-body font-bold text-content-standard-primary mb-spacing-300">
+                  <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
                     등록된 학생 ({enrolledStudents.length}명)
                   </h3>
                   {enrolledStudents.length === 0 ? (
-                    <p className="text-label text-content-standard-tertiary">등록된 학생이 없습니다.</p>
+                    <p className="text-content-standard-tertiary text-label">등록된 학생이 없습니다.</p>
                   ) : (
                     <>
                       <input
@@ -446,28 +460,32 @@ export default function CoursesPage() {
                         placeholder="이름 검색..."
                         value={enrolledSearchQuery}
                         onChange={(e) => setEnrolledSearchQuery(e.target.value)}
-                        className="w-full px-spacing-400 py-spacing-200 mb-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-label text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                        className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                       />
                       {getFilteredEnrolledStudents().length === 0 ? (
-                        <p className="text-label text-content-standard-tertiary">검색 결과가 없습니다.</p>
+                        <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
                       ) : (
                         <div className="grid grid-cols-2 gap-spacing-200">
                           {getFilteredEnrolledStudents().map((student) => (
-                        <div
-                          key={student.id}
-                          className="flex items-center justify-between px-spacing-300 py-spacing-200 bg-components-fill-standard-secondary rounded-radius-200 border border-line-outline">
-                          <div>
-                            <div className="text-body text-content-standard-primary font-medium">{student.name}</div>
-                            <div className="text-footnote text-content-standard-tertiary">{student.phone_number}</div>
-                          </div>
-                          <button
-                            onClick={() => handleUnenroll(student.id)}
-                            className="px-spacing-300 py-spacing-150 bg-solid-translucent-red text-solid-red rounded-radius-200 text-footnote font-medium hover:bg-solid-translucent-pink transition-colors">
-                            제거
-                          </button>
+                            <div
+                              key={student.id}
+                              className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
+                              <div>
+                                <div className="font-medium text-body text-content-standard-primary">
+                                  {student.name}
+                                </div>
+                                <div className="text-content-standard-tertiary text-footnote">
+                                  {student.phone_number}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleUnenroll(student.id)}
+                                className="rounded-radius-200 bg-solid-translucent-red px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-red transition-colors hover:bg-solid-translucent-pink">
+                                제거
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
                       )}
                     </>
                   )}
@@ -475,11 +493,11 @@ export default function CoursesPage() {
 
                 {/* 미등록 학생 */}
                 <div>
-                  <h3 className="text-body font-bold text-content-standard-primary mb-spacing-300">
+                  <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
                     학생 추가 ({getUnenrolledStudents().length}명)
                   </h3>
                   {getUnenrolledStudents().length === 0 ? (
-                    <p className="text-label text-content-standard-tertiary">모든 학생이 등록되었습니다.</p>
+                    <p className="text-content-standard-tertiary text-label">모든 학생이 등록되었습니다.</p>
                   ) : (
                     <>
                       <input
@@ -487,38 +505,42 @@ export default function CoursesPage() {
                         placeholder="이름 검색..."
                         value={unenrolledSearchQuery}
                         onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
-                        className="w-full px-spacing-400 py-spacing-200 mb-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-label text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                        className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                       />
                       {getFilteredUnenrolledStudents().length === 0 ? (
-                        <p className="text-label text-content-standard-tertiary">검색 결과가 없습니다.</p>
+                        <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
                       ) : (
                         <div className="grid grid-cols-2 gap-spacing-200">
                           {getFilteredUnenrolledStudents().map((student) => (
-                        <div
-                          key={student.id}
-                          className="flex items-center justify-between px-spacing-300 py-spacing-200 bg-components-fill-standard-secondary rounded-radius-200 border border-line-outline">
-                          <div>
-                            <div className="text-body text-content-standard-primary font-medium">{student.name}</div>
-                            <div className="text-footnote text-content-standard-tertiary">{student.phone_number}</div>
-                          </div>
-                          <button
-                            onClick={() => handleEnroll(student.id)}
-                            className="px-spacing-300 py-spacing-150 bg-solid-translucent-green text-solid-green rounded-radius-200 text-footnote font-medium hover:bg-solid-translucent-green transition-colors">
-                            추가
-                          </button>
+                            <div
+                              key={student.id}
+                              className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
+                              <div>
+                                <div className="font-medium text-body text-content-standard-primary">
+                                  {student.name}
+                                </div>
+                                <div className="text-content-standard-tertiary text-footnote">
+                                  {student.phone_number}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleEnroll(student.id)}
+                                className="rounded-radius-200 bg-solid-translucent-green px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-green transition-colors hover:bg-solid-translucent-green">
+                                추가
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
                       )}
                     </>
                   )}
                 </div>
               </div>
 
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider">
+              <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowEnrollModal(false)}
-                  className="w-full px-spacing-500 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="w-full rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   닫기
                 </button>
               </div>

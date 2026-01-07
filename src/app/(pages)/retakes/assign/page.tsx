@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Course {
   id: string;
@@ -92,9 +92,7 @@ export default function AssignRetakePage() {
     );
   };
 
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,31 +133,33 @@ export default function AssignRetakePage() {
 
   return (
     <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto max-w-4xl">
         {/* 헤더 */}
         <div className="mb-spacing-700">
-          <Link href="/retakes" className="text-body text-core-accent hover:underline mb-spacing-400 inline-block">
+          <Link href="/retakes" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 재시험 관리로 돌아가기
           </Link>
-          <div className="flex justify-between items-end">
+          <div className="flex items-end justify-between">
             <div>
-              <h1 className="text-title font-bold text-content-standard-primary mb-spacing-200">재시험 할당</h1>
+              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">재시험 할당</h1>
               <p className="text-body text-content-standard-secondary">학생들에게 재시험을 할당합니다</p>
             </div>
             <Link
               href="/exams/create"
-              className="px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-medium hover:bg-components-interactive-hover transition-colors border border-line-outline">
+              className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
               + 시험 생성
             </Link>
           </div>
         </div>
 
         {/* 폼 */}
-        <form onSubmit={handleSubmit} className="bg-components-fill-standard-primary rounded-radius-400 border border-line-outline p-spacing-600">
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
           <div className="space-y-spacing-400">
             {/* 코스 선택 */}
             <div>
-              <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                 코스 선택 <span className="text-core-status-negative">*</span>
               </label>
               <select
@@ -170,7 +170,7 @@ export default function AssignRetakePage() {
                   setSelectedStudents([]);
                 }}
                 required
-                className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all">
+                className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
                 <option value="">코스를 선택하세요</option>
                 {courses.map((course) => (
                   <option key={course.id} value={course.id}>
@@ -183,14 +183,14 @@ export default function AssignRetakePage() {
             {/* 시험 선택 */}
             {selectedCourse && (
               <div>
-                <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                   시험 선택 <span className="text-core-status-negative">*</span>
                 </label>
                 <select
                   value={selectedExam}
                   onChange={(e) => setSelectedExam(e.target.value)}
                   required
-                  className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all">
+                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
                   <option value="">시험을 선택하세요</option>
                   {exams.map((exam) => (
                     <option key={exam.id} value={exam.id}>
@@ -203,7 +203,7 @@ export default function AssignRetakePage() {
 
             {/* 예정일 */}
             <div>
-              <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                 재시험 예정일 <span className="text-core-status-negative">*</span>
               </label>
               <input
@@ -211,22 +211,22 @@ export default function AssignRetakePage() {
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
                 required
-                className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
               />
             </div>
 
             {/* 학생 선택 */}
             {selectedCourse && (
               <div>
-                <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                   학생 선택 <span className="text-core-status-negative">*</span>
-                  <span className="text-content-standard-tertiary font-normal ml-spacing-200">
+                  <span className="ml-spacing-200 font-normal text-content-standard-tertiary">
                     ({selectedStudents.length}명 선택됨)
                   </span>
                 </label>
                 {students.length === 0 ? (
-                  <div className="bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 p-spacing-300">
-                    <p className="text-body text-content-standard-tertiary text-center py-spacing-400">
+                  <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
+                    <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
                       이 코스에 등록된 학생이 없습니다.
                     </p>
                   </div>
@@ -237,32 +237,34 @@ export default function AssignRetakePage() {
                       placeholder="학생 이름 검색..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full px-spacing-400 py-spacing-300 mb-spacing-200 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                      className="mb-spacing-200 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
-                    <div className="bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 p-spacing-300 max-h-80 overflow-y-auto">
+                    <div className="max-h-80 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
                       {filteredStudents.length === 0 ? (
-                        <p className="text-body text-content-standard-tertiary text-center py-spacing-400">
+                        <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
                           검색 결과가 없습니다.
                         </p>
                       ) : (
                         <div className="grid grid-cols-2 gap-spacing-200">
                           {filteredStudents.map((student) => (
-                        <label
-                          key={student.id}
-                          className="flex items-center gap-spacing-200 px-spacing-300 py-spacing-200 hover:bg-components-interactive-hover rounded-radius-200 cursor-pointer transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={selectedStudents.includes(student.id)}
-                            onChange={() => toggleStudent(student.id)}
-                            className="w-4 h-4 accent-core-accent"
-                          />
-                          <div>
-                            <div className="text-body text-content-standard-primary">{student.name}</div>
-                            <div className="text-footnote text-content-standard-tertiary">{student.phone_number}</div>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
+                            <label
+                              key={student.id}
+                              className="flex cursor-pointer items-center gap-spacing-200 rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-interactive-hover">
+                              <input
+                                type="checkbox"
+                                checked={selectedStudents.includes(student.id)}
+                                onChange={() => toggleStudent(student.id)}
+                                className="h-4 w-4 accent-core-accent"
+                              />
+                              <div>
+                                <div className="text-body text-content-standard-primary">{student.name}</div>
+                                <div className="text-content-standard-tertiary text-footnote">
+                                  {student.phone_number}
+                                </div>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </>
@@ -272,13 +274,15 @@ export default function AssignRetakePage() {
 
             {/* 메모 */}
             <div>
-              <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">메모 (선택)</label>
+              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
+                메모 (선택)
+              </label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
                 placeholder="재시험 관련 메모를 입력하세요"
-                className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all resize-none"
+                className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
               />
             </div>
 
@@ -287,13 +291,13 @@ export default function AssignRetakePage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                 취소
               </button>
               <button
                 type="submit"
                 disabled={loading || !selectedExam || selectedStudents.length === 0 || !scheduledDate}
-                className="flex-1 px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                className="flex-1 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                 {loading ? "할당 중..." : "재시험 할당"}
               </button>
             </div>

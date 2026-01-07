@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner, getSession } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient, getSession, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
 
 // 재시험 할당 (관리자만)
 export async function POST(request: Request) {

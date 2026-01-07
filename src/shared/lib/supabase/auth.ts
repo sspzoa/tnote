@@ -41,9 +41,9 @@ export async function getAuthenticatedClient() {
 
   // Set current user ID and workspace for RLS policies
   // PostgreSQL 세션 변수를 설정하여 RLS 정책에서 사용
-  await supabase.rpc('set_current_user', {
+  await supabase.rpc("set_current_user", {
     user_id: session.userId,
-    user_workspace: session.workspace
+    user_workspace: session.workspace,
   });
 
   return { supabase, session };

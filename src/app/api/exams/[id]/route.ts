@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
 
 // 시험 정보 조회 (관리자만)
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdminOrOwner();
     const { id } = await params;
@@ -84,7 +84,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 // 시험 삭제 (관리자만)
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdminOrOwner();
     const { id } = await params;

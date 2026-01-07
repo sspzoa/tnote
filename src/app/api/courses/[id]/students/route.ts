@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
 
 // 코스에 등록된 학생 목록 조회 (관리자만)
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdminOrOwner();
     const { id } = await params;

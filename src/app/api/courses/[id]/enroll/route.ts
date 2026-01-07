@@ -53,11 +53,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
     const { supabase } = await getAuthenticatedClient();
 
-    const { error } = await supabase
-      .from("CourseEnrollments")
-      .delete()
-      .eq("course_id", id)
-      .eq("student_id", studentId);
+    const { error } = await supabase.from("CourseEnrollments").delete().eq("course_id", id).eq("student_id", studentId);
 
     if (error) throw error;
 

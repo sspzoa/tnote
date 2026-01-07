@@ -1,6 +1,6 @@
+import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
 import { createAdminClient } from "@/shared/lib/supabase/server";
 
 export async function POST(request: Request) {

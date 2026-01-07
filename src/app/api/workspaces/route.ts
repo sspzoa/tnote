@@ -6,10 +6,7 @@ export async function GET() {
   try {
     const supabase = await createAdminClient();
 
-    const { data, error } = await supabase
-      .from("Workspaces")
-      .select("id, name")
-      .order("name", { ascending: true });
+    const { data, error } = await supabase.from("Workspaces").select("id, name").order("name", { ascending: true });
 
     if (error) throw error;
 

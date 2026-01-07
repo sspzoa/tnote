@@ -1,6 +1,6 @@
+import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
-import bcrypt from "bcrypt";
 
 // 학생 목록 조회 (관리자만)
 export async function GET(request: Request) {
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         birth_year: birthYear ? Number.parseInt(birthYear) : null,
         password: hashedPassword,
         isAdmin: false,
-        role: 'student',
+        role: "student",
         workspace: session.workspace,
       })
       .select()

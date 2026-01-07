@@ -1,5 +1,5 @@
-import { getSession } from "@/shared/lib/supabase/auth";
 import { NextResponse } from "next/server";
+import { getSession } from "@/shared/lib/supabase/auth";
 
 export async function GET() {
   try {

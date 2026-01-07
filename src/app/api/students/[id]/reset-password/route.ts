@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
 import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
 
 // 비밀번호 재설정 (전화번호로 초기화) - 관리자만
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdminOrOwner();
     const { id } = await params; // student uuid
@@ -36,7 +36,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     return NextResponse.json({
       success: true,
-      message: "비밀번호가 전화번호로 초기화되었습니다."
+      message: "비밀번호가 전화번호로 초기화되었습니다.",
     });
   } catch (error: any) {
     console.error("Password reset error:", error);

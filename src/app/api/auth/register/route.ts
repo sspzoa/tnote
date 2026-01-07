@@ -1,6 +1,6 @@
+import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/shared/lib/supabase/server";
-import bcrypt from "bcrypt";
 
 export async function POST(request: Request) {
   try {
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         phone_number: phoneNumber,
         password: hashedPassword,
         isAdmin: true,
-        role: 'owner',
+        role: "owner",
         workspace: newWorkspace.id,
       })
       .select()
@@ -63,10 +63,7 @@ export async function POST(request: Request) {
     }
 
     // 워크스페이스 owner 업데이트
-    await supabase
-      .from("Workspaces")
-      .update({ owner: newUser.id })
-      .eq("id", newWorkspace.id);
+    await supabase.from("Workspaces").update({ owner: newUser.id }).eq("id", newWorkspace.id);
 
     return NextResponse.json({
       success: true,

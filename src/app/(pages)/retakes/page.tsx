@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Retake {
   id: string;
@@ -59,7 +59,7 @@ interface AssignStudent {
 }
 
 export default function RetakesPage() {
-  const router = useRouter();
+  const _router = useRouter();
   const [retakes, setRetakes] = useState<Retake[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "completed" | "absent">("all");
@@ -412,7 +412,7 @@ export default function RetakesPage() {
   };
 
   const filteredAssignStudents = assignStudents.filter((student) =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase())
+    student.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const getAge = (birthYear: number | null) => {
@@ -454,7 +454,8 @@ export default function RetakesPage() {
       absent: "결석",
     };
     return (
-      <span className={`px-spacing-300 py-spacing-100 rounded-radius-200 text-footnote font-semibold ${styles[status as keyof typeof styles]}`}>
+      <span
+        className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${styles[status as keyof typeof styles]}`}>
         {labels[status as keyof typeof labels]}
       </span>
     );
@@ -462,27 +463,27 @@ export default function RetakesPage() {
 
   return (
     <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         {/* 헤더 */}
         <div className="mb-spacing-700">
-          <Link href="/" className="text-body text-core-accent hover:underline mb-spacing-400 inline-block">
+          <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 홈으로 돌아가기
           </Link>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-title font-bold text-content-standard-primary mb-spacing-200">재시험 관리</h1>
+              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">재시험 관리</h1>
               <p className="text-body text-content-standard-secondary">학생들의 재시험을 관리합니다</p>
             </div>
             <button
               onClick={openAssignModal}
-              className="px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-opacity">
+              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
               + 재시험 할당
             </button>
           </div>
         </div>
 
         {/* 필터 */}
-        <div className="flex gap-spacing-300 mb-spacing-600 flex-wrap">
+        <div className="mb-spacing-600 flex flex-wrap gap-spacing-300">
           {[
             { value: "all", label: "전체" },
             { value: "pending", label: "대기중" },
@@ -492,7 +493,7 @@ export default function RetakesPage() {
             <button
               key={item.value}
               onClick={() => setFilter(item.value as typeof filter)}
-              className={`px-spacing-400 py-spacing-200 rounded-radius-300 text-label font-medium transition-colors ${
+              className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
                 filter === item.value
                   ? "bg-core-accent text-solid-white"
                   : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
@@ -504,64 +505,84 @@ export default function RetakesPage() {
 
         {/* 재시험 목록 */}
         {loading ? (
-          <div className="text-center py-spacing-900 text-content-standard-tertiary">로딩중...</div>
+          <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
         ) : retakes.length === 0 ? (
-          <div className="text-center py-spacing-900">
+          <div className="py-spacing-900 text-center">
             <p className="text-body text-content-standard-tertiary">재시험이 없습니다.</p>
           </div>
         ) : (
-          <div className="bg-components-fill-standard-primary rounded-radius-400 border border-line-outline">
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
             <table className="w-full rounded-radius-400">
               <thead className="bg-components-fill-standard-secondary">
                 <tr>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">학생</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">시험</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">예정일</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary">상태</th>
-                  <th className="px-spacing-500 py-spacing-400 text-left text-body font-semibold text-content-standard-primary w-24"></th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    학생
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    시험
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    예정일
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    상태
+                  </th>
+                  <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
                 </tr>
               </thead>
               <tbody>
                 {retakes.map((retake) => (
-                  <tr key={retake.id} className="border-t border-line-divider hover:bg-components-interactive-hover transition-colors">
+                  <tr
+                    key={retake.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
                     <td className="px-spacing-500 py-spacing-400">
                       <button
                         onClick={() => handleViewStudent(retake.student.id)}
-                        className="text-left hover:text-core-accent transition-colors">
-                        <div className="text-body font-medium text-content-standard-primary hover:text-core-accent">{retake.student.name}</div>
-                        <div className="text-footnote text-content-standard-tertiary">{retake.student.phone_number}</div>
+                        className="text-left transition-colors hover:text-core-accent">
+                        <div className="font-medium text-body text-content-standard-primary hover:text-core-accent">
+                          {retake.student.name}
+                        </div>
+                        <div className="text-content-standard-tertiary text-footnote">
+                          {retake.student.phone_number}
+                        </div>
                       </button>
                     </td>
                     <td className="px-spacing-500 py-spacing-400">
-                      <div className="text-body text-content-standard-primary">{retake.exam.course.name} - {retake.exam.name}</div>
-                      <div className="text-footnote text-content-standard-secondary">{retake.exam.exam_number}회차</div>
+                      <div className="text-body text-content-standard-primary">
+                        {retake.exam.course.name} - {retake.exam.name}
+                      </div>
+                      <div className="text-content-standard-secondary text-footnote">{retake.exam.exam_number}회차</div>
                     </td>
                     <td className="px-spacing-500 py-spacing-400">
                       <div className="text-body text-content-standard-primary">{retake.current_scheduled_date}</div>
                       {(retake.postpone_count > 0 || retake.absent_count > 0) && (
-                        <div className="flex gap-spacing-200 mt-spacing-100">
+                        <div className="mt-spacing-100 flex gap-spacing-200">
                           {retake.postpone_count > 0 && (
-                            <span className="text-footnote text-content-standard-tertiary">연기 {retake.postpone_count}회</span>
+                            <span className="text-content-standard-tertiary text-footnote">
+                              연기 {retake.postpone_count}회
+                            </span>
                           )}
                           {retake.absent_count > 0 && (
-                            <span className="text-footnote text-content-standard-tertiary">결석 {retake.absent_count}회</span>
+                            <span className="text-content-standard-tertiary text-footnote">
+                              결석 {retake.absent_count}회
+                            </span>
                           )}
                         </div>
                       )}
                     </td>
                     <td className="px-spacing-500 py-spacing-400">{getStatusBadge(retake.status)}</td>
-                    <td className="px-spacing-500 py-spacing-400 relative">
+                    <td className="relative px-spacing-500 py-spacing-400">
                       <button
                         onClick={() => setOpenMenuId(openMenuId === retake.id ? null : retake.id)}
-                        className="px-spacing-300 py-spacing-200 hover:bg-components-fill-standard-secondary rounded-radius-200 transition-colors">
-                        <svg className="w-5 h-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
+                        className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
+                        <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                         </svg>
                       </button>
                       {openMenuId === retake.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                          <div className="absolute right-0 top-full mt-spacing-100 bg-components-fill-standard-primary border border-line-outline rounded-radius-300 shadow-lg py-spacing-200 z-20 min-w-[140px]">
+                          <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[140px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
                             {retake.status !== "completed" && (
                               <>
                                 <button
@@ -569,7 +590,7 @@ export default function RetakesPage() {
                                     setOpenMenuId(null);
                                     openPostponeModal(retake);
                                   }}
-                                  className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                                  className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                                   연기
                                 </button>
                                 {retake.status === "pending" && (
@@ -578,7 +599,7 @@ export default function RetakesPage() {
                                       setOpenMenuId(null);
                                       openAbsentModal(retake);
                                     }}
-                                    className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                                    className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                                     결석
                                   </button>
                                 )}
@@ -587,10 +608,10 @@ export default function RetakesPage() {
                                     setOpenMenuId(null);
                                     openCompleteModal(retake);
                                   }}
-                                  className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                                  className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                                   완료
                                 </button>
-                                <div className="my-spacing-100 border-t border-line-divider" />
+                                <div className="my-spacing-100 border-line-divider border-t" />
                               </>
                             )}
                             <button
@@ -598,7 +619,7 @@ export default function RetakesPage() {
                                 setOpenMenuId(null);
                                 handleViewHistory(retake);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                               이력 보기
                             </button>
                             <button
@@ -606,16 +627,16 @@ export default function RetakesPage() {
                                 setOpenMenuId(null);
                                 openEditModal(retake);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary hover:bg-components-interactive-hover transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                               수정
                             </button>
-                            <div className="my-spacing-100 border-t border-line-divider" />
+                            <div className="my-spacing-100 border-line-divider border-t" />
                             <button
                               onClick={() => {
                                 setOpenMenuId(null);
                                 handleDelete(retake);
                               }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative hover:bg-solid-translucent-red transition-colors">
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
                               삭제
                             </button>
                           </div>
@@ -631,13 +652,18 @@ export default function RetakesPage() {
 
         {/* 연기 모달 */}
         {showPostponeModal && selectedRetake && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowPostponeModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowPostponeModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-title font-bold text-content-standard-primary mb-spacing-200">재시험 연기</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-200 font-bold text-content-standard-primary text-title">재시험 연기</h2>
                 <div className="text-body text-content-standard-secondary">
-                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name}{" "}
+                  {selectedRetake.exam.exam_number}회차
                 </div>
               </div>
 
@@ -646,30 +672,30 @@ export default function RetakesPage() {
                 <div className="space-y-spacing-400">
                   {/* 현재 예정일 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       현재 예정일
                     </label>
-                    <div className="px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-tertiary">
+                    <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
                       {selectedRetake.current_scheduled_date}
                     </div>
                   </div>
 
                   {/* 새로운 날짜 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       새로운 날짜 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
                       type="date"
                       value={postponeDate}
                       onChange={(e) => setPostponeDate(e.target.value)}
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
 
                   {/* 연기 사유 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       연기 사유 (선택사항)
                     </label>
                     <textarea
@@ -677,23 +703,23 @@ export default function RetakesPage() {
                       onChange={(e) => setPostponeNote(e.target.value)}
                       rows={3}
                       placeholder="연기 사유를 입력하세요"
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all resize-none"
+                      className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 모달 푸터 */}
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowPostponeModal(false)}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handlePostpone}
                   disabled={!postponeDate}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   연기
                 </button>
               </div>
@@ -703,13 +729,18 @@ export default function RetakesPage() {
 
         {/* 결석 모달 */}
         {showAbsentModal && selectedRetake && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowAbsentModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowAbsentModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-title font-bold text-content-standard-primary mb-spacing-200">결석 처리</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-200 font-bold text-content-standard-primary text-title">결석 처리</h2>
                 <div className="text-body text-content-standard-secondary">
-                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name}{" "}
+                  {selectedRetake.exam.exam_number}회차
                 </div>
               </div>
 
@@ -718,17 +749,17 @@ export default function RetakesPage() {
                 <div className="space-y-spacing-400">
                   {/* 예정일 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       예정일
                     </label>
-                    <div className="px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-tertiary">
+                    <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
                       {selectedRetake.current_scheduled_date}
                     </div>
                   </div>
 
                   {/* 결석 사유 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       결석 사유 (선택사항)
                     </label>
                     <textarea
@@ -736,22 +767,22 @@ export default function RetakesPage() {
                       onChange={(e) => setAbsentNote(e.target.value)}
                       rows={3}
                       placeholder="결석 사유를 입력하세요"
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all resize-none"
+                      className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 모달 푸터 */}
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowAbsentModal(false)}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleAbsent}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-core-status-negative text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-all">
+                  className="flex-1 rounded-radius-400 bg-core-status-negative px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90">
                   결석 처리
                 </button>
               </div>
@@ -761,13 +792,18 @@ export default function RetakesPage() {
 
         {/* 완료 모달 */}
         {showCompleteModal && selectedRetake && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowCompleteModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowCompleteModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-title font-bold text-content-standard-primary mb-spacing-200">완료 처리</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-200 font-bold text-content-standard-primary text-title">완료 처리</h2>
                 <div className="text-body text-content-standard-secondary">
-                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name}{" "}
+                  {selectedRetake.exam.exam_number}회차
                 </div>
               </div>
 
@@ -776,17 +812,17 @@ export default function RetakesPage() {
                 <div className="space-y-spacing-400">
                   {/* 예정일 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       예정일
                     </label>
-                    <div className="px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-tertiary">
+                    <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
                       {selectedRetake.current_scheduled_date}
                     </div>
                   </div>
 
                   {/* 메모 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       메모 (선택사항)
                     </label>
                     <textarea
@@ -794,22 +830,22 @@ export default function RetakesPage() {
                       onChange={(e) => setCompleteNote(e.target.value)}
                       rows={3}
                       placeholder="메모를 입력하세요"
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all resize-none"
+                      className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 모달 푸터 */}
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowCompleteModal(false)}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleComplete}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-core-status-positive text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 transition-all">
+                  className="flex-1 rounded-radius-400 bg-core-status-positive px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90">
                   완료 처리
                 </button>
               </div>
@@ -819,13 +855,18 @@ export default function RetakesPage() {
 
         {/* 수정 모달 */}
         {showEditModal && selectedRetake && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowEditModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowEditModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-title font-bold text-content-standard-primary mb-spacing-200">재시험 수정</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-200 font-bold text-content-standard-primary text-title">재시험 수정</h2>
                 <div className="text-body text-content-standard-secondary">
-                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name}{" "}
+                  {selectedRetake.exam.exam_number}회차
                 </div>
               </div>
 
@@ -834,20 +875,20 @@ export default function RetakesPage() {
                 <div className="space-y-spacing-400">
                   {/* 예정일 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       예정일 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
                       type="date"
                       value={editDate}
                       onChange={(e) => setEditDate(e.target.value)}
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
 
                   {/* 메모 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       메모 (선택사항)
                     </label>
                     <textarea
@@ -855,23 +896,23 @@ export default function RetakesPage() {
                       onChange={(e) => setEditNote(e.target.value)}
                       rows={3}
                       placeholder="메모를 입력하세요"
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all resize-none"
+                      className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 모달 푸터 */}
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider flex gap-spacing-300">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleEdit}
                   disabled={!editDate}
-                  className="flex-1 px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                  className="flex-1 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   저장
                 </button>
               </div>
@@ -881,25 +922,31 @@ export default function RetakesPage() {
 
         {/* 학생 정보 모달 */}
         {showStudentModal && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowStudentModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowStudentModal(false)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-title font-bold text-content-standard-primary">학생 정보</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-title">학생 정보</h2>
               </div>
 
               {/* 모달 내용 */}
               <div className="p-spacing-600">
                 {loadingStudentInfo ? (
-                  <div className="text-center py-spacing-900 text-content-standard-tertiary">로딩중...</div>
+                  <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
                 ) : selectedStudentInfo ? (
                   <div className="space-y-spacing-400">
                     {/* 이름 */}
                     <div>
-                      <div className="flex items-center gap-spacing-300 mb-spacing-200">
-                        <h3 className="text-heading font-bold text-content-standard-primary">{selectedStudentInfo.name}</h3>
+                      <div className="mb-spacing-200 flex items-center gap-spacing-300">
+                        <h3 className="font-bold text-content-standard-primary text-heading">
+                          {selectedStudentInfo.name}
+                        </h3>
                         {selectedStudentInfo.birth_year && getGrade(selectedStudentInfo.birth_year) && (
-                          <span className="px-spacing-300 py-spacing-100 bg-solid-translucent-blue text-solid-blue rounded-radius-200 text-footnote font-semibold">
+                          <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                             {getGrade(selectedStudentInfo.birth_year)}
                           </span>
                         )}
@@ -909,15 +956,15 @@ export default function RetakesPage() {
                     {/* 정보 목록 */}
                     <div className="space-y-spacing-300">
                       <div className="flex items-start gap-spacing-300">
-                        <span className="text-body text-content-standard-tertiary w-24 flex-shrink-0">전화번호</span>
-                        <span className="text-body text-content-standard-primary font-medium">
+                        <span className="w-24 flex-shrink-0 text-body text-content-standard-tertiary">전화번호</span>
+                        <span className="font-medium text-body text-content-standard-primary">
                           {selectedStudentInfo.phone_number}
                         </span>
                       </div>
 
                       {selectedStudentInfo.parent_phone_number && (
                         <div className="flex items-start gap-spacing-300">
-                          <span className="text-body text-content-standard-tertiary w-24 flex-shrink-0">부모님</span>
+                          <span className="w-24 flex-shrink-0 text-body text-content-standard-tertiary">부모님</span>
                           <span className="text-body text-content-standard-secondary">
                             {selectedStudentInfo.parent_phone_number}
                           </span>
@@ -926,7 +973,7 @@ export default function RetakesPage() {
 
                       {selectedStudentInfo.school && (
                         <div className="flex items-start gap-spacing-300">
-                          <span className="text-body text-content-standard-tertiary w-24 flex-shrink-0">학교</span>
+                          <span className="w-24 flex-shrink-0 text-body text-content-standard-tertiary">학교</span>
                           <span className="text-body text-content-standard-secondary">
                             {selectedStudentInfo.school}
                           </span>
@@ -935,7 +982,7 @@ export default function RetakesPage() {
 
                       {selectedStudentInfo.birth_year && (
                         <div className="flex items-start gap-spacing-300">
-                          <span className="text-body text-content-standard-tertiary w-24 flex-shrink-0">출생년도</span>
+                          <span className="w-24 flex-shrink-0 text-body text-content-standard-tertiary">출생년도</span>
                           <span className="text-body text-content-standard-secondary">
                             {selectedStudentInfo.birth_year}년
                           </span>
@@ -944,17 +991,17 @@ export default function RetakesPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-spacing-900 text-content-standard-tertiary">
+                  <div className="py-spacing-900 text-center text-content-standard-tertiary">
                     학생 정보를 불러올 수 없습니다.
                   </div>
                 )}
               </div>
 
               {/* 모달 푸터 */}
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider">
+              <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowStudentModal(false)}
-                  className="w-full px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="w-full rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   닫기
                 </button>
               </div>
@@ -964,20 +1011,24 @@ export default function RetakesPage() {
 
         {/* 할당 모달 */}
         {showAssignModal && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowAssignModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowAssignModal(false)}>
+            <div
+              className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <div className="flex justify-between items-center">
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-heading font-bold text-content-standard-primary">재시험 할당</h2>
-                    <p className="text-label text-content-standard-secondary mt-spacing-100">
+                    <h2 className="font-bold text-content-standard-primary text-heading">재시험 할당</h2>
+                    <p className="mt-spacing-100 text-content-standard-secondary text-label">
                       학생들에게 재시험을 할당합니다
                     </p>
                   </div>
                   <Link
                     href="/courses"
-                    className="px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-300 text-body font-medium hover:bg-components-interactive-hover transition-colors border border-line-outline">
+                    className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                     수업 관리
                   </Link>
                 </div>
@@ -988,14 +1039,14 @@ export default function RetakesPage() {
                 <div className="space-y-spacing-400">
                   {/* 코스 선택 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       코스 선택 <span className="text-core-status-negative">*</span>
                     </label>
                     <select
                       value={selectedCourse}
                       onChange={(e) => handleCourseChange(e.target.value)}
                       required
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all">
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
                       <option value="">코스를 선택하세요</option>
                       {courses.map((course) => (
                         <option key={course.id} value={course.id}>
@@ -1008,14 +1059,14 @@ export default function RetakesPage() {
                   {/* 시험 선택 */}
                   {selectedCourse && (
                     <div>
-                      <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                      <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                         시험 선택 <span className="text-core-status-negative">*</span>
                       </label>
                       <select
                         value={selectedExam}
                         onChange={(e) => setSelectedExam(e.target.value)}
                         required
-                        className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all">
+                        className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
                         <option value="">시험을 선택하세요</option>
                         {exams.map((exam) => (
                           <option key={exam.id} value={exam.id}>
@@ -1028,7 +1079,7 @@ export default function RetakesPage() {
 
                   {/* 예정일 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                       재시험 예정일 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
@@ -1036,22 +1087,22 @@ export default function RetakesPage() {
                       value={scheduledDate}
                       onChange={(e) => setScheduledDate(e.target.value)}
                       required
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
 
                   {/* 학생 선택 */}
                   {selectedCourse && (
                     <div>
-                      <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">
+                      <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
                         학생 선택 <span className="text-core-status-negative">*</span>
-                        <span className="text-content-standard-tertiary font-normal ml-spacing-200">
+                        <span className="ml-spacing-200 font-normal text-content-standard-tertiary">
                           ({selectedStudents.length}명 선택됨)
                         </span>
                       </label>
                       {assignStudents.length === 0 ? (
-                        <div className="bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 p-spacing-300">
-                          <p className="text-body text-content-standard-tertiary text-center py-spacing-400">
+                        <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
+                          <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
                             이 코스에 등록된 학생이 없습니다.
                           </p>
                         </div>
@@ -1062,11 +1113,11 @@ export default function RetakesPage() {
                             placeholder="학생 이름 검색..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-spacing-400 py-spacing-300 mb-spacing-200 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all"
+                            className="mb-spacing-200 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                           />
-                          <div className="bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 p-spacing-300 max-h-60 overflow-y-auto">
+                          <div className="max-h-60 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
                             {filteredAssignStudents.length === 0 ? (
-                              <p className="text-body text-content-standard-tertiary text-center py-spacing-400">
+                              <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
                                 검색 결과가 없습니다.
                               </p>
                             ) : (
@@ -1074,16 +1125,18 @@ export default function RetakesPage() {
                                 {filteredAssignStudents.map((student) => (
                                   <label
                                     key={student.id}
-                                    className="flex items-center gap-spacing-200 px-spacing-300 py-spacing-200 hover:bg-components-interactive-hover rounded-radius-200 cursor-pointer transition-colors">
+                                    className="flex cursor-pointer items-center gap-spacing-200 rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-interactive-hover">
                                     <input
                                       type="checkbox"
                                       checked={selectedStudents.includes(student.id)}
                                       onChange={() => toggleStudent(student.id)}
-                                      className="w-4 h-4 accent-core-accent"
+                                      className="h-4 w-4 accent-core-accent"
                                     />
                                     <div>
                                       <div className="text-body text-content-standard-primary">{student.name}</div>
-                                      <div className="text-footnote text-content-standard-tertiary">{student.phone_number}</div>
+                                      <div className="text-content-standard-tertiary text-footnote">
+                                        {student.phone_number}
+                                      </div>
                                     </div>
                                   </label>
                                 ))}
@@ -1097,29 +1150,31 @@ export default function RetakesPage() {
 
                   {/* 메모 */}
                   <div>
-                    <label className="block text-body font-semibold text-content-standard-primary mb-spacing-200">메모 (선택)</label>
+                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
+                      메모 (선택)
+                    </label>
                     <textarea
                       value={assignNote}
                       onChange={(e) => setAssignNote(e.target.value)}
                       rows={3}
                       placeholder="재시험 관련 메모를 입력하세요"
-                      className="w-full px-spacing-400 py-spacing-300 bg-components-fill-standard-secondary border border-line-outline rounded-radius-300 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:outline-none focus:border-core-accent focus:ring-2 focus:ring-core-accent-translucent transition-all resize-none"
+                      className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
 
                 {/* 모달 푸터 */}
-                <div className="flex gap-spacing-300 pt-spacing-500 border-t border-line-divider mt-spacing-500">
+                <div className="mt-spacing-500 flex gap-spacing-300 border-line-divider border-t pt-spacing-500">
                   <button
                     type="button"
                     onClick={() => setShowAssignModal(false)}
-                    className="flex-1 px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                    className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                     취소
                   </button>
                   <button
                     type="submit"
                     disabled={assigning || !selectedExam || selectedStudents.length === 0 || !scheduledDate}
-                    className="flex-1 px-spacing-500 py-spacing-400 bg-core-accent text-solid-white rounded-radius-400 text-body font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    className="flex-1 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                     {assigning ? "할당 중..." : "재시험 할당"}
                   </button>
                 </div>
@@ -1130,35 +1185,45 @@ export default function RetakesPage() {
 
         {/* 이력 모달 */}
         {showHistoryModal && selectedRetake && (
-          <div className="fixed inset-0 bg-solid-black/50 flex items-center justify-center p-spacing-400 z-50" onClick={() => setShowHistoryModal(false)}>
-            <div className="bg-components-fill-standard-primary rounded-radius-600 border border-line-outline max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowHistoryModal(false)}>
+            <div
+              className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
               {/* 모달 헤더 */}
-              <div className="px-spacing-600 py-spacing-500 border-b border-line-divider">
-                <h2 className="text-title font-bold text-content-standard-primary mb-spacing-200">재시험 이력</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-200 font-bold text-content-standard-primary text-title">재시험 이력</h2>
                 <div className="text-body text-content-standard-secondary">
-                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+                  {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name}{" "}
+                  {selectedRetake.exam.exam_number}회차
                 </div>
               </div>
 
               {/* 모달 내용 */}
               <div className="flex-1 overflow-y-auto p-spacing-600">
                 {loadingHistory ? (
-                  <div className="text-center py-spacing-900 text-content-standard-tertiary">로딩중...</div>
+                  <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
                 ) : history.length === 0 ? (
-                  <div className="text-center py-spacing-900">
+                  <div className="py-spacing-900 text-center">
                     <p className="text-body text-content-standard-tertiary">이력이 없습니다.</p>
                   </div>
                 ) : (
                   <div className="space-y-spacing-400">
                     {history.map((item) => (
-                      <div key={item.id} className="bg-components-fill-standard-secondary rounded-radius-400 p-spacing-500 border border-line-outline">
-                        <div className="flex items-start justify-between mb-spacing-300">
+                      <div
+                        key={item.id}
+                        className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
+                        <div className="mb-spacing-300 flex items-start justify-between">
                           <div className="flex items-center gap-spacing-300">
-                            <span className={`px-spacing-300 py-spacing-100 rounded-radius-200 text-footnote font-semibold ${
-                              item.action_type === "postpone" ? "bg-solid-translucent-blue text-solid-blue" :
-                              item.action_type === "absent" ? "bg-solid-translucent-red text-solid-red" :
-                              "bg-solid-translucent-green text-solid-green"
-                            }`}>
+                            <span
+                              className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${
+                                item.action_type === "postpone"
+                                  ? "bg-solid-translucent-blue text-solid-blue"
+                                  : item.action_type === "absent"
+                                    ? "bg-solid-translucent-red text-solid-red"
+                                    : "bg-solid-translucent-green text-solid-green"
+                              }`}>
                               {getActionLabel(item.action_type)}
                             </span>
                             {item.action_type === "postpone" && item.previous_date && item.new_date && (
@@ -1167,15 +1232,11 @@ export default function RetakesPage() {
                               </span>
                             )}
                           </div>
-                          <span className="text-footnote text-content-standard-tertiary">
+                          <span className="text-content-standard-tertiary text-footnote">
                             {new Date(item.created_at).toLocaleString("ko-KR")}
                           </span>
                         </div>
-                        {item.note && (
-                          <p className="text-body text-content-standard-secondary">
-                            {item.note}
-                          </p>
-                        )}
+                        {item.note && <p className="text-body text-content-standard-secondary">{item.note}</p>}
                       </div>
                     ))}
                   </div>
@@ -1183,10 +1244,10 @@ export default function RetakesPage() {
               </div>
 
               {/* 모달 푸터 */}
-              <div className="px-spacing-600 py-spacing-500 border-t border-line-divider">
+              <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowHistoryModal(false)}
-                  className="w-full px-spacing-500 py-spacing-400 bg-components-fill-standard-secondary text-content-standard-primary rounded-radius-400 text-body font-semibold hover:bg-components-interactive-hover transition-colors">
+                  className="w-full rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   닫기
                 </button>
               </div>
