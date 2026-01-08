@@ -67,15 +67,14 @@ export async function GET(request: Request) {
 
     const { supabase } = await getAuthenticatedClient();
 
+    // RLS가 workspace 필터링을 자동으로 처리
     let query = supabase
       .from("RetakeAssignments")
       .select(`
         *,
-        exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(id, phone_number, name, school, workspace)
+        exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name)),
+        student:Users!inner!RetakeAssignments_student_id_fkey(id, phone_number, name, school)
       `)
-      .eq("exam.course.workspace", session.workspace)
-      .eq("student.workspace", session.workspace)
       .order("current_scheduled_date", { ascending: true });
 
     // 필터 적용

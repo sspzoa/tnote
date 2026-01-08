@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
 
-    const { supabase, session } = await getAuthenticatedClient();
+    const { supabase } = await getAuthenticatedClient();
 
     if (courseId) {
       // 특정 코스의 학생만 조회
@@ -40,12 +40,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: students });
     }
 
-    // 전체 학생 조회 (role = student, 현재 사용자의 workspace)
+    // 전체 학생 조회 (role = student, RLS가 workspace 필터링 처리)
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
       .eq("role", "student")
-      .eq("workspace", session.workspace)
       .order("name", { ascending: true });
 
     if (error) throw error;

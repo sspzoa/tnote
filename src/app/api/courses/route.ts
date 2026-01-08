@@ -5,15 +5,15 @@ import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supaba
 export async function GET() {
   try {
     await requireAdminOrOwner();
-    const { supabase, session } = await getAuthenticatedClient();
+    const { supabase } = await getAuthenticatedClient();
 
+    // RLS가 workspace 필터링을 자동으로 처리
     const { data, error } = await supabase
       .from("Courses")
       .select(`
         *,
         enrollments:CourseEnrollments(count)
       `)
-      .eq("workspace", session.workspace)
       .order("created_at", { ascending: false });
 
     if (error) throw error;

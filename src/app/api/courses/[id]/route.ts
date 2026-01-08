@@ -7,8 +7,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase, session } = await getAuthenticatedClient();
+    const { supabase } = await getAuthenticatedClient();
 
+    // RLS가 workspace 필터링을 자동으로 처리
     const { data, error } = await supabase
       .from("Courses")
       .select(`
@@ -16,7 +17,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         student_count:CourseEnrollments(count)
       `)
       .eq("id", id)
-      .eq("workspace", session.workspace)
       .single();
 
     if (error) throw error;
@@ -48,15 +48,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "수업 이름을 입력해주세요." }, { status: 400 });
     }
 
-    const { supabase, session } = await getAuthenticatedClient();
+    const { supabase } = await getAuthenticatedClient();
 
-    const { data, error } = await supabase
-      .from("Courses")
-      .update({ name })
-      .eq("id", id)
-      .eq("workspace", session.workspace)
-      .select()
-      .single();
+    // RLS가 workspace 필터링을 자동으로 처리
+    const { data, error } = await supabase.from("Courses").update({ name }).eq("id", id).select().single();
 
     if (error) throw error;
 
@@ -73,9 +68,11 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase, session } = await getAuthenticatedClient();
+    const { supabase } = await getAuthenticatedClient();
 
-    const { error } = await supabase.from("Courses").delete().eq("id", id).eq("workspace", session.workspace);
+    // RLS가 workspace 필터링을 자동으로 처리
+    // CASCADE 외래 키로 관련 데이터 자동 삭제 (Enrollments, Exams, RetakeAssignments 등)
+    const { error } = await supabase.from("Courses").delete().eq("id", id);
 
     if (error) throw error;
 

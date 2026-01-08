@@ -1,19 +1,18 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { requireOwner } from "@/shared/lib/supabase/auth";
-import { createAdminClient } from "@/shared/lib/supabase/server";
+import { getAuthenticatedClient, requireOwner } from "@/shared/lib/supabase/auth";
 
 // 관리자 목록 조회 (Owner만 가능)
 export async function GET() {
   try {
-    const session = await requireOwner();
+    await requireOwner();
 
-    const supabase = await createAdminClient();
+    const { supabase } = await getAuthenticatedClient();
 
+    // RLS가 workspace 필터링을 자동으로 처리
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, role, created_at")
-      .eq("workspace", session.workspace)
       .in("role", ["owner", "admin"])
       .order("created_at", { ascending: true });
 
@@ -32,7 +31,7 @@ export async function GET() {
 // 관리자 초대 (Owner만 가능)
 export async function POST(request: Request) {
   try {
-    const session = await requireOwner();
+    await requireOwner();
 
     const { name, phoneNumber, password } = await request.json();
 
@@ -44,9 +43,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "비밀번호는 최소 8자 이상이어야 합니다." }, { status: 400 });
     }
 
-    const supabase = await createAdminClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // 전화번호 중복 체크
+    // 전화번호 중복 체크 (RLS가 workspace 필터링 처리)
     const { data: existingUser } = await supabase
       .from("Users")
       .select("phone_number")
@@ -73,7 +72,12 @@ export async function POST(request: Request) {
       .select("id, phone_number, name, role, created_at")
       .single();
 
-    if (adminError) throw adminError;
+    if (adminError) {
+      if (adminError.code === "23505") {
+        return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
+      }
+      throw adminError;
+    }
 
     return NextResponse.json({ success: true, data: newAdmin });
   } catch (error: any) {
