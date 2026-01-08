@@ -19,38 +19,71 @@ export function proxy(request: NextRequest) {
 
   // API 경로 처리
   if (pathname.startsWith("/api/")) {
-    // 인증 불필요 API 경로 (로그인, 회원가입, 워크스페이스 목록 조회)
-    const publicApiPaths = ["/api/auth/login", "/api/auth/register", "/api/workspaces"];
-    if (publicApiPaths.some((path) => pathname.startsWith(path))) {
-      return NextResponse.next();
+    const method = request.method;
+
+    // 인증 불필요 API (public)
+    const publicApis = [
+      { path: "/api/auth/login", methods: ["POST"] },
+      { path: "/api/auth/register", methods: ["POST"] },
+      { path: "/api/workspaces", methods: ["GET"] },
+    ];
+
+    for (const api of publicApis) {
+      if (pathname.startsWith(api.path) && api.methods.includes(method)) {
+        return NextResponse.next();
+      }
     }
 
-    // 세션 필수
+    // 세션 필수 - 인증 체크
     if (!sessionCookie) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     try {
       const sessionData = JSON.parse(sessionCookie.value);
+      const role = sessionData.role as "owner" | "admin" | "student";
+
+      // 모든 인증된 사용자 접근 가능 API
+      const authenticatedApis = ["/api/auth/me", "/api/auth/logout", "/api/auth/change-password"];
+
+      if (authenticatedApis.some((path) => pathname.startsWith(path))) {
+        return NextResponse.next();
+      }
 
       // Owner 전용 API
       if (pathname.startsWith("/api/admins")) {
-        if (sessionData.role !== "owner") {
+        if (role !== "owner") {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
+        return NextResponse.next();
       }
 
-      // Admin 또는 Owner 전용 API
-      const adminOnlyApis = ["/api/students", "/api/courses"];
+      // Admin/Owner 전용 API (모든 메서드)
+      const adminOnlyApis = ["/api/students", "/api/courses", "/api/exams"];
       if (adminOnlyApis.some((path) => pathname.startsWith(path))) {
-        if (sessionData.role === "student") {
+        if (role === "student") {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.next();
+      }
+
+      // Retakes API - 메서드별 권한
+      if (pathname.startsWith("/api/retakes")) {
+        // GET: 모든 인증된 사용자 (학생은 본인 것만, API에서 처리)
+        if (method === "GET") {
+          return NextResponse.next();
+        }
+        // POST, PATCH, DELETE: Admin/Owner만
+        if (["POST", "PATCH", "DELETE"].includes(method)) {
+          if (role === "student") {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+          }
+          return NextResponse.next();
         }
       }
 
-      // retakes는 모든 인증된 사용자 접근 가능 (student도 자신의 데이터 조회)
-
-      return NextResponse.next();
+      // 알 수 없는 API 경로
+      return NextResponse.json({ error: "Not Found" }, { status: 404 });
     } catch {
       return NextResponse.json({ error: "Invalid session" }, { status: 401 });
     }
