@@ -47,7 +47,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     // 먼저 시험이 현재 workspace에 속하는지 확인
     const { data: exam } = await supabase
       .from("Exams")
-      .select("id, course:Courses!inner(workspace)")
+      .select("id, course_id, course:Courses!inner(workspace)")
       .eq("id", id)
       .eq("course.workspace", session.workspace)
       .single();
@@ -56,10 +56,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
     }
 
+    // course_id 조건을 추가하여 workspace 안전성 확보
     const { data, error } = await supabase
       .from("Exams")
       .update(updateData)
       .eq("id", id)
+      .eq("course_id", exam.course_id)
       .select(`
         *,
         course:Courses(id, name)
@@ -94,7 +96,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     // 먼저 시험이 현재 workspace에 속하는지 확인
     const { data: exam } = await supabase
       .from("Exams")
-      .select("id, course:Courses!inner(workspace)")
+      .select("id, course_id, course:Courses!inner(workspace)")
       .eq("id", id)
       .eq("course.workspace", session.workspace)
       .single();
@@ -103,7 +105,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const { error } = await supabase.from("Exams").delete().eq("id", id);
+    // course_id 조건을 추가하여 workspace 안전성 확보
+    const { error } = await supabase.from("Exams").delete().eq("id", id).eq("course_id", exam.course_id);
 
     if (error) throw error;
 

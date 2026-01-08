@@ -31,8 +31,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "워크스페이스 소유자는 삭제할 수 없습니다." }, { status: 400 });
     }
 
-    // 관리자 삭제
-    const { error: deleteError } = await supabase.from("Users").delete().eq("id", id);
+    // 관리자 삭제 (workspace 조건 추가로 안전성 확보)
+    const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
     if (deleteError) throw deleteError;
 
