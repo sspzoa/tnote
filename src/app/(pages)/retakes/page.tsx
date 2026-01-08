@@ -91,7 +91,6 @@ export default function RetakesPage() {
   const [selectedExam, setSelectedExam] = useState("");
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [scheduledDate, setScheduledDate] = useState("");
-  const [assignNote, setAssignNote] = useState("");
   const [assigning, setAssigning] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -385,7 +384,6 @@ export default function RetakesPage() {
           examId: selectedExam,
           studentIds: selectedStudents,
           scheduledDate,
-          note: assignNote,
         }),
       });
 
@@ -396,7 +394,6 @@ export default function RetakesPage() {
         setSelectedExam("");
         setSelectedStudents([]);
         setScheduledDate("");
-        setAssignNote("");
         setSearchQuery("");
         fetchRetakes();
       } else {
@@ -1040,14 +1037,14 @@ export default function RetakesPage() {
                   {/* 코스 선택 */}
                   <div>
                     <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                      코스 선택 <span className="text-core-status-negative">*</span>
+                      수업 선택 <span className="text-core-status-negative">*</span>
                     </label>
                     <select
                       value={selectedCourse}
                       onChange={(e) => handleCourseChange(e.target.value)}
                       required
                       className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
-                      <option value="">코스를 선택하세요</option>
+                      <option value="">수업을 선택하세요</option>
                       {courses.map((course) => (
                         <option key={course.id} value={course.id}>
                           {course.name}
@@ -1103,7 +1100,7 @@ export default function RetakesPage() {
                       {assignStudents.length === 0 ? (
                         <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
                           <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
-                            이 코스에 등록된 학생이 없습니다.
+                            이 수업에 등록된 학생이 없습니다.
                           </p>
                         </div>
                       ) : (
@@ -1147,20 +1144,6 @@ export default function RetakesPage() {
                       )}
                     </div>
                   )}
-
-                  {/* 메모 */}
-                  <div>
-                    <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                      메모 (선택)
-                    </label>
-                    <textarea
-                      value={assignNote}
-                      onChange={(e) => setAssignNote(e.target.value)}
-                      rows={3}
-                      placeholder="재시험 관련 메모를 입력하세요"
-                      className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                    />
-                  </div>
                 </div>
 
                 {/* 모달 푸터 */}

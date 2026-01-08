@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       .single();
 
     if (!course) {
-      return NextResponse.json({ error: "코스를 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json({ error: "수업을 찾을 수 없습니다." }, { status: 404 });
     }
 
     const { data, error } = await supabase

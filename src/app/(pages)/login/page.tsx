@@ -131,12 +131,6 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-spacing-600">
       <div className="w-full max-w-md">
         <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-800">
-          {/* 헤더 */}
-          <div className="mb-spacing-800 text-center">
-            <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">티노트</h1>
-            <p className="text-body text-content-standard-secondary">학생 관리 서비스</p>
-          </div>
-
           {/* 탭 */}
           <div className="mb-spacing-600 flex gap-spacing-300">
             <button
@@ -251,7 +245,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowRegisterModal(true)}
                 className="w-full font-medium text-body text-core-accent hover:underline">
-                계정이 없으신가요? 회원가입
+                회원가입
               </button>
             )}
           </form>
@@ -259,7 +253,7 @@ export default function LoginPage() {
 
         {/* 푸터 */}
         <p className="mt-spacing-600 text-center text-content-standard-tertiary text-label">
-          © 2026 Tnote. 교사를 위한 학생 관리 서비스.
+          &copy; {new Date().getFullYear()} Seungpyo Suh. All rights reserved.
         </p>
       </div>
 
@@ -306,7 +300,7 @@ export default function LoginPage() {
                     value={registerForm.workspaceName}
                     onChange={(e) => setRegisterForm({ ...registerForm, workspaceName: e.target.value })}
                     required
-                    placeholder="예: 홍길동 학원"
+                    placeholder="ex. 러셀부천 김희창T"
                     className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>

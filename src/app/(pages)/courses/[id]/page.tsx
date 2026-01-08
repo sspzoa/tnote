@@ -300,7 +300,7 @@ export default function CourseDetailPage() {
                     type="number"
                     value={examNumber}
                     onChange={(e) => setExamNumber(e.target.value)}
-                    placeholder="예: 1"
+                    placeholder="ex. 1"
                     min="1"
                     className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
@@ -314,7 +314,7 @@ export default function CourseDetailPage() {
                     type="text"
                     value={examName}
                     onChange={(e) => setExamName(e.target.value)}
-                    placeholder="예: 중간고사"
+                    placeholder="예: 복습테스트"
                     className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>

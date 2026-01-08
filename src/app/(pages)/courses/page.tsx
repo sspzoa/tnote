@@ -71,7 +71,7 @@ export default function CoursesPage() {
 
   const handleCreate = async () => {
     if (!courseName.trim()) {
-      alert("코스 이름을 입력해주세요.");
+      alert("수업 이름을 입력해주세요.");
       return;
     }
 
@@ -84,12 +84,12 @@ export default function CoursesPage() {
       });
 
       if (response.ok) {
-        alert("코스가 생성되었습니다.");
+        alert("수업이 생성되었습니다.");
         setShowCreateModal(false);
         setCourseName("");
         fetchCourses();
       } else {
-        alert("코스 생성에 실패했습니다.");
+        alert("수업 생성에 실패했습니다.");
       }
     } catch (error) {
       console.error("Create error:", error);
@@ -101,7 +101,7 @@ export default function CoursesPage() {
 
   const handleEdit = async () => {
     if (!selectedCourse || !courseName.trim()) {
-      alert("코스 이름을 입력해주세요.");
+      alert("수업 이름을 입력해주세요.");
       return;
     }
 
@@ -114,11 +114,11 @@ export default function CoursesPage() {
       });
 
       if (response.ok) {
-        alert("코스가 수정되었습니다.");
+        alert("수업이 수정되었습니다.");
         setShowEditModal(false);
         fetchCourses();
       } else {
-        alert("코스 수정에 실패했습니다.");
+        alert("수업 수정에 실패했습니다.");
       }
     } catch (error) {
       console.error("Edit error:", error);
@@ -129,7 +129,7 @@ export default function CoursesPage() {
   };
 
   const handleDelete = async (course: Course) => {
-    if (!confirm(`"${course.name}" 코스를 삭제하시겠습니까?\n등록된 학생 정보는 유지되지만 수강 기록이 삭제됩니다.`)) {
+    if (!confirm(`"${course.name}" 수업을 삭제하시겠습니까?\n등록된 학생 정보는 유지되지만 수강 기록이 삭제됩니다.`)) {
       return;
     }
 
@@ -139,10 +139,10 @@ export default function CoursesPage() {
       });
 
       if (response.ok) {
-        alert("코스가 삭제되었습니다.");
+        alert("수업이 삭제되었습니다.");
         fetchCourses();
       } else {
-        alert("코스 삭제에 실패했습니다.");
+        alert("수업 삭제에 실패했습니다.");
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -177,7 +177,7 @@ export default function CoursesPage() {
   const handleUnenroll = async (studentId: string) => {
     if (!selectedCourse) return;
 
-    if (!confirm("이 학생을 코스에서 제거하시겠습니까?")) return;
+    if (!confirm("이 학생을 수업에서 제거하시겠습니까?")) return;
 
     try {
       const response = await fetch(`/api/courses/${selectedCourse.id}/enroll`, {
@@ -366,7 +366,7 @@ export default function CoursesPage() {
                   type="text"
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
-                  placeholder="예: 웹 프로그래밍 기초"
+                  placeholder="ex. [고2] 대수 심화반 화토"
                   className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                 />
               </div>

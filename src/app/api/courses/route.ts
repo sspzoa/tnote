@@ -31,7 +31,7 @@ export async function GET() {
     if (error.message === "Unauthorized") {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
-    return NextResponse.json({ error: "코스 목록 조회 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "수업 목록 조회 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
 
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const { name } = await request.json();
 
     if (!name) {
-      return NextResponse.json({ error: "코스 이름을 입력해주세요." }, { status: 400 });
+      return NextResponse.json({ error: "수업 이름을 입력해주세요." }, { status: 400 });
     }
 
     const { supabase, session } = await getAuthenticatedClient();
@@ -61,6 +61,6 @@ export async function POST(request: Request) {
     if (error.message === "Unauthorized") {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
-    return NextResponse.json({ error: "코스 생성 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "수업 생성 중 오류가 발생했습니다." }, { status: 500 });
   }
 }

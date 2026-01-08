@@ -33,7 +33,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     if (error.message === "Unauthorized" || error.message === "Forbidden") {
       return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
     }
-    return NextResponse.json({ error: "코스 조회 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "수업 조회 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
 
@@ -45,7 +45,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const { name } = await request.json();
 
     if (!name) {
-      return NextResponse.json({ error: "코스 이름을 입력해주세요." }, { status: 400 });
+      return NextResponse.json({ error: "수업 이름을 입력해주세요." }, { status: 400 });
     }
 
     const { supabase, session } = await getAuthenticatedClient();
@@ -63,7 +63,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error("Course update error:", error);
-    return NextResponse.json({ error: "코스 수정 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "수업 수정 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
 
@@ -82,6 +82,6 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Course delete error:", error);
-    return NextResponse.json({ error: "코스 삭제 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "수업 삭제 중 오류가 발생했습니다." }, { status: 500 });
   }
 }

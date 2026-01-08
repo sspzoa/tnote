@@ -31,8 +31,10 @@ export default function Home() {
   const [userName, setUserName] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [userRole, setUserRole] = useState<string>("");
+  const [workspaceName, setWorkspaceName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [retakes, setRetakes] = useState<Retake[]>([]);
+  const [retakesLoading, setRetakesLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordForm, setPasswordForm] = useState<PasswordChangeForm>({
     currentPassword: "",
@@ -59,6 +61,7 @@ export default function Home() {
         setUserName(result.user.name);
         setUserId(result.user.id);
         setUserRole(result.user.role);
+        setWorkspaceName(result.user.workspaceName || "");
       }
     } catch (error) {
       console.error("Failed to fetch user info:", error);
@@ -68,6 +71,7 @@ export default function Home() {
   };
 
   const fetchMyRetakes = async () => {
+    setRetakesLoading(true);
     try {
       const response = await fetch(`/api/retakes?studentId=${userId}`);
       const result = await response.json();
@@ -76,6 +80,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Failed to fetch retakes:", error);
+    } finally {
+      setRetakesLoading(false);
     }
   };
 
@@ -153,7 +159,14 @@ export default function Home() {
           {/* 헤더 */}
           <div className="mb-spacing-800">
             <div className="mb-spacing-200 flex items-start justify-between">
-              <h1 className="font-bold text-content-standard-primary text-display">내 재시험 일정</h1>
+              <div className="flex items-center gap-spacing-400">
+                <h1 className="font-bold text-content-standard-primary text-display">Tnote</h1>
+                {workspaceName && (
+                  <span className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-body text-content-standard-secondary">
+                    {workspaceName}
+                  </span>
+                )}
+              </div>
               {userName && (
                 <div className="flex items-center gap-spacing-300">
                   <span className="font-medium text-body text-content-standard-primary">{userName}</span>
@@ -170,11 +183,15 @@ export default function Home() {
                 </div>
               )}
             </div>
-            <p className="text-body text-content-standard-secondary">나에게 할당된 재시험 목록입니다</p>
+            <p className="text-body text-content-standard-secondary">수업 관련 서비스를 한 곳에서 확인하세요</p>
           </div>
 
           {/* 재시험 목록 */}
-          {retakes.length === 0 ? (
+          {retakesLoading ? (
+            <div className="py-spacing-900 text-center">
+              <p className="text-body text-content-standard-tertiary">로딩 중...</p>
+            </div>
+          ) : retakes.length === 0 ? (
             <div className="py-spacing-900 text-center">
               <p className="text-body text-content-standard-tertiary">할당된 재시험이 없습니다.</p>
             </div>
@@ -306,7 +323,14 @@ export default function Home() {
         {/* 헤더 */}
         <div className="mb-spacing-800">
           <div className="mb-spacing-200 flex items-start justify-between">
-            <h1 className="font-bold text-content-standard-primary text-display">티노트</h1>
+            <div className="flex items-center gap-spacing-400">
+              <h1 className="font-bold text-content-standard-primary text-display">Tnote</h1>
+              {workspaceName && (
+                <span className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-body text-content-standard-secondary">
+                  {workspaceName}
+                </span>
+              )}
+            </div>
             {userName && (
               <div className="flex items-center gap-spacing-300">
                 <span className="font-medium text-body text-content-standard-primary">{userName}</span>
@@ -323,7 +347,7 @@ export default function Home() {
               </div>
             )}
           </div>
-          <p className="text-body text-content-standard-secondary">교사를 위한 학생 관리 서비스</p>
+          <p className="text-body text-content-standard-secondary">선생님을 위한 학생 관리 서비스</p>
         </div>
 
         {/* 메뉴 카드 */}
@@ -371,7 +395,7 @@ export default function Home() {
                 수업 관리
               </h2>
             </div>
-            <p className="mb-spacing-400 text-body text-content-standard-secondary">수업과 코스를 관리합니다</p>
+            <p className="mb-spacing-400 text-body text-content-standard-secondary">수업을 관리합니다</p>
             <div className="font-semibold text-core-accent text-label">바로가기 →</div>
           </Link>
 

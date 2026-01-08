@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/shared/lib/supabase/auth";
+import { createClient } from "@/shared/lib/supabase/server";
 
 export async function GET() {
   try {
@@ -9,6 +10,14 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
+    // 워크스페이스 이름 가져오기
+    let workspaceName = null;
+    if (session.workspace) {
+      const supabase = await createClient();
+      const { data: workspace } = await supabase.from("Workspaces").select("name").eq("id", session.workspace).single();
+      workspaceName = workspace?.name || null;
+    }
+
     return NextResponse.json({
       user: {
         id: session.userId,
@@ -16,6 +25,7 @@ export async function GET() {
         phoneNumber: session.phoneNumber,
         role: session.role,
         workspace: session.workspace,
+        workspaceName: workspaceName,
       },
     });
   } catch (error) {

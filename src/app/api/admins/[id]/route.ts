@@ -32,7 +32,11 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     }
 
     // 관리자 삭제 (workspace 조건 추가로 안전성 확보)
-    const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
+    const { error: deleteError } = await supabase
+      .from("Users")
+      .delete()
+      .eq("id", id)
+      .eq("workspace", session.workspace);
 
     if (deleteError) throw deleteError;
 
