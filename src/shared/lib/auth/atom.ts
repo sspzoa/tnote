@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import type { SessionData } from "./session";
+import type { Session } from "../supabase/auth";
 
-export const userAtom = atom<SessionData | null>(null);
+export const userAtom = atom<Session | null>(null);
 export const isAuthenticatedAtom = atom((get) => get(userAtom) !== null);

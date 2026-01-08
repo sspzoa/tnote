@@ -21,12 +21,12 @@ export async function POST(request: Request) {
     // 전화번호로 사용자 조회
     let query = supabase.from("Users").select("*").eq("phone_number", phoneNumber);
 
-    // 학생 로그인: 워크스페이스와 isAdmin=false 조건 추가
+    // 학생 로그인: 워크스페이스와 role=student 조건 추가
     if (!isTeacher) {
-      query = query.eq("workspace", workspaceId).eq("isAdmin", false);
+      query = query.eq("workspace", workspaceId).eq("role", "student");
     } else {
-      // 선생님 로그인: isAdmin=true 조건 추가
-      query = query.eq("isAdmin", true);
+      // 선생님 로그인: role이 owner 또는 admin인 경우
+      query = query.in("role", ["owner", "admin"]);
     }
 
     const { data: user, error } = await query.single();
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         name: user.name,
         phoneNumber: user.phone_number,
         school: user.school,
-        isAdmin: user.isAdmin,
+        role: user.role,
         workspace: user.workspace,
       },
     });

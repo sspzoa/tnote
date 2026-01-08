@@ -40,11 +40,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: students });
     }
 
-    // 전체 학생 조회 (isAdmin = false, 현재 사용자의 workspace)
+    // 전체 학생 조회 (role = student, 현재 사용자의 workspace)
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
-      .eq("isAdmin", false)
+      .eq("role", "student")
       .eq("workspace", session.workspace)
       .order("name", { ascending: true });
 
@@ -84,7 +84,6 @@ export async function POST(request: Request) {
         school: school || null,
         birth_year: birthYear ? Number.parseInt(birthYear) : null,
         password: hashedPassword,
-        isAdmin: false,
         role: "student",
         workspace: session.workspace,
       })

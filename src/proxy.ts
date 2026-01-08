@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 로그인 페이지는 인증 체크 제외
@@ -14,29 +14,59 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // API 라우트는 middleware에서 체크하지 않음 (각 API에서 처리)
-  if (pathname.startsWith("/api/")) {
-    return NextResponse.next();
-  }
-
-  // Public 경로 (인증 불필요)
-  const publicPaths = ["/login"];
-  if (publicPaths.includes(pathname)) {
-    return NextResponse.next();
-  }
-
   // 세션 체크
-  const session = request.cookies.get("session");
-  if (!session) {
+  const sessionCookie = request.cookies.get("session");
+
+  // API 경로 처리
+  if (pathname.startsWith("/api/")) {
+    // 인증 불필요 API 경로 (로그인, 회원가입, 워크스페이스 목록 조회)
+    const publicApiPaths = ["/api/auth/login", "/api/auth/register", "/api/workspaces"];
+    if (publicApiPaths.some((path) => pathname.startsWith(path))) {
+      return NextResponse.next();
+    }
+
+    // 세션 필수
+    if (!sessionCookie) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+      const sessionData = JSON.parse(sessionCookie.value);
+
+      // Owner 전용 API
+      if (pathname.startsWith("/api/admins")) {
+        if (sessionData.role !== "owner") {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+      }
+
+      // Admin 또는 Owner 전용 API
+      const adminOnlyApis = ["/api/students", "/api/courses"];
+      if (adminOnlyApis.some((path) => pathname.startsWith(path))) {
+        if (sessionData.role === "student") {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+      }
+
+      // retakes는 모든 인증된 사용자 접근 가능 (student도 자신의 데이터 조회)
+
+      return NextResponse.next();
+    } catch {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+  }
+
+  // 페이지 경로 처리
+  if (!sessionCookie) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   try {
-    const sessionData = JSON.parse(session.value);
+    const sessionData = JSON.parse(sessionCookie.value);
 
     // 학생은 특정 페이지만 접근 가능
     if (sessionData.role === "student") {
-      const studentAllowedPaths = ["/", "/my-retakes"]; // 학생용 페이지 추가 예정
+      const studentAllowedPaths = ["/", "/my-retakes"];
 
       if (!studentAllowedPaths.some((path) => pathname.startsWith(path))) {
         return NextResponse.redirect(new URL("/", request.url));

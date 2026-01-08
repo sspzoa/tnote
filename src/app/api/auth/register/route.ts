@@ -49,7 +49,6 @@ export async function POST(request: Request) {
         name,
         phone_number: phoneNumber,
         password: hashedPassword,
-        isAdmin: true,
         role: "owner",
         workspace: newWorkspace.id,
       })

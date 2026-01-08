@@ -79,3 +79,11 @@ export async function requireOwner() {
 export async function requireAdminOrOwner() {
   return requireAuth(["owner", "admin"]);
 }
+
+/**
+ * 세션 삭제
+ */
+export async function clearSession(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+}
