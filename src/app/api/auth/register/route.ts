@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       .from("Workspaces")
       .insert({
         name: workspaceName,
+        owner: null,
       })
       .select()
       .single();

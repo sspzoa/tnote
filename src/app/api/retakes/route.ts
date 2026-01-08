@@ -5,7 +5,7 @@ import { getAuthenticatedClient, getSession, requireAdminOrOwner } from "@/share
 export async function POST(request: Request) {
   try {
     await requireAdminOrOwner();
-    const { examId, studentIds, scheduledDate, note } = await request.json();
+    const { examId, studentIds, scheduledDate } = await request.json();
 
     if (!examId || !studentIds || !Array.isArray(studentIds) || !scheduledDate) {
       return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
@@ -18,7 +18,6 @@ export async function POST(request: Request) {
       exam_id: examId,
       student_id: studentId,
       current_scheduled_date: scheduledDate,
-      note: note || null,
     }));
 
     const { data, error } = await supabase
