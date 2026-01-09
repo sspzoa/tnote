@@ -195,8 +195,18 @@ export default function Home() {
         borderColor = "#2563EB";
         break;
       case "retake":
-        backgroundColor = "#EF4444"; // solid-red
-        borderColor = "#DC2626";
+        // Status-based colors for retakes
+        if (event.metadata?.status === "completed") {
+          backgroundColor = "#10B981"; // solid-green (완료)
+          borderColor = "#059669";
+        } else if (event.metadata?.status === "absent") {
+          backgroundColor = "#6B7280"; // solid-gray (결석)
+          borderColor = "#4B5563";
+        } else {
+          // postponed, scheduled, 기타 모두 예정으로 처리
+          backgroundColor = "#EF4444"; // solid-red (예정)
+          borderColor = "#DC2626";
+        }
         break;
       case "clinic":
         // Status-based colors for clinics
@@ -452,8 +462,23 @@ export default function Home() {
                     <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
                       상태
                     </label>
-                    <span className="inline-block rounded-radius-300 bg-solid-translucent-red px-spacing-300 py-spacing-100 font-medium text-footnote text-solid-red">
-                      {selectedEvent.metadata.status}
+                    <span
+                      className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${
+                        selectedEvent.metadata.status === "completed"
+                          ? "bg-solid-translucent-green text-solid-green"
+                          : selectedEvent.metadata.status === "absent"
+                            ? "bg-solid-translucent-gray text-solid-gray"
+                            : selectedEvent.metadata.status === "postponed"
+                              ? "bg-solid-translucent-yellow text-solid-yellow"
+                              : "bg-solid-translucent-blue text-solid-blue"
+                      }`}>
+                      {selectedEvent.metadata.status === "completed"
+                        ? "완료"
+                        : selectedEvent.metadata.status === "absent"
+                          ? "결석"
+                          : selectedEvent.metadata.status === "postponed"
+                            ? "연기"
+                            : "예정"}
                     </span>
                   </div>
                 )}
