@@ -5,7 +5,7 @@ import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supaba
 // 학생 목록 조회 (관리자만)
 export async function GET(request: Request) {
   try {
-    await requireAdminOrOwner();
+    const session = await requireAdminOrOwner();
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
 
@@ -40,11 +40,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: students });
     }
 
-    // 전체 학생 조회 (role = student, RLS가 workspace 필터링 처리)
+    // 전체 학생 조회 (role = student, 명시적 workspace 필터링)
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
       .eq("role", "student")
+      .eq("workspace", session.workspace)
       .order("name", { ascending: true });
 
     if (error) throw error;

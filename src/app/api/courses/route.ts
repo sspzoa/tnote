@@ -4,16 +4,17 @@ import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supaba
 // 코스 목록 조회 (관리자만)
 export async function GET() {
   try {
-    await requireAdminOrOwner();
+    const session = await requireAdminOrOwner();
     const { supabase } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // 명시적 workspace 필터링
     const { data, error } = await supabase
       .from("Courses")
       .select(`
         *,
         enrollments:CourseEnrollments(count)
       `)
+      .eq("workspace", session.workspace)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
