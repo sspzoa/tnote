@@ -647,7 +647,9 @@ export default function ClinicsPage() {
                                   className="h-4 w-4 cursor-pointer rounded border-line-outline text-core-accent focus:ring-2 focus:ring-core-accent-translucent"
                                 />
                                 <div className="flex-1">
-                                  <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+                                  <div className="font-medium text-body text-content-standard-primary">
+                                    {student.name}
+                                  </div>
                                   <div className="text-content-standard-tertiary text-footnote">
                                     {student.phone_number} {student.school && `· ${student.school}`}
                                   </div>
