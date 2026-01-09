@@ -294,7 +294,7 @@ export async function GET(request: Request) {
       // Get all clinic attendance for count
       const { data: allAttendance, error: attendanceError } = await supabase
         .from("ClinicAttendance")
-        .select("attendance_date, clinic_id");
+        .select("attendance_date, clinic_id, student_id");
 
       if (attendanceError) throw attendanceError;
 

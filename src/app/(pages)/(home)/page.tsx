@@ -35,7 +35,7 @@ const CustomToolbar = ({
   currentDate,
   setCurrentDate,
 }: {
-  onNavigate: (action: string) => void;
+  onNavigate: (action: "PREV" | "NEXT" | "TODAY" | "DATE", newDate?: Date) => void;
   date: Date;
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
