@@ -59,11 +59,16 @@ export function proxy(request: NextRequest) {
       }
 
       // Admin/Owner 전용 API (모든 메서드)
-      const adminOnlyApis = ["/api/students", "/api/courses", "/api/exams"];
+      const adminOnlyApis = ["/api/students", "/api/courses", "/api/exams", "/api/clinics"];
       if (adminOnlyApis.some((path) => pathname.startsWith(path))) {
         if (role === "student") {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
+        return NextResponse.next();
+      }
+
+      // Calendar API - 모든 인증된 사용자 접근 가능
+      if (pathname.startsWith("/api/calendar")) {
         return NextResponse.next();
       }
 
@@ -107,7 +112,7 @@ export function proxy(request: NextRequest) {
     }
 
     // Owner/Admin만 접근 가능한 관리 페이지
-    const adminPaths = ["/students", "/courses", "/exams", "/retakes", "/admins"];
+    const adminPaths = ["/students", "/courses", "/exams", "/retakes", "/admins", "/clinics"];
     if (adminPaths.some((path) => pathname.startsWith(path))) {
       if (sessionData.role === "student") {
         return NextResponse.redirect(new URL("/", request.url));

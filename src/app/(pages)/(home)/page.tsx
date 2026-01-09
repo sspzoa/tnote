@@ -1,8 +1,26 @@
 "use client";
 
+import { format, getDay, parse, startOfWeek } from "date-fns";
+import { ko } from "date-fns/locale";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "@/app/calendar-custom.css";
+
+// Setup calendar localizer
+const locales = {
+  ko: ko,
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
 
 interface PasswordChangeForm {
   currentPassword: string;
@@ -10,21 +28,82 @@ interface PasswordChangeForm {
   confirmPassword: string;
 }
 
-interface Retake {
-  id: string;
-  current_scheduled_date: string;
-  status: string;
-  note: string | null;
-  exam: {
-    id: string;
-    name: string;
-    exam_number: number;
-    course: {
-      id: string;
-      name: string;
-    };
+// Custom toolbar component for calendar
+const CustomToolbar = ({
+  onNavigate,
+  date,
+  currentDate,
+  setCurrentDate,
+}: {
+  onNavigate: (action: string) => void;
+  date: Date;
+  currentDate: Date;
+  setCurrentDate: (date: Date) => void;
+}) => {
+  const goToBack = () => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    setCurrentDate(newDate);
+    onNavigate("PREV");
   };
-}
+
+  const goToNext = () => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    setCurrentDate(newDate);
+    onNavigate("NEXT");
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    onNavigate("TODAY");
+  };
+
+  return (
+    <div className="mb-spacing-500 flex flex-col gap-spacing-400 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-spacing-300">
+        <button
+          onClick={goToBack}
+          className="rounded-radius-300 bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
+          type="button">
+          ←
+        </button>
+        <button
+          onClick={goToToday}
+          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-body text-solid-white transition-opacity hover:opacity-90"
+          type="button">
+          오늘
+        </button>
+        <button
+          onClick={goToNext}
+          className="rounded-radius-300 bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
+          type="button">
+          →
+        </button>
+      </div>
+
+      <h2 className="font-bold text-content-standard-primary text-heading">
+        {format(date, "yyyy년 M월", { locale: ko })}
+      </h2>
+
+      <div className="flex flex-wrap gap-spacing-200">
+        <div className="flex items-center gap-spacing-200 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-300 py-spacing-100">
+          <div className="h-3 w-3 rounded-radius-100 bg-[#3B82F6]" />
+          <span className="text-content-standard-secondary text-footnote">수업</span>
+        </div>
+        <div className="flex items-center gap-spacing-200 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-300 py-spacing-100">
+          <div className="h-3 w-3 rounded-radius-100 bg-[#EF4444]" />
+          <span className="text-content-standard-secondary text-footnote">재시험</span>
+        </div>
+        <div className="flex items-center gap-spacing-200 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-300 py-spacing-100">
+          <div className="h-3 w-3 rounded-radius-100 bg-[#8B5CF6]" />
+          <span className="text-content-standard-secondary text-footnote">클리닉</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const router = useRouter();
@@ -33,7 +112,6 @@ export default function Home() {
   const [userRole, setUserRole] = useState<string>("");
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [retakes, setRetakes] = useState<Retake[]>([]);
   const [retakesLoading, setRetakesLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordForm, setPasswordForm] = useState<PasswordChangeForm>({
@@ -42,6 +120,9 @@ export default function Home() {
     confirmPassword: "",
   });
   const [passwordChanging, setPasswordChanging] = useState(false);
+  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     fetchUserInfo();
@@ -49,9 +130,9 @@ export default function Home() {
 
   useEffect(() => {
     if (userRole === "student" && userId) {
-      fetchMyRetakes();
+      fetchCalendarEvents();
     }
-  }, [userRole, userId]);
+  }, [userRole, userId, currentDate]);
 
   const fetchUserInfo = async () => {
     try {
@@ -70,19 +151,78 @@ export default function Home() {
     }
   };
 
-  const fetchMyRetakes = async () => {
+  const fetchCalendarEvents = async () => {
     setRetakesLoading(true);
     try {
-      const response = await fetch(`/api/retakes?studentId=${userId}`);
+      // Get month range from currentDate
+      const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+      const response = await fetch(
+        `/api/calendar?start=${start.toISOString().split("T")[0]}&end=${end.toISOString().split("T")[0]}`,
+      );
       const result = await response.json();
+
       if (response.ok) {
-        setRetakes(result.data || []);
+        // Transform to react-big-calendar format
+        const events = result.data.map((e: any) => ({
+          ...e,
+          start: new Date(e.date),
+          end: new Date(e.date),
+        }));
+        setCalendarEvents(events);
       }
     } catch (error) {
-      console.error("Failed to fetch retakes:", error);
+      console.error("Failed to fetch calendar events:", error);
     } finally {
       setRetakesLoading(false);
     }
+  };
+
+  // Handle calendar navigation
+  const handleNavigate = (newDate: Date) => {
+    setCurrentDate(newDate);
+  };
+
+  // Custom event styling
+  const eventStyleGetter = (event: any) => {
+    let backgroundColor = "";
+    let borderColor = "";
+
+    switch (event.type) {
+      case "course":
+        backgroundColor = "#3B82F6"; // solid-blue
+        borderColor = "#2563EB";
+        break;
+      case "retake":
+        backgroundColor = "#EF4444"; // solid-red
+        borderColor = "#DC2626";
+        break;
+      case "clinic":
+        // Status-based colors for clinics
+        if (event.metadata?.status === "attended") {
+          backgroundColor = "#10B981"; // solid-green
+          borderColor = "#059669";
+        } else if (event.metadata?.status === "absent") {
+          backgroundColor = "#6B7280"; // solid-gray
+          borderColor = "#4B5563";
+        } else {
+          backgroundColor = "#8B5CF6"; // solid-purple
+          borderColor = "#7C3AED";
+        }
+        break;
+    }
+
+    return {
+      style: {
+        backgroundColor,
+        color: "#FFFFFF",
+        border: `1px solid ${borderColor}`,
+        borderRadius: "4px",
+        fontSize: "0.875rem",
+        padding: "2px 4px",
+      },
+    };
   };
 
   const handleLogout = async () => {
@@ -186,53 +326,149 @@ export default function Home() {
             <p className="text-body text-content-standard-secondary">수업 관련 서비스를 한 곳에서 확인하세요</p>
           </div>
 
-          {/* 재시험 목록 */}
-          {retakesLoading ? (
-            <div className="py-spacing-900 text-center">
-              <p className="text-body text-content-standard-tertiary">로딩 중...</p>
-            </div>
-          ) : retakes.length === 0 ? (
-            <div className="py-spacing-900 text-center">
-              <p className="text-body text-content-standard-tertiary">할당된 재시험이 없습니다.</p>
-            </div>
-          ) : (
-            <div className="space-y-spacing-400">
-              {retakes.map((retake) => (
-                <div
-                  key={retake.id}
-                  className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
-                  <div className="mb-spacing-400 flex items-start justify-between">
-                    <div>
-                      <h3 className="mb-spacing-100 font-bold text-content-standard-primary text-heading">
-                        {retake.exam.course.name} - {retake.exam.name}
-                      </h3>
-                      <p className="text-body text-content-standard-secondary">{retake.exam.exam_number}회차</p>
-                    </div>
-                    <span
-                      className={`rounded-radius-200 px-spacing-400 py-spacing-150 font-semibold text-footnote ${
-                        retake.status === "completed"
-                          ? "bg-solid-translucent-green text-solid-green"
-                          : retake.status === "rescheduled"
-                            ? "bg-solid-translucent-orange text-solid-orange"
-                            : "bg-solid-translucent-blue text-solid-blue"
-                      }`}>
-                      {retake.status === "completed" ? "완료" : retake.status === "rescheduled" ? "일정변경" : "예정"}
+          {/* 캘린더 */}
+          <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
+            {retakesLoading ? (
+              <div className="flex min-h-[700px] items-center justify-center">
+                <p className="text-body text-content-standard-tertiary">로딩 중...</p>
+              </div>
+            ) : (
+              <Calendar
+                localizer={localizer}
+                events={calendarEvents}
+                startAccessor="start"
+                endAccessor="end"
+                date={currentDate}
+                onNavigate={handleNavigate}
+                onSelectEvent={(event) => setSelectedEvent(event)}
+                eventPropGetter={eventStyleGetter}
+                components={{
+                  toolbar: (props) => (
+                    <CustomToolbar {...props} currentDate={currentDate} setCurrentDate={setCurrentDate} />
+                  ),
+                }}
+                messages={{
+                  today: "오늘",
+                  previous: "이전",
+                  next: "다음",
+                  month: "월",
+                  week: "주",
+                  day: "일",
+                  agenda: "일정",
+                  date: "날짜",
+                  time: "시간",
+                  event: "이벤트",
+                  noEventsInRange: "이 범위에 일정이 없습니다.",
+                  showMore: (total: number) => `+${total} 더보기`,
+                }}
+                culture="ko"
+                views={["month"]}
+                defaultView="month"
+                style={{ height: "700px" }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Event detail modal */}
+        {selectedEvent && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setSelectedEvent(null)}>
+            <div
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">일정 상세</h2>
+              </div>
+
+              <div className="space-y-spacing-400 p-spacing-600">
+                <div>
+                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                    타입
+                  </label>
+                  <div className="flex items-center gap-spacing-200">
+                    <div
+                      className="h-4 w-4 rounded-radius-100"
+                      style={{
+                        backgroundColor:
+                          selectedEvent.type === "course"
+                            ? "#3B82F6"
+                            : selectedEvent.type === "retake"
+                              ? "#EF4444"
+                              : selectedEvent.metadata?.status === "attended"
+                                ? "#10B981"
+                                : selectedEvent.metadata?.status === "absent"
+                                  ? "#6B7280"
+                                  : "#8B5CF6",
+                      }}
+                    />
+                    <span className="text-body text-content-standard-primary">
+                      {selectedEvent.type === "course" ? "수업" : selectedEvent.type === "retake" ? "재시험" : "클리닉"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-spacing-200 text-body text-content-standard-secondary">
-                    <span>📅</span>
-                    <span>{new Date(retake.current_scheduled_date).toLocaleDateString("ko-KR")}</span>
-                  </div>
-                  {retake.note && (
-                    <div className="mt-spacing-400 rounded-radius-300 bg-components-fill-standard-secondary p-spacing-400">
-                      <p className="text-content-standard-secondary text-label">{retake.note}</p>
-                    </div>
-                  )}
                 </div>
-              ))}
+
+                <div>
+                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                    제목
+                  </label>
+                  <p className="text-body text-content-standard-primary">{selectedEvent.title}</p>
+                </div>
+
+                <div>
+                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                    날짜
+                  </label>
+                  <p className="text-body text-content-standard-primary">
+                    {format(selectedEvent.start, "yyyy년 M월 d일 (EEE)", { locale: ko })}
+                  </p>
+                </div>
+
+                {selectedEvent.type === "clinic" && selectedEvent.metadata?.status && (
+                  <div>
+                    <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                      상태
+                    </label>
+                    <span
+                      className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${
+                        selectedEvent.metadata.status === "attended"
+                          ? "bg-solid-translucent-green text-solid-green"
+                          : selectedEvent.metadata.status === "absent"
+                            ? "bg-solid-translucent-gray text-solid-gray"
+                            : "bg-solid-translucent-purple text-solid-purple"
+                      }`}>
+                      {selectedEvent.metadata.status === "attended"
+                        ? "출석"
+                        : selectedEvent.metadata.status === "absent"
+                          ? "결석"
+                          : "예정"}
+                    </span>
+                  </div>
+                )}
+
+                {selectedEvent.type === "retake" && selectedEvent.metadata?.status && (
+                  <div>
+                    <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                      상태
+                    </label>
+                    <span className="inline-block rounded-radius-300 bg-solid-translucent-red px-spacing-300 py-spacing-100 font-medium text-footnote text-solid-red">
+                      {selectedEvent.metadata.status}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="w-full rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+                  닫기
+                </button>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {showPasswordModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -396,6 +632,21 @@ export default function Home() {
               </h2>
             </div>
             <p className="mb-spacing-400 text-body text-content-standard-secondary">수업을 관리합니다</p>
+            <div className="font-semibold text-core-accent text-label">바로가기 →</div>
+          </Link>
+
+          <Link
+            href="/clinics"
+            className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
+            <div className="mb-spacing-500 flex items-center gap-spacing-300">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-orange">
+                <span className="text-heading text-solid-orange">🏥</span>
+              </div>
+              <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
+                클리닉 관리
+              </h2>
+            </div>
+            <p className="mb-spacing-400 text-body text-content-standard-secondary">자유 출석 클리닉을 관리합니다</p>
             <div className="font-semibold text-core-accent text-label">바로가기 →</div>
           </Link>
 

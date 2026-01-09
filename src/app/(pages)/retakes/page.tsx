@@ -412,6 +412,10 @@ export default function RetakesPage() {
     student.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const filteredRetakes = retakes.filter((retake) =>
+    retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   const getAge = (birthYear: number | null) => {
     if (!birthYear) return 0;
     const currentYear = new Date().getFullYear();
@@ -500,12 +504,29 @@ export default function RetakesPage() {
           ))}
         </div>
 
+        {/* 검색 */}
+        <div className="mb-spacing-600">
+          <input
+            type="text"
+            placeholder="학생 이름 검색..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+          />
+        </div>
+
         {/* 재시험 목록 */}
         {loading ? (
           <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
         ) : retakes.length === 0 ? (
           <div className="py-spacing-900 text-center">
             <p className="text-body text-content-standard-tertiary">재시험이 없습니다.</p>
+          </div>
+        ) : filteredRetakes.length === 0 ? (
+          <div className="py-spacing-900 text-center">
+            <p className="text-body text-content-standard-tertiary">
+              {retakes.length === 0 ? "재시험이 없습니다." : "검색 결과가 없습니다."}
+            </p>
           </div>
         ) : (
           <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
@@ -528,7 +549,7 @@ export default function RetakesPage() {
                 </tr>
               </thead>
               <tbody>
-                {retakes.map((retake) => (
+                {filteredRetakes.map((retake) => (
                   <tr
                     key={retake.id}
                     className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
@@ -1110,7 +1131,7 @@ export default function RetakesPage() {
                             placeholder="학생 이름 검색..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="mb-spacing-200 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                            className="mb-spacing-200 w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                           />
                           <div className="max-h-60 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
                             {filteredAssignStudents.length === 0 ? (

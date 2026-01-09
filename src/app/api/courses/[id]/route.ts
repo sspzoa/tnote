@@ -42,16 +42,35 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   try {
     await requireAdminOrOwner();
     const { id } = await params;
-    const { name } = await request.json();
+    const { name, startDate, endDate, daysOfWeek } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: "수업 이름을 입력해주세요." }, { status: 400 });
     }
 
+    // Validate date range if provided
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      return NextResponse.json({ error: "시작일은 종료일보다 앞서야 합니다." }, { status: 400 });
+    }
+
+    // Validate days_of_week if provided
+    if (
+      daysOfWeek !== undefined &&
+      daysOfWeek !== null &&
+      (!Array.isArray(daysOfWeek) || !daysOfWeek.every((d: number) => d >= 0 && d <= 6))
+    ) {
+      return NextResponse.json({ error: "올바른 요일을 선택해주세요." }, { status: 400 });
+    }
+
     const { supabase } = await getAuthenticatedClient();
 
+    const updateData: any = { name };
+    if (startDate !== undefined) updateData.start_date = startDate || null;
+    if (endDate !== undefined) updateData.end_date = endDate || null;
+    if (daysOfWeek !== undefined) updateData.days_of_week = daysOfWeek || null;
+
     // RLS가 workspace 필터링을 자동으로 처리
-    const { data, error } = await supabase.from("Courses").update({ name }).eq("id", id).select().single();
+    const { data, error } = await supabase.from("Courses").update(updateData).eq("id", id).select().single();
 
     if (error) throw error;
 

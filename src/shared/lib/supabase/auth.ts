@@ -39,12 +39,18 @@ export async function getAuthenticatedClient() {
 
   const supabase = await createClient();
 
-  // Set current user ID and workspace for RLS policies
+  // Set current user ID, workspace, and role for RLS policies
   // PostgreSQL 세션 변수를 설정하여 RLS 정책에서 사용
-  await supabase.rpc("set_current_user", {
+  const { error } = await supabase.rpc("set_current_user", {
     user_id: session.userId,
     user_workspace: session.workspace,
+    user_role: session.role,
   });
+
+  if (error) {
+    console.error("Failed to set RLS context:", error);
+    throw new Error("Failed to set RLS context");
+  }
 
   return { supabase, session };
 }
