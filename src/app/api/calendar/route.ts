@@ -10,7 +10,6 @@ interface CalendarEvent {
   metadata?: any;
 }
 
-// Helper function to generate clinic session dates with status
 function generateClinicSessions(
   clinic: {
     id: string;
@@ -28,7 +27,6 @@ function generateClinicSessions(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Create attendance map by date
   const attendanceByDate = new Map<string, Set<string>>();
   for (const record of attendanceRecords) {
     if (!attendanceByDate.has(record.attendance_date)) {
@@ -37,10 +35,8 @@ function generateClinicSessions(
     attendanceByDate.get(record.attendance_date)?.add(record.student_id);
   }
 
-  // Track all dates we've processed
   const processedDates = new Set<string>();
 
-  // 1. Generate regular operating day schedules
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dayOfWeek = d.getDay();
     if (clinic.operating_days.includes(dayOfWeek)) {
@@ -48,7 +44,6 @@ function generateClinicSessions(
       processedDates.add(dateStr);
       const dateObj = new Date(dateStr);
 
-      // Determine status
       let status: "attended" | "absent" | "scheduled" = "scheduled";
       const hasAttendance = studentId ? attendanceByDate.get(dateStr)?.has(studentId) : false;
 
@@ -77,12 +72,10 @@ function generateClinicSessions(
     }
   }
 
-  // 2. Add any attendance records that weren't in the regular schedule
   for (const dateStr of attendanceByDate.keys()) {
     if (!processedDates.has(dateStr)) {
       const hasAttendance = studentId ? attendanceByDate.get(dateStr)?.has(studentId) : false;
 
-      // Only add if this student attended (for student view) or if there's any attendance (for admin view)
       if (hasAttendance || !studentId) {
         events.push({
           id: `clinic-${clinic.id}-${dateStr}`,
@@ -103,7 +96,6 @@ function generateClinicSessions(
   return events;
 }
 
-// Helper function to generate course session dates
 function generateCourseSessions(course: {
   id: string;
   name: string;
@@ -147,9 +139,7 @@ export async function GET(request: Request) {
 
     const events: CalendarEvent[] = [];
 
-    // For students: only show their enrolled courses, retakes, and clinic attendance
     if (session.role === "student") {
-      // 1. Get enrolled courses with schedules
       const { data: enrollments, error: enrollError } = await supabase
         .from("CourseEnrollments")
         .select(`
@@ -165,7 +155,6 @@ export async function GET(request: Request) {
 
       if (enrollError) throw enrollError;
 
-      // Generate course session events
       enrollments?.forEach((enrollment: any) => {
         const course = enrollment.course;
         if (course.start_date && course.end_date && course.days_of_week) {
@@ -173,7 +162,6 @@ export async function GET(request: Request) {
         }
       });
 
-      // 2. Get retakes
       const { data: retakes, error: retakeError } = await supabase
         .from("RetakeAssignments")
         .select(`
@@ -217,25 +205,19 @@ export async function GET(request: Request) {
 
       if (clinicsError) throw clinicsError;
 
-      // 4. Get all clinic attendance records (for status calculation)
       const { data: allAttendance, error: attendanceError } = await supabase
         .from("ClinicAttendance")
         .select("attendance_date, student_id, clinic_id");
 
       if (attendanceError) throw attendanceError;
 
-      // Generate clinic session events
       clinics?.forEach((clinic: any) => {
         if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-          // Filter attendance records for this clinic
-          const clinicAttendance = allAttendance?.filter((a) => a.clinic_id === clinic.id) || [];
+              const clinicAttendance = allAttendance?.filter((a) => a.clinic_id === clinic.id) || [];
           events.push(...generateClinicSessions(clinic, clinicAttendance, session.userId));
         }
       });
     } else {
-      // For admin/owner: show all workspace courses, retakes, clinics
-
-      // 1. Get all courses with schedules (workspace 필터링)
       const { data: courses, error: coursesError } = await supabase
         .from("Courses")
         .select("id, name, start_date, end_date, days_of_week")
@@ -251,7 +233,6 @@ export async function GET(request: Request) {
         }
       });
 
-      // 2. Get all retakes
       const { data: retakes, error: retakeError } = await supabase.from("RetakeAssignments").select(`
           id,
           current_scheduled_date,
@@ -294,7 +275,6 @@ export async function GET(request: Request) {
 
       if (clinicsError) throw clinicsError;
 
-      // Get all clinic attendance for count
       const { data: allAttendance, error: attendanceError } = await supabase
         .from("ClinicAttendance")
         .select("attendance_date, clinic_id, student_id");
@@ -304,13 +284,11 @@ export async function GET(request: Request) {
       clinics?.forEach((clinic: any) => {
         if (clinic.start_date && clinic.end_date && clinic.operating_days) {
           const clinicAttendance = allAttendance?.filter((a) => a.clinic_id === clinic.id) || [];
-          // For admin, don't filter by student ID
           events.push(...generateClinicSessions(clinic, clinicAttendance));
         }
       });
     }
 
-    // Filter by date range if provided
     let filteredEvents = events;
     if (startDate && endDate) {
       filteredEvents = events.filter((e) => e.date >= startDate && e.date <= endDate);

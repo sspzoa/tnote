@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 클리닉 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET() {
   try {
     const session = await getSession();
@@ -24,7 +23,6 @@ export async function GET() {
   }
 }
 
-// 클리닉 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
     const body = await request.json();

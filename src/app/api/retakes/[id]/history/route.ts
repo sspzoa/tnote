@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 재시험 이력 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 RetakeAssignment가 현재 workspace에 속하는지 확인
     const { data: retake } = await supabase
       .from("RetakeAssignments")
       .select(`

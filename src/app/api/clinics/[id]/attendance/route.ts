@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 클리닉 출석 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
@@ -13,7 +12,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
     const { supabase } = await getAuthenticatedClient();
 
-    // 먼저 clinic이 현재 workspace에 속하는지 확인
     const { data: clinic } = await supabase
       .from("Clinics")
       .select("id")
@@ -53,7 +51,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 }
 
-// 출석 기록 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: clinicId } = await params;
@@ -65,7 +62,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 clinic이 현재 workspace에 속하는지 확인
     const { data: clinic } = await supabase
       .from("Clinics")
       .select("id")
@@ -77,7 +73,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "클리닉을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // Insert attendance records (upsert to handle duplicates)
     const records = studentIds.map((studentId: string) => ({
       clinic_id: clinicId,
       student_id: studentId,
@@ -99,7 +94,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 출석 목록 동기화 (토글 기능) - 권한: middleware에서 이미 체크됨
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: clinicId } = await params;
@@ -111,7 +105,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 clinic이 현재 workspace에 속하는지 확인
     const { data: clinic } = await supabase
       .from("Clinics")
       .select("id")
@@ -123,7 +116,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "클리닉을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 1. 현재 해당 날짜의 모든 출석 기록 조회
     const { data: existingRecords, error: fetchError } = await supabase
       .from("ClinicAttendance")
       .select("id, student_id")
@@ -135,20 +127,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const existingStudentIds = new Set(existingRecords?.map((r) => r.student_id) || []);
     const newStudentIds = new Set(studentIds);
 
-    // 2. 삭제할 기록들 (기존에 있는데 새 목록에 없는 학생들)
     const toDelete = existingRecords?.filter((r) => !newStudentIds.has(r.student_id)).map((r) => r.id) || [];
-
-    // 3. 추가할 학생들 (새 목록에 있는데 기존에 없는 학생들)
     const toAdd = studentIds.filter((id: string) => !existingStudentIds.has(id));
 
-    // 4. 삭제 실행
     if (toDelete.length > 0) {
       const { error: deleteError } = await supabase.from("ClinicAttendance").delete().in("id", toDelete);
 
       if (deleteError) throw deleteError;
     }
 
-    // 5. 추가 실행
     if (toAdd.length > 0) {
       const records = toAdd.map((studentId: string) => ({
         clinic_id: clinicId,
@@ -173,7 +160,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 출석 기록 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: clinicId } = await params;
@@ -186,7 +172,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 clinic이 현재 workspace에 속하는지 확인
     const { data: clinic } = await supabase
       .from("Clinics")
       .select("id")

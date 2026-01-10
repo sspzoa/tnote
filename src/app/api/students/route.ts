@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 학생 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -11,8 +10,6 @@ export async function GET(request: Request) {
     const { supabase, session } = await getAuthenticatedClient();
 
     if (courseId) {
-      // 특정 코스의 학생만 조회
-      // 먼저 코스가 현재 workspace에 속하는지 확인
       const { data: courseData, error: courseError } = await supabase
         .from("Courses")
         .select("workspace")
@@ -53,7 +50,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: students });
     }
 
-    // 전체 학생 조회 (role = student, workspace로 필터링)
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
@@ -73,7 +69,6 @@ export async function GET(request: Request) {
   }
 }
 
-// 학생 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
     const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
@@ -84,7 +79,6 @@ export async function POST(request: Request) {
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 전화번호를 비밀번호로 해싱
     const hashedPassword = await bcrypt.hash(phoneNumber, 10);
 
     const { data, error } = await supabase

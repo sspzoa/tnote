@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 코스에 등록된 학생 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 코스가 현재 사용자의 workspace에 속하는지 확인
     const { data: course } = await supabase
       .from("Courses")
       .select("id")
@@ -30,7 +28,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     if (error) throw error;
 
-    // student 정보만 추출
     const students = data.map((enrollment) => enrollment.student);
 
     return NextResponse.json({ data: students });

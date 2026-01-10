@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/shared/lib/supabase/server";
 
-// 워크스페이스 목록 조회
 export async function GET() {
   try {
     const supabase = await createAdminClient();

@@ -2,14 +2,12 @@ import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 비밀번호 재설정 (전화번호로 초기화) - 권한: middleware에서 이미 체크됨
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params; // student uuid
+    const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 학생 정보 조회 (같은 workspace인지 확인)
     const { data: student, error: fetchError } = await supabase
       .from("Users")
       .select("phone_number")
@@ -21,10 +19,8 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 전화번호로 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(student.phone_number, 10);
 
-    // 비밀번호 업데이트
     const { error: updateError } = await supabase
       .from("Users")
       .update({ password: hashedPassword })

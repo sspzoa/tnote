@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 시험 정보 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -30,7 +29,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 시험 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -42,7 +40,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (examNumber !== undefined) updateData.exam_number = examNumber;
     if (name !== undefined) updateData.name = name;
 
-    // 먼저 시험이 현재 workspace에 속하는지 확인
     const { data: exam } = await supabase
       .from("Exams")
       .select("id, course_id, course:Courses!inner(workspace)")
@@ -54,7 +51,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // course_id 조건을 추가하여 workspace 안전성 확보
     const { data, error } = await supabase
       .from("Exams")
       .update(updateData)
@@ -83,14 +79,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 시험 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 시험이 현재 workspace에 속하는지 확인
     const { data: exam } = await supabase
       .from("Exams")
       .select("id, course_id, course:Courses!inner(workspace)")
@@ -102,7 +96,6 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // course_id 조건을 추가하여 workspace 안전성 확보
     const { error } = await supabase.from("Exams").delete().eq("id", id).eq("course_id", exam.course_id);
 
     if (error) throw error;

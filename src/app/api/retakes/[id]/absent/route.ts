@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 재시험 결석 처리 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -9,7 +8,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 현재 재시험 정보 조회 (workspace 확인 포함)
     const { data: current, error: fetchError } = await supabase
       .from("RetakeAssignments")
       .select(`
@@ -27,7 +25,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 결석 카운트 증가 및 상태 업데이트
     const { data: updated, error: updateError } = await supabase
       .from("RetakeAssignments")
       .update({
@@ -40,7 +37,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     if (updateError) throw updateError;
 
-    // 이력 기록
     const { error: historyError } = await supabase.from("RetakeHistory").insert({
       retake_assignment_id: id,
       action_type: "absent",

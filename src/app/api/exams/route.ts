@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 시험 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -36,7 +35,6 @@ export async function GET(request: Request) {
   }
 }
 
-// 시험 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
     const { courseId, examNumber, name } = await request.json();
@@ -47,7 +45,6 @@ export async function POST(request: Request) {
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 코스가 현재 workspace에 속하는지 확인
     const { data: course } = await supabase
       .from("Courses")
       .select("id")
@@ -73,7 +70,6 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      // 중복 시험 처리
       if (error.code === "23505") {
         return NextResponse.json({ error: "이미 같은 회차의 시험이 존재합니다." }, { status: 409 });
       }

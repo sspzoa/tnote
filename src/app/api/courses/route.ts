@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 코스 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET() {
   try {
     const { supabase, session } = await getAuthenticatedClient();
 
-    // workspace 필터링으로 현재 workspace의 코스만 조회
     const { data, error } = await supabase
       .from("Courses")
       .select(`
@@ -18,7 +16,6 @@ export async function GET() {
 
     if (error) throw error;
 
-    // 학생 수 계산
     const coursesWithCount = data.map((course: any) => ({
       ...course,
       student_count: course.enrollments[0]?.count || 0,
@@ -35,7 +32,6 @@ export async function GET() {
   }
 }
 
-// 코스 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
     const { name, startDate, endDate, daysOfWeek } = await request.json();
@@ -44,12 +40,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "수업 이름을 입력해주세요." }, { status: 400 });
     }
 
-    // Validate date range
     if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
       return NextResponse.json({ error: "시작일은 종료일보다 앞서야 합니다." }, { status: 400 });
     }
 
-    // Validate days_of_week
     if (daysOfWeek && (!Array.isArray(daysOfWeek) || !daysOfWeek.every((d: number) => d >= 0 && d <= 6))) {
       return NextResponse.json({ error: "올바른 요일을 선택해주세요." }, { status: 400 });
     }

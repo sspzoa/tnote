@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   try {
     const { name, phoneNumber, password, workspaceName } = await request.json();
 
-    // 입력 검증
     if (!name || !phoneNumber || !password || !workspaceName) {
       return NextResponse.json({ error: "모든 필수 정보를 입력해주세요." }, { status: 400 });
     }
@@ -17,7 +16,6 @@ export async function POST(request: Request) {
 
     const supabase = await createAdminClient();
 
-    // 전화번호 중복 확인
     const { data: existingUser } = await supabase
       .from("Users")
       .select("phone_number")
@@ -28,10 +26,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
     }
 
-    // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 새 워크스페이스 생성
     const { data: newWorkspace, error: workspaceError } = await supabase
       .from("Workspaces")
       .insert({
@@ -43,7 +39,6 @@ export async function POST(request: Request) {
 
     if (workspaceError) throw workspaceError;
 
-    // 오너 계정 생성
     const { data: newUser, error: userError } = await supabase
       .from("Users")
       .insert({
@@ -57,12 +52,10 @@ export async function POST(request: Request) {
       .single();
 
     if (userError) {
-      // 사용자 생성 실패 시 워크스페이스 롤백
       await supabase.from("Workspaces").delete().eq("id", newWorkspace.id);
       throw userError;
     }
 
-    // 워크스페이스 owner 업데이트
     await supabase.from("Workspaces").update({ owner: newUser.id }).eq("id", newWorkspace.id);
 
     return NextResponse.json({

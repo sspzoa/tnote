@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 클리닉 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -43,7 +42,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 클리닉 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;

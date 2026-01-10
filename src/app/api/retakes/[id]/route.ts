@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 재시험 정보 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -32,7 +31,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 재시험 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -40,7 +38,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 재시험이 현재 workspace에 속하는지 확인
     const { data: retake } = await supabase
       .from("RetakeAssignments")
       .select(`
@@ -85,14 +82,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 재시험 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 먼저 재시험이 현재 workspace에 속하는지 확인
     const { data: retake } = await supabase
       .from("RetakeAssignments")
       .select(`

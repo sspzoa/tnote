@@ -30,7 +30,6 @@ export async function getSession(): Promise<Session | null> {
 
 /**
  * Supabase 클라이언트를 세션 사용자로 인증
- * RLS가 비활성화되어 있으므로 API 레벨에서 workspace 필터링을 수행해야 함
  */
 export async function getAuthenticatedClient() {
   const session = await getSession();

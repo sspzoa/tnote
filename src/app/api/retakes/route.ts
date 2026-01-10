@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 재시험 할당 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
     const { examId, studentIds, scheduledDate } = await request.json();
@@ -12,7 +11,6 @@ export async function POST(request: Request) {
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // exam이 현재 workspace의 코스에 속하는지 확인
     const { data: exam } = await supabase
       .from("Exams")
       .select("id, course:Courses!inner(workspace)")
@@ -24,7 +22,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 모든 학생이 현재 workspace에 속하는지 확인
     const { data: students } = await supabase
       .from("Users")
       .select("id")
@@ -36,7 +33,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "일부 학생을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 각 학생에게 재시험 할당
     const assignments = studentIds.map((studentId) => ({
       exam_id: examId,
       student_id: studentId,
@@ -53,7 +49,6 @@ export async function POST(request: Request) {
       `);
 
     if (error) {
-      // 중복 할당 처리
       if (error.code === "23505") {
         return NextResponse.json({ error: "이미 재시험이 할당된 학생이 있습니다." }, { status: 409 });
       }
@@ -70,7 +65,6 @@ export async function POST(request: Request) {
   }
 }
 
-// 재시험 목록 조회 (권한: middleware에서 이미 체크됨, 학생은 본인 것만 필터링)
 export async function GET(request: Request) {
   try {
     const session = await getSession();
@@ -80,14 +74,12 @@ export async function GET(request: Request) {
     let studentId = searchParams.get("studentId");
     const status = searchParams.get("status");
 
-    // 학생은 본인의 재시험만 조회 가능
     if (session.role === "student") {
       studentId = session.userId;
     }
 
     const { supabase } = await getAuthenticatedClient();
 
-    // RLS와 명시적 workspace 필터 모두 적용 (방어적 코딩)
     let query = supabase
       .from("RetakeAssignments")
       .select(`
@@ -98,7 +90,6 @@ export async function GET(request: Request) {
       .eq("student.workspace", session.workspace)
       .order("current_scheduled_date", { ascending: true });
 
-    // 필터 적용
     if (courseId) {
       query = query.eq("exam.course_id", courseId);
     }

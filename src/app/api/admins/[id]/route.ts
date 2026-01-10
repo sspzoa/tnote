@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 관리자 삭제 (권한: middleware에서 이미 체크됨, Owner 본인은 삭제 불가)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
@@ -11,14 +10,12 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
     const { id } = await params;
 
-    // Owner 본인 삭제 방지
     if (id === session.userId) {
       return NextResponse.json({ error: "본인 계정은 삭제할 수 없습니다." }, { status: 400 });
     }
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // workspace 필터링으로 같은 workspace의 사용자인지 확인
     const { data: targetUser } = await supabase
       .from("Users")
       .select("id, role")
@@ -30,12 +27,10 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "사용자를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // Owner는 삭제할 수 없음
     if (targetUser.role === "owner") {
       return NextResponse.json({ error: "워크스페이스 소유자는 삭제할 수 없습니다." }, { status: 400 });
     }
 
-    // 관리자 삭제 (workspace 필터링으로 안전성 보장)
     const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
     if (deleteError) throw deleteError;

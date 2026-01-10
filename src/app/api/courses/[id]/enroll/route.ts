@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 학생 등록 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -13,7 +12,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 코스와 학생이 모두 현재 workspace에 속하는지 확인
     const { data: course } = await supabase
       .from("Courses")
       .select("id")
@@ -63,7 +61,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 학생 제거 (권한: middleware에서 이미 체크됨)
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -75,7 +72,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 코스가 현재 workspace에 속하는지 확인
     const { data: course } = await supabase
       .from("Courses")
       .select("id")

@@ -2,12 +2,10 @@ import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 관리자 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET() {
   try {
     const { supabase, session } = await getAuthenticatedClient();
 
-    // workspace 필터링으로 현재 workspace의 관리자만 조회
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, role, created_at")
@@ -27,7 +25,6 @@ export async function GET() {
   }
 }
 
-// 관리자 초대 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
     const { name, phoneNumber, password } = await request.json();
@@ -42,7 +39,6 @@ export async function POST(request: Request) {
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 전화번호 중복 체크 (workspace 내에서 확인)
     const { data: existingUser } = await supabase
       .from("Users")
       .select("phone_number")
@@ -54,10 +50,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
     }
 
-    // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 관리자 계정 생성
     const { data: newAdmin, error: adminError } = await supabase
       .from("Users")
       .insert({
