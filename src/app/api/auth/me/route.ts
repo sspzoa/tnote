@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/shared/lib/supabase/auth";
-import { createClient } from "@/shared/lib/supabase/server";
+import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
 export async function GET() {
   try {
@@ -13,7 +12,7 @@ export async function GET() {
     // 워크스페이스 이름 가져오기
     let workspaceName = null;
     if (session.workspace) {
-      const supabase = await createClient();
+      const { supabase } = await getAuthenticatedClient();
       const { data: workspace } = await supabase.from("Workspaces").select("name").eq("id", session.workspace).single();
       workspaceName = workspace?.name || null;
     }
