@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 시험 정보 조회 (관리자만)
+// 시험 정보 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();
@@ -31,10 +30,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 시험 정보 수정 (관리자만)
+// 시험 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { examNumber, name } = await request.json();
 
@@ -85,10 +83,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 시험 삭제 (관리자만)
+// 시험 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
     const { supabase, session } = await getAuthenticatedClient();

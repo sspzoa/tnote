@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 학생 등록 (관리자만)
+// 학생 등록 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { studentId } = await request.json();
 
@@ -12,7 +11,31 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "학생 ID를 입력해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 코스와 학생이 모두 현재 workspace에 속하는지 확인
+    const { data: course } = await supabase
+      .from("Courses")
+      .select("id")
+      .eq("id", id)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!course) {
+      return NextResponse.json({ error: "수업을 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    const { data: student } = await supabase
+      .from("Users")
+      .select("id")
+      .eq("id", studentId)
+      .eq("workspace", session.workspace)
+      .eq("role", "student")
+      .single();
+
+    if (!student) {
+      return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const { data, error } = await supabase
       .from("CourseEnrollments")
@@ -40,10 +63,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 학생 제거 (관리자만)
+// 학생 제거 (권한: middleware에서 이미 체크됨)
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { studentId } = await request.json();
 
@@ -51,7 +73,19 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       return NextResponse.json({ error: "학생 ID를 입력해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 코스가 현재 workspace에 속하는지 확인
+    const { data: course } = await supabase
+      .from("Courses")
+      .select("id")
+      .eq("id", id)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!course) {
+      return NextResponse.json({ error: "수업을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const { error } = await supabase.from("CourseEnrollments").delete().eq("course_id", id).eq("student_id", studentId);
 

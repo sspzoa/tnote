@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 재시험 연기 (관리자만)
+// 재시험 연기 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { newDate, note } = await request.json();
 
@@ -12,13 +11,20 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "새로운 날짜를 입력해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // 현재 재시험 정보 조회
+    // 현재 재시험 정보 조회 (workspace 확인 포함)
     const { data: current, error: fetchError } = await supabase
       .from("RetakeAssignments")
-      .select("current_scheduled_date, postpone_count")
+      .select(`
+        current_scheduled_date,
+        postpone_count,
+        exam:Exams!inner(course:Courses!inner(workspace)),
+        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+      `)
       .eq("id", id)
+      .eq("exam.course.workspace", session.workspace)
+      .eq("student.workspace", session.workspace)
       .single();
 
     if (fetchError || !current) {

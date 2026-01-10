@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
   }
 
   // 세션 체크
-  const sessionCookie = request.cookies.get("session");
+  const sessionCookie다른 = request.cookies.get("session");
 
   // API 경로 처리
   if (pathname.startsWith("/api/")) {

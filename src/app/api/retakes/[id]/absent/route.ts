@@ -1,20 +1,26 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 재시험 결석 처리 (관리자만)
+// 재시험 결석 처리 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { note } = await request.json();
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // 현재 재시험 정보 조회
+    // 현재 재시험 정보 조회 (workspace 확인 포함)
     const { data: current, error: fetchError } = await supabase
       .from("RetakeAssignments")
-      .select("absent_count, current_scheduled_date")
+      .select(`
+        absent_count,
+        current_scheduled_date,
+        exam:Exams!inner(course:Courses!inner(workspace)),
+        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+      `)
       .eq("id", id)
+      .eq("exam.course.workspace", session.workspace)
+      .eq("student.workspace", session.workspace)
       .single();
 
     if (fetchError || !current) {

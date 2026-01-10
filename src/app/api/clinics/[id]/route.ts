@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 클리닉 정보 수정 (관리자만)
+// 클리닉 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { name, operatingDays, startDate, endDate } = await request.json();
 
@@ -25,9 +24,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     updateData.updated_at = new Date().toISOString();
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    const { data, error } = await supabase.from("Clinics").update(updateData).eq("id", id).select().single();
+    const { data, error } = await supabase
+      .from("Clinics")
+      .update(updateData)
+      .eq("id", id)
+      .eq("workspace", session.workspace)
+      .select()
+      .single();
 
     if (error) throw error;
 
@@ -38,15 +43,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 클리닉 삭제 (관리자만)
+// 클리닉 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    const { error } = await supabase.from("Clinics").delete().eq("id", id);
+    const { error } = await supabase.from("Clinics").delete().eq("id", id).eq("workspace", session.workspace);
 
     if (error) throw error;
 

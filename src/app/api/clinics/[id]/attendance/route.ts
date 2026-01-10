@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 클리닉 출석 조회
+// 클리닉 출석 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-    }
 
     const { id: clinicId } = await params;
     const { searchParams } = new URL(request.url);
@@ -15,6 +12,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const studentId = searchParams.get("studentId");
 
     const { supabase } = await getAuthenticatedClient();
+
+    // 먼저 clinic이 현재 workspace에 속하는지 확인
+    const { data: clinic } = await supabase
+      .from("Clinics")
+      .select("id")
+      .eq("id", clinicId)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!clinic) {
+      return NextResponse.json({ error: "클리닉을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     let query = supabase
       .from("ClinicAttendance")
@@ -44,10 +53,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 }
 
-// 출석 기록 (관리자만)
+// 출석 기록 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id: clinicId } = await params;
     const { studentIds, date, note } = await request.json();
 
@@ -55,7 +63,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "학생과 날짜를 선택해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 먼저 clinic이 현재 workspace에 속하는지 확인
+    const { data: clinic } = await supabase
+      .from("Clinics")
+      .select("id")
+      .eq("id", clinicId)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!clinic) {
+      return NextResponse.json({ error: "클리닉을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     // Insert attendance records (upsert to handle duplicates)
     const records = studentIds.map((studentId: string) => ({
@@ -79,10 +99,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 출석 목록 동기화 (토글 기능) - 관리자만
+// 출석 목록 동기화 (토글 기능) - 권한: middleware에서 이미 체크됨
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id: clinicId } = await params;
     const { studentIds, date, note } = await request.json();
 
@@ -90,7 +109,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "학생 목록과 날짜를 제공해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 먼저 clinic이 현재 workspace에 속하는지 확인
+    const { data: clinic } = await supabase
+      .from("Clinics")
+      .select("id")
+      .eq("id", clinicId)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!clinic) {
+      return NextResponse.json({ error: "클리닉을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     // 1. 현재 해당 날짜의 모든 출석 기록 조회
     const { data: existingRecords, error: fetchError } = await supabase
@@ -142,10 +173,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 출석 기록 삭제 (관리자만)
+// 출석 기록 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id: clinicId } = await params;
     const { searchParams } = new URL(request.url);
     const attendanceId = searchParams.get("attendanceId");
@@ -154,7 +184,19 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       return NextResponse.json({ error: "출석 ID가 필요합니다." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 먼저 clinic이 현재 workspace에 속하는지 확인
+    const { data: clinic } = await supabase
+      .from("Clinics")
+      .select("id")
+      .eq("id", clinicId)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!clinic) {
+      return NextResponse.json({ error: "클리닉을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const { error } = await supabase.from("ClinicAttendance").delete().eq("id", attendanceId).eq("clinic_id", clinicId);
 

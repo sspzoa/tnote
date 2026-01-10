@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 클리닉 목록 조회
+// 클리닉 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET() {
   try {
     const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-    }
 
     const { supabase } = await getAuthenticatedClient();
 
-    const { data, error } = await supabase.from("Clinics").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("Clinics")
+      .select("*")
+      .eq("workspace", session.workspace)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw error;
@@ -23,11 +24,9 @@ export async function GET() {
   }
 }
 
-// 클리닉 생성 (관리자만)
+// 클리닉 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
-    await requireAdminOrOwner();
-
     const body = await request.json();
     const { name, operatingDays, startDate, endDate } = body;
 

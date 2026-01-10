@@ -1,33 +1,46 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 학생 목록 조회 (관리자만)
+// 학생 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(request: Request) {
   try {
-    await requireAdminOrOwner();
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
     if (courseId) {
       // 특정 코스의 학생만 조회
+      // 먼저 코스가 현재 workspace에 속하는지 확인
+      const { data: courseData, error: courseError } = await supabase
+        .from("Courses")
+        .select("workspace")
+        .eq("id", courseId)
+        .eq("workspace", session.workspace)
+        .single();
+
+      if (courseError || !courseData) {
+        return NextResponse.json({ error: "코스를 찾을 수 없습니다." }, { status: 404 });
+      }
+
       const { data, error } = await supabase
         .from("CourseEnrollments")
         .select(`
           student_id,
           enrolled_at,
-          student:Users!CourseEnrollments_student_id_fkey(
+          student:Users!inner!CourseEnrollments_student_id_fkey(
             id,
             phone_number,
             name,
             parent_phone_number,
             school,
-            birth_year
+            birth_year,
+            workspace
           )
         `)
         .eq("course_id", courseId)
+        .eq("student.workspace", session.workspace)
         .order("enrolled_at", { ascending: true });
 
       if (error) throw error;
@@ -40,11 +53,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: students });
     }
 
-    // 전체 학생 조회 (role = student, RLS가 workspace 필터링 처리)
+    // 전체 학생 조회 (role = student, workspace로 필터링)
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
       .eq("role", "student")
+      .eq("workspace", session.workspace)
       .order("name", { ascending: true });
 
     if (error) throw error;
@@ -59,10 +73,9 @@ export async function GET(request: Request) {
   }
 }
 
-// 학생 생성 (관리자만)
+// 학생 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
-    await requireAdminOrOwner();
     const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
 
     if (!name || !phoneNumber) {

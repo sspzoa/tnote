@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 학생 정보 조회 (관리자만)
+// 학생 정보 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 다른 workspace의 학생 접근 방지
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, parent_phone_number, school, birth_year")
       .eq("id", id)
+      .eq("workspace", session.workspace)
       .single();
 
     if (error) throw error;
@@ -28,14 +28,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 학생 정보 수정 (관리자만)
+// 학생 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
@@ -44,11 +43,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (school !== undefined) updateData.school = school;
     if (birthYear !== undefined) updateData.birth_year = birthYear;
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 다른 workspace의 학생 수정 방지
     const { data, error } = await supabase
       .from("Users")
       .update(updateData)
       .eq("id", id)
+      .eq("workspace", session.workspace)
       .select("id, phone_number, name, parent_phone_number, school, birth_year")
       .single();
 
@@ -64,17 +64,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 학생 삭제 (관리자만)
+// 학생 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 다른 workspace의 학생 삭제 방지
     // CASCADE 외래 키로 관련 데이터 자동 삭제
-    const { error } = await supabase.from("Users").delete().eq("id", id);
+    const { error } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
     if (error) throw error;
 

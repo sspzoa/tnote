@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 코스 목록 조회 (관리자만)
+// 코스 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET() {
   try {
-    await requireAdminOrOwner();
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 현재 workspace의 코스만 조회
     const { data, error } = await supabase
       .from("Courses")
       .select(`
         *,
         enrollments:CourseEnrollments(count)
       `)
+      .eq("workspace", session.workspace)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -35,10 +35,9 @@ export async function GET() {
   }
 }
 
-// 코스 생성 (관리자만)
+// 코스 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
-    await requireAdminOrOwner();
     const { name, startDate, endDate, daysOfWeek } = await request.json();
 
     if (!name) {

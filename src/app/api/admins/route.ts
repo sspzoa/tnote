@@ -1,19 +1,18 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 관리자 목록 조회 (Owner만 가능)
+// 관리자 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET() {
   try {
-    await requireOwner();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    const { supabase } = await getAuthenticatedClient();
-
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 현재 workspace의 관리자만 조회
     const { data, error } = await supabase
       .from("Users")
       .select("id, phone_number, name, role, created_at")
       .in("role", ["owner", "admin"])
+      .eq("workspace", session.workspace)
       .order("created_at", { ascending: true });
 
     if (error) throw error;
@@ -28,11 +27,9 @@ export async function GET() {
   }
 }
 
-// 관리자 초대 (Owner만 가능)
+// 관리자 초대 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
-    await requireOwner();
-
     const { name, phoneNumber, password } = await request.json();
 
     if (!name || !phoneNumber || !password) {
@@ -45,11 +42,12 @@ export async function POST(request: Request) {
 
     const { supabase, session } = await getAuthenticatedClient();
 
-    // 전화번호 중복 체크 (RLS가 workspace 필터링 처리)
+    // 전화번호 중복 체크 (workspace 내에서 확인)
     const { data: existingUser } = await supabase
       .from("Users")
       .select("phone_number")
       .eq("phone_number", phoneNumber)
+      .eq("workspace", session.workspace)
       .single();
 
     if (existingUser) {

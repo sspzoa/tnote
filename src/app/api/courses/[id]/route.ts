@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 코스 정보 조회 (관리자만)
+// 코스 정보 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 다른 workspace의 코스 접근 방지
     const { data, error } = await supabase
       .from("Courses")
       .select(`
@@ -17,6 +16,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         student_count:CourseEnrollments(count)
       `)
       .eq("id", id)
+      .eq("workspace", session.workspace)
       .single();
 
     if (error) throw error;
@@ -37,10 +37,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-// 코스 정보 수정 (관리자만)
+// 코스 정보 수정 (권한: middleware에서 이미 체크됨)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
     const { name, startDate, endDate, daysOfWeek } = await request.json();
 
@@ -62,15 +61,21 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "올바른 요일을 선택해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
     const updateData: any = { name };
     if (startDate !== undefined) updateData.start_date = startDate || null;
     if (endDate !== undefined) updateData.end_date = endDate || null;
     if (daysOfWeek !== undefined) updateData.days_of_week = daysOfWeek || null;
 
-    // RLS가 workspace 필터링을 자동으로 처리
-    const { data, error } = await supabase.from("Courses").update(updateData).eq("id", id).select().single();
+    // workspace 필터링으로 다른 workspace의 코스 수정 방지
+    const { data, error } = await supabase
+      .from("Courses")
+      .update(updateData)
+      .eq("id", id)
+      .eq("workspace", session.workspace)
+      .select()
+      .single();
 
     if (error) throw error;
 
@@ -81,17 +86,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 }
 
-// 코스 삭제 (관리자만)
+// 코스 삭제 (권한: middleware에서 이미 체크됨)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
+    // workspace 필터링으로 다른 workspace의 코스 삭제 방지
     // CASCADE 외래 키로 관련 데이터 자동 삭제 (Enrollments, Exams, RetakeAssignments 등)
-    const { error } = await supabase.from("Courses").delete().eq("id", id);
+    const { error } = await supabase.from("Courses").delete().eq("id", id).eq("workspace", session.workspace);
 
     if (error) throw error;
 

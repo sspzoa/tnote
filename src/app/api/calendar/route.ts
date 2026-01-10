@@ -207,10 +207,11 @@ export async function GET(request: Request) {
         });
       });
 
-      // 3. Get all clinics with schedules
+      // 3. Get all clinics with schedules (workspace 필터링)
       const { data: clinics, error: clinicsError } = await supabase
         .from("Clinics")
         .select("id, name, start_date, end_date, operating_days")
+        .eq("workspace", session.workspace)
         .not("start_date", "is", null)
         .not("end_date", "is", null);
 
@@ -234,10 +235,11 @@ export async function GET(request: Request) {
     } else {
       // For admin/owner: show all workspace courses, retakes, clinics
 
-      // 1. Get all courses with schedules
+      // 1. Get all courses with schedules (workspace 필터링)
       const { data: courses, error: coursesError } = await supabase
         .from("Courses")
         .select("id, name, start_date, end_date, days_of_week")
+        .eq("workspace", session.workspace)
         .not("start_date", "is", null)
         .not("end_date", "is", null);
 
@@ -282,10 +284,11 @@ export async function GET(request: Request) {
         });
       });
 
-      // 3. Get all clinics with schedules
+      // 3. Get all clinics with schedules (workspace 필터링)
       const { data: clinics, error: clinicsError } = await supabase
         .from("Clinics")
         .select("id, name, start_date, end_date, operating_days")
+        .eq("workspace", session.workspace)
         .not("start_date", "is", null)
         .not("end_date", "is", null);
 

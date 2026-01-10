@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 관리자 삭제 (Owner만 가능, Owner 본인은 삭제 불가)
+// 관리자 삭제 (권한: middleware에서 이미 체크됨, Owner 본인은 삭제 불가)
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await requireOwner();
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
     // Owner 본인 삭제 방지
@@ -12,11 +16,15 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "본인 계정은 삭제할 수 없습니다." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
-    // RLS가 workspace 필터링을 자동으로 처리
-    // 같은 workspace의 사용자인지 확인
-    const { data: targetUser } = await supabase.from("Users").select("id, role").eq("id", id).single();
+    // workspace 필터링으로 같은 workspace의 사용자인지 확인
+    const { data: targetUser } = await supabase
+      .from("Users")
+      .select("id, role")
+      .eq("id", id)
+      .eq("workspace", session.workspace)
+      .single();
 
     if (!targetUser) {
       return NextResponse.json({ error: "사용자를 찾을 수 없습니다." }, { status: 404 });
@@ -27,8 +35,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "워크스페이스 소유자는 삭제할 수 없습니다." }, { status: 400 });
     }
 
-    // 관리자 삭제 (RLS가 workspace 안전성 보장)
-    const { error: deleteError } = await supabase.from("Users").delete().eq("id", id);
+    // 관리자 삭제 (workspace 필터링으로 안전성 보장)
+    const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
     if (deleteError) throw deleteError;
 

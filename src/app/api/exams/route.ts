@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 시험 목록 조회 (관리자만)
+// 시험 목록 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(request: Request) {
   try {
-    await requireAdminOrOwner();
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
 
@@ -37,17 +36,28 @@ export async function GET(request: Request) {
   }
 }
 
-// 시험 생성 (관리자만)
+// 시험 생성 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
-    await requireAdminOrOwner();
     const { courseId, examNumber, name } = await request.json();
 
     if (!courseId || !examNumber || !name) {
       return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 코스가 현재 workspace에 속하는지 확인
+    const { data: course } = await supabase
+      .from("Courses")
+      .select("id")
+      .eq("id", courseId)
+      .eq("workspace", session.workspace)
+      .single();
+
+    if (!course) {
+      return NextResponse.json({ error: "코스를 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const { data, error } = await supabase
       .from("Exams")

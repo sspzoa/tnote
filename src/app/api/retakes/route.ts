@@ -1,17 +1,40 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
 
-// 재시험 할당 (관리자만)
+// 재시험 할당 (권한: middleware에서 이미 체크됨)
 export async function POST(request: Request) {
   try {
-    await requireAdminOrOwner();
     const { examId, studentIds, scheduledDate } = await request.json();
 
     if (!examId || !studentIds || !Array.isArray(studentIds) || !scheduledDate) {
       return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
     }
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // exam이 현재 workspace의 코스에 속하는지 확인
+    const { data: exam } = await supabase
+      .from("Exams")
+      .select("id, course:Courses!inner(workspace)")
+      .eq("id", examId)
+      .eq("course.workspace", session.workspace)
+      .single();
+
+    if (!exam) {
+      return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    // 모든 학생이 현재 workspace에 속하는지 확인
+    const { data: students } = await supabase
+      .from("Users")
+      .select("id")
+      .in("id", studentIds)
+      .eq("workspace", session.workspace)
+      .eq("role", "student");
+
+    if (!students || students.length !== studentIds.length) {
+      return NextResponse.json({ error: "일부 학생을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     // 각 학생에게 재시험 할당
     const assignments = studentIds.map((studentId) => ({
@@ -47,13 +70,10 @@ export async function POST(request: Request) {
   }
 }
 
-// 재시험 목록 조회 (관리자는 전체, 학생은 본인 것만)
+// 재시험 목록 조회 (권한: middleware에서 이미 체크됨, 학생은 본인 것만 필터링)
 export async function GET(request: Request) {
   try {
     const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-    }
 
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");

@@ -1,11 +1,10 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 비밀번호 재설정 (전화번호로 초기화) - 관리자만
+// 비밀번호 재설정 (전화번호로 초기화) - 권한: middleware에서 이미 체크됨
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params; // student uuid
 
     const { supabase, session } = await getAuthenticatedClient();

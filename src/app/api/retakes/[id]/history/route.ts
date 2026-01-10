@@ -1,13 +1,29 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, requireAdminOrOwner } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// 재시험 이력 조회 (관리자만)
+// 재시험 이력 조회 (권한: middleware에서 이미 체크됨)
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdminOrOwner();
     const { id } = await params;
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
+
+    // 먼저 RetakeAssignment가 현재 workspace에 속하는지 확인
+    const { data: retake } = await supabase
+      .from("RetakeAssignments")
+      .select(`
+        id,
+        exam:Exams!inner(course:Courses!inner(workspace)),
+        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+      `)
+      .eq("id", id)
+      .eq("exam.course.workspace", session.workspace)
+      .eq("student.workspace", session.workspace)
+      .single();
+
+    if (!retake) {
+      return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const { data, error } = await supabase
       .from("RetakeHistory")
