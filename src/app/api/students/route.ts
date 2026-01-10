@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         .select(`
           student_id,
           enrolled_at,
-          student:Users!inner!CourseEnrollments_student_id_fkey(
+          student:Users!CourseEnrollments_student_id_fkey!inner(
             id,
             phone_number,
             name,

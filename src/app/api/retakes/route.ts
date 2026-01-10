@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
 export async function POST(request: Request) {
   try {
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const session = await getSession();
+    const { supabase, session } = await getAuthenticatedClient();
 
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
@@ -78,14 +78,12 @@ export async function GET(request: Request) {
       studentId = session.userId;
     }
 
-    const { supabase } = await getAuthenticatedClient();
-
     let query = supabase
       .from("RetakeAssignments")
       .select(`
         *,
         exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(id, phone_number, name, school, workspace)
+        student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
       `)
       .eq("student.workspace", session.workspace)
       .order("current_scheduled_date", { ascending: true });

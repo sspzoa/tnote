@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
 export async function GET() {
   try {
-    const session = await getSession();
-
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
     const { data, error } = await supabase
       .from("Clinics")

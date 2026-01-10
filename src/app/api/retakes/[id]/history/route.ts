@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       .select(`
         id,
         exam:Exams!inner(course:Courses!inner(workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+        student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
       `)
       .eq("id", id)
       .eq("exam.course.workspace", session.workspace)

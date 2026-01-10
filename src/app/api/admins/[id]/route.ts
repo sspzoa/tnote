@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const { supabase, session } = await getAuthenticatedClient();
     const { id } = await params;
 
     if (id === session.userId) {
       return NextResponse.json({ error: "본인 계정은 삭제할 수 없습니다." }, { status: 400 });
     }
-
-    const { supabase, session } = await getAuthenticatedClient();
 
     const { data: targetUser } = await supabase
       .from("Users")
@@ -31,7 +25,11 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "워크스페이스 소유자는 삭제할 수 없습니다." }, { status: 400 });
     }
 
-    const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
+    const { error: deleteError } = await supabase
+      .from("Users")
+      .delete()
+      .eq("id", id)
+      .eq("workspace", session.workspace);
 
     if (deleteError) throw deleteError;
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
 interface CalendarEvent {
   id: string;
@@ -126,16 +126,11 @@ function generateCourseSessions(course: {
 
 export async function GET(request: Request) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-    }
+    const { supabase, session } = await getAuthenticatedClient();
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("start"); // YYYY-MM-DD
     const endDate = searchParams.get("end"); // YYYY-MM-DD
-
-    const { supabase } = await getAuthenticatedClient();
 
     const events: CalendarEvent[] = [];
 
@@ -213,7 +208,7 @@ export async function GET(request: Request) {
 
       clinics?.forEach((clinic: any) => {
         if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-              const clinicAttendance = allAttendance?.filter((a) => a.clinic_id === clinic.id) || [];
+          const clinicAttendance = allAttendance?.filter((a) => a.clinic_id === clinic.id) || [];
           events.push(...generateClinicSessions(clinic, clinicAttendance, session.userId));
         }
       });

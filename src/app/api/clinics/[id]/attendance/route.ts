@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient, getSession } from "@/shared/lib/supabase/auth";
+import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getSession();
-
     const { id: clinicId } = await params;
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
     const studentId = searchParams.get("studentId");
 
-    const { supabase } = await getAuthenticatedClient();
+    const { supabase, session } = await getAuthenticatedClient();
 
     const { data: clinic } = await supabase
       .from("Clinics")
@@ -47,6 +45,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ data });
   } catch (error: any) {
     console.error("Clinic attendance fetch error:", error);
+    if (error.message === "Unauthorized" || error.message === "Forbidden") {
+      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+    }
     return NextResponse.json({ error: "출석 조회 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
@@ -90,6 +91,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     console.error("Clinic attendance creation error:", error);
+    if (error.message === "Unauthorized" || error.message === "Forbidden") {
+      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+    }
     return NextResponse.json({ error: "출석 기록 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
@@ -156,6 +160,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     });
   } catch (error: any) {
     console.error("Clinic attendance sync error:", error);
+    if (error.message === "Unauthorized" || error.message === "Forbidden") {
+      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+    }
     return NextResponse.json({ error: "출석 동기화 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
@@ -190,6 +197,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Clinic attendance delete error:", error);
+    if (error.message === "Unauthorized" || error.message === "Forbidden") {
+      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+    }
     return NextResponse.json({ error: "출석 삭제 중 오류가 발생했습니다." }, { status: 500 });
   }
 }

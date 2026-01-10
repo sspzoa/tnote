@@ -14,7 +14,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         absent_count,
         current_scheduled_date,
         exam:Exams!inner(course:Courses!inner(workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+        student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
       `)
       .eq("id", id)
       .eq("exam.course.workspace", session.workspace)

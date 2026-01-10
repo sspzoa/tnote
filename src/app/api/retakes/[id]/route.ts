@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       .select(`
         *,
         exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(id, phone_number, name, school, workspace)
+        student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
       `)
       .eq("id", id)
       .eq("exam.course.workspace", session.workspace)
@@ -43,7 +43,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       .select(`
         id,
         exam:Exams!inner(course:Courses!inner(workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+        student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
       `)
       .eq("id", id)
       .eq("exam.course.workspace", session.workspace)
@@ -93,7 +93,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       .select(`
         id,
         exam:Exams!inner(course:Courses!inner(workspace)),
-        student:Users!inner!RetakeAssignments_student_id_fkey(workspace)
+        student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
       `)
       .eq("id", id)
       .eq("exam.course.workspace", session.workspace)
