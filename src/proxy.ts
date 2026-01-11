@@ -50,7 +50,7 @@ export function proxy(request: NextRequest) {
         return NextResponse.next();
       }
 
-      const adminOnlyApis = ["/api/students", "/api/courses", "/api/exams", "/api/clinics"];
+      const adminOnlyApis = ["/api/students", "/api/courses", "/api/exams", "/api/clinics", "/api/consultations"];
       if (adminOnlyApis.some((path) => pathname.startsWith(path))) {
         if (role === "student") {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });

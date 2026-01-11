@@ -19,6 +19,16 @@ interface Course {
   name: string;
 }
 
+interface ConsultationLog {
+  id: string;
+  student_id: string;
+  consultation_date: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -44,6 +54,19 @@ export default function StudentsPage() {
     birthYear: "",
   });
   const [saving, setSaving] = useState(false);
+
+  // 상담일지 관련 상태
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [consultationLogs, setConsultationLogs] = useState<ConsultationLog[]>([]);
+  const [loadingConsultations, setLoadingConsultations] = useState(false);
+  const [showAddConsultationModal, setShowAddConsultationModal] = useState(false);
+  const [showEditConsultationModal, setShowEditConsultationModal] = useState(false);
+  const [selectedConsultation, setSelectedConsultation] = useState<ConsultationLog | null>(null);
+  const [consultationForm, setConsultationForm] = useState({
+    date: new Date().toISOString().split("T")[0],
+    title: "",
+    content: "",
+  });
 
   useEffect(() => {
     fetchCourses();
@@ -234,6 +257,131 @@ export default function StudentsPage() {
     }
   };
 
+  // 상담일지 관련 함수
+  const openConsultationModal = async (student: Student) => {
+    setSelectedStudent(student);
+    setShowConsultationModal(true);
+    await fetchConsultationLogs(student.id);
+  };
+
+  const fetchConsultationLogs = async (studentId: string) => {
+    setLoadingConsultations(true);
+    try {
+      const response = await fetch(`/api/students/${studentId}/consultations`);
+      const result = await response.json();
+      setConsultationLogs(result.data || []);
+    } catch (error) {
+      console.error("Failed to fetch consultation logs:", error);
+    } finally {
+      setLoadingConsultations(false);
+    }
+  };
+
+  const handleAddConsultation = async () => {
+    if (!selectedStudent || !consultationForm.title.trim() || !consultationForm.content.trim()) {
+      alert("제목과 상담 내용을 입력해주세요.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/students/${selectedStudent.id}/consultations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          consultationDate: consultationForm.date,
+          title: consultationForm.title,
+          content: consultationForm.content,
+        }),
+      });
+
+      if (response.ok) {
+        alert("상담일지가 추가되었습니다.");
+        setShowAddConsultationModal(false);
+        setConsultationForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
+        await fetchConsultationLogs(selectedStudent.id);
+      } else {
+        const result = await response.json();
+        alert(result.error || "상담일지 추가에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Add consultation error:", error);
+      alert("오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEditConsultation = async () => {
+    if (!selectedConsultation || !consultationForm.title.trim() || !consultationForm.content.trim()) {
+      alert("제목과 상담 내용을 입력해주세요.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/consultations/${selectedConsultation.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          consultationDate: consultationForm.date,
+          title: consultationForm.title,
+          content: consultationForm.content,
+        }),
+      });
+
+      if (response.ok) {
+        alert("상담일지가 수정되었습니다.");
+        setShowEditConsultationModal(false);
+        if (selectedStudent) {
+          await fetchConsultationLogs(selectedStudent.id);
+        }
+      } else {
+        const result = await response.json();
+        alert(result.error || "상담일지 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Edit consultation error:", error);
+      alert("오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteConsultation = async (consultation: ConsultationLog) => {
+    if (!confirm("이 상담일지를 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/consultations/${consultation.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        alert("상담일지가 삭제되었습니다.");
+        if (selectedStudent) {
+          await fetchConsultationLogs(selectedStudent.id);
+        }
+      } else {
+        alert("상담일지 삭제에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Delete consultation error:", error);
+      alert("오류가 발생했습니다.");
+    }
+  };
+
+  const openEditConsultationModal = (consultation: ConsultationLog) => {
+    setSelectedConsultation(consultation);
+    setConsultationForm({
+      date: consultation.consultation_date,
+      title: consultation.title,
+      content: consultation.content,
+    });
+    setShowEditConsultationModal(true);
+  };
+
   const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
@@ -359,6 +507,15 @@ export default function StudentsPage() {
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
                           <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[160px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
+                            <button
+                              onClick={() => {
+                                setOpenMenuId(null);
+                                openConsultationModal(student);
+                              }}
+                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                              상담일지
+                            </button>
+                            <div className="my-spacing-100 border-line-divider border-t" />
                             <button
                               onClick={() => handleEditClick(student)}
                               className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
@@ -581,6 +738,236 @@ export default function StudentsPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving || !editForm.name || !editForm.phoneNumber}
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+                  {saving ? "저장 중..." : "저장"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 상담일지 목록 모달 */}
+        {showConsultationModal && selectedStudent && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowConsultationModal(false)}>
+            <div
+              className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="mb-spacing-100 font-bold text-content-standard-primary text-heading">
+                  {selectedStudent.name} - 상담일지
+                </h2>
+                <p className="text-content-standard-secondary text-label">학생의 상담 기록을 관리합니다</p>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-spacing-600">
+                {loadingConsultations ? (
+                  <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+                ) : consultationLogs.length === 0 ? (
+                  <div className="py-spacing-900 text-center">
+                    <p className="text-body text-content-standard-tertiary">상담일지가 없습니다.</p>
+                    <button
+                      onClick={() => {
+                        setConsultationForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
+                        setShowAddConsultationModal(true);
+                      }}
+                      className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+                      첫 상담일지 작성
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-spacing-300">
+                    {consultationLogs.map((log) => (
+                      <div
+                        key={log.id}
+                        onClick={() => openEditConsultationModal(log)}
+                        className="cursor-pointer rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-400 transition-colors hover:bg-components-interactive-hover">
+                        <div className="flex items-start justify-between gap-spacing-300">
+                          <div className="flex-1">
+                            <div className="mb-spacing-100 flex items-center gap-spacing-300">
+                              <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                                {log.consultation_date}
+                              </span>
+                            </div>
+                            <h3 className="font-medium text-body text-content-standard-primary">{log.title}</h3>
+                          </div>
+                          <svg
+                            className="h-5 w-5 flex-shrink-0 text-content-standard-tertiary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
+                <button
+                  onClick={() => setShowConsultationModal(false)}
+                  className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  닫기
+                </button>
+                <button
+                  onClick={() => {
+                    setConsultationForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
+                    setShowAddConsultationModal(true);
+                  }}
+                  className="flex-1 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90">
+                  + 상담일지 추가
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 상담일지 추가 모달 */}
+        {showAddConsultationModal && selectedStudent && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowAddConsultationModal(false)}>
+            <div
+              className="w-full max-w-2xl rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">상담일지 추가</h2>
+                <p className="mt-spacing-100 text-content-standard-secondary text-label">
+                  {selectedStudent.name} 학생의 상담일지를 작성합니다
+                </p>
+              </div>
+
+              <div className="space-y-spacing-400 p-spacing-600">
+                <div>
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+                    상담 날짜 <span className="text-core-status-negative">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={consultationForm.date}
+                    onChange={(e) => setConsultationForm({ ...consultationForm, date: e.target.value })}
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+                    제목 <span className="text-core-status-negative">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={consultationForm.title}
+                    onChange={(e) => setConsultationForm({ ...consultationForm, title: e.target.value })}
+                    placeholder="상담 제목을 입력하세요"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+                    상담 내용 <span className="text-core-status-negative">*</span>
+                  </label>
+                  <textarea
+                    value={consultationForm.content}
+                    onChange={(e) => setConsultationForm({ ...consultationForm, content: e.target.value })}
+                    rows={10}
+                    placeholder="상담 내용을 입력하세요"
+                    className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
+                <button
+                  onClick={() => setShowAddConsultationModal(false)}
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  취소
+                </button>
+                <button
+                  onClick={handleAddConsultation}
+                  disabled={saving || !consultationForm.title.trim() || !consultationForm.content.trim()}
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+                  {saving ? "추가 중..." : "추가"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 상담일지 수정 모달 */}
+        {showEditConsultationModal && selectedConsultation && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={() => setShowEditConsultationModal(false)}>
+            <div
+              className="w-full max-w-2xl rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">상담일지 수정</h2>
+              </div>
+
+              <div className="space-y-spacing-400 p-spacing-600">
+                <div>
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+                    상담 날짜 <span className="text-core-status-negative">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={consultationForm.date}
+                    onChange={(e) => setConsultationForm({ ...consultationForm, date: e.target.value })}
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+                    제목 <span className="text-core-status-negative">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={consultationForm.title}
+                    onChange={(e) => setConsultationForm({ ...consultationForm, title: e.target.value })}
+                    placeholder="상담 제목을 입력하세요"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+                    상담 내용 <span className="text-core-status-negative">*</span>
+                  </label>
+                  <textarea
+                    value={consultationForm.content}
+                    onChange={(e) => setConsultationForm({ ...consultationForm, content: e.target.value })}
+                    rows={10}
+                    placeholder="상담 내용을 입력하세요"
+                    className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
+                <button
+                  onClick={() => setShowEditConsultationModal(false)}
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  취소
+                </button>
+                <button
+                  onClick={() => {
+                    if (selectedConsultation) {
+                      setShowEditConsultationModal(false);
+                      handleDeleteConsultation(selectedConsultation);
+                    }
+                  }}
+                  className="flex-1 rounded-radius-300 bg-core-status-negative px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90">
+                  삭제
+                </button>
+                <button
+                  onClick={handleEditConsultation}
+                  disabled={saving || !consultationForm.title.trim() || !consultationForm.content.trim()}
                   className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "저장 중..." : "저장"}
                 </button>
