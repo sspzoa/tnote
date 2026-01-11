@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { useState } from "react";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import { showAddConsultationModalAtom, showEditConsultationModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
@@ -6,12 +7,31 @@ import { useConsultationCreate } from "../(hooks)/useConsultationCreate";
 import { useConsultationDelete } from "../(hooks)/useConsultationDelete";
 import { useConsultationUpdate } from "../(hooks)/useConsultationUpdate";
 
+const NEW_STUDENT_TEMPLATE = `1. 수강 계기
+-
+
+2. 공부해 오던 방식
+- 
+
+3. 기존 성적대
+- 
+
+4. 목표 성적대
+- 
+
+5. 특별히 원하는 점
+- 
+
+6. 기타
+- `;
+
 export default function ConsultationFormModal() {
   const [showAddModal, setShowAddModal] = useAtom(showAddConsultationModalAtom);
   const [showEditModal, setShowEditModal] = useAtom(showEditConsultationModalAtom);
   const selectedStudent = useAtomValue(selectedStudentAtom);
   const selectedConsultation = useAtomValue(selectedConsultationAtom);
   const [form, setForm] = useAtom(consultationFormAtom);
+  const [isNewStudentConsultation, setIsNewStudentConsultation] = useState(false);
   const { createConsultation, isCreating } = useConsultationCreate();
   const { updateConsultation, isUpdating } = useConsultationUpdate();
   const { deleteConsultation, isDeleting } = useConsultationDelete();
@@ -27,6 +47,24 @@ export default function ConsultationFormModal() {
       setShowEditModal(false);
     } else {
       setShowAddModal(false);
+      setIsNewStudentConsultation(false);
+    }
+  };
+
+  const handleNewStudentCheckbox = (checked: boolean) => {
+    setIsNewStudentConsultation(checked);
+    if (checked) {
+      setForm({
+        ...form,
+        title: "신규생 상담",
+        content: NEW_STUDENT_TEMPLATE,
+      });
+    } else {
+      setForm({
+        ...form,
+        title: "",
+        content: "",
+      });
     }
   };
 
@@ -46,6 +84,7 @@ export default function ConsultationFormModal() {
       alert("상담일지가 추가되었습니다.");
       setShowAddModal(false);
       setForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
+      setIsNewStudentConsultation(false);
     } catch (error) {
       console.error("Add consultation error:", error);
       alert(error instanceof Error ? error.message : "상담일지 추가에 실패했습니다.");
@@ -113,6 +152,23 @@ export default function ConsultationFormModal() {
         </div>
 
         <div className="space-y-spacing-400 p-spacing-600">
+          {!isEditMode && (
+            <div className="flex items-center gap-spacing-300">
+              <input
+                type="checkbox"
+                id="newStudentConsultation"
+                checked={isNewStudentConsultation}
+                onChange={(e) => handleNewStudentCheckbox(e.target.checked)}
+                className="h-5 w-5 cursor-pointer rounded border-line-outline text-core-accent transition-all focus:ring-2 focus:ring-core-accent-translucent"
+              />
+              <label
+                htmlFor="newStudentConsultation"
+                className="cursor-pointer font-semibold text-body text-content-standard-primary">
+                신규생 상담 (템플릿 자동 입력)
+              </label>
+            </div>
+          )}
+
           <div>
             <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
               상담 날짜 <span className="text-core-status-negative">*</span>
