@@ -1,6 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { openMenuIdAtom, type Retake } from "../(atoms)/useRetakesStore";
 
 interface RetakeListProps {
@@ -107,7 +108,9 @@ export default function RetakeList({
                   <div className="font-medium text-body text-content-standard-primary hover:text-core-accent">
                     {retake.student.name}
                   </div>
-                  <div className="text-content-standard-tertiary text-footnote">{retake.student.phone_number}</div>
+                  <div className="text-content-standard-tertiary text-footnote">
+                    {formatPhoneNumber(retake.student.phone_number)}
+                  </div>
                 </button>
               </td>
               <td className="px-spacing-500 py-spacing-400">

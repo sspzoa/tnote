@@ -1,6 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { selectedStudentIdAtom, showStudentModalAtom } from "../(atoms)/useModalStore";
 import { useStudentInfo } from "../(hooks)/useStudentInfo";
 
@@ -66,14 +67,16 @@ export default function StudentInfoModal() {
                 <div className="flex items-start gap-spacing-300">
                   <span className="w-24 flex-shrink-0 text-body text-content-standard-tertiary">전화번호</span>
                   <span className="font-medium text-body text-content-standard-primary">
-                    {studentInfo.phone_number}
+                    {formatPhoneNumber(studentInfo.phone_number)}
                   </span>
                 </div>
 
                 {studentInfo.parent_phone_number && (
                   <div className="flex items-start gap-spacing-300">
                     <span className="w-24 flex-shrink-0 text-body text-content-standard-tertiary">부모님</span>
-                    <span className="text-body text-content-standard-secondary">{studentInfo.parent_phone_number}</span>
+                    <span className="text-body text-content-standard-secondary">
+                      {formatPhoneNumber(studentInfo.parent_phone_number)}
+                    </span>
                   </div>
                 )}
 

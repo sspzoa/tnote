@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showConsultationModalAtom, showEditModalAtom } from "../(atoms)/useModalStore";
 import type { Student } from "../(atoms)/useStudentsStore";
@@ -52,7 +53,11 @@ export default function StudentList({ students }: StudentListProps) {
 
   const handleResetPassword = async (student: Student) => {
     setOpenMenuId(null);
-    if (!confirm(`${student.name} 학생의 비밀번호를 전화번호(${student.phone_number})로 초기화하시겠습니까?`)) {
+    if (
+      !confirm(
+        `${student.name} 학생의 비밀번호를 전화번호(${formatPhoneNumber(student.phone_number)})로 초기화하시겠습니까?`,
+      )
+    ) {
       return;
     }
 
@@ -127,10 +132,10 @@ export default function StudentList({ students }: StudentListProps) {
                 )}
               </td>
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                {student.phone_number}
+                {formatPhoneNumber(student.phone_number)}
               </td>
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                {student.parent_phone_number || "-"}
+                {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
               </td>
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {student.school || "-"}

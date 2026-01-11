@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { createFormAtom } from "../(atoms)/useFormStore";
 import { showCreateModalAtom } from "../(atoms)/useModalStore";
 import { useStudentCreate } from "../(hooks)/useStudentCreate";
@@ -13,8 +14,8 @@ export default function StudentCreateModal() {
     try {
       await createStudent({
         name: form.name,
-        phoneNumber: form.phoneNumber,
-        parentPhoneNumber: form.parentPhoneNumber || null,
+        phoneNumber: removePhoneHyphens(form.phoneNumber),
+        parentPhoneNumber: form.parentPhoneNumber ? removePhoneHyphens(form.parentPhoneNumber) : null,
         school: form.school || null,
         birthYear: form.birthYear || null,
       });

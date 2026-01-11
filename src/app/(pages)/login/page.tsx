@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 interface Workspace {
   id: string;
@@ -53,7 +54,7 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          phoneNumber,
+          phoneNumber: removePhoneHyphens(phoneNumber),
           password,
           workspaceId: tab === "student" ? workspaceId : undefined,
           isTeacher: tab === "teacher",
@@ -101,7 +102,7 @@ export default function LoginPage() {
         },
         body: JSON.stringify({
           name: registerForm.name,
-          phoneNumber: registerForm.phoneNumber,
+          phoneNumber: removePhoneHyphens(registerForm.phoneNumber),
           password: registerForm.password,
           workspaceName: registerForm.workspaceName,
         }),

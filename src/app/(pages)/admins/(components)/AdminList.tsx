@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
 
@@ -58,7 +59,7 @@ export default function AdminList({ admins }: AdminListProps) {
                 {admin.name}
               </td>
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                {admin.phone_number}
+                {formatPhoneNumber(admin.phone_number)}
               </td>
               <td className="px-spacing-500 py-spacing-400">
                 <span

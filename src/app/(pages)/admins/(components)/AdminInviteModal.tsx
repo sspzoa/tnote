@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { formErrorAtom, inviteFormAtom } from "../(atoms)/useFormStore";
 import { showInviteModalAtom } from "../(atoms)/useModalStore";
 import { useAdminCreate } from "../(hooks)/useAdminCreate";
@@ -27,7 +28,7 @@ export default function AdminInviteModal() {
     try {
       await createAdmin({
         name: form.name,
-        phoneNumber: form.phoneNumber,
+        phoneNumber: removePhoneHyphens(form.phoneNumber),
         password: form.password,
       });
       alert("관리자가 추가되었습니다.");
