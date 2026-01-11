@@ -30,6 +30,8 @@ export default function CoursesPage() {
   const [enrolledSearchQuery, setEnrolledSearchQuery] = useState("");
   const [unenrolledSearchQuery, setUnenrolledSearchQuery] = useState("");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [loadingStudentId, setLoadingStudentId] = useState<string | null>(null);
+  const [loadingEnrolledStudents, setLoadingEnrolledStudents] = useState(false);
 
   useEffect(() => {
     fetchCourses();
@@ -59,13 +61,20 @@ export default function CoursesPage() {
     }
   };
 
-  const fetchEnrolledStudents = async (courseId: string) => {
+  const fetchEnrolledStudents = async (courseId: string, showLoading = true) => {
+    if (showLoading) {
+      setLoadingEnrolledStudents(true);
+    }
     try {
       const response = await fetch(`/api/courses/${courseId}/students`);
       const result = await response.json();
       setEnrolledStudents(result.data || []);
     } catch (error) {
       console.error("Failed to fetch enrolled students:", error);
+    } finally {
+      if (showLoading) {
+        setLoadingEnrolledStudents(false);
+      }
     }
   };
 
@@ -153,6 +162,7 @@ export default function CoursesPage() {
   const handleEnroll = async (studentId: string) => {
     if (!selectedCourse) return;
 
+    setLoadingStudentId(studentId);
     try {
       const response = await fetch(`/api/courses/${selectedCourse.id}/enroll`, {
         method: "POST",
@@ -161,8 +171,7 @@ export default function CoursesPage() {
       });
 
       if (response.ok) {
-        alert("학생이 등록되었습니다.");
-        fetchEnrolledStudents(selectedCourse.id);
+        fetchEnrolledStudents(selectedCourse.id, false);
         fetchCourses();
       } else {
         const result = await response.json();
@@ -171,14 +180,15 @@ export default function CoursesPage() {
     } catch (error) {
       console.error("Enroll error:", error);
       alert("오류가 발생했습니다.");
+    } finally {
+      setLoadingStudentId(null);
     }
   };
 
   const handleUnenroll = async (studentId: string) => {
     if (!selectedCourse) return;
 
-    if (!confirm("이 학생을 수업에서 제거하시겠습니까?")) return;
-
+    setLoadingStudentId(studentId);
     try {
       const response = await fetch(`/api/courses/${selectedCourse.id}/enroll`, {
         method: "DELETE",
@@ -187,8 +197,7 @@ export default function CoursesPage() {
       });
 
       if (response.ok) {
-        alert("학생이 제거되었습니다.");
-        fetchEnrolledStudents(selectedCourse.id);
+        fetchEnrolledStudents(selectedCourse.id, false);
         fetchCourses();
       } else {
         alert("학생 제거에 실패했습니다.");
@@ -196,6 +205,8 @@ export default function CoursesPage() {
     } catch (error) {
       console.error("Unenroll error:", error);
       alert("오류가 발생했습니다.");
+    } finally {
+      setLoadingStudentId(null);
     }
   };
 
@@ -446,95 +457,103 @@ export default function CoursesPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-spacing-600">
-                {/* 등록된 학생 */}
-                <div className="mb-spacing-600">
-                  <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
-                    등록된 학생 ({enrolledStudents.length}명)
-                  </h3>
-                  {enrolledStudents.length === 0 ? (
-                    <p className="text-content-standard-tertiary text-label">등록된 학생이 없습니다.</p>
-                  ) : (
-                    <>
-                      <input
-                        type="text"
-                        placeholder="이름 검색..."
-                        value={enrolledSearchQuery}
-                        onChange={(e) => setEnrolledSearchQuery(e.target.value)}
-                        className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                      />
-                      {getFilteredEnrolledStudents().length === 0 ? (
-                        <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
+                {loadingEnrolledStudents ? (
+                  <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+                ) : (
+                  <>
+                    {/* 등록된 학생 */}
+                    <div className="mb-spacing-600">
+                      <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
+                        등록된 학생 ({enrolledStudents.length}명)
+                      </h3>
+                      {enrolledStudents.length === 0 ? (
+                        <p className="text-content-standard-tertiary text-label">등록된 학생이 없습니다.</p>
                       ) : (
-                        <div className="grid grid-cols-2 gap-spacing-200">
-                          {getFilteredEnrolledStudents().map((student) => (
-                            <div
-                              key={student.id}
-                              className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                              <div>
-                                <div className="font-medium text-body text-content-standard-primary">
-                                  {student.name}
+                        <>
+                          <input
+                            type="text"
+                            placeholder="이름 검색..."
+                            value={enrolledSearchQuery}
+                            onChange={(e) => setEnrolledSearchQuery(e.target.value)}
+                            className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                          />
+                          {getFilteredEnrolledStudents().length === 0 ? (
+                            <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-spacing-200">
+                              {getFilteredEnrolledStudents().map((student) => (
+                                <div
+                                  key={student.id}
+                                  className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
+                                  <div>
+                                    <div className="font-medium text-body text-content-standard-primary">
+                                      {student.name}
+                                    </div>
+                                    <div className="text-content-standard-tertiary text-footnote">
+                                      {student.phone_number}
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => handleUnenroll(student.id)}
+                                    disabled={loadingStudentId === student.id}
+                                    className="rounded-radius-200 bg-solid-translucent-red px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-red transition-colors hover:bg-solid-translucent-pink disabled:cursor-not-allowed disabled:opacity-50">
+                                    {loadingStudentId === student.id ? "제거 중..." : "제거"}
+                                  </button>
                                 </div>
-                                <div className="text-content-standard-tertiary text-footnote">
-                                  {student.phone_number}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => handleUnenroll(student.id)}
-                                className="rounded-radius-200 bg-solid-translucent-red px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-red transition-colors hover:bg-solid-translucent-pink">
-                                제거
-                              </button>
+                              ))}
                             </div>
-                          ))}
-                        </div>
+                          )}
+                        </>
                       )}
-                    </>
-                  )}
-                </div>
+                    </div>
 
-                {/* 미등록 학생 */}
-                <div>
-                  <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
-                    학생 추가 ({getUnenrolledStudents().length}명)
-                  </h3>
-                  {getUnenrolledStudents().length === 0 ? (
-                    <p className="text-content-standard-tertiary text-label">모든 학생이 등록되었습니다.</p>
-                  ) : (
-                    <>
-                      <input
-                        type="text"
-                        placeholder="이름 검색..."
-                        value={unenrolledSearchQuery}
-                        onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
-                        className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                      />
-                      {getFilteredUnenrolledStudents().length === 0 ? (
-                        <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
+                    {/* 미등록 학생 */}
+                    <div>
+                      <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
+                        학생 추가 ({getUnenrolledStudents().length}명)
+                      </h3>
+                      {getUnenrolledStudents().length === 0 ? (
+                        <p className="text-content-standard-tertiary text-label">모든 학생이 등록되었습니다.</p>
                       ) : (
-                        <div className="grid grid-cols-2 gap-spacing-200">
-                          {getFilteredUnenrolledStudents().map((student) => (
-                            <div
-                              key={student.id}
-                              className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                              <div>
-                                <div className="font-medium text-body text-content-standard-primary">
-                                  {student.name}
+                        <>
+                          <input
+                            type="text"
+                            placeholder="이름 검색..."
+                            value={unenrolledSearchQuery}
+                            onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
+                            className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+                          />
+                          {getFilteredUnenrolledStudents().length === 0 ? (
+                            <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-spacing-200">
+                              {getFilteredUnenrolledStudents().map((student) => (
+                                <div
+                                  key={student.id}
+                                  className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
+                                  <div>
+                                    <div className="font-medium text-body text-content-standard-primary">
+                                      {student.name}
+                                    </div>
+                                    <div className="text-content-standard-tertiary text-footnote">
+                                      {student.phone_number}
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => handleEnroll(student.id)}
+                                    disabled={loadingStudentId === student.id}
+                                    className="rounded-radius-200 bg-solid-translucent-green px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-green transition-colors hover:bg-solid-translucent-green disabled:cursor-not-allowed disabled:opacity-50">
+                                    {loadingStudentId === student.id ? "추가 중..." : "추가"}
+                                  </button>
                                 </div>
-                                <div className="text-content-standard-tertiary text-footnote">
-                                  {student.phone_number}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => handleEnroll(student.id)}
-                                className="rounded-radius-200 bg-solid-translucent-green px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-green transition-colors hover:bg-solid-translucent-green">
-                                추가
-                              </button>
+                              ))}
                             </div>
-                          ))}
-                        </div>
+                          )}
+                        </>
                       )}
-                    </>
-                  )}
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="border-line-divider border-t px-spacing-600 py-spacing-500">

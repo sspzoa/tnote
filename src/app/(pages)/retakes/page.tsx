@@ -93,6 +93,7 @@ export default function RetakesPage() {
   const [scheduledDate, setScheduledDate] = useState("");
   const [assigning, setAssigning] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loadingAssignStudents, setLoadingAssignStudents] = useState(false);
 
   useEffect(() => {
     fetchRetakes();
@@ -340,6 +341,7 @@ export default function RetakesPage() {
   };
 
   const fetchStudentsForAssign = async (courseId: string) => {
+    setLoadingAssignStudents(true);
     try {
       const response = await fetch(`/api/courses/${courseId}/students`);
       const result = await response.json();
@@ -347,6 +349,8 @@ export default function RetakesPage() {
     } catch (error) {
       console.error("Failed to fetch students:", error);
       setAssignStudents([]);
+    } finally {
+      setLoadingAssignStudents(false);
     }
   };
 
@@ -1118,7 +1122,13 @@ export default function RetakesPage() {
                           ({selectedStudents.length}명 선택됨)
                         </span>
                       </label>
-                      {assignStudents.length === 0 ? (
+                      {loadingAssignStudents ? (
+                        <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
+                          <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
+                            로딩중...
+                          </p>
+                        </div>
+                      ) : assignStudents.length === 0 ? (
                         <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
                           <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">
                             이 수업에 등록된 학생이 없습니다.

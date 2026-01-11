@@ -46,6 +46,7 @@ export default function ClinicsPage() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [attendanceSearchQuery, setAttendanceSearchQuery] = useState("");
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
 
   const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -78,6 +79,7 @@ export default function ClinicsPage() {
   };
 
   const fetchAttendance = async (clinicId: string, date: string) => {
+    setLoadingAttendance(true);
     try {
       const response = await fetch(`/api/clinics/${clinicId}/attendance?date=${date}`);
       const result = await response.json();
@@ -86,6 +88,8 @@ export default function ClinicsPage() {
       setSelectedStudentIds(result.data.map((record: AttendanceRecord) => record.student.id));
     } catch (error) {
       console.error("Failed to fetch attendance:", error);
+    } finally {
+      setLoadingAttendance(false);
     }
   };
 
@@ -620,7 +624,9 @@ export default function ClinicsPage() {
                   <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
                     참석 학생 선택 ({allStudents.length}명)
                   </h3>
-                  {allStudents.length === 0 ? (
+                  {loadingAttendance ? (
+                    <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+                  ) : allStudents.length === 0 ? (
                     <p className="text-content-standard-tertiary text-label">학생이 없습니다.</p>
                   ) : (
                     <>
