@@ -6,14 +6,14 @@ import Container from "@/shared/components/common/container";
 import ErrorComponent from "@/shared/components/common/errorComponent";
 import Header from "@/shared/components/common/header";
 import LoadingComponent from "@/shared/components/common/loadingComponent";
-import { editDateAtom, editNoteAtom, postponeDateAtom, postponeNoteAtom } from "./(atoms)/useFormStore";
+import { postponeDateAtom, postponeNoteAtom } from "./(atoms)/useFormStore";
 import {
   selectedStudentIdAtom,
   showAbsentModalAtom,
   showAssignModalAtom,
   showCompleteModalAtom,
-  showEditModalAtom,
   showHistoryModalAtom,
+  showManagementStatusModalAtom,
   showPostponeModalAtom,
   showStudentModalAtom,
 } from "./(atoms)/useModalStore";
@@ -24,10 +24,10 @@ import {
   searchQueryAtom,
   selectedRetakeAtom,
 } from "./(atoms)/useRetakesStore";
+import ManagementStatusModal from "./(components)/ManagementStatusModal";
 import RetakeAbsentModal from "./(components)/RetakeAbsentModal";
 import RetakeAssignModal from "./(components)/RetakeAssignModal";
 import RetakeCompleteModal from "./(components)/RetakeCompleteModal";
-import RetakeEditModal from "./(components)/RetakeEditModal";
 import RetakeHistoryModal from "./(components)/RetakeHistoryModal";
 import RetakeList from "./(components)/RetakeList";
 import RetakePostponeModal from "./(components)/RetakePostponeModal";
@@ -44,15 +44,13 @@ export default function RetakesPage() {
   const [, setShowPostponeModal] = useAtom(showPostponeModalAtom);
   const [, setShowAbsentModal] = useAtom(showAbsentModalAtom);
   const [, setShowCompleteModal] = useAtom(showCompleteModalAtom);
-  const [, setShowEditModal] = useAtom(showEditModalAtom);
   const [, setShowHistoryModal] = useAtom(showHistoryModalAtom);
   const [, setShowAssignModal] = useAtom(showAssignModalAtom);
   const [, setShowStudentModal] = useAtom(showStudentModalAtom);
+  const [, setShowManagementStatusModal] = useAtom(showManagementStatusModalAtom);
   const [, setSelectedStudentId] = useAtom(selectedStudentIdAtom);
   const [, setPostponeDate] = useAtom(postponeDateAtom);
   const [, setPostponeNote] = useAtom(postponeNoteAtom);
-  const [, setEditDate] = useAtom(editDateAtom);
-  const [, setEditNote] = useAtom(editNoteAtom);
 
   const { retakes: fetchedRetakes, isLoading, error, refetch } = useRetakes(filter);
   const { deleteRetake } = useRetakeDelete();
@@ -74,14 +72,6 @@ export default function RetakesPage() {
   const handleComplete = (retake: (typeof retakes)[number]) => {
     setSelectedRetake(retake);
     setShowCompleteModal(true);
-    setOpenMenuId(null);
-  };
-
-  const handleEdit = (retake: (typeof retakes)[number]) => {
-    setSelectedRetake(retake);
-    setEditDate(retake.current_scheduled_date);
-    setEditNote(retake.note || "");
-    setShowEditModal(true);
     setOpenMenuId(null);
   };
 
@@ -112,6 +102,12 @@ export default function RetakesPage() {
 
   const handleAssignClick = () => {
     setShowAssignModal(true);
+  };
+
+  const handleManagementStatusChange = (retake: (typeof retakes)[number]) => {
+    setSelectedRetake(retake);
+    setShowManagementStatusModal(true);
+    setOpenMenuId(null);
   };
 
   const handleActionSuccess = () => {
@@ -199,9 +195,9 @@ export default function RetakesPage() {
           onPostpone={handlePostpone}
           onAbsent={handleAbsent}
           onComplete={handleComplete}
-          onEdit={handleEdit}
           onViewHistory={handleViewHistory}
           onDelete={handleDelete}
+          onManagementStatusChange={handleManagementStatusChange}
         />
       )}
 
@@ -209,10 +205,10 @@ export default function RetakesPage() {
       <RetakePostponeModal onSuccess={handleActionSuccess} />
       <RetakeAbsentModal onSuccess={handleActionSuccess} />
       <RetakeCompleteModal onSuccess={handleActionSuccess} />
-      <RetakeEditModal />
       <RetakeHistoryModal />
       <StudentInfoModal />
       <RetakeAssignModal onSuccess={handleActionSuccess} />
+      <ManagementStatusModal onSuccess={handleActionSuccess} />
     </Container>
   );
 }

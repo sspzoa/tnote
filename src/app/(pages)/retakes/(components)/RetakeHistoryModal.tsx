@@ -15,8 +15,21 @@ export default function RetakeHistoryModal() {
       postpone: "연기",
       absent: "결석",
       complete: "완료",
+      status_change: "상태 변경",
+      management_status_change: "관리 상태 변경",
+      note_update: "메모 수정",
     };
     return labels[actionType as keyof typeof labels] || actionType;
+  };
+
+  const getActionBadgeStyle = (actionType: string) => {
+    if (actionType === "postpone") return "bg-solid-translucent-blue text-solid-blue";
+    if (actionType === "absent") return "bg-solid-translucent-red text-solid-red";
+    if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
+    if (actionType === "status_change") return "bg-solid-translucent-purple text-solid-purple";
+    if (actionType === "management_status_change") return "bg-solid-translucent-yellow text-solid-yellow";
+    if (actionType === "note_update") return "bg-components-fill-standard-secondary text-content-standard-secondary";
+    return "bg-components-fill-standard-secondary text-content-standard-secondary";
   };
 
   if (!isOpen || !selectedRetake) return null;
@@ -50,22 +63,37 @@ export default function RetakeHistoryModal() {
                   key={item.id}
                   className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
                   <div className="mb-spacing-300 flex items-start justify-between">
-                    <div className="flex items-center gap-spacing-300">
-                      <span
-                        className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${
-                          item.action_type === "postpone"
-                            ? "bg-solid-translucent-blue text-solid-blue"
-                            : item.action_type === "absent"
-                              ? "bg-solid-translucent-red text-solid-red"
-                              : "bg-solid-translucent-green text-solid-green"
-                        }`}>
-                        {getActionLabel(item.action_type)}
-                      </span>
+                    <div className="flex flex-col gap-spacing-200">
+                      <div className="flex items-center gap-spacing-300">
+                        <span
+                          className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
+                          {getActionLabel(item.action_type)}
+                        </span>
+                      </div>
                       {item.action_type === "postpone" && item.previous_date && item.new_date && (
                         <span className="text-body text-content-standard-primary">
-                          {item.previous_date} → {item.new_date}
+                          일정: {item.previous_date} → {item.new_date}
                         </span>
                       )}
+                      {item.action_type === "status_change" && item.previous_status && item.new_status && (
+                        <span className="text-body text-content-standard-primary">
+                          상태:{" "}
+                          {item.previous_status === "pending"
+                            ? "대기중"
+                            : item.previous_status === "completed"
+                              ? "완료"
+                              : "결석"}{" "}
+                          →{" "}
+                          {item.new_status === "pending" ? "대기중" : item.new_status === "completed" ? "완료" : "결석"}
+                        </span>
+                      )}
+                      {item.action_type === "management_status_change" &&
+                        item.previous_management_status &&
+                        item.new_management_status && (
+                          <span className="text-body text-content-standard-primary">
+                            관리 상태: {item.previous_management_status} → {item.new_management_status}
+                          </span>
+                        )}
                     </div>
                     <span className="text-content-standard-tertiary text-footnote">
                       {new Date(item.created_at).toLocaleString("ko-KR")}

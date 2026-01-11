@@ -10,8 +10,8 @@ interface RetakeListProps {
   onAbsent: (retake: Retake) => void;
   onComplete: (retake: Retake) => void;
   onViewHistory: (retake: Retake) => void;
-  onEdit: (retake: Retake) => void;
   onDelete: (retake: Retake) => void;
+  onManagementStatusChange: (retake: Retake) => void;
 }
 
 export default function RetakeList({
@@ -21,8 +21,8 @@ export default function RetakeList({
   onAbsent,
   onComplete,
   onViewHistory,
-  onEdit,
   onDelete,
+  onManagementStatusChange,
 }: RetakeListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
 
@@ -45,6 +45,33 @@ export default function RetakeList({
     );
   };
 
+  const getManagementStatusBadge = (status: string) => {
+    const isCompleted = status.includes("완료");
+    const isInProgress = status.includes("진행 중");
+    const isNeeded = status.includes("필요") || status.includes("예정");
+
+    let bgColor = "bg-components-fill-standard-secondary";
+    let textColor = "text-content-standard-secondary";
+
+    if (isCompleted) {
+      bgColor = "bg-solid-translucent-green";
+      textColor = "text-solid-green";
+    } else if (isInProgress) {
+      bgColor = "bg-solid-translucent-blue";
+      textColor = "text-solid-blue";
+    } else if (isNeeded) {
+      bgColor = "bg-solid-translucent-yellow";
+      textColor = "text-solid-yellow";
+    }
+
+    return (
+      <span
+        className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote ${bgColor} ${textColor}`}>
+        {status}
+      </span>
+    );
+  };
+
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full rounded-radius-400">
@@ -61,6 +88,9 @@ export default function RetakeList({
             </th>
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               상태
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              관리 상태
             </th>
             <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
           </tr>
@@ -102,6 +132,13 @@ export default function RetakeList({
                 )}
               </td>
               <td className="px-spacing-500 py-spacing-400">{getStatusBadge(retake.status)}</td>
+              <td className="px-spacing-500 py-spacing-400">
+                <button
+                  onClick={() => onManagementStatusChange(retake)}
+                  className="transition-opacity hover:opacity-70">
+                  {getManagementStatusBadge(retake.management_status)}
+                </button>
+              </td>
               <td className="relative px-spacing-500 py-spacing-400">
                 <button
                   onClick={() => setOpenMenuId(openMenuId === retake.id ? null : retake.id)}
@@ -152,14 +189,6 @@ export default function RetakeList({
                         }}
                         className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                         이력 보기
-                      </button>
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onEdit(retake);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        수정
                       </button>
                       <div className="my-spacing-100 border-line-divider border-t" />
                       <button

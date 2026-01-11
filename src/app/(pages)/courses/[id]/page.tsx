@@ -169,6 +169,14 @@ export default function CourseDetailPage() {
     }
   };
 
+  const openCreateModal = () => {
+    // 기존 시험들의 최대 회차를 찾아서 +1
+    const maxExamNumber = exams.length > 0 ? Math.max(...exams.map((e) => e.exam_number)) : 0;
+    setExamNumber((maxExamNumber + 1).toString());
+    setExamName("");
+    setShowCreateModal(true);
+  };
+
   const openEditModal = (exam: Exam) => {
     setSelectedExam(exam);
     setExamNumber(exam.exam_number.toString());
@@ -191,7 +199,7 @@ export default function CourseDetailPage() {
                 <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
               </div>
               <button
-                onClick={() => setShowCreateModal(true)}
+                onClick={openCreateModal}
                 className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
                 + 시험 생성
               </button>
@@ -206,7 +214,7 @@ export default function CourseDetailPage() {
           <div className="py-spacing-900 text-center">
             <p className="text-body text-content-standard-tertiary">시험이 없습니다.</p>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={openCreateModal}
               className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
               첫 시험 만들기
             </button>

@@ -10,10 +10,6 @@ export const absentNoteAtom = atom("");
 // Complete form
 export const completeNoteAtom = atom("");
 
-// Edit form
-export const editDateAtom = atom("");
-export const editNoteAtom = atom("");
-
 // Assign form
 export const selectedCourseAtom = atom("");
 export const selectedExamAtom = atom("");
