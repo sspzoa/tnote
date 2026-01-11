@@ -1,8 +1,8 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
-import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/students/[id]/consultations - Get all consultation logs for a student
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { supabase, session } = await getAuthenticatedClient();
 

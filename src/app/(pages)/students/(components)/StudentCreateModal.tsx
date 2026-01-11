@@ -1,0 +1,98 @@
+import { useAtom } from "jotai";
+import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { createFormAtom } from "../(atoms)/useFormStore";
+import { showCreateModalAtom } from "../(atoms)/useModalStore";
+import { useStudentCreate } from "../(hooks)/useStudentCreate";
+
+export default function StudentCreateModal() {
+  const [showModal, setShowModal] = useAtom(showCreateModalAtom);
+  const [form, setForm] = useAtom(createFormAtom);
+  const { createStudent, isCreating } = useStudentCreate();
+
+  const handleCreate = async () => {
+    try {
+      await createStudent({
+        name: form.name,
+        phoneNumber: form.phoneNumber,
+        parentPhoneNumber: form.parentPhoneNumber || null,
+        school: form.school || null,
+        birthYear: form.birthYear || null,
+      });
+      alert("학생이 추가되었습니다.");
+      setShowModal(false);
+      setForm({ name: "", phoneNumber: "", parentPhoneNumber: "", school: "", birthYear: "" });
+    } catch (error) {
+      console.error("Create error:", error);
+      alert(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={showModal}
+      onClose={() => setShowModal(false)}
+      title="학생 추가"
+      subtitle="새로운 학생을 추가합니다. 비밀번호는 전화번호로 자동 설정됩니다."
+      maxWidth="2xl"
+      footer={
+        <>
+          <Button variant="secondary" className="flex-1" onClick={() => setShowModal(false)}>
+            취소
+          </Button>
+          <Button
+            variant="primary"
+            className="flex-1"
+            onClick={handleCreate}
+            disabled={!form.name || !form.phoneNumber}
+            isLoading={isCreating}
+            loadingText="추가 중...">
+            추가
+          </Button>
+        </>
+      }>
+      <div className="space-y-spacing-400">
+        <FormInput
+          label="이름"
+          type="text"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          required
+        />
+
+        <FormInput
+          label="전화번호"
+          type="tel"
+          value={form.phoneNumber}
+          onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+          placeholder="01012345678"
+          required
+        />
+
+        <FormInput
+          label="부모님 전화번호"
+          type="tel"
+          value={form.parentPhoneNumber}
+          onChange={(e) => setForm({ ...form, parentPhoneNumber: e.target.value })}
+          placeholder="01012345678"
+        />
+
+        <FormInput
+          label="학교"
+          type="text"
+          value={form.school}
+          onChange={(e) => setForm({ ...form, school: e.target.value })}
+        />
+
+        <FormInput
+          label="출생년도"
+          type="number"
+          min="1900"
+          max="2100"
+          value={form.birthYear}
+          onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
+          placeholder="2010"
+        />
+      </div>
+    </Modal>
+  );
+}

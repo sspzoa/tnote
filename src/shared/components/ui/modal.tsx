@@ -1,0 +1,46 @@
+import type { ReactNode } from "react";
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  footer?: ReactNode;
+  maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl";
+}
+
+const maxWidthStyles = {
+  sm: "max-w-sm",
+  md: "max-w-md",
+  lg: "max-w-lg",
+  xl: "max-w-xl",
+  "2xl": "max-w-2xl",
+};
+
+export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "md" }: ModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+      onClick={onClose}>
+      <div
+        className={`flex w-full ${maxWidthStyles[maxWidth]} flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary`}
+        onClick={(e) => e.stopPropagation()}>
+        <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+          <h2 className="font-bold text-content-standard-primary text-heading">{title}</h2>
+          {subtitle && <p className="mt-spacing-100 text-content-standard-secondary text-label">{subtitle}</p>}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-spacing-600">{children}</div>
+
+        {footer && (
+          <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
+            {footer}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

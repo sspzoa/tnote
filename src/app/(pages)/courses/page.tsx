@@ -1,572 +1,64 @@
 "use client";
 
+import { useSetAtom } from "jotai";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-interface Course {
-  id: string;
-  name: string;
-  created_at: string;
-  student_count?: number;
-}
-
-interface Student {
-  id: string; // primary key (uuid)
-  phone_number: string;
-  name: string;
-}
+import Container from "@/shared/components/common/container";
+import ErrorComponent from "@/shared/components/common/errorComponent";
+import Header from "@/shared/components/common/header";
+import LoadingComponent from "@/shared/components/common/loadingComponent";
+import { showCreateModalAtom } from "./(atoms)/useModalStore";
+import CourseCreateModal from "./(components)/CourseCreateModal";
+import CourseEditModal from "./(components)/CourseEditModal";
+import CourseList from "./(components)/CourseList";
+import EnrollmentModal from "./(components)/EnrollmentModal";
+import { useCourses } from "./(hooks)/useCourses";
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [allStudents, setAllStudents] = useState<Student[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showEnrollModal, setShowEnrollModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [enrolledStudents, setEnrolledStudents] = useState<Student[]>([]);
-  const [courseName, setCourseName] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [enrolledSearchQuery, setEnrolledSearchQuery] = useState("");
-  const [unenrolledSearchQuery, setUnenrolledSearchQuery] = useState("");
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [loadingStudentId, setLoadingStudentId] = useState<string | null>(null);
-  const [loadingEnrolledStudents, setLoadingEnrolledStudents] = useState(false);
+  const { courses, isLoading, error } = useCourses();
+  const setShowCreateModal = useSetAtom(showCreateModalAtom);
 
-  useEffect(() => {
-    fetchCourses();
-    fetchAllStudents();
-  }, []);
+  if (isLoading) {
+    return <LoadingComponent />;
+  }
 
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/courses");
-      const result = await response.json();
-      setCourses(result.data || []);
-    } catch (error) {
-      console.error("Failed to fetch courses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAllStudents = async () => {
-    try {
-      const response = await fetch("/api/students");
-      const result = await response.json();
-      setAllStudents(result.data || []);
-    } catch (error) {
-      console.error("Failed to fetch students:", error);
-    }
-  };
-
-  const fetchEnrolledStudents = async (courseId: string, showLoading = true) => {
-    if (showLoading) {
-      setLoadingEnrolledStudents(true);
-    }
-    try {
-      const response = await fetch(`/api/courses/${courseId}/students`);
-      const result = await response.json();
-      setEnrolledStudents(result.data || []);
-    } catch (error) {
-      console.error("Failed to fetch enrolled students:", error);
-    } finally {
-      if (showLoading) {
-        setLoadingEnrolledStudents(false);
-      }
-    }
-  };
-
-  const handleCreate = async () => {
-    if (!courseName.trim()) {
-      alert("수업 이름을 입력해주세요.");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const response = await fetch("/api/courses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: courseName }),
-      });
-
-      if (response.ok) {
-        alert("수업이 생성되었습니다.");
-        setShowCreateModal(false);
-        setCourseName("");
-        fetchCourses();
-      } else {
-        alert("수업 생성에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Create error:", error);
-      alert("오류가 발생했습니다.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleEdit = async () => {
-    if (!selectedCourse || !courseName.trim()) {
-      alert("수업 이름을 입력해주세요.");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const response = await fetch(`/api/courses/${selectedCourse.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: courseName }),
-      });
-
-      if (response.ok) {
-        alert("수업이 수정되었습니다.");
-        setShowEditModal(false);
-        fetchCourses();
-      } else {
-        alert("수업 수정에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Edit error:", error);
-      alert("오류가 발생했습니다.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async (course: Course) => {
-    if (!confirm(`"${course.name}" 수업을 삭제하시겠습니까?\n등록된 학생 정보는 유지되지만 수강 기록이 삭제됩니다.`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/courses/${course.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        alert("수업이 삭제되었습니다.");
-        fetchCourses();
-      } else {
-        alert("수업 삭제에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert("오류가 발생했습니다.");
-    }
-  };
-
-  const handleEnroll = async (studentId: string) => {
-    if (!selectedCourse) return;
-
-    setLoadingStudentId(studentId);
-    try {
-      const response = await fetch(`/api/courses/${selectedCourse.id}/enroll`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId }),
-      });
-
-      if (response.ok) {
-        fetchEnrolledStudents(selectedCourse.id, false);
-        fetchCourses();
-      } else {
-        const result = await response.json();
-        alert(result.error || "학생 등록에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Enroll error:", error);
-      alert("오류가 발생했습니다.");
-    } finally {
-      setLoadingStudentId(null);
-    }
-  };
-
-  const handleUnenroll = async (studentId: string) => {
-    if (!selectedCourse) return;
-
-    setLoadingStudentId(studentId);
-    try {
-      const response = await fetch(`/api/courses/${selectedCourse.id}/enroll`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId }),
-      });
-
-      if (response.ok) {
-        fetchEnrolledStudents(selectedCourse.id, false);
-        fetchCourses();
-      } else {
-        alert("학생 제거에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Unenroll error:", error);
-      alert("오류가 발생했습니다.");
-    } finally {
-      setLoadingStudentId(null);
-    }
-  };
-
-  const openEditModal = (course: Course) => {
-    setSelectedCourse(course);
-    setCourseName(course.name);
-    setShowEditModal(true);
-  };
-
-  const openEnrollModal = (course: Course) => {
-    setSelectedCourse(course);
-    setShowEnrollModal(true);
-    fetchEnrolledStudents(course.id);
-  };
-
-  const getUnenrolledStudents = () => {
-    return allStudents.filter((student) => !enrolledStudents.find((enrolled) => enrolled.id === student.id));
-  };
-
-  const getFilteredEnrolledStudents = () => {
-    return enrolledStudents.filter((student) => student.name.toLowerCase().includes(enrolledSearchQuery.toLowerCase()));
-  };
-
-  const getFilteredUnenrolledStudents = () => {
-    return getUnenrolledStudents().filter((student) =>
-      student.name.toLowerCase().includes(unenrolledSearchQuery.toLowerCase()),
-    );
-  };
+  if (error) {
+    return <ErrorComponent errorMessage="수업 목록을 불러오는데 실패했습니다." />;
+  }
 
   return (
-    <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-      <div className="mx-auto max-w-7xl">
-        {/* 헤더 */}
-        <div className="mb-spacing-700">
-          <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-            ← 홈으로 돌아가기
-          </Link>
-          <div className="flex items-end justify-between">
-            <div>
-              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">수업 관리</h1>
-              <p className="text-body text-content-standard-secondary">전체 {courses.length}개 수업</p>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-              + 수업 생성
-            </button>
-          </div>
+    <Container>
+      <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
+        ← 홈으로 돌아가기
+      </Link>
+
+      <Header
+        title="수업 관리"
+        subtitle={`전체 ${courses.length}개 수업`}
+        action={
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+            + 수업 생성
+          </button>
+        }
+      />
+
+      {courses.length === 0 ? (
+        <div className="py-spacing-900 text-center">
+          <p className="text-body text-content-standard-tertiary">수업이 없습니다.</p>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+            첫 수업 만들기
+          </button>
         </div>
+      ) : (
+        <CourseList courses={courses} />
+      )}
 
-        {/* 코스 목록 */}
-        {loading ? (
-          <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
-        ) : courses.length === 0 ? (
-          <div className="py-spacing-900 text-center">
-            <p className="text-body text-content-standard-tertiary">수업이 없습니다.</p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-              첫 수업 만들기
-            </button>
-          </div>
-        ) : (
-          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-            <table className="w-full rounded-radius-400">
-              <thead className="bg-components-fill-standard-secondary">
-                <tr>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    수업명
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    학생 수
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    관리
-                  </th>
-                  <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((course) => (
-                  <tr
-                    key={course.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="px-spacing-500 py-spacing-400">
-                      <Link href={`/courses/${course.id}`}>
-                        <div className="cursor-pointer font-medium text-body text-content-standard-primary transition-colors hover:text-core-accent">
-                          {course.name}
-                        </div>
-                      </Link>
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                        {course.student_count || 0}명
-                      </span>
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <div className="flex gap-spacing-200">
-                        <Link href={`/courses/${course.id}`}>
-                          <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
-                            시험 관리
-                          </button>
-                        </Link>
-                        <button
-                          onClick={() => openEnrollModal(course)}
-                          className="rounded-radius-300 bg-solid-translucent-blue px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-blue transition-colors hover:bg-solid-translucent-indigo">
-                          학생 관리
-                        </button>
-                      </div>
-                    </td>
-                    <td className="relative px-spacing-500 py-spacing-400">
-                      <button
-                        onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)}
-                        className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                        <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                        </svg>
-                      </button>
-                      {openMenuId === course.id && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                          <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
-                            <button
-                              onClick={() => {
-                                setOpenMenuId(null);
-                                openEditModal(course);
-                              }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                              수정
-                            </button>
-                            <div className="my-spacing-100 border-line-divider border-t" />
-                            <button
-                              onClick={() => {
-                                setOpenMenuId(null);
-                                handleDelete(course);
-                              }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                              삭제
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* 생성 모달 */}
-        {showCreateModal && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-            onClick={() => setShowCreateModal(false)}>
-            <div
-              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-              onClick={(e) => e.stopPropagation()}>
-              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-                <h2 className="font-bold text-content-standard-primary text-heading">수업 생성</h2>
-              </div>
-
-              <div className="p-spacing-600">
-                <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                  수업 이름 <span className="text-core-status-negative">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={courseName}
-                  onChange={(e) => setCourseName(e.target.value)}
-                  placeholder="ex. [고2] 대수 심화반 화토"
-                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                />
-              </div>
-
-              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
-                <button
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    setCourseName("");
-                  }}
-                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                  취소
-                </button>
-                <button
-                  onClick={handleCreate}
-                  disabled={saving || !courseName.trim()}
-                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                  {saving ? "생성 중..." : "생성"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 수정 모달 */}
-        {showEditModal && selectedCourse && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-            onClick={() => setShowEditModal(false)}>
-            <div
-              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-              onClick={(e) => e.stopPropagation()}>
-              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-                <h2 className="font-bold text-content-standard-primary text-heading">수업 수정</h2>
-              </div>
-
-              <div className="p-spacing-600">
-                <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                  수업 이름 <span className="text-core-status-negative">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={courseName}
-                  onChange={(e) => setCourseName(e.target.value)}
-                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                />
-              </div>
-
-              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                  취소
-                </button>
-                <button
-                  onClick={handleEdit}
-                  disabled={saving || !courseName.trim()}
-                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                  {saving ? "저장 중..." : "저장"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 학생 관리 모달 */}
-        {showEnrollModal && selectedCourse && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-            onClick={() => setShowEnrollModal(false)}>
-            <div
-              className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-              onClick={(e) => e.stopPropagation()}>
-              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-                <h2 className="mb-spacing-100 font-bold text-content-standard-primary text-heading">학생 관리</h2>
-                <p className="text-content-standard-secondary text-label">{selectedCourse.name}</p>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-spacing-600">
-                {loadingEnrolledStudents ? (
-                  <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
-                ) : (
-                  <>
-                    {/* 등록된 학생 */}
-                    <div className="mb-spacing-600">
-                      <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
-                        등록된 학생 ({enrolledStudents.length}명)
-                      </h3>
-                      {enrolledStudents.length === 0 ? (
-                        <p className="text-content-standard-tertiary text-label">등록된 학생이 없습니다.</p>
-                      ) : (
-                        <>
-                          <input
-                            type="text"
-                            placeholder="이름 검색..."
-                            value={enrolledSearchQuery}
-                            onChange={(e) => setEnrolledSearchQuery(e.target.value)}
-                            className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                          />
-                          {getFilteredEnrolledStudents().length === 0 ? (
-                            <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
-                          ) : (
-                            <div className="grid grid-cols-2 gap-spacing-200">
-                              {getFilteredEnrolledStudents().map((student) => (
-                                <div
-                                  key={student.id}
-                                  className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                                  <div>
-                                    <div className="font-medium text-body text-content-standard-primary">
-                                      {student.name}
-                                    </div>
-                                    <div className="text-content-standard-tertiary text-footnote">
-                                      {student.phone_number}
-                                    </div>
-                                  </div>
-                                  <button
-                                    onClick={() => handleUnenroll(student.id)}
-                                    disabled={loadingStudentId === student.id}
-                                    className="rounded-radius-200 bg-solid-translucent-red px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-red transition-colors hover:bg-solid-translucent-pink disabled:cursor-not-allowed disabled:opacity-50">
-                                    {loadingStudentId === student.id ? "제거 중..." : "제거"}
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-
-                    {/* 미등록 학생 */}
-                    <div>
-                      <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
-                        학생 추가 ({getUnenrolledStudents().length}명)
-                      </h3>
-                      {getUnenrolledStudents().length === 0 ? (
-                        <p className="text-content-standard-tertiary text-label">모든 학생이 등록되었습니다.</p>
-                      ) : (
-                        <>
-                          <input
-                            type="text"
-                            placeholder="이름 검색..."
-                            value={unenrolledSearchQuery}
-                            onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
-                            className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                          />
-                          {getFilteredUnenrolledStudents().length === 0 ? (
-                            <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
-                          ) : (
-                            <div className="grid grid-cols-2 gap-spacing-200">
-                              {getFilteredUnenrolledStudents().map((student) => (
-                                <div
-                                  key={student.id}
-                                  className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                                  <div>
-                                    <div className="font-medium text-body text-content-standard-primary">
-                                      {student.name}
-                                    </div>
-                                    <div className="text-content-standard-tertiary text-footnote">
-                                      {student.phone_number}
-                                    </div>
-                                  </div>
-                                  <button
-                                    onClick={() => handleEnroll(student.id)}
-                                    disabled={loadingStudentId === student.id}
-                                    className="rounded-radius-200 bg-solid-translucent-green px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-green transition-colors hover:bg-solid-translucent-green disabled:cursor-not-allowed disabled:opacity-50">
-                                    {loadingStudentId === student.id ? "추가 중..." : "추가"}
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
-                <button
-                  onClick={() => setShowEnrollModal(false)}
-                  className="w-full rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                  닫기
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+      <CourseCreateModal />
+      <CourseEditModal />
+      <EnrollmentModal />
+    </Container>
   );
 }

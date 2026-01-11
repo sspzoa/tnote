@@ -1,5 +1,5 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
-import { NextRequest, NextResponse } from "next/server";
 
 // PATCH /api/consultations/[id] - Update a consultation log
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -54,7 +54,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 // DELETE /api/consultations/[id] - Delete a consultation log
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { supabase, session } = await getAuthenticatedClient();
 
