@@ -7,7 +7,7 @@ import ErrorComponent from "@/shared/components/common/errorComponent";
 import Header from "@/shared/components/common/header";
 import LoadingComponent from "@/shared/components/common/loadingComponent";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
-import { searchQueryAtom } from "./(atoms)/useStudentsStore";
+import { searchQueryAtom, showFavoritesOnlyAtom } from "./(atoms)/useStudentsStore";
 import ConsultationFormModal from "./(components)/ConsultationFormModal";
 import ConsultationListModal from "./(components)/ConsultationListModal";
 import StudentCreateModal from "./(components)/StudentCreateModal";
@@ -21,9 +21,12 @@ export default function StudentsPage() {
   const { students, isLoading: studentsLoading, error: studentsError } = useStudents();
   const { courses, isLoading: coursesLoading } = useCourses();
   const searchQuery = useAtomValue(searchQueryAtom);
+  const showFavoritesOnly = useAtomValue(showFavoritesOnlyAtom);
   const [, setShowCreateModal] = useAtom(showCreateModalAtom);
 
-  const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredStudents = students
+    .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((student) => !showFavoritesOnly || student.is_favorite);
 
   if (studentsLoading || coursesLoading) {
     return <LoadingComponent />;

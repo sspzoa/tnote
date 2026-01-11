@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
+import { Star } from "lucide-react";
 import { SearchInput } from "@/shared/components/ui";
-import { type Course, searchQueryAtom, selectedCourseAtom } from "../(atoms)/useStudentsStore";
+import { type Course, searchQueryAtom, selectedCourseAtom, showFavoritesOnlyAtom } from "../(atoms)/useStudentsStore";
 
 interface StudentFilterBarProps {
   courses: Course[];
@@ -9,6 +10,7 @@ interface StudentFilterBarProps {
 export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [selectedCourse, setSelectedCourse] = useAtom(selectedCourseAtom);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useAtom(showFavoritesOnlyAtom);
 
   return (
     <>
@@ -22,6 +24,16 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
               : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
           }`}>
           전체
+        </button>
+        <button
+          onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+          className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+            showFavoritesOnly
+              ? "bg-solid-yellow text-solid-white"
+              : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
+          }`}>
+          <Star className={`h-4 w-4 ${showFavoritesOnly ? "fill-current" : ""}`} />
+          즐겨찾기
         </button>
         {courses.map((course) => (
           <button

@@ -1,10 +1,12 @@
 import { useAtom } from "jotai";
+import { Star } from "lucide-react";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showConsultationModalAtom, showEditModalAtom } from "../(atoms)/useModalStore";
 import type { Student } from "../(atoms)/useStudentsStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useStudentDelete } from "../(hooks)/useStudentDelete";
+import { useStudentFavorite } from "../(hooks)/useStudentFavorite";
 import { useStudentPasswordReset } from "../(hooks)/useStudentPasswordReset";
 
 interface StudentListProps {
@@ -36,6 +38,7 @@ export default function StudentList({ students }: StudentListProps) {
   const [, setShowConsultationModal] = useAtom(showConsultationModalAtom);
   const [, setEditForm] = useAtom(editFormAtom);
   const { deleteStudent } = useStudentDelete();
+  const { toggleFavorite } = useStudentFavorite();
   const { resetPassword } = useStudentPasswordReset();
 
   const handleEditClick = (student: Student) => {
@@ -93,6 +96,19 @@ export default function StudentList({ students }: StudentListProps) {
     setOpenMenuId(null);
   };
 
+  const handleToggleFavorite = async (student: Student, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await toggleFavorite({
+        studentId: student.id,
+        isFavorite: !student.is_favorite,
+      });
+    } catch (error) {
+      console.error("Toggle favorite error:", error);
+      alert("즐겨찾기 업데이트에 실패했습니다.");
+    }
+  };
+
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full rounded-radius-400">
@@ -122,7 +138,16 @@ export default function StudentList({ students }: StudentListProps) {
               key={student.id}
               className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
               <td className="px-spacing-500 py-spacing-400">
-                <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+                <div className="flex items-center gap-spacing-200">
+                  <button
+                    onClick={(e) => handleToggleFavorite(student, e)}
+                    className="transition-colors hover:scale-110">
+                    <Star
+                      className={`h-5 w-5 ${student.is_favorite ? "fill-solid-yellow text-solid-yellow" : "text-content-standard-tertiary"}`}
+                    />
+                  </button>
+                  <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+                </div>
               </td>
               <td className="px-spacing-500 py-spacing-400">
                 {student.birth_year && getGrade(student.birth_year) && (

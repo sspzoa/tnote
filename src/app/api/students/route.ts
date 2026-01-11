@@ -33,6 +33,7 @@ export async function GET(request: Request) {
             parent_phone_number,
             school,
             birth_year,
+            is_favorite,
             workspace
           )
         `)
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabase
       .from("Users")
-      .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
+      .select("id, phone_number, name, parent_phone_number, school, birth_year, is_favorite, created_at")
       .eq("role", "student")
       .eq("workspace", session.workspace)
       .order("name", { ascending: true });

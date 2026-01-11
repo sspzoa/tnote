@@ -7,6 +7,7 @@ export interface Student {
   parent_phone_number: string | null;
   school: string | null;
   birth_year: number | null;
+  is_favorite: boolean;
   enrolled_at?: string;
   created_at?: string;
 }
@@ -20,6 +21,7 @@ export interface Course {
 export const studentsAtom = atom<Student[]>([]);
 export const coursesAtom = atom<Course[]>([]);
 export const selectedCourseAtom = atom<string>("all");
+export const showFavoritesOnlyAtom = atom<boolean>(false);
 export const searchQueryAtom = atom<string>("");
 
 // Selected student state
