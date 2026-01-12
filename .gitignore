@@ -41,6 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 .idea
-CLAUDE.md
 AGENTS.md
-/.mcp.json
+/opencode.json
