@@ -129,8 +129,8 @@ export async function GET(request: Request) {
     const { supabase, session } = await getAuthenticatedClient();
 
     const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get("start"); // YYYY-MM-DD
-    const endDate = searchParams.get("end"); // YYYY-MM-DD
+    const startDate = searchParams.get("start");
+    const endDate = searchParams.get("end");
 
     const events: CalendarEvent[] = [];
 
@@ -199,9 +199,11 @@ export async function GET(request: Request) {
 
       if (clinicsError) throw clinicsError;
 
+      const clinicIds = clinics?.map((c: any) => c.id) || [];
       const { data: allAttendance, error: attendanceError } = await supabase
         .from("ClinicAttendance")
-        .select("attendance_date, student_id, clinic_id");
+        .select("attendance_date, student_id, clinic_id")
+        .in("clinic_id", clinicIds.length > 0 ? clinicIds : [""]);
 
       if (attendanceError) throw attendanceError;
 
@@ -227,18 +229,21 @@ export async function GET(request: Request) {
         }
       });
 
-      const { data: retakes, error: retakeError } = await supabase.from("RetakeAssignments").select(`
+      const { data: retakes, error: retakeError } = await supabase
+        .from("RetakeAssignments")
+        .select(`
           id,
           current_scheduled_date,
           status,
-          student:Users!RetakeAssignments_student_id_fkey(name),
+          student:Users!RetakeAssignments_student_id_fkey!inner(name, workspace),
           exam:Exams!inner(
             id,
             name,
             exam_number,
             course:Courses!inner(id, name)
           )
-        `);
+        `)
+        .eq("student.workspace", session.workspace);
 
       if (retakeError) throw retakeError;
 
@@ -268,9 +273,11 @@ export async function GET(request: Request) {
 
       if (clinicsError) throw clinicsError;
 
+      const clinicIds = clinics?.map((c: any) => c.id) || [];
       const { data: allAttendance, error: attendanceError } = await supabase
         .from("ClinicAttendance")
-        .select("attendance_date, clinic_id, student_id");
+        .select("attendance_date, clinic_id, student_id")
+        .in("clinic_id", clinicIds.length > 0 ? clinicIds : [""]);
 
       if (attendanceError) throw attendanceError;
 
