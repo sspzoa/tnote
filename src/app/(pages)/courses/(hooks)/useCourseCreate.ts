@@ -2,6 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CreateCourseData {
   name: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  daysOfWeek?: number[] | null;
 }
 
 export const useCourseCreate = () => {

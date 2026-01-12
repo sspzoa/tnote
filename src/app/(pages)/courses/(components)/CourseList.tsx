@@ -1,7 +1,12 @@
 import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
-import { courseNameAtom } from "../(atoms)/useFormStore";
+import {
+  courseDaysOfWeekAtom,
+  courseEndDateAtom,
+  courseNameAtom,
+  courseStartDateAtom,
+} from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
 import { useCourseDelete } from "../(hooks)/useCourseDelete";
 
@@ -15,11 +20,17 @@ export default function CourseList({ courses }: CourseListProps) {
   const setShowEditModal = useSetAtom(showEditModalAtom);
   const setShowEnrollModal = useSetAtom(showEnrollModalAtom);
   const setCourseName = useSetAtom(courseNameAtom);
+  const setStartDate = useSetAtom(courseStartDateAtom);
+  const setEndDate = useSetAtom(courseEndDateAtom);
+  const setDaysOfWeek = useSetAtom(courseDaysOfWeekAtom);
   const { deleteCourse } = useCourseDelete();
 
   const openEditModal = (course: Course) => {
     setSelectedCourse(course);
     setCourseName(course.name);
+    setStartDate(course.start_date || "");
+    setEndDate(course.end_date || "");
+    setDaysOfWeek(course.days_of_week || []);
     setShowEditModal(true);
   };
 

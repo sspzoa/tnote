@@ -5,6 +5,9 @@ export interface Course {
   name: string;
   created_at: string;
   student_count?: number;
+  start_date?: string | null;
+  end_date?: string | null;
+  days_of_week?: number[] | null;
 }
 
 export interface Student {
