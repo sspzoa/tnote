@@ -12,7 +12,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "is_favorite must be a boolean" }, { status: 400 });
     }
 
-    // Verify student belongs to workspace
     const { data: student, error: fetchError } = await supabase
       .from("Users")
       .select("id, workspace")

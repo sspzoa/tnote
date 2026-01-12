@@ -2,12 +2,7 @@
 
 import { useAtom } from "jotai";
 import { selectedCourseAtom } from "../(atoms)/useCoursesStore";
-import {
-  courseDaysOfWeekAtom,
-  courseEndDateAtom,
-  courseNameAtom,
-  courseStartDateAtom,
-} from "../(atoms)/useFormStore";
+import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { showEditModalAtom } from "../(atoms)/useModalStore";
 import { useCourseUpdate } from "../(hooks)/useCourseUpdate";
 
@@ -48,9 +43,7 @@ export default function CourseEditModal() {
   };
 
   const toggleDay = (index: number) => {
-    const newDays = daysOfWeek.includes(index)
-      ? daysOfWeek.filter((d) => d !== index)
-      : [...daysOfWeek, index].sort();
+    const newDays = daysOfWeek.includes(index) ? daysOfWeek.filter((d) => d !== index) : [...daysOfWeek, index].sort();
     setDaysOfWeek(newDays);
   };
 

@@ -45,7 +45,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "관리 상태 변경에 실패했습니다." }, { status: 500 });
     }
 
-    // Create history record
     await supabase.from("RetakeHistory").insert({
       retake_assignment_id: id,
       action_type: "management_status_change",

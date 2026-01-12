@@ -33,7 +33,6 @@ export default function StudentInfoModal() {
     setStudentId(null);
   };
 
-  // Public method to open modal with student ID
   if (!isOpen) return null;
 
   return (
@@ -114,7 +113,6 @@ export default function StudentInfoModal() {
   );
 }
 
-// Export a way to open the modal with student ID
 export const openStudentInfoModal = (
   setShowModal: (show: boolean) => void,
   setStudentId: (id: string) => void,

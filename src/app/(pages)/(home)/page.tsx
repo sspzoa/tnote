@@ -9,7 +9,6 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@/app/calendar-custom.css";
 
-// Setup calendar localizer
 const locales = {
   ko: ko,
 };
@@ -28,7 +27,6 @@ interface PasswordChangeForm {
   confirmPassword: string;
 }
 
-// Custom toolbar component for calendar
 const CustomToolbar = ({
   onNavigate,
   date,
@@ -154,7 +152,6 @@ export default function Home() {
   const fetchCalendarEvents = async () => {
     setRetakesLoading(true);
     try {
-      // Get month range from currentDate
       const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
@@ -164,7 +161,6 @@ export default function Home() {
       const result = await response.json();
 
       if (response.ok) {
-        // Transform to react-big-calendar format
         const events = result.data.map((e: any) => ({
           ...e,
           start: new Date(e.date),
@@ -179,12 +175,10 @@ export default function Home() {
     }
   };
 
-  // Handle calendar navigation
   const handleNavigate = (newDate: Date) => {
     setCurrentDate(newDate);
   };
 
-  // Custom event styling
   const eventStyleGetter = (event: any) => {
     let backgroundColor = "";
     let borderColor = "";
@@ -195,7 +189,6 @@ export default function Home() {
         borderColor = "#2563EB";
         break;
       case "retake":
-        // Status-based colors for retakes
         if (event.metadata?.status === "completed") {
           backgroundColor = "#10B981"; // solid-green (완료)
           borderColor = "#059669";
@@ -203,13 +196,11 @@ export default function Home() {
           backgroundColor = "#6B7280"; // solid-gray (결석)
           borderColor = "#4B5563";
         } else {
-          // postponed, scheduled, 기타 모두 예정으로 처리
           backgroundColor = "#EF4444"; // solid-red (예정)
           borderColor = "#DC2626";
         }
         break;
       case "clinic":
-        // Status-based colors for clinics
         if (event.metadata?.status === "attended") {
           backgroundColor = "#10B981"; // solid-green
           borderColor = "#059669";
@@ -301,7 +292,6 @@ export default function Home() {
     );
   }
 
-  // 학생용 화면
   if (userRole === "student") {
     return (
       <div className="min-h-screen p-spacing-600 md:p-spacing-800">
@@ -577,7 +567,6 @@ export default function Home() {
     );
   }
 
-  // 관리자/오너용 화면
   return (
     <div className="min-h-screen p-spacing-600 md:p-spacing-800">
       <div className="mx-auto max-w-7xl">

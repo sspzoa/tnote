@@ -18,7 +18,6 @@ export const createClient = async () => {
   });
 };
 
-// RLS를 우회하는 관리자 클라이언트 (서버 API에서만 사용)
 export const createAdminClient = async () => {
   const cookieStore = await cookies();
 

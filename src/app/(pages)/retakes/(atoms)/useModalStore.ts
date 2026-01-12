@@ -1,6 +1,5 @@
 import { atom } from "jotai";
 
-// Retakes main modals
 export const showPostponeModalAtom = atom(false);
 export const showAbsentModalAtom = atom(false);
 export const showCompleteModalAtom = atom(false);
@@ -9,5 +8,4 @@ export const showStudentModalAtom = atom(false);
 export const showAssignModalAtom = atom(false);
 export const showManagementStatusModalAtom = atom(false);
 
-// Student info modal state
 export const selectedStudentIdAtom = atom<string | null>(null);

@@ -190,7 +190,6 @@ export async function GET(request: Request) {
         });
       });
 
-      // 3. Get all clinics with schedules (workspace 필터링)
       const { data: clinics, error: clinicsError } = await supabase
         .from("Clinics")
         .select("id, name, start_date, end_date, operating_days")
@@ -260,7 +259,6 @@ export async function GET(request: Request) {
         });
       });
 
-      // 3. Get all clinics with schedules (workspace 필터링)
       const { data: clinics, error: clinicsError } = await supabase
         .from("Clinics")
         .select("id, name, start_date, end_date, operating_days")

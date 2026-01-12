@@ -1,12 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
 
-// PATCH /api/consultations/[id] - Update a consultation log
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { supabase, session } = await getAuthenticatedClient();
 
-    // Check role
     if (session.role !== "owner" && session.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -20,7 +18,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Update consultation log (workspace check ensures tenant isolation)
     const { data, error } = await supabase
       .from("ConsultationLogs")
       .update({
@@ -53,19 +50,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
-// DELETE /api/consultations/[id] - Delete a consultation log
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { supabase, session } = await getAuthenticatedClient();
 
-    // Check role
     if (session.role !== "owner" && session.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { id: consultationId } = await params;
 
-    // Delete consultation log (workspace check ensures tenant isolation)
     const { error } = await supabase
       .from("ConsultationLogs")
       .delete()

@@ -1,6 +1,5 @@
 import { atom } from "jotai";
 
-// Edit form state
 export const editFormAtom = atom({
   name: "",
   phoneNumber: "",
@@ -9,7 +8,6 @@ export const editFormAtom = atom({
   birthYear: "",
 });
 
-// Create form state
 export const createFormAtom = atom({
   name: "",
   phoneNumber: "",

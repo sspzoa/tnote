@@ -170,7 +170,6 @@ export default function CourseDetailPage() {
   };
 
   const openCreateModal = () => {
-    // 기존 시험들의 최대 회차를 찾아서 +1
     const maxExamNumber = exams.length > 0 ? Math.max(...exams.map((e) => e.exam_number)) : 0;
     setExamNumber((maxExamNumber + 1).toString());
     setExamName("");

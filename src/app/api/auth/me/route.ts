@@ -9,7 +9,6 @@ export async function GET() {
       return NextResponse.json({ user: null });
     }
 
-    // 워크스페이스 이름 가져오기
     let workspaceName = null;
     if (session.workspace) {
       const { supabase } = await getAuthenticatedClient();

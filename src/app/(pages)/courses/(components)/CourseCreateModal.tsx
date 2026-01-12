@@ -1,12 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import {
-  courseDaysOfWeekAtom,
-  courseEndDateAtom,
-  courseNameAtom,
-  courseStartDateAtom,
-} from "../(atoms)/useFormStore";
+import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { showCreateModalAtom } from "../(atoms)/useModalStore";
 import { useCourseCreate } from "../(hooks)/useCourseCreate";
 
@@ -49,9 +44,7 @@ export default function CourseCreateModal() {
   };
 
   const toggleDay = (index: number) => {
-    const newDays = daysOfWeek.includes(index)
-      ? daysOfWeek.filter((d) => d !== index)
-      : [...daysOfWeek, index].sort();
+    const newDays = daysOfWeek.includes(index) ? daysOfWeek.filter((d) => d !== index) : [...daysOfWeek, index].sort();
     setDaysOfWeek(newDays);
   };
 

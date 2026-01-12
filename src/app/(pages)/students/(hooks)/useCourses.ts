@@ -12,7 +12,6 @@ export const useCourses = () => {
         throw new Error(result.error || "Failed to fetch courses");
       }
 
-      // Extract unique courses from exams
       const uniqueCourses = result.data.reduce((acc: Course[], exam: any) => {
         if (!acc.find((c) => c.id === exam.course.id)) {
           acc.push(exam.course);

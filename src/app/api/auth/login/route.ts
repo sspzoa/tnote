@@ -11,7 +11,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "전화번호와 비밀번호를 입력해주세요." }, { status: 400 });
     }
 
-    // 학생 로그인 시 워크스페이스 필수
     if (!isTeacher && !workspaceId) {
       return NextResponse.json({ error: "워크스페이스를 선택해주세요." }, { status: 400 });
     }

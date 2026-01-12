@@ -64,7 +64,6 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // 오류 UI 대신 alert 사용
         alert(data.error || "로그인에 실패했습니다.");
         return;
       }
@@ -111,7 +110,6 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // 오류 UI 대신 alert 사용
         alert(data.error || "회원가입에 실패했습니다.");
         return;
       }

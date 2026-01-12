@@ -1,12 +1,7 @@
 import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
-import {
-  courseDaysOfWeekAtom,
-  courseEndDateAtom,
-  courseNameAtom,
-  courseStartDateAtom,
-} from "../(atoms)/useFormStore";
+import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
 import { useCourseDelete } from "../(hooks)/useCourseDelete";
 
