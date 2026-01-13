@@ -53,9 +53,9 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
       <div className="mb-spacing-600">
         <SearchInput
           placeholder="학생 이름 검색..."
+          size="lg"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-spacing-500 py-spacing-400 text-body"
         />
       </div>
     </>

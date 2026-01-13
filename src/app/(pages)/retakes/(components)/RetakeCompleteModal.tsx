@@ -1,6 +1,9 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { Button } from "@/shared/components/ui/button";
+import { FormTextarea } from "@/shared/components/ui/formTextarea";
+import { Modal } from "@/shared/components/ui/modal";
 import { completeNoteAtom } from "../(atoms)/useFormStore";
 import { showCompleteModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -40,62 +43,42 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
     }
   };
 
-  if (!isOpen || !selectedRetake) return null;
+  if (!selectedRetake) return null;
+
+  const subtitle = `${selectedRetake.student.name} - ${selectedRetake.exam.course.name} - ${selectedRetake.exam.name} ${selectedRetake.exam.exam_number}회차`;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-      onClick={handleClose}>
-      <div
-        className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-        onClick={(e) => e.stopPropagation()}>
-        <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-          <h2 className="mb-spacing-200 font-bold text-content-standard-primary text-title">완료 처리</h2>
-          <div className="text-body text-content-standard-secondary">
-            {selectedRetake.student.name} - {selectedRetake.exam.course.name} - {selectedRetake.exam.name}{" "}
-            {selectedRetake.exam.exam_number}회차
-          </div>
-        </div>
-
-        <div className="p-spacing-600">
-          <div className="space-y-spacing-400">
-            <div>
-              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                예정일
-              </label>
-              <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
-                {selectedRetake.current_scheduled_date}
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                메모 (선택사항)
-              </label>
-              <textarea
-                value={completeNote}
-                onChange={(e) => setCompleteNote(e.target.value)}
-                rows={3}
-                placeholder="메모를 입력하세요"
-                className="w-full resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
-          <button
-            onClick={handleClose}
-            className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="완료 처리"
+      subtitle={subtitle}
+      footer={
+        <>
+          <Button variant="secondary" onClick={handleClose} className="flex-1">
             취소
-          </button>
-          <button
-            onClick={handleComplete}
-            className="flex-1 rounded-radius-400 bg-core-status-positive px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90">
+          </Button>
+          <Button variant="success" onClick={handleComplete} className="flex-1">
             완료 처리
-          </button>
+          </Button>
+        </>
+      }>
+      <div className="space-y-spacing-400">
+        <div>
+          <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">예정일</label>
+          <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
+            {selectedRetake.current_scheduled_date}
+          </div>
         </div>
+
+        <FormTextarea
+          label="메모 (선택사항)"
+          value={completeNote}
+          onChange={(e) => setCompleteNote(e.target.value)}
+          rows={3}
+          placeholder="메모를 입력하세요"
+        />
       </div>
-    </div>
+    </Modal>
   );
 }

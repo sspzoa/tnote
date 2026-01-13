@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
@@ -29,6 +30,10 @@ export default function AdminList({ admins }: AdminListProps) {
       alert(error instanceof Error ? error.message : "관리자 삭제에 실패했습니다.");
     }
   };
+
+  const getMenuItems = (admin: Admin): DropdownMenuItem[] => [
+    { label: "삭제", onClick: () => handleDelete(admin), variant: "danger" },
+  ];
 
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
@@ -77,28 +82,12 @@ export default function AdminList({ admins }: AdminListProps) {
               <td className="relative px-spacing-500 py-spacing-400">
                 {admin.role !== "owner" && (
                   <>
-                    <button
-                      onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)}
-                      className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                      <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                    {openMenuId === admin.id && (
-                      <>
-                        <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                        <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
-                          <button
-                            onClick={() => {
-                              setOpenMenuId(null);
-                              handleDelete(admin);
-                            }}
-                            className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                            삭제
-                          </button>
-                        </div>
-                      </>
-                    )}
+                    <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)} />
+                    <DropdownMenu
+                      isOpen={openMenuId === admin.id}
+                      onClose={() => setOpenMenuId(null)}
+                      items={getMenuItems(admin)}
+                    />
                   </>
                 )}
               </td>

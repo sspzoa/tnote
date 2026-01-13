@@ -2,6 +2,12 @@
 
 import { useAtom } from "jotai";
 import { useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { FormInput } from "@/shared/components/ui/formInput";
+import { FormSelect } from "@/shared/components/ui/formSelect";
+import { Modal } from "@/shared/components/ui/modal";
+import { SearchInput } from "@/shared/components/ui/searchInput";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
 import { useExamsForAssign } from "../(hooks)/useExamsForAssign";
@@ -77,145 +83,126 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
 
   const filteredStudents = students.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  if (!isOpen) return null;
+  const courseOptions = [
+    { value: "", label: "과목을 선택하세요" },
+    ...courses.map((course) => ({ value: course.id, label: course.name })),
+  ];
+
+  const examOptions = [
+    { value: "", label: "시험을 선택하세요" },
+    ...exams.map((exam) => ({ value: exam.id, label: `${exam.name} ${exam.exam_number}회차` })),
+  ];
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-      onClick={handleClose}>
-      <div
-        className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-        onClick={(e) => e.stopPropagation()}>
-        <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-          <h2 className="font-bold text-content-standard-primary text-title">재시험 배정</h2>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="재시험 배정"
+      maxWidth="2xl"
+      footer={
+        <>
+          <Button variant="secondary" onClick={handleClose} className="flex-1">
+            취소
+          </Button>
+          <Button
+            onClick={handleAssign}
+            disabled={!selectedExamId || selectedStudentIds.length === 0 || !scheduledDate || isAssigning}
+            className="flex-1">
+            {isAssigning ? "배정 중..." : "배정하기"}
+          </Button>
+        </>
+      }>
+      <div className="space-y-spacing-500">
+        <FormSelect
+          label="과목 선택"
+          required
+          value={selectedCourseId}
+          onChange={(e) => handleCourseChange(e.target.value)}
+          disabled={coursesLoading}
+          options={courseOptions}
+        />
 
-        <div className="flex-1 overflow-y-auto p-spacing-600">
-          <div className="space-y-spacing-500">
-            <div>
-              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                과목 선택 <span className="text-core-status-negative">*</span>
+        {selectedCourseId && (
+          <FormSelect
+            label="시험 선택"
+            required
+            value={selectedExamId}
+            onChange={(e) => setSelectedExamId(e.target.value)}
+            disabled={examsLoading}
+            options={examOptions}
+          />
+        )}
+
+        <FormInput
+          label="예정일"
+          required
+          type="date"
+          value={scheduledDate}
+          onChange={(e) => setScheduledDate(e.target.value)}
+        />
+
+        {selectedCourseId && (
+          <div>
+            <div className="mb-spacing-200 flex items-center justify-between">
+              <label className="font-semibold text-body text-content-standard-primary">
+                학생 선택 <span className="text-core-status-negative">*</span>
               </label>
-              <select
-                value={selectedCourseId}
-                onChange={(e) => handleCourseChange(e.target.value)}
-                disabled={coursesLoading}
-                className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50">
-                <option value="">과목을 선택하세요</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name}
-                  </option>
-                ))}
-              </select>
+              <button
+                onClick={handleSelectAll}
+                className="text-body text-core-accent hover:underline"
+                disabled={studentsLoading || filteredStudents.length === 0}>
+                {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
+                  ? "전체 해제"
+                  : "전체 선택"}
+              </button>
             </div>
 
-            {selectedCourseId && (
-              <div>
-                <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                  시험 선택 <span className="text-core-status-negative">*</span>
-                </label>
-                <select
-                  value={selectedExamId}
-                  onChange={(e) => setSelectedExamId(e.target.value)}
-                  disabled={examsLoading}
-                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50">
-                  <option value="">시험을 선택하세요</option>
-                  {exams.map((exam) => (
-                    <option key={exam.id} value={exam.id}>
-                      {exam.name} {exam.exam_number}회차
-                    </option>
+            <SearchInput
+              placeholder="학생 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mb-spacing-300"
+            />
+
+            <div className="max-h-64 overflow-y-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary">
+              {studentsLoading ? (
+                <div className="py-spacing-600 text-center text-content-standard-tertiary">로딩중...</div>
+              ) : filteredStudents.length === 0 ? (
+                <div className="py-spacing-600 text-center text-content-standard-tertiary">
+                  {students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."}
+                </div>
+              ) : (
+                <div className="divide-y divide-line-divider">
+                  {filteredStudents.map((student) => (
+                    <label
+                      key={student.id}
+                      className="flex cursor-pointer items-center gap-spacing-300 px-spacing-400 py-spacing-300 transition-colors hover:bg-components-interactive-hover">
+                      <input
+                        type="checkbox"
+                        checked={selectedStudentIds.includes(student.id)}
+                        onChange={() => handleStudentToggle(student.id)}
+                        className="size-4 cursor-pointer accent-core-accent"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+                        <div className="text-content-standard-tertiary text-footnote">
+                          {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
+                        </div>
+                      </div>
+                    </label>
                   ))}
-                </select>
-              </div>
-            )}
-
-            <div>
-              <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">
-                예정일 <span className="text-core-status-negative">*</span>
-              </label>
-              <input
-                type="date"
-                value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
-                className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-              />
+                </div>
+              )}
             </div>
 
-            {selectedCourseId && (
-              <div>
-                <div className="mb-spacing-200 flex items-center justify-between">
-                  <label className="font-semibold text-body text-content-standard-primary">
-                    학생 선택 <span className="text-core-status-negative">*</span>
-                  </label>
-                  <button
-                    onClick={handleSelectAll}
-                    className="text-body text-core-accent hover:underline"
-                    disabled={studentsLoading || filteredStudents.length === 0}>
-                    {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
-                      ? "전체 해제"
-                      : "전체 선택"}
-                  </button>
-                </div>
-
-                <input
-                  type="text"
-                  placeholder="학생 검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="mb-spacing-300 w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-                />
-
-                <div className="max-h-64 overflow-y-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary">
-                  {studentsLoading ? (
-                    <div className="py-spacing-600 text-center text-content-standard-tertiary">로딩중...</div>
-                  ) : filteredStudents.length === 0 ? (
-                    <div className="py-spacing-600 text-center text-content-standard-tertiary">
-                      {students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."}
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-line-divider">
-                      {filteredStudents.map((student) => (
-                        <label
-                          key={student.id}
-                          className="flex cursor-pointer items-center gap-spacing-300 px-spacing-400 py-spacing-300 transition-colors hover:bg-components-interactive-hover">
-                          <input
-                            type="checkbox"
-                            checked={selectedStudentIds.includes(student.id)}
-                            onChange={() => handleStudentToggle(student.id)}
-                            className="size-4 cursor-pointer accent-core-accent"
-                          />
-                          <span className="text-body text-content-standard-primary">{student.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {selectedStudentIds.length > 0 && (
-                  <div className="mt-spacing-200 text-body text-content-standard-secondary">
-                    선택된 학생: {selectedStudentIds.length}명
-                  </div>
-                )}
+            {selectedStudentIds.length > 0 && (
+              <div className="mt-spacing-200 text-body text-content-standard-secondary">
+                선택된 학생: {selectedStudentIds.length}명
               </div>
             )}
           </div>
-        </div>
-
-        <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
-          <button
-            onClick={handleClose}
-            className="flex-1 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-            취소
-          </button>
-          <button
-            onClick={handleAssign}
-            disabled={!selectedExamId || selectedStudentIds.length === 0 || !scheduledDate || isAssigning}
-            className="flex-1 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-            {isAssigning ? "배정 중..." : "배정하기"}
-          </button>
-        </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 }

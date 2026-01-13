@@ -1,5 +1,6 @@
 import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
+import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
@@ -47,6 +48,11 @@ export default function CourseList({ courses }: CourseListProps) {
       alert("수업 삭제에 실패했습니다.");
     }
   };
+
+  const getMenuItems = (course: Course): DropdownMenuItem[] => [
+    { label: "수정", onClick: () => openEditModal(course), dividerAfter: true },
+    { label: "삭제", onClick: () => handleDelete(course), variant: "danger" },
+  ];
 
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
@@ -97,37 +103,12 @@ export default function CourseList({ courses }: CourseListProps) {
                 </div>
               </td>
               <td className="relative px-spacing-500 py-spacing-400">
-                <button
-                  onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)}
-                  className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                  <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-                {openMenuId === course.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          openEditModal(course);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        수정
-                      </button>
-                      <div className="my-spacing-100 border-line-divider border-t" />
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          handleDelete(course);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                        삭제
-                      </button>
-                    </div>
-                  </>
-                )}
+                <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)} />
+                <DropdownMenu
+                  isOpen={openMenuId === course.id}
+                  onClose={() => setOpenMenuId(null)}
+                  items={getMenuItems(course)}
+                />
               </td>
             </tr>
           ))}

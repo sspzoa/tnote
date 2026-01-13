@@ -1,6 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { type Clinic, openMenuIdAtom } from "../(atoms)/useClinicsStore";
 
 interface ClinicListProps {
@@ -10,9 +11,15 @@ interface ClinicListProps {
   onAttendance: (clinic: Clinic) => void;
 }
 
+const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+
 export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: ClinicListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+
+  const getMenuItems = (clinic: Clinic): DropdownMenuItem[] => [
+    { label: "수정", onClick: () => onEdit(clinic), dividerAfter: true },
+    { label: "삭제", onClick: () => onDelete(clinic), variant: "danger" },
+  ];
 
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
@@ -58,37 +65,12 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
                 </button>
               </td>
               <td className="relative px-spacing-500 py-spacing-400">
-                <button
-                  onClick={() => setOpenMenuId(openMenuId === clinic.id ? null : clinic.id)}
-                  className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                  <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-                {openMenuId === clinic.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onEdit(clinic);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        수정
-                      </button>
-                      <div className="my-spacing-100 border-line-divider border-t" />
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onDelete(clinic);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                        삭제
-                      </button>
-                    </div>
-                  </>
-                )}
+                <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === clinic.id ? null : clinic.id)} />
+                <DropdownMenu
+                  isOpen={openMenuId === clinic.id}
+                  onClose={() => setOpenMenuId(null)}
+                  items={getMenuItems(clinic)}
+                />
               </td>
             </tr>
           ))}

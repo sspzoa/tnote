@@ -1,6 +1,8 @@
 import { useAtom } from "jotai";
 import { Star } from "lucide-react";
+import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import { getGrade } from "@/shared/lib/utils/student";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showConsultationModalAtom, showEditModalAtom } from "../(atoms)/useModalStore";
 import type { Student } from "../(atoms)/useStudentsStore";
@@ -12,24 +14,6 @@ import { useStudentPasswordReset } from "../(hooks)/useStudentPasswordReset";
 interface StudentListProps {
   students: Student[];
 }
-
-const getAge = (birthYear: number | null) => {
-  if (!birthYear) return 0;
-  const currentYear = new Date().getFullYear();
-  return currentYear - birthYear + 1;
-};
-
-const getGrade = (birthYear: number | null) => {
-  if (!birthYear) return null;
-  const age = getAge(birthYear);
-  const gradeNumber = age - 7;
-
-  if (gradeNumber <= 0) return "미취학";
-  if (gradeNumber <= 6) return `초${gradeNumber}`;
-  if (gradeNumber <= 9) return `중${gradeNumber - 6}`;
-  if (gradeNumber <= 12) return `고${gradeNumber - 9}`;
-  return "졸업";
-};
 
 export default function StudentList({ students }: StudentListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
@@ -51,11 +35,9 @@ export default function StudentList({ students }: StudentListProps) {
       birthYear: student.birth_year?.toString() || "",
     });
     setShowEditModal(true);
-    setOpenMenuId(null);
   };
 
   const handleResetPassword = async (student: Student) => {
-    setOpenMenuId(null);
     if (
       !confirm(
         `${student.name} 학생의 비밀번호를 전화번호(${formatPhoneNumber(student.phone_number)})로 초기화하시겠습니까?`,
@@ -74,7 +56,6 @@ export default function StudentList({ students }: StudentListProps) {
   };
 
   const handleDelete = async (student: Student) => {
-    setOpenMenuId(null);
     if (
       !confirm(`${student.name} 학생을 삭제하시겠습니까?\n관련된 모든 데이터(수강 정보, 재시험 등)가 함께 삭제됩니다.`)
     ) {
@@ -93,7 +74,6 @@ export default function StudentList({ students }: StudentListProps) {
   const openConsultationModal = (student: Student) => {
     setSelectedStudent(student);
     setShowConsultationModal(true);
-    setOpenMenuId(null);
   };
 
   const handleToggleFavorite = async (student: Student, e: React.MouseEvent) => {
@@ -108,6 +88,13 @@ export default function StudentList({ students }: StudentListProps) {
       alert("즐겨찾기 업데이트에 실패했습니다.");
     }
   };
+
+  const getMenuItems = (student: Student): DropdownMenuItem[] => [
+    { label: "상담일지", onClick: () => openConsultationModal(student), dividerAfter: true },
+    { label: "정보 수정", onClick: () => handleEditClick(student) },
+    { label: "비밀번호 초기화", onClick: () => handleResetPassword(student), dividerAfter: true },
+    { label: "학생 삭제", onClick: () => handleDelete(student), variant: "danger" },
+  ];
 
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
@@ -166,42 +153,12 @@ export default function StudentList({ students }: StudentListProps) {
                 {student.school || "-"}
               </td>
               <td className="relative px-spacing-500 py-spacing-400">
-                <button
-                  onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)}
-                  className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                  <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-                {openMenuId === student.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[160px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
-                      <button
-                        onClick={() => openConsultationModal(student)}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        상담일지
-                      </button>
-                      <div className="my-spacing-100 border-line-divider border-t" />
-                      <button
-                        onClick={() => handleEditClick(student)}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        정보 수정
-                      </button>
-                      <button
-                        onClick={() => handleResetPassword(student)}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        비밀번호 초기화
-                      </button>
-                      <div className="my-spacing-100 border-line-divider border-t" />
-                      <button
-                        onClick={() => handleDelete(student)}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                        학생 삭제
-                      </button>
-                    </div>
-                  </>
-                )}
+                <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />
+                <DropdownMenu
+                  isOpen={openMenuId === student.id}
+                  onClose={() => setOpenMenuId(null)}
+                  items={getMenuItems(student)}
+                />
               </td>
             </tr>
           ))}

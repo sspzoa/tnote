@@ -6,6 +6,7 @@ import Container from "@/shared/components/common/container";
 import ErrorComponent from "@/shared/components/common/errorComponent";
 import Header from "@/shared/components/common/header";
 import LoadingComponent from "@/shared/components/common/loadingComponent";
+import { SearchInput } from "@/shared/components/ui/searchInput";
 import { postponeDateAtom, postponeNoteAtom } from "./(atoms)/useFormStore";
 import {
   selectedStudentIdAtom,
@@ -282,12 +283,11 @@ export default function RetakesPage() {
 
       {/* 검색 */}
       <div className="mb-spacing-600">
-        <input
-          type="text"
+        <SearchInput
           placeholder="학생 이름 검색..."
+          size="lg"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
         />
       </div>
 
