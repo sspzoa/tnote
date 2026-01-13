@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import LoadingComponent from "@/shared/components/common/loadingComponent";
 
 interface Course {
   id: string;
@@ -183,6 +184,10 @@ export default function CourseDetailPage() {
     setShowEditModal(true);
   };
 
+  if (loading || !course) {
+    return <LoadingComponent />;
+  }
+
   return (
     <div className="min-h-screen p-spacing-600 md:p-spacing-800">
       <div className="mx-auto max-w-7xl">
@@ -191,25 +196,21 @@ export default function CourseDetailPage() {
           <Link href="/courses" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 수업 목록으로 돌아가기
           </Link>
-          {course && (
-            <div className="flex items-end justify-between">
-              <div>
-                <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{course.name}</h1>
-                <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
-              </div>
-              <button
-                onClick={openCreateModal}
-                className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-                + 시험 생성
-              </button>
+          <div className="flex items-end justify-between">
+            <div>
+              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{course.name}</h1>
+              <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
             </div>
-          )}
+            <button
+              onClick={openCreateModal}
+              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+              + 시험 생성
+            </button>
+          </div>
         </div>
 
         {/* 시험 목록 */}
-        {loading ? (
-          <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
-        ) : exams.length === 0 ? (
+        {exams.length === 0 ? (
           <div className="py-spacing-900 text-center">
             <p className="text-body text-content-standard-tertiary">시험이 없습니다.</p>
             <button

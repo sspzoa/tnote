@@ -17,10 +17,6 @@ export default function CoursesPage() {
   const { courses, isLoading, error } = useCourses();
   const setShowCreateModal = useSetAtom(showCreateModalAtom);
 
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
   if (error) {
     return <ErrorComponent errorMessage="수업 목록을 불러오는데 실패했습니다." />;
   }
@@ -43,7 +39,9 @@ export default function CoursesPage() {
         }
       />
 
-      {courses.length === 0 ? (
+      {isLoading ? (
+        <LoadingComponent />
+      ) : courses.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="text-body text-content-standard-tertiary">수업이 없습니다.</p>
           <button

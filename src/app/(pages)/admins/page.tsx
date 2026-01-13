@@ -15,10 +15,6 @@ export default function AdminsPage() {
   const { admins, isLoading, error } = useAdmins();
   const setShowInviteModal = useSetAtom(showInviteModalAtom);
 
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
   if (error) {
     return <ErrorComponent errorMessage="관리자 목록을 불러오는데 실패했습니다." />;
   }
@@ -41,7 +37,9 @@ export default function AdminsPage() {
         }
       />
 
-      {admins.length === 0 ? (
+      {isLoading ? (
+        <LoadingComponent />
+      ) : admins.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="text-body text-content-standard-tertiary">관리자가 없습니다.</p>
         </div>

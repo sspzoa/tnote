@@ -36,10 +36,6 @@ export default function ClinicsPage() {
   const setEndDate = useSetAtom(endDateAtom);
   const setSelectedDate = useSetAtom(selectedDateAtom);
 
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
   if (error) {
     return <ErrorComponent errorMessage="클리닉 목록을 불러오는데 실패했습니다." />;
   }
@@ -90,7 +86,9 @@ export default function ClinicsPage() {
         }
       />
 
-      {clinics.length === 0 ? (
+      {isLoading ? (
+        <LoadingComponent />
+      ) : clinics.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="text-body text-content-standard-tertiary">클리닉이 없습니다.</p>
           <button

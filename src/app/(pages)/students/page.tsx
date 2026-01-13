@@ -28,9 +28,7 @@ export default function StudentsPage() {
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .filter((student) => !showFavoritesOnly || student.is_favorite);
 
-  if (studentsLoading || coursesLoading) {
-    return <LoadingComponent />;
-  }
+  const isLoading = studentsLoading || coursesLoading;
 
   if (studentsError) {
     return <ErrorComponent errorMessage="학생 목록을 불러오는데 실패했습니다." />;
@@ -56,7 +54,9 @@ export default function StudentsPage() {
 
       <StudentFilterBar courses={courses} />
 
-      {filteredStudents.length === 0 ? (
+      {isLoading ? (
+        <LoadingComponent />
+      ) : filteredStudents.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="text-body text-content-standard-tertiary">
             {students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
