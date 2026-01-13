@@ -7,5 +7,6 @@ export const showHistoryModalAtom = atom(false);
 export const showStudentModalAtom = atom(false);
 export const showAssignModalAtom = atom(false);
 export const showManagementStatusModalAtom = atom(false);
+export const showEditDateModalAtom = atom(false);
 
 export const selectedStudentIdAtom = atom<string | null>(null);

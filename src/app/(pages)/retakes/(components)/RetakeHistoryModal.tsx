@@ -1,27 +1,44 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { Undo2 } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
+import type { History } from "../(atoms)/useRetakesStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
 import { useRetakeHistory } from "../(hooks)/useRetakeHistory";
+import { useRetakeUndo } from "../(hooks)/useRetakeUndo";
 
-export default function RetakeHistoryModal() {
+interface RetakeHistoryModalProps {
+  onSuccess?: () => void;
+}
+
+export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProps) {
   const [isOpen, setIsOpen] = useAtom(showHistoryModalAtom);
   const [selectedRetake] = useAtom(selectedRetakeAtom);
-  const { history, isLoading } = useRetakeHistory(selectedRetake?.id || null);
+  const { history, isLoading, refetch } = useRetakeHistory(selectedRetake?.id || null);
+  const { undoAction, isUndoing } = useRetakeUndo();
+
+  // 모달이 열릴 때마다 이력 새로고침
+  useEffect(() => {
+    if (isOpen && selectedRetake?.id) {
+      refetch();
+    }
+  }, [isOpen, selectedRetake?.id, refetch]);
 
   const getActionLabel = (actionType: string) => {
-    const labels = {
+    const labels: Record<string, string> = {
       postpone: "연기",
       absent: "결석",
       complete: "완료",
       status_change: "상태 변경",
       management_status_change: "관리 상태 변경",
       note_update: "메모 수정",
+      date_edit: "날짜 수정",
     };
-    return labels[actionType as keyof typeof labels] || actionType;
+    return labels[actionType] || actionType;
   };
 
   const getActionBadgeStyle = (actionType: string) => {
@@ -30,8 +47,37 @@ export default function RetakeHistoryModal() {
     if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
     if (actionType === "status_change") return "bg-solid-translucent-purple text-solid-purple";
     if (actionType === "management_status_change") return "bg-solid-translucent-yellow text-solid-yellow";
+    if (actionType === "date_edit") return "bg-solid-translucent-blue text-solid-blue";
     if (actionType === "note_update") return "bg-components-fill-standard-secondary text-content-standard-secondary";
     return "bg-components-fill-standard-secondary text-content-standard-secondary";
+  };
+
+  const canUndo = (item: History, index: number) => {
+    // 가장 최근 이력만 되돌릴 수 있음 (index 0)
+    if (index !== 0) return false;
+    // note_update는 되돌릴 수 없음
+    if (item.action_type === "note_update") return false;
+    return true;
+  };
+
+  const handleUndo = async (item: History) => {
+    if (!selectedRetake) return;
+
+    if (!confirm(`"${getActionLabel(item.action_type)}" 작업을 되돌리시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      await undoAction({
+        retakeId: selectedRetake.id,
+        historyId: item.id,
+      });
+      alert("작업이 되돌려졌습니다.");
+      await refetch();
+      onSuccess?.();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "되돌리기에 실패했습니다.");
+    }
   };
 
   if (!selectedRetake) return null;
@@ -44,7 +90,7 @@ export default function RetakeHistoryModal() {
       onClose={() => setIsOpen(false)}
       title="재시험 이력"
       subtitle={subtitle}
-      maxWidth="lg"
+      maxWidth="3xl"
       footer={
         <Button variant="secondary" onClick={() => setIsOpen(false)} className="w-full">
           닫기
@@ -58,26 +104,23 @@ export default function RetakeHistoryModal() {
         </div>
       ) : (
         <div className="space-y-spacing-400">
-          {history.map((item) => (
+          {history.map((item, index) => (
             <div
               key={item.id}
               className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
-              <div className="mb-spacing-300 flex items-start justify-between">
-                <div className="flex flex-col gap-spacing-200">
-                  <div className="flex items-center gap-spacing-300">
-                    <span
-                      className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
-                      {getActionLabel(item.action_type)}
-                    </span>
-                  </div>
-                  {item.action_type === "postpone" && item.previous_date && item.new_date && (
-                    <span className="text-body text-content-standard-primary">
-                      일정: {item.previous_date} → {item.new_date}
+              <div className="flex items-center justify-between gap-spacing-300">
+                <div className="flex min-w-0 flex-1 items-center gap-spacing-300">
+                  <span
+                    className={`shrink-0 rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
+                    {getActionLabel(item.action_type)}
+                  </span>
+                  {(item.action_type === "postpone" || item.action_type === "date_edit") && item.new_date && (
+                    <span className="truncate text-body text-content-standard-primary">
+                      {item.previous_date || "미지정"} → {item.new_date}
                     </span>
                   )}
                   {item.action_type === "status_change" && item.previous_status && item.new_status && (
-                    <span className="text-body text-content-standard-primary">
-                      상태:{" "}
+                    <span className="truncate text-body text-content-standard-primary">
                       {item.previous_status === "pending"
                         ? "대기중"
                         : item.previous_status === "completed"
@@ -89,16 +132,27 @@ export default function RetakeHistoryModal() {
                   {item.action_type === "management_status_change" &&
                     item.previous_management_status &&
                     item.new_management_status && (
-                      <span className="text-body text-content-standard-primary">
-                        관리 상태: {item.previous_management_status} → {item.new_management_status}
+                      <span className="truncate text-body text-content-standard-primary">
+                        {item.previous_management_status} → {item.new_management_status}
                       </span>
                     )}
                 </div>
-                <span className="text-content-standard-tertiary text-footnote">
-                  {new Date(item.created_at).toLocaleString("ko-KR")}
-                </span>
+                <div className="flex shrink-0 items-center gap-spacing-300">
+                  <span className="shrink-0 text-content-standard-tertiary text-footnote">
+                    {new Date(item.created_at).toLocaleString("ko-KR")}
+                  </span>
+                  {canUndo(item, index) && (
+                    <button
+                      onClick={() => handleUndo(item)}
+                      disabled={isUndoing}
+                      className="rounded-radius-200 p-spacing-200 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary disabled:opacity-50"
+                      title="되돌리기">
+                      <Undo2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-              {item.note && <p className="text-body text-content-standard-secondary">{item.note}</p>}
+              {item.note && <p className="mt-spacing-300 text-body text-content-standard-secondary">{item.note}</p>}
             </div>
           ))}
         </div>

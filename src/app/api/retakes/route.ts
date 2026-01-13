@@ -4,7 +4,7 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
   const { examId, studentIds, scheduledDate } = await request.json();
 
-  if (!examId || !studentIds || !Array.isArray(studentIds) || !scheduledDate) {
+  if (!examId || !studentIds || !Array.isArray(studentIds)) {
     return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
   }
 
@@ -33,7 +33,7 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
   const assignments = studentIds.map((studentId) => ({
     exam_id: examId,
     student_id: studentId,
-    current_scheduled_date: scheduledDate,
+    current_scheduled_date: scheduledDate || null,
   }));
 
   const { data, error } = await supabase
@@ -74,7 +74,7 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
       student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
     `)
     .eq("student.workspace", session.workspace)
-    .order("current_scheduled_date", { ascending: true });
+    .order("current_scheduled_date", { ascending: false, nullsFirst: true });
 
   if (courseId) {
     query = query.eq("exam.course_id", courseId);

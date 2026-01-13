@@ -15,7 +15,7 @@ export interface Retake {
   id: string;
   exam_id: string;
   student_id: string;
-  current_scheduled_date: string;
+  current_scheduled_date: string | null;
   status: "pending" | "completed" | "absent";
   management_status: ManagementStatus;
   postpone_count: number;
@@ -40,7 +40,14 @@ export interface Retake {
 
 export interface History {
   id: string;
-  action_type: "postpone" | "absent" | "complete" | "status_change" | "management_status_change" | "note_update";
+  action_type:
+    | "postpone"
+    | "absent"
+    | "complete"
+    | "status_change"
+    | "management_status_change"
+    | "note_update"
+    | "date_edit";
   previous_date: string | null;
   new_date: string | null;
   previous_status: string | null;
@@ -78,3 +85,5 @@ export const selectedManagementStatusAtom = atom<ManagementStatus | "all">("all"
 export const selectedRetakeAtom = atom<Retake | null>(null);
 export const openMenuIdAtom = atom<string | null>(null);
 export const searchQueryAtom = atom("");
+export const showCompletedAtom = atom<boolean>(false);
+export const selectedDateAtom = atom<string>("all");

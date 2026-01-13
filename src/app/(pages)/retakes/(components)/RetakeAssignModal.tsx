@@ -62,7 +62,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
   };
 
   const handleAssign = async () => {
-    if (!selectedExamId || selectedStudentIds.length === 0 || !scheduledDate) {
+    if (!selectedExamId || selectedStudentIds.length === 0) {
       alert("모든 필수 항목을 입력해주세요.");
       return;
     }
@@ -71,7 +71,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       await assignRetake({
         examId: selectedExamId,
         studentIds: selectedStudentIds,
-        scheduledDate,
+        scheduledDate: scheduledDate || null,
       });
       alert(`${selectedStudentIds.length}명의 재시험이 배정되었습니다.`);
       handleClose();
@@ -106,7 +106,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           </Button>
           <Button
             onClick={handleAssign}
-            disabled={!selectedExamId || selectedStudentIds.length === 0 || !scheduledDate || isAssigning}
+            disabled={!selectedExamId || selectedStudentIds.length === 0 || isAssigning}
             className="flex-1">
             {isAssigning ? "배정 중..." : "배정하기"}
           </Button>
@@ -134,8 +134,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
         )}
 
         <FormInput
-          label="예정일"
-          required
+          label="예정일 (선택)"
           type="date"
           value={scheduledDate}
           onChange={(e) => setScheduledDate(e.target.value)}

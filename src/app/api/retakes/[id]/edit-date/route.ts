@@ -3,7 +3,7 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
   const id = params?.id;
-  const { newDate, note } = await request.json();
+  const { newDate } = await request.json();
 
   if (!newDate) {
     return NextResponse.json({ error: "새로운 날짜를 입력해주세요." }, { status: 400 });
@@ -13,8 +13,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     .from("RetakeAssignments")
     .select(`
       current_scheduled_date,
-      postpone_count,
-      status,
       exam:Exams!inner(course:Courses!inner(workspace)),
       student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
     `)
@@ -27,33 +25,41 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
   }
 
+  const previousDate = current.current_scheduled_date;
+
+  // 날짜가 같으면 변경하지 않음
+  if (previousDate === newDate) {
+    return NextResponse.json({ error: "날짜가 변경되지 않았습니다." }, { status: 400 });
+  }
+
   const { data: updated, error: updateError } = await supabase
     .from("RetakeAssignments")
     .update({
       current_scheduled_date: newDate,
-      postpone_count: current.postpone_count + 1,
-      status: "pending",
     })
     .eq("id", id)
     .select()
     .single();
 
-  if (updateError) throw updateError;
+  if (updateError) {
+    throw new Error(`재시험 업데이트 실패: ${updateError.message}`);
+  }
 
+  // 이력에 날짜 수정으로 기록 (연기 횟수 증가 없이)
   const { error: historyError } = await supabase.from("RetakeHistory").insert({
     retake_assignment_id: id,
-    action_type: "postpone",
-    previous_date: current.current_scheduled_date,
+    action_type: "date_edit",
+    previous_date: previousDate,
     new_date: newDate,
-    previous_status: current.status,
-    new_status: "pending",
-    note: note || null,
+    note: null,
   });
 
-  if (historyError) throw historyError;
+  if (historyError) {
+    throw new Error(`이력 저장 실패: ${historyError.message}`);
+  }
 
-  await logger.logUpdate("retake-postpone", id!, `Retake postponed to ${newDate}`);
+  await logger.logUpdate("retake-edit-date", id!, `Retake date changed from ${previousDate} to ${newDate}`);
   return NextResponse.json({ success: true, data: updated });
 };
 
-export const PATCH = withLogging(handlePatch, { resource: "retake-postpone", action: "update" });
+export const PATCH = withLogging(handlePatch, { resource: "retake-edit-date", action: "update" });

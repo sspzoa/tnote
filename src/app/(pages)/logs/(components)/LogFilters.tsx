@@ -1,7 +1,7 @@
 "use client";
 
-import { SearchInput } from "@/shared/components/ui/searchInput";
 import { useAtom } from "jotai";
+import { SearchInput } from "@/shared/components/ui/searchInput";
 import { logFilterAtom } from "../(atoms)/useFilterStore";
 
 const levels = [

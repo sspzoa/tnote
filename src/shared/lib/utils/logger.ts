@@ -60,17 +60,23 @@ const consoleLog = (entry: LogEntry) => {
   const message = formatLogMessage(entry);
 
   switch (entry.level) {
-    case "error":
-      console.error(message, entry.metadata || "");
+    case "error": {
+      const stack = entry.metadata?.stack;
+      if (stack) {
+        console.error(message, "\n", stack);
+      } else {
+        console.error(message, entry.metadata ? JSON.stringify(entry.metadata) : "");
+      }
       break;
+    }
     case "warn":
-      console.warn(message, entry.metadata || "");
+      console.warn(message, entry.metadata ? JSON.stringify(entry.metadata) : "");
       break;
     case "debug":
-      console.debug(message, entry.metadata || "");
+      console.debug(message, entry.metadata ? JSON.stringify(entry.metadata) : "");
       break;
     default:
-      console.log(message, entry.metadata || "");
+      console.log(message, entry.metadata ? JSON.stringify(entry.metadata) : "");
   }
 };
 

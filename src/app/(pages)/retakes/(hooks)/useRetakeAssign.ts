@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 interface AssignData {
   examId: string;
   studentIds: string[];
-  scheduledDate: string;
+  scheduledDate: string | null;
 }
 
 export const useRetakeAssign = () => {

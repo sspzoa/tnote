@@ -7,12 +7,13 @@ import ErrorComponent from "@/shared/components/common/errorComponent";
 import Header from "@/shared/components/common/header";
 import LoadingComponent from "@/shared/components/common/loadingComponent";
 import { SearchInput } from "@/shared/components/ui/searchInput";
-import { postponeDateAtom, postponeNoteAtom } from "./(atoms)/useFormStore";
+import { editDateAtom, postponeDateAtom, postponeNoteAtom } from "./(atoms)/useFormStore";
 import {
   selectedStudentIdAtom,
   showAbsentModalAtom,
   showAssignModalAtom,
   showCompleteModalAtom,
+  showEditDateModalAtom,
   showHistoryModalAtom,
   showManagementStatusModalAtom,
   showPostponeModalAtom,
@@ -25,14 +26,17 @@ import {
   retakesAtom,
   searchQueryAtom,
   selectedCourseAtom,
+  selectedDateAtom,
   selectedExamAtom,
   selectedManagementStatusAtom,
   selectedRetakeAtom,
+  showCompletedAtom,
 } from "./(atoms)/useRetakesStore";
 import ManagementStatusModal from "./(components)/ManagementStatusModal";
 import RetakeAbsentModal from "./(components)/RetakeAbsentModal";
 import RetakeAssignModal from "./(components)/RetakeAssignModal";
 import RetakeCompleteModal from "./(components)/RetakeCompleteModal";
+import RetakeEditDateModal from "./(components)/RetakeEditDateModal";
 import RetakeHistoryModal from "./(components)/RetakeHistoryModal";
 import RetakeList from "./(components)/RetakeList";
 import RetakePostponeModal from "./(components)/RetakePostponeModal";
@@ -61,6 +65,8 @@ export default function RetakesPage() {
   const [selectedExam, setSelectedExam] = useAtom(selectedExamAtom);
   const [selectedManagementStatus, setSelectedManagementStatus] = useAtom(selectedManagementStatusAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
+  const [showCompleted, setShowCompleted] = useAtom(showCompletedAtom);
+  const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
   const [, setSelectedRetake] = useAtom(selectedRetakeAtom);
   const [, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [, setShowPostponeModal] = useAtom(showPostponeModalAtom);
@@ -70,9 +76,11 @@ export default function RetakesPage() {
   const [, setShowAssignModal] = useAtom(showAssignModalAtom);
   const [, setShowStudentModal] = useAtom(showStudentModalAtom);
   const [, setShowManagementStatusModal] = useAtom(showManagementStatusModalAtom);
+  const [, setShowEditDateModal] = useAtom(showEditDateModalAtom);
   const [, setSelectedStudentId] = useAtom(selectedStudentIdAtom);
   const [, setPostponeDate] = useAtom(postponeDateAtom);
   const [, setPostponeNote] = useAtom(postponeNoteAtom);
+  const [, setEditDate] = useAtom(editDateAtom);
 
   const { retakes: fetchedRetakes, isLoading, error, refetch } = useRetakes(filter);
   const { courses } = useCourses();
@@ -134,6 +142,13 @@ export default function RetakesPage() {
     setOpenMenuId(null);
   };
 
+  const handleEditDate = (retake: (typeof retakes)[number]) => {
+    setSelectedRetake(retake);
+    setEditDate("");
+    setShowEditDateModal(true);
+    setOpenMenuId(null);
+  };
+
   const handleActionSuccess = () => {
     refetch();
   };
@@ -149,6 +164,7 @@ export default function RetakesPage() {
     setSelectedExam("all");
     setSelectedManagementStatus("all");
     setSearchQuery("");
+    setSelectedDate("all");
   };
 
   const isFilterActive =
@@ -156,12 +172,15 @@ export default function RetakesPage() {
     selectedCourse !== "all" ||
     selectedExam !== "all" ||
     selectedManagementStatus !== "all" ||
-    searchQuery !== "";
+    searchQuery !== "" ||
+    selectedDate !== "all";
 
   const filteredRetakes = fetchedRetakes
+    .filter((retake) => showCompleted || retake.status !== "completed")
     .filter((retake) => selectedCourse === "all" || retake.exam.course.id === selectedCourse)
     .filter((retake) => selectedExam === "all" || retake.exam.id === selectedExam)
     .filter((retake) => selectedManagementStatus === "all" || retake.management_status === selectedManagementStatus)
+    .filter((retake) => selectedDate === "all" || retake.current_scheduled_date === selectedDate)
     .filter((retake) => retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (error) {
@@ -193,6 +212,17 @@ export default function RetakesPage() {
 
       {/* 필터 드롭다운 */}
       <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
+        {/* 완료된 재시험 보기 토글 */}
+        <button
+          onClick={() => setShowCompleted(!showCompleted)}
+          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+            showCompleted
+              ? "bg-solid-translucent-green text-solid-green"
+              : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
+          }`}>
+          {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
+        </button>
+
         {/* 상태 필터 */}
         <select
           value={filter}
@@ -243,6 +273,14 @@ export default function RetakesPage() {
             </option>
           ))}
         </select>
+
+        {/* 날짜 필터 */}
+        <input
+          type="date"
+          value={selectedDate === "all" ? "" : selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value || "all")}
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+        />
 
         {/* 필터 초기화 버튼 */}
         {isFilterActive && (
@@ -312,6 +350,7 @@ export default function RetakesPage() {
           onViewHistory={handleViewHistory}
           onDelete={handleDelete}
           onManagementStatusChange={handleManagementStatusChange}
+          onEditDate={handleEditDate}
         />
       )}
 
@@ -319,10 +358,11 @@ export default function RetakesPage() {
       <RetakePostponeModal onSuccess={handleActionSuccess} />
       <RetakeAbsentModal onSuccess={handleActionSuccess} />
       <RetakeCompleteModal onSuccess={handleActionSuccess} />
-      <RetakeHistoryModal />
+      <RetakeHistoryModal onSuccess={handleActionSuccess} />
       <StudentInfoModal />
       <RetakeAssignModal onSuccess={handleActionSuccess} />
       <ManagementStatusModal onSuccess={handleActionSuccess} />
+      <RetakeEditDateModal onSuccess={handleActionSuccess} />
     </Container>
   );
 }

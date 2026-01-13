@@ -12,3 +12,5 @@ export const selectedExamAtom = atom("");
 export const selectedStudentsAtom = atom<string[]>([]);
 export const scheduledDateAtom = atom("");
 export const assignSearchQueryAtom = atom("");
+
+export const editDateAtom = atom("");

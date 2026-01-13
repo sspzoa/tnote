@@ -13,6 +13,7 @@ interface RetakeListProps {
   onViewHistory: (retake: Retake) => void;
   onDelete: (retake: Retake) => void;
   onManagementStatusChange: (retake: Retake) => void;
+  onEditDate: (retake: Retake) => void;
 }
 
 export default function RetakeList({
@@ -24,6 +25,7 @@ export default function RetakeList({
   onViewHistory,
   onDelete,
   onManagementStatusChange,
+  onEditDate,
 }: RetakeListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
 
@@ -120,7 +122,9 @@ export default function RetakeList({
                 <div className="text-content-standard-secondary text-footnote">{retake.exam.exam_number}회차</div>
               </td>
               <td className="px-spacing-500 py-spacing-400">
-                <div className="text-body text-content-standard-primary">{retake.current_scheduled_date}</div>
+                <div className="text-body text-content-standard-primary">
+                  {retake.current_scheduled_date || <span className="text-content-standard-tertiary">미지정</span>}
+                </div>
                 {(retake.postpone_count > 0 || retake.absent_count > 0) && (
                   <div className="mt-spacing-100 flex gap-spacing-200">
                     {retake.postpone_count > 0 && (
@@ -193,6 +197,16 @@ export default function RetakeList({
                         className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                         이력 보기
                       </button>
+                      {retake.status !== "completed" && (
+                        <button
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            onEditDate(retake);
+                          }}
+                          className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                          수정
+                        </button>
+                      )}
                       <div className="my-spacing-100 border-line-divider border-t" />
                       <button
                         onClick={() => {
