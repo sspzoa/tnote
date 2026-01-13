@@ -1,81 +1,58 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
+import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
+const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+  const id = params?.id;
 
-    const { supabase, session } = await getAuthenticatedClient();
+  const { data, error } = await supabase
+    .from("Users")
+    .select("id, phone_number, name, parent_phone_number, school, birth_year")
+    .eq("id", id)
+    .eq("workspace", session.workspace)
+    .single();
 
-    const { data, error } = await supabase
-      .from("Users")
-      .select("id, phone_number, name, parent_phone_number, school, birth_year")
-      .eq("id", id)
-      .eq("workspace", session.workspace)
-      .single();
+  if (error) throw error;
 
-    if (error) throw error;
+  await logger.info("read", "students", `Retrieved student: ${data.name}`, { resourceId: id });
+  return NextResponse.json({ data });
+};
 
-    return NextResponse.json({ data });
-  } catch (error: any) {
-    console.error("Student fetch error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "학생 조회 중 오류가 발생했습니다." }, { status: 500 });
-  }
-}
+const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+  const id = params?.id;
+  const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
-    const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
+  const updateData: Record<string, unknown> = {};
+  if (name !== undefined) updateData.name = name;
+  if (phoneNumber !== undefined) updateData.phone_number = phoneNumber;
+  if (parentPhoneNumber !== undefined) updateData.parent_phone_number = parentPhoneNumber;
+  if (school !== undefined) updateData.school = school;
+  if (birthYear !== undefined) updateData.birth_year = birthYear;
 
-    const { supabase, session } = await getAuthenticatedClient();
+  const { data, error } = await supabase
+    .from("Users")
+    .update(updateData)
+    .eq("id", id)
+    .eq("workspace", session.workspace)
+    .select("id, phone_number, name, parent_phone_number, school, birth_year")
+    .single();
 
-    const updateData: any = {};
-    if (name !== undefined) updateData.name = name;
-    if (phoneNumber !== undefined) updateData.phone_number = phoneNumber;
-    if (parentPhoneNumber !== undefined) updateData.parent_phone_number = parentPhoneNumber;
-    if (school !== undefined) updateData.school = school;
-    if (birthYear !== undefined) updateData.birth_year = birthYear;
+  if (error) throw error;
 
-    const { data, error } = await supabase
-      .from("Users")
-      .update(updateData)
-      .eq("id", id)
-      .eq("workspace", session.workspace)
-      .select("id, phone_number, name, parent_phone_number, school, birth_year")
-      .single();
+  await logger.logUpdate("students", id!, `Student updated: ${data.name}`);
+  return NextResponse.json({ success: true, data });
+};
 
-    if (error) throw error;
+const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+  const id = params?.id;
 
-    return NextResponse.json({ success: true, data });
-  } catch (error: any) {
-    console.error("Student update error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "학생 정보 수정 중 오류가 발생했습니다." }, { status: 500 });
-  }
-}
+  const { error } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
+  if (error) throw error;
 
-    const { supabase, session } = await getAuthenticatedClient();
+  await logger.logDelete("students", id!, "Student deleted");
+  return NextResponse.json({ success: true });
+};
 
-    const { error } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
-
-    if (error) throw error;
-
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("Student delete error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "학생 삭제 중 오류가 발생했습니다." }, { status: 500 });
-  }
-}
+export const GET = withLogging(handleGet, { resource: "students", action: "read" });
+export const PATCH = withLogging(handlePatch, { resource: "students", action: "update" });
+export const DELETE = withLogging(handleDelete, { resource: "students", action: "delete" });

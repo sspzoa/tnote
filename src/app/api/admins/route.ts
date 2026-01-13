@@ -1,82 +1,67 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
+import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-export async function GET() {
-  try {
-    const { supabase, session } = await getAuthenticatedClient();
+const handleGet = async ({ supabase, session, logger }: ApiContext) => {
+  const { data, error } = await supabase
+    .from("Users")
+    .select("id, phone_number, name, role, created_at")
+    .in("role", ["owner", "admin"])
+    .eq("workspace", session.workspace)
+    .order("created_at", { ascending: true });
 
-    const { data, error } = await supabase
-      .from("Users")
-      .select("id, phone_number, name, role, created_at")
-      .in("role", ["owner", "admin"])
-      .eq("workspace", session.workspace)
-      .order("created_at", { ascending: true });
+  if (error) throw error;
 
-    if (error) throw error;
+  await logger.info("read", "admins", `Retrieved ${data.length} admins`);
+  return NextResponse.json({ data });
+};
 
-    return NextResponse.json({ data });
-  } catch (error: any) {
-    console.error("Admins fetch error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "관리자 목록 조회 중 오류가 발생했습니다." }, { status: 500 });
+const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+  const { name, phoneNumber, password } = await request.json();
+
+  if (!name || !phoneNumber || !password) {
+    return NextResponse.json({ error: "모든 필수 정보를 입력해주세요." }, { status: 400 });
   }
-}
 
-export async function POST(request: Request) {
-  try {
-    const { name, phoneNumber, password } = await request.json();
+  if (password.length < 8) {
+    return NextResponse.json({ error: "비밀번호는 최소 8자 이상이어야 합니다." }, { status: 400 });
+  }
 
-    if (!name || !phoneNumber || !password) {
-      return NextResponse.json({ error: "모든 필수 정보를 입력해주세요." }, { status: 400 });
-    }
+  const { data: existingUser } = await supabase
+    .from("Users")
+    .select("phone_number")
+    .eq("phone_number", phoneNumber)
+    .eq("workspace", session.workspace)
+    .single();
 
-    if (password.length < 8) {
-      return NextResponse.json({ error: "비밀번호는 최소 8자 이상이어야 합니다." }, { status: 400 });
-    }
+  if (existingUser) {
+    return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
+  }
 
-    const { supabase, session } = await getAuthenticatedClient();
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { data: existingUser } = await supabase
-      .from("Users")
-      .select("phone_number")
-      .eq("phone_number", phoneNumber)
-      .eq("workspace", session.workspace)
-      .single();
+  const { data: newAdmin, error: adminError } = await supabase
+    .from("Users")
+    .insert({
+      name,
+      phone_number: phoneNumber,
+      password: hashedPassword,
+      role: "admin",
+      workspace: session.workspace,
+    })
+    .select("id, phone_number, name, role, created_at")
+    .single();
 
-    if (existingUser) {
+  if (adminError) {
+    if (adminError.code === "23505") {
       return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const { data: newAdmin, error: adminError } = await supabase
-      .from("Users")
-      .insert({
-        name,
-        phone_number: phoneNumber,
-        password: hashedPassword,
-        role: "admin",
-        workspace: session.workspace,
-      })
-      .select("id, phone_number, name, role, created_at")
-      .single();
-
-    if (adminError) {
-      if (adminError.code === "23505") {
-        return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
-      }
-      throw adminError;
-    }
-
-    return NextResponse.json({ success: true, data: newAdmin });
-  } catch (error: any) {
-    console.error("Admin creation error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "관리자 추가 중 오류가 발생했습니다." }, { status: 500 });
+    throw adminError;
   }
-}
+
+  await logger.logCreate("admins", newAdmin.id, `Admin created: ${name}`);
+  return NextResponse.json({ success: true, data: newAdmin });
+};
+
+export const GET = withLogging(handleGet, { resource: "admins", action: "read" });
+export const POST = withLogging(handlePost, { resource: "admins", action: "create" });

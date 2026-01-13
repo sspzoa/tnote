@@ -665,22 +665,41 @@ export default function Home() {
           </Link>
 
           {userRole === "owner" && (
-            <Link
-              href="/admins"
-              className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
-              <div className="mb-spacing-500 flex items-center gap-spacing-300">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-blue">
-                  <span className="text-heading text-solid-blue">👨‍💼</span>
+            <>
+              <Link
+                href="/admins"
+                className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
+                <div className="mb-spacing-500 flex items-center gap-spacing-300">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-blue">
+                    <span className="text-heading text-solid-blue">👨‍💼</span>
+                  </div>
+                  <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
+                    관리자 관리
+                  </h2>
                 </div>
-                <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
-                  관리자 관리
-                </h2>
-              </div>
-              <p className="mb-spacing-400 text-body text-content-standard-secondary">
-                워크스페이스 관리자를 관리합니다
-              </p>
-              <div className="font-semibold text-core-accent text-label">바로가기 →</div>
-            </Link>
+                <p className="mb-spacing-400 text-body text-content-standard-secondary">
+                  워크스페이스 관리자를 관리합니다
+                </p>
+                <div className="font-semibold text-core-accent text-label">바로가기 →</div>
+              </Link>
+
+              <Link
+                href="/logs"
+                className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
+                <div className="mb-spacing-500 flex items-center gap-spacing-300">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-gray">
+                    <span className="text-heading text-solid-gray">📋</span>
+                  </div>
+                  <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
+                    시스템 로그
+                  </h2>
+                </div>
+                <p className="mb-spacing-400 text-body text-content-standard-secondary">
+                  API 활동 로그와 통계를 확인합니다
+                </p>
+                <div className="font-semibold text-core-accent text-label">바로가기 →</div>
+              </Link>
+            </>
           )}
         </div>
       </div>

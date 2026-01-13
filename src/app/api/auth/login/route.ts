@@ -2,8 +2,11 @@ import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/shared/lib/supabase/server";
+import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function POST(request: Request) {
+  const logger = createLogger(request, null);
+
   try {
     const { phoneNumber, password, workspaceId, isTeacher } = await request.json();
 
@@ -28,11 +31,13 @@ export async function POST(request: Request) {
     const { data: user, error } = await query.single();
 
     if (error || !user) {
+      await logger.logAuth("login", `Login failed: user not found (${phoneNumber})`, false);
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      await logger.logAuth("login", `Login failed: invalid password (${phoneNumber})`, false);
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
@@ -53,6 +58,9 @@ export async function POST(request: Request) {
       path: "/",
     });
 
+    const loggerWithSession = createLogger(request, sessionData);
+    await loggerWithSession.logAuth("login", `User logged in: ${user.name} (${user.role})`, true);
+
     return NextResponse.json({
       success: true,
       user: {
@@ -65,7 +73,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    await logger.logError("auth", error instanceof Error ? error : new Error(String(error)), 500);
     return NextResponse.json({ error: "로그인 중 오류가 발생했습니다." }, { status: 500 });
   }
 }

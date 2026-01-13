@@ -20,9 +20,10 @@ const PUBLIC_APIS: PublicApi[] = [
 
 const AUTHENTICATED_APIS = ["/api/auth/me", "/api/auth/logout", "/api/auth/change-password"];
 const ADMIN_ONLY_APIS = ["/api/students", "/api/courses", "/api/exams", "/api/clinics", "/api/consultations"];
+const OWNER_ONLY_APIS = ["/api/logs"];
 const STUDENT_ALLOWED_PATHS = ["/", "/my-retakes"];
 const ADMIN_PATHS = ["/students", "/courses", "/exams", "/retakes", "/admins", "/clinics"];
-const OWNER_ONLY_PATHS = ["/admins"];
+const OWNER_ONLY_PATHS = ["/admins", "/logs"];
 
 const MUTATING_METHODS = ["POST", "PATCH", "DELETE"];
 
@@ -61,6 +62,10 @@ const handleApiRoute = (request: NextRequest, pathname: string, sessionCookie: s
   }
 
   if (pathname.startsWith("/api/admins")) {
+    return role === "owner" ? NextResponse.next() : NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (OWNER_ONLY_APIS.some((path) => pathname.startsWith(path))) {
     return role === "owner" ? NextResponse.next() : NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

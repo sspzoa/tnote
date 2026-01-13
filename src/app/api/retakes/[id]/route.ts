@@ -1,68 +1,53 @@
 import { NextResponse } from "next/server";
-import { getAuthenticatedClient } from "@/shared/lib/supabase/auth";
+import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
+const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+  const id = params?.id;
 
-    const { supabase, session } = await getAuthenticatedClient();
+  const { data, error } = await supabase
+    .from("RetakeAssignments")
+    .select(`
+      *,
+      exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
+      student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
+    `)
+    .eq("id", id)
+    .eq("exam.course.workspace", session.workspace)
+    .eq("student.workspace", session.workspace)
+    .single();
 
-    const { data, error } = await supabase
-      .from("RetakeAssignments")
-      .select(`
-        *,
-        exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
-        student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
-      `)
-      .eq("id", id)
-      .eq("exam.course.workspace", session.workspace)
-      .eq("student.workspace", session.workspace)
-      .single();
+  if (error) throw error;
 
-    if (error) throw error;
+  await logger.info("read", "retakes", `Retrieved retake assignment`, { resourceId: id });
+  return NextResponse.json({ data });
+};
 
-    return NextResponse.json({ data });
-  } catch (error: any) {
-    console.error("Retake fetch error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "재시험 조회 중 오류가 발생했습니다." }, { status: 500 });
+const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+  const id = params?.id;
+
+  const { data: retake } = await supabase
+    .from("RetakeAssignments")
+    .select(`
+      id,
+      exam:Exams!inner(course:Courses!inner(workspace)),
+      student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
+    `)
+    .eq("id", id)
+    .eq("exam.course.workspace", session.workspace)
+    .eq("student.workspace", session.workspace)
+    .single();
+
+  if (!retake) {
+    return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
   }
-}
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
+  const { error } = await supabase.from("RetakeAssignments").delete().eq("id", id);
 
-    const { supabase, session } = await getAuthenticatedClient();
+  if (error) throw error;
 
-    const { data: retake } = await supabase
-      .from("RetakeAssignments")
-      .select(`
-        id,
-        exam:Exams!inner(course:Courses!inner(workspace)),
-        student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
-      `)
-      .eq("id", id)
-      .eq("exam.course.workspace", session.workspace)
-      .eq("student.workspace", session.workspace)
-      .single();
+  await logger.logDelete("retakes", id!, "Retake assignment deleted");
+  return NextResponse.json({ success: true });
+};
 
-    if (!retake) {
-      return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
-    }
-
-    const { error } = await supabase.from("RetakeAssignments").delete().eq("id", id);
-
-    if (error) throw error;
-
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("Retake delete error:", error);
-    if (error.message === "Unauthorized" || error.message === "Forbidden") {
-      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
-    }
-    return NextResponse.json({ error: "재시험 삭제 중 오류가 발생했습니다." }, { status: 500 });
-  }
-}
+export const GET = withLogging(handleGet, { resource: "retakes", action: "read" });
+export const DELETE = withLogging(handleDelete, { resource: "retakes", action: "delete" });

@@ -1,8 +1,11 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/shared/lib/supabase/server";
+import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function POST(request: Request) {
+  const logger = createLogger(request, null);
+
   try {
     const { name, phoneNumber, password, workspaceName } = await request.json();
 
@@ -58,12 +61,17 @@ export async function POST(request: Request) {
 
     await supabase.from("Workspaces").update({ owner: newUser.id }).eq("id", newWorkspace.id);
 
+    await logger.info("create", "auth", `New workspace registered: ${workspaceName} by ${name}`, {
+      resourceId: newWorkspace.id,
+      metadata: { userId: newUser.id, workspaceName },
+    });
+
     return NextResponse.json({
       success: true,
       message: "회원가입이 완료되었습니다. 로그인해주세요.",
     });
   } catch (error) {
-    console.error("Registration error:", error);
+    await logger.logError("auth", error instanceof Error ? error : new Error(String(error)), 500);
     return NextResponse.json({ error: "회원가입 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
