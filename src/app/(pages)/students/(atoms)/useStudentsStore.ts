@@ -15,6 +15,8 @@ export interface Student {
 export interface Course {
   id: string;
   name: string;
+  start_date: string | null;
+  end_date: string | null;
 }
 
 export const studentsAtom = atom<Student[]>([]);

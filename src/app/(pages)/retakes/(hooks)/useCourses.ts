@@ -1,9 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Course } from "../(atoms)/useStudentsStore";
+
+export interface CourseForFilter {
+  id: string;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+}
 
 export const useCourses = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["courses-for-filter"],
+    queryKey: ["courses-for-retakes-filter"],
     queryFn: async () => {
       const response = await fetch("/api/courses");
       const result = await response.json();
@@ -15,7 +21,7 @@ export const useCourses = () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const activeCourses = result.data.filter((course: Course) => {
+      const activeCourses = result.data.filter((course: CourseForFilter) => {
         if (!course.start_date || !course.end_date) {
           return false;
         }
@@ -27,7 +33,7 @@ export const useCourses = () => {
         return today >= startDate && today <= endDate;
       });
 
-      return activeCourses as Course[];
+      return activeCourses as CourseForFilter[];
     },
   });
 

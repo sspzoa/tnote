@@ -22,6 +22,7 @@ import {
   openMenuIdAtom,
   retakesAtom,
   searchQueryAtom,
+  selectedCourseAtom,
   selectedRetakeAtom,
 } from "./(atoms)/useRetakesStore";
 import ManagementStatusModal from "./(components)/ManagementStatusModal";
@@ -32,12 +33,14 @@ import RetakeHistoryModal from "./(components)/RetakeHistoryModal";
 import RetakeList from "./(components)/RetakeList";
 import RetakePostponeModal from "./(components)/RetakePostponeModal";
 import StudentInfoModal from "./(components)/StudentInfoModal";
+import { useCourses } from "./(hooks)/useCourses";
 import { useRetakeDelete } from "./(hooks)/useRetakeDelete";
 import { useRetakes } from "./(hooks)/useRetakes";
 
 export default function RetakesPage() {
   const [filter, setFilter] = useAtom(filterAtom);
   const [retakes] = useAtom(retakesAtom);
+  const [selectedCourse, setSelectedCourse] = useAtom(selectedCourseAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [, setSelectedRetake] = useAtom(selectedRetakeAtom);
   const [, setOpenMenuId] = useAtom(openMenuIdAtom);
@@ -53,6 +56,7 @@ export default function RetakesPage() {
   const [, setPostponeNote] = useAtom(postponeNoteAtom);
 
   const { retakes: fetchedRetakes, isLoading, error, refetch } = useRetakes(filter);
+  const { courses } = useCourses();
   const { deleteRetake } = useRetakeDelete();
 
   const handlePostpone = (retake: (typeof retakes)[number]) => {
@@ -114,9 +118,9 @@ export default function RetakesPage() {
     refetch();
   };
 
-  const filteredRetakes = fetchedRetakes.filter((retake) =>
-    retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredRetakes = fetchedRetakes
+    .filter((retake) => selectedCourse === "all" || retake.exam.course.id === selectedCourse)
+    .filter((retake) => retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (error) {
     return (
@@ -145,8 +149,8 @@ export default function RetakesPage() {
         }
       />
 
-      {/* 필터 */}
-      <div className="mb-spacing-600 flex flex-wrap gap-spacing-300">
+      {/* 상태 필터 */}
+      <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
         {[
           { value: "all", label: "전체" },
           { value: "pending", label: "대기중" },
@@ -165,6 +169,33 @@ export default function RetakesPage() {
           </button>
         ))}
       </div>
+
+      {/* 반별 필터 */}
+      {courses.length > 0 && (
+        <div className="mb-spacing-600 flex flex-wrap gap-spacing-300">
+          <button
+            onClick={() => setSelectedCourse("all")}
+            className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+              selectedCourse === "all"
+                ? "bg-core-accent text-solid-white"
+                : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
+            }`}>
+            전체 반
+          </button>
+          {courses.map((course) => (
+            <button
+              key={course.id}
+              onClick={() => setSelectedCourse(course.id)}
+              className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+                selectedCourse === course.id
+                  ? "bg-core-accent text-solid-white"
+                  : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
+              }`}>
+              {course.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* 검색 */}
       <div className="mb-spacing-600">
