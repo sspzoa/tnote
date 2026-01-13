@@ -95,7 +95,7 @@ export default function EnrollmentModal() {
                 {filteredEnrolledStudents.length === 0 ? (
                   <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
                 ) : (
-                  <div className="max-h-48 overflow-y-auto">
+                  <div className="max-h-36 overflow-y-auto">
                     <div className="grid grid-cols-2 gap-spacing-200">
                       {filteredEnrolledStudents.map((student) => (
                         <div
@@ -140,7 +140,7 @@ export default function EnrollmentModal() {
                 {filteredUnenrolledStudents.length === 0 ? (
                   <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
                 ) : (
-                  <div className="max-h-48 overflow-y-auto">
+                  <div className="max-h-36 overflow-y-auto">
                     <div className="grid grid-cols-2 gap-spacing-200">
                       {filteredUnenrolledStudents.map((student) => (
                         <div
