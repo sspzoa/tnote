@@ -35,6 +35,7 @@ export default function LogList() {
     level: filters.level || undefined,
     action: filters.action || undefined,
     resource: filters.resource || undefined,
+    search: filters.search || undefined,
     startDate: filters.startDate || undefined,
     endDate: filters.endDate || undefined,
     limit: ITEMS_PER_PAGE,
@@ -176,31 +177,34 @@ function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
       <button
         onClick={onToggle}
         className="flex w-full flex-col gap-spacing-200 p-spacing-500 text-left hover:bg-components-interactive-hover/50">
-        {/* 첫 번째 줄: 레벨, 시간, 액션, 리소스, 상태코드, 처리시간 */}
-        <div className="flex w-full items-center gap-spacing-400">
+        {/* 첫 번째 줄: 레벨, 시간, 유저, 액션, 경로, 상태코드, 처리시간 */}
+        <div className="flex w-full items-center gap-spacing-500">
           {/* 레벨 */}
           <span
-            className={`flex-shrink-0 rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote ${levelStyles[log.level]}`}>
+            className={`shrink-0 rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote ${levelStyles[log.level]}`}>
             {log.level.toUpperCase()}
           </span>
 
           {/* 시간 */}
-          <span className="w-28 flex-shrink-0 text-content-standard-tertiary text-footnote">{timestamp}</span>
+          <span className="shrink-0 text-content-standard-tertiary text-footnote">{timestamp}</span>
+
+          {/* 유저 */}
+          <span className="shrink-0 font-medium text-content-standard-primary text-label">{log.user_name || "-"}</span>
 
           {/* 액션 */}
-          <span className="w-14 flex-shrink-0 text-content-standard-secondary text-label">
+          <span className="shrink-0 text-content-standard-secondary text-footnote">
             {actionLabels[log.action] || log.action}
           </span>
 
           {/* 경로 */}
-          <span className="flex-1 truncate font-mono text-content-standard-primary text-label">
+          <span className="min-w-0 flex-1 truncate font-mono text-content-standard-primary text-label">
             {log.method} {log.path}
           </span>
 
           {/* 상태코드 */}
           {log.status_code && (
             <span
-              className={`flex-shrink-0 text-label ${
+              className={`shrink-0 text-label ${
                 log.status_code >= 500
                   ? "text-solid-red"
                   : log.status_code >= 400
@@ -213,13 +217,11 @@ function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
 
           {/* 처리시간 */}
           {log.duration_ms !== null && (
-            <span className="w-16 flex-shrink-0 text-right text-content-standard-tertiary text-footnote">
-              {log.duration_ms}ms
-            </span>
+            <span className="shrink-0 text-content-standard-tertiary text-footnote">{log.duration_ms}ms</span>
           )}
 
           {/* 확장 아이콘 */}
-          <span className="flex-shrink-0 text-content-standard-tertiary">{isExpanded ? "▲" : "▼"}</span>
+          <span className="shrink-0 text-content-standard-tertiary">{isExpanded ? "▲" : "▼"}</span>
         </div>
 
         {/* 두 번째 줄: 메시지 */}

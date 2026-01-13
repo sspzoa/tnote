@@ -9,6 +9,7 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
   const action = searchParams.get("action");
   const resource = searchParams.get("resource");
   const userId = searchParams.get("userId");
+  const search = searchParams.get("search");
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
   const limit = Math.min(Number.parseInt(searchParams.get("limit") || "100"), 500);
@@ -32,6 +33,9 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
   }
   if (userId) {
     query = query.eq("user_id", userId);
+  }
+  if (search) {
+    query = query.or(`user_name.ilike.%${search}%,message.ilike.%${search}%,path.ilike.%${search}%`);
   }
   if (startDate) {
     query = query.gte("created_at", startDate);

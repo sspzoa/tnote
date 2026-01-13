@@ -28,6 +28,7 @@ export interface LogFilters {
   action?: string;
   resource?: string;
   userId?: string;
+  search?: string;
   startDate?: string;
   endDate?: string;
   limit?: number;
@@ -57,6 +58,7 @@ export const useLogs = (filters: LogFilters = {}) => {
   if (filters.action) queryString.set("action", filters.action);
   if (filters.resource) queryString.set("resource", filters.resource);
   if (filters.userId) queryString.set("userId", filters.userId);
+  if (filters.search) queryString.set("search", filters.search);
   if (filters.startDate) queryString.set("startDate", filters.startDate);
   if (filters.endDate) queryString.set("endDate", filters.endDate);
   if (filters.limit) queryString.set("limit", filters.limit.toString());
