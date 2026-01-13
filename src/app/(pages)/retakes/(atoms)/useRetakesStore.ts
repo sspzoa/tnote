@@ -73,6 +73,8 @@ export interface AssignStudent {
 export const retakesAtom = atom<Retake[]>([]);
 export const filterAtom = atom<"all" | "pending" | "completed" | "absent">("all");
 export const selectedCourseAtom = atom<string>("all");
+export const selectedExamAtom = atom<string>("all");
+export const selectedManagementStatusAtom = atom<ManagementStatus | "all">("all");
 export const selectedRetakeAtom = atom<Retake | null>(null);
 export const openMenuIdAtom = atom<string | null>(null);
 export const searchQueryAtom = atom("");

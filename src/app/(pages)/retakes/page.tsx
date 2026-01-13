@@ -19,10 +19,13 @@ import {
 } from "./(atoms)/useModalStore";
 import {
   filterAtom,
+  type ManagementStatus,
   openMenuIdAtom,
   retakesAtom,
   searchQueryAtom,
   selectedCourseAtom,
+  selectedExamAtom,
+  selectedManagementStatusAtom,
   selectedRetakeAtom,
 } from "./(atoms)/useRetakesStore";
 import ManagementStatusModal from "./(components)/ManagementStatusModal";
@@ -34,13 +37,28 @@ import RetakeList from "./(components)/RetakeList";
 import RetakePostponeModal from "./(components)/RetakePostponeModal";
 import StudentInfoModal from "./(components)/StudentInfoModal";
 import { useCourses } from "./(hooks)/useCourses";
+import { useExams } from "./(hooks)/useExams";
 import { useRetakeDelete } from "./(hooks)/useRetakeDelete";
 import { useRetakes } from "./(hooks)/useRetakes";
+
+const managementStatusOptions: ManagementStatus[] = [
+  "재시 안내 예정",
+  "재시 안내 완료",
+  "클리닉 1회 불참 연락 필요",
+  "클리닉 1회 불참 연락 완료",
+  "클리닉 2회 불참 연락 필요",
+  "클리닉 2회 불참 연락 완료",
+  "실장 집중 상담 필요",
+  "실장 집중 상담 진행 중",
+  "실장 집중 상담 완료",
+];
 
 export default function RetakesPage() {
   const [filter, setFilter] = useAtom(filterAtom);
   const [retakes] = useAtom(retakesAtom);
   const [selectedCourse, setSelectedCourse] = useAtom(selectedCourseAtom);
+  const [selectedExam, setSelectedExam] = useAtom(selectedExamAtom);
+  const [selectedManagementStatus, setSelectedManagementStatus] = useAtom(selectedManagementStatusAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [, setSelectedRetake] = useAtom(selectedRetakeAtom);
   const [, setOpenMenuId] = useAtom(openMenuIdAtom);
@@ -57,6 +75,7 @@ export default function RetakesPage() {
 
   const { retakes: fetchedRetakes, isLoading, error, refetch } = useRetakes(filter);
   const { courses } = useCourses();
+  const { exams } = useExams(selectedCourse === "all" ? null : selectedCourse);
   const { deleteRetake } = useRetakeDelete();
 
   const handlePostpone = (retake: (typeof retakes)[number]) => {
@@ -118,8 +137,30 @@ export default function RetakesPage() {
     refetch();
   };
 
+  const handleCourseChange = (courseId: string) => {
+    setSelectedCourse(courseId);
+    setSelectedExam("all");
+  };
+
+  const handleResetFilters = () => {
+    setFilter("all");
+    setSelectedCourse("all");
+    setSelectedExam("all");
+    setSelectedManagementStatus("all");
+    setSearchQuery("");
+  };
+
+  const isFilterActive =
+    filter !== "all" ||
+    selectedCourse !== "all" ||
+    selectedExam !== "all" ||
+    selectedManagementStatus !== "all" ||
+    searchQuery !== "";
+
   const filteredRetakes = fetchedRetakes
     .filter((retake) => selectedCourse === "all" || retake.exam.course.id === selectedCourse)
+    .filter((retake) => selectedExam === "all" || retake.exam.id === selectedExam)
+    .filter((retake) => selectedManagementStatus === "all" || retake.management_status === selectedManagementStatus)
     .filter((retake) => retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (error) {
@@ -149,32 +190,74 @@ export default function RetakesPage() {
         }
       />
 
-      {/* 상태 필터 */}
+      {/* 필터 드롭다운 */}
       <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
-        {[
-          { value: "all", label: "전체" },
-          { value: "pending", label: "대기중" },
-          { value: "completed", label: "완료" },
-          { value: "absent", label: "결석" },
-        ].map((item) => (
+        {/* 상태 필터 */}
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value as typeof filter)}
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+          <option value="all">전체 상태</option>
+          <option value="pending">대기중</option>
+          <option value="completed">완료</option>
+          <option value="absent">결석</option>
+        </select>
+
+        {/* 반 필터 */}
+        <select
+          value={selectedCourse}
+          onChange={(e) => handleCourseChange(e.target.value)}
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+          <option value="all">전체 반</option>
+          {courses.map((course) => (
+            <option key={course.id} value={course.id}>
+              {course.name}
+            </option>
+          ))}
+        </select>
+
+        {/* 시험 필터 */}
+        <select
+          value={selectedExam}
+          onChange={(e) => setSelectedExam(e.target.value)}
+          disabled={selectedCourse === "all"}
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50">
+          <option value="all">전체 시험</option>
+          {exams.map((exam) => (
+            <option key={exam.id} value={exam.id}>
+              {exam.name}
+            </option>
+          ))}
+        </select>
+
+        {/* 관리상태 필터 */}
+        <select
+          value={selectedManagementStatus}
+          onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+          <option value="all">전체 관리 상태</option>
+          {managementStatusOptions.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
+
+        {/* 필터 초기화 버튼 */}
+        {isFilterActive && (
           <button
-            key={item.value}
-            onClick={() => setFilter(item.value as typeof filter)}
-            className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
-              filter === item.value
-                ? "bg-core-accent text-solid-white"
-                : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
-            }`}>
-            {item.label}
+            onClick={handleResetFilters}
+            className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-colors hover:text-content-standard-primary">
+            초기화
           </button>
-        ))}
+        )}
       </div>
 
-      {/* 반별 필터 */}
+      {/* 반별 필터 버튼 */}
       {courses.length > 0 && (
-        <div className="mb-spacing-600 flex flex-wrap gap-spacing-300">
+        <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
           <button
-            onClick={() => setSelectedCourse("all")}
+            onClick={() => handleCourseChange("all")}
             className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
               selectedCourse === "all"
                 ? "bg-core-accent text-solid-white"
@@ -185,7 +268,7 @@ export default function RetakesPage() {
           {courses.map((course) => (
             <button
               key={course.id}
-              onClick={() => setSelectedCourse(course.id)}
+              onClick={() => handleCourseChange(course.id)}
               className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
                 selectedCourse === course.id
                   ? "bg-core-accent text-solid-white"
