@@ -9,7 +9,8 @@ export default function PagesLayout({
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="ml-64 flex-1">{children}</main>
+      {/* Mobile: add top padding for header, Desktop: add left margin for sidebar */}
+      <main className="flex-1 pt-14 md:ml-64 md:pt-0">{children}</main>
     </div>
   );
 }

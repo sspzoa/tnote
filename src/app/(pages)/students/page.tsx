@@ -4,12 +4,13 @@ import { useAtom, useAtomValue } from "jotai";
 import { MessageSquare, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import Container from "@/shared/components/common/container";
-import ErrorComponent from "@/shared/components/common/errorComponent";
-import Header from "@/shared/components/common/header";
-import LoadingComponent from "@/shared/components/common/loadingComponent";
+import Container from "@/shared/components/common/Container";
+import ErrorComponent from "@/shared/components/common/ErrorComponent";
+import Header from "@/shared/components/common/Header";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import { searchQueryAtom, showFavoritesOnlyAtom } from "./(atoms)/useStudentsStore";
 import ConsultationFormModal from "./(components)/ConsultationFormModal";
@@ -22,25 +23,6 @@ import { useAllConsultations } from "./(hooks)/useAllConsultations";
 import { useCourses } from "./(hooks)/useCourses";
 import { useStudents } from "./(hooks)/useStudents";
 
-interface Consultation {
-  id: string;
-  student_id: string;
-  consultation_date: string;
-  title: string;
-  content: string;
-  created_at: string;
-  student: {
-    id: string;
-    name: string;
-    phone_number: string;
-    school: string | null;
-  };
-  creator?: {
-    id: string;
-    name: string;
-  } | null;
-}
-
 export default function StudentsPage() {
   const { students, isLoading: studentsLoading, error: studentsError } = useStudents();
   const { courses, isLoading: coursesLoading } = useCourses();
@@ -48,7 +30,7 @@ export default function StudentsPage() {
   const searchQuery = useAtomValue(searchQueryAtom);
   const showFavoritesOnly = useAtomValue(showFavoritesOnlyAtom);
   const [, setShowCreateModal] = useAtom(showCreateModalAtom);
-  const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null);
+  const [selectedConsultation, setSelectedConsultation] = useState<ConsultationWithDetails | null>(null);
   const [showConsultationPanel, setShowConsultationPanel] = useState(false);
 
   const filteredStudents = students

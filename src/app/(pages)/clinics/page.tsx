@@ -2,10 +2,10 @@
 
 import { useSetAtom } from "jotai";
 import Link from "next/link";
-import Container from "@/shared/components/common/container";
-import ErrorComponent from "@/shared/components/common/errorComponent";
-import Header from "@/shared/components/common/header";
-import LoadingComponent from "@/shared/components/common/loadingComponent";
+import Container from "@/shared/components/common/Container";
+import ErrorComponent from "@/shared/components/common/ErrorComponent";
+import Header from "@/shared/components/common/Header";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { type Clinic, selectedClinicAtom } from "./(atoms)/useClinicsStore";
 import {
   clinicNameAtom,

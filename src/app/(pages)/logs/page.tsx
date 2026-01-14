@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Container from "@/shared/components/common/container";
+import Container from "@/shared/components/common/Container";
 import LogFilters from "./(components)/LogFilters";
 import LogList from "./(components)/LogList";
 import LogStats from "./(components)/LogStats";

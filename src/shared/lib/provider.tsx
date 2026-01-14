@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as JotaiProvider } from "jotai";
 import { type PropsWithChildren, useState } from "react";
+import { ToastContainer } from "@/shared/components/common/Toast";
 
 const createQueryClient = () =>
   new QueryClient({
@@ -23,7 +24,10 @@ export function Providers({ children }: PropsWithChildren) {
 
   return (
     <JotaiProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <ToastContainer />
+      </QueryClientProvider>
     </JotaiProvider>
   );
 }

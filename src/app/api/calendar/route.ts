@@ -10,6 +10,29 @@ interface CalendarEvent {
   metadata?: Record<string, unknown>;
 }
 
+// Supabase query result types (relations return single object when using !inner)
+interface CourseData {
+  id: string;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+  days_of_week: number[] | null;
+}
+
+interface ClinicData {
+  id: string;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+  operating_days: number[];
+}
+
+interface AttendanceRecord {
+  attendance_date: string;
+  student_id: string;
+  clinic_id?: string;
+}
+
 const generateClinicSessions = (
   clinic: {
     id: string;
@@ -18,7 +41,7 @@ const generateClinicSessions = (
     end_date: string;
     operating_days: number[];
   },
-  attendanceRecords: Array<{ attendance_date: string; student_id: string }>,
+  attendanceRecords: AttendanceRecord[],
   studentId?: string,
 ): CalendarEvent[] => {
   const events: CalendarEvent[] = [];
@@ -147,16 +170,18 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (enrollError) throw enrollError;
 
-    enrollments?.forEach((enrollment: Record<string, unknown>) => {
-      const course = enrollment.course as {
-        id: string;
-        name: string;
-        start_date: string;
-        end_date: string;
-        days_of_week: number[];
-      };
+    enrollments?.forEach((enrollment) => {
+      const course = enrollment.course as unknown as CourseData;
       if (course.start_date && course.end_date && course.days_of_week) {
-        events.push(...generateCourseSessions(course));
+        events.push(
+          ...generateCourseSessions({
+            id: course.id,
+            name: course.name,
+            start_date: course.start_date,
+            end_date: course.end_date,
+            days_of_week: course.days_of_week,
+          }),
+        );
       }
     });
 
@@ -177,8 +202,8 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (retakeError) throw retakeError;
 
-    retakes?.forEach((retake: Record<string, unknown>) => {
-      const exam = retake.exam as { name: string; course: { name: string } };
+    retakes?.forEach((retake) => {
+      const exam = retake.exam as unknown as { name: string; course: { id: string; name: string } };
       events.push({
         id: `retake-${retake.id}`,
         type: "retake",
@@ -203,7 +228,7 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (clinicsError) throw clinicsError;
 
-    const clinicIds = clinics?.map((c: { id: string }) => c.id) || [];
+    const clinicIds = (clinics as ClinicData[] | null)?.map((c) => c.id) || [];
     const { data: allAttendance, error: attendanceError } = await supabase
       .from("ClinicAttendance")
       .select("attendance_date, student_id, clinic_id")
@@ -211,14 +236,25 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (attendanceError) throw attendanceError;
 
-    clinics?.forEach(
-      (clinic: { id: string; name: string; start_date: string; end_date: string; operating_days: number[] }) => {
-        if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-          const clinicAttendance = allAttendance?.filter((a: { clinic_id: string }) => a.clinic_id === clinic.id) || [];
-          events.push(...generateClinicSessions(clinic, clinicAttendance, session.userId));
-        }
-      },
-    );
+    (clinics as ClinicData[] | null)?.forEach((clinic) => {
+      if (clinic.start_date && clinic.end_date && clinic.operating_days) {
+        const clinicAttendance =
+          (allAttendance as AttendanceRecord[] | null)?.filter((a) => a.clinic_id === clinic.id) || [];
+        events.push(
+          ...generateClinicSessions(
+            {
+              id: clinic.id,
+              name: clinic.name,
+              start_date: clinic.start_date,
+              end_date: clinic.end_date,
+              operating_days: clinic.operating_days,
+            },
+            clinicAttendance,
+            session.userId,
+          ),
+        );
+      }
+    });
   } else {
     const { data: courses, error: coursesError } = await supabase
       .from("Courses")
@@ -229,13 +265,19 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (coursesError) throw coursesError;
 
-    courses?.forEach(
-      (course: { id: string; name: string; start_date: string; end_date: string; days_of_week: number[] }) => {
-        if (course.start_date && course.end_date && course.days_of_week) {
-          events.push(...generateCourseSessions(course));
-        }
-      },
-    );
+    (courses as CourseData[] | null)?.forEach((course) => {
+      if (course.start_date && course.end_date && course.days_of_week) {
+        events.push(
+          ...generateCourseSessions({
+            id: course.id,
+            name: course.name,
+            start_date: course.start_date,
+            end_date: course.end_date,
+            days_of_week: course.days_of_week,
+          }),
+        );
+      }
+    });
 
     const { data: retakes, error: retakeError } = await supabase
       .from("RetakeAssignments")
@@ -255,9 +297,9 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (retakeError) throw retakeError;
 
-    retakes?.forEach((retake: Record<string, unknown>) => {
-      const student = retake.student as { name: string };
-      const exam = retake.exam as { name: string; course: { name: string } };
+    retakes?.forEach((retake) => {
+      const student = retake.student as unknown as { name: string };
+      const exam = retake.exam as unknown as { name: string; course: { name: string } };
       events.push({
         id: `retake-${retake.id}`,
         type: "retake",
@@ -283,7 +325,7 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (clinicsError) throw clinicsError;
 
-    const clinicIds = clinics?.map((c: { id: string }) => c.id) || [];
+    const clinicIds = (clinics as ClinicData[] | null)?.map((c) => c.id) || [];
     const { data: allAttendance, error: attendanceError } = await supabase
       .from("ClinicAttendance")
       .select("attendance_date, clinic_id, student_id")
@@ -291,14 +333,24 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (attendanceError) throw attendanceError;
 
-    clinics?.forEach(
-      (clinic: { id: string; name: string; start_date: string; end_date: string; operating_days: number[] }) => {
-        if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-          const clinicAttendance = allAttendance?.filter((a: { clinic_id: string }) => a.clinic_id === clinic.id) || [];
-          events.push(...generateClinicSessions(clinic, clinicAttendance));
-        }
-      },
-    );
+    (clinics as ClinicData[] | null)?.forEach((clinic) => {
+      if (clinic.start_date && clinic.end_date && clinic.operating_days) {
+        const clinicAttendance =
+          (allAttendance as AttendanceRecord[] | null)?.filter((a) => a.clinic_id === clinic.id) || [];
+        events.push(
+          ...generateClinicSessions(
+            {
+              id: clinic.id,
+              name: clinic.name,
+              start_date: clinic.start_date,
+              end_date: clinic.end_date,
+              operating_days: clinic.operating_days,
+            },
+            clinicAttendance,
+          ),
+        );
+      }
+    });
   }
 
   let filteredEvents = events;

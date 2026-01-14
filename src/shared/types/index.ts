@@ -120,6 +120,25 @@ export interface ConsultationLog {
   updated_at: string;
 }
 
+export interface ConsultationWithDetails {
+  id: string;
+  student_id: string;
+  consultation_date: string;
+  title: string;
+  content: string;
+  created_at: string;
+  student: {
+    id: string;
+    name: string;
+    phone_number: string;
+    school: string | null;
+  };
+  creator?: {
+    id: string;
+    name: string;
+  } | null;
+}
+
 // Admin types
 export interface Admin {
   id: string;

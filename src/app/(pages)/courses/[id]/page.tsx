@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import LoadingComponent from "@/shared/components/common/loadingComponent";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import {
   StudentListContainer,
   StudentListEmpty,

@@ -3,20 +3,46 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
   const consultationId = params?.id;
-  const body = await request.json();
+  if (!consultationId) {
+    return NextResponse.json({ error: "상담일지 ID가 필요합니다." }, { status: 400 });
+  }
 
+  const body = await request.json();
   const { consultationDate, title, content } = body;
 
-  if (!consultationDate || !title || !content) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  // 필수 필드 검증
+  if (!consultationDate) {
+    return NextResponse.json({ error: "상담 날짜를 입력해주세요." }, { status: 400 });
+  }
+
+  if (!title || typeof title !== "string" || title.trim().length === 0) {
+    return NextResponse.json({ error: "제목을 입력해주세요." }, { status: 400 });
+  }
+
+  if (title.length > 200) {
+    return NextResponse.json({ error: "제목은 200자 이하여야 합니다." }, { status: 400 });
+  }
+
+  if (!content || typeof content !== "string" || content.trim().length === 0) {
+    return NextResponse.json({ error: "내용을 입력해주세요." }, { status: 400 });
+  }
+
+  if (content.length > 5000) {
+    return NextResponse.json({ error: "내용은 5000자 이하여야 합니다." }, { status: 400 });
+  }
+
+  // 날짜 형식 검증
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(consultationDate)) {
+    return NextResponse.json({ error: "올바른 날짜 형식이 아닙니다." }, { status: 400 });
   }
 
   const { data, error } = await supabase
     .from("ConsultationLogs")
     .update({
       consultation_date: consultationDate,
-      title: title,
-      content: content,
+      title: title.trim(),
+      content: content.trim(),
       updated_at: new Date().toISOString(),
     })
     .eq("id", consultationId)
@@ -29,15 +55,18 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
   }
 
   if (!data) {
-    return NextResponse.json({ error: "Consultation log not found" }, { status: 404 });
+    return NextResponse.json({ error: "상담일지를 찾을 수 없습니다." }, { status: 404 });
   }
 
-  await logger.logUpdate("consultations", consultationId!, `Consultation updated: ${title}`);
+  await logger.logUpdate("consultations", consultationId, `Consultation updated: ${title}`);
   return NextResponse.json({ data });
 };
 
 const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
   const consultationId = params?.id;
+  if (!consultationId) {
+    return NextResponse.json({ error: "상담일지 ID가 필요합니다." }, { status: 400 });
+  }
 
   const { error } = await supabase
     .from("ConsultationLogs")
@@ -49,7 +78,7 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
     throw error;
   }
 
-  await logger.logDelete("consultations", consultationId!, "Consultation deleted");
+  await logger.logDelete("consultations", consultationId, "Consultation deleted");
   return NextResponse.json({ success: true });
 };
 

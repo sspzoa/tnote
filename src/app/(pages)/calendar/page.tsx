@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@/app/calendar-custom.css";
-import Container from "@/shared/components/common/container";
-import Header from "@/shared/components/common/header";
+import Container from "@/shared/components/common/Container";
+import Header from "@/shared/components/common/Header";
 import type { CalendarEvent } from "@/shared/types";
+import { useCalendarEvents } from "./(hooks)/useCalendarEvents";
 
 interface FilterState {
   course: boolean;
@@ -131,8 +132,6 @@ const CustomToolbar = ({
 };
 
 export default function CalendarPage() {
-  const [loading, setLoading] = useState(false);
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [filters, setFilters] = useState<FilterState>({
@@ -140,6 +139,8 @@ export default function CalendarPage() {
     retake: true,
     clinic: true,
   });
+
+  const { events, isLoading } = useCalendarEvents(currentDate);
 
   // Hide overlay when modal opens
   useEffect(() => {
@@ -152,36 +153,6 @@ export default function CalendarPage() {
       document.body.classList.remove("modal-open");
     };
   }, [selectedEvent]);
-
-  useEffect(() => {
-    fetchCalendarEvents();
-  }, [currentDate]);
-
-  const fetchCalendarEvents = async () => {
-    setLoading(true);
-    try {
-      const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-
-      const response = await fetch(
-        `/api/calendar?start=${start.toISOString().split("T")[0]}&end=${end.toISOString().split("T")[0]}`,
-      );
-      const result = await response.json();
-
-      if (response.ok) {
-        const events = result.data.map((e: CalendarEvent) => ({
-          ...e,
-          start: new Date(e.date),
-          end: new Date(e.date),
-        }));
-        setCalendarEvents(events);
-      }
-    } catch (error) {
-      console.error("Failed to fetch calendar events:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleNavigate = (newDate: Date) => {
     setCurrentDate(newDate);
@@ -242,6 +213,13 @@ export default function CalendarPage() {
     };
   };
 
+  const filteredEvents = events.filter((event) => {
+    if (event.type === "course" && !filters.course) return false;
+    if (event.type === "retake" && !filters.retake) return false;
+    if (event.type === "clinic" && !filters.clinic) return false;
+    return true;
+  });
+
   return (
     <Container>
       <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
@@ -251,19 +229,14 @@ export default function CalendarPage() {
       <Header title="캘린더" subtitle="수업, 재시험, 클리닉 일정을 확인하세요" />
 
       <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
-        {loading ? (
+        {isLoading ? (
           <div className="flex min-h-[600px] items-center justify-center">
             <p className="text-body text-content-standard-tertiary">로딩 중...</p>
           </div>
         ) : (
           <Calendar
             localizer={localizer}
-            events={calendarEvents.filter((event) => {
-              if (event.type === "course" && !filters.course) return false;
-              if (event.type === "retake" && !filters.retake) return false;
-              if (event.type === "clinic" && !filters.clinic) return false;
-              return true;
-            })}
+            events={filteredEvents}
             startAccessor="start"
             endAccessor="end"
             date={currentDate}

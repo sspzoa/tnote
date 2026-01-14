@@ -3,6 +3,9 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
   const id = params?.id;
+  if (!id) {
+    return NextResponse.json({ error: "관리자 ID가 필요합니다." }, { status: 400 });
+  }
 
   if (id === session.userId) {
     return NextResponse.json({ error: "본인 계정은 삭제할 수 없습니다." }, { status: 400 });
@@ -27,8 +30,12 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
 
   if (deleteError) throw deleteError;
 
-  await logger.logDelete("admins", id!, `Admin deleted: ${targetUser.name}`);
+  await logger.logDelete("admins", id, `Admin deleted: ${targetUser.name}`);
   return NextResponse.json({ success: true });
 };
 
-export const DELETE = withLogging(handleDelete, { resource: "admins", action: "delete" });
+export const DELETE = withLogging(handleDelete, {
+  resource: "admins",
+  action: "delete",
+  allowedRoles: ["owner"],
+});
