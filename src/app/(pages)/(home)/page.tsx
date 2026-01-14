@@ -3,6 +3,7 @@
 import { BookOpen, ClipboardList, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 
 interface Stats {
   courseCount: number;
@@ -17,60 +18,51 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserInfo();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        const result = await response.json();
 
-  useEffect(() => {
-    if (userRole && userRole !== "student") {
-      fetchStats();
-    }
-  }, [userRole]);
+        if (result.user) {
+          setUserName(result.user.name);
+          setUserRole(result.user.role);
 
-  const fetchUserInfo = async () => {
-    try {
-      const response = await fetch("/api/auth/me");
-      const result = await response.json();
-      if (result.user) {
-        setUserName(result.user.name);
-        setUserRole(result.user.role);
+          if (result.user.role !== "student") {
+            const [coursesRes, studentsRes, retakesRes] = await Promise.all([
+              fetch("/api/courses"),
+              fetch("/api/students"),
+              fetch("/api/retakes?status=pending"),
+            ]);
+
+            const [coursesData, studentsData, retakesData] = await Promise.all([
+              coursesRes.json(),
+              studentsRes.json(),
+              retakesRes.json(),
+            ]);
+
+            setStats({
+              courseCount: coursesData.data?.length || 0,
+              studentCount: studentsData.data?.length || 0,
+              pendingRetakeCount: retakesData.data?.length || 0,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch user info:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const fetchStats = async () => {
-    try {
-      const [coursesRes, studentsRes, retakesRes] = await Promise.all([
-        fetch("/api/courses"),
-        fetch("/api/students"),
-        fetch("/api/retakes?status=pending"),
-      ]);
-
-      const [coursesData, studentsData, retakesData] = await Promise.all([
-        coursesRes.json(),
-        studentsRes.json(),
-        retakesRes.json(),
-      ]);
-
-      setStats({
-        courseCount: coursesData.data?.length || 0,
-        studentCount: studentsData.data?.length || 0,
-        pendingRetakeCount: retakesData.data?.length || 0,
-      });
-    } catch (error) {
-      console.error("Failed to fetch stats:", error);
-    }
-  };
+    fetchData();
+  }, []);
 
   const isStudent = userRole === "student";
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-body text-content-standard-tertiary">로딩중...</div>
+        <LoadingComponent />
       </div>
     );
   }

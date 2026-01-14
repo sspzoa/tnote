@@ -2,6 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useState } from "react";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { logFilterAtom, selectedLogAtom } from "../(atoms)/useFilterStore";
 import { type LogEntry, useLogs } from "../(hooks)/useLogs";
 
@@ -43,21 +44,7 @@ export default function LogList() {
   });
 
   if (isLoading) {
-    return (
-      <div className="space-y-spacing-300">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className="animate-pulse rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
-            <div className="flex items-center gap-spacing-400">
-              <div className="h-6 w-16 rounded-radius-200 bg-components-fill-standard-secondary" />
-              <div className="h-4 w-24 rounded-radius-200 bg-components-fill-standard-secondary" />
-              <div className="h-4 flex-1 rounded-radius-200 bg-components-fill-standard-secondary" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
   if (error) {

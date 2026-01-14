@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { useLogStats } from "../(hooks)/useLogs";
 
 const levelColors: Record<string, string> = {
@@ -27,18 +28,7 @@ export default function LogStats() {
   const { stats, isLoading, error } = useLogStats(days);
 
   if (isLoading) {
-    return (
-      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
-        <div className="animate-pulse space-y-spacing-400">
-          <div className="h-6 w-32 rounded-radius-200 bg-components-fill-standard-secondary" />
-          <div className="grid grid-cols-4 gap-spacing-400">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-20 rounded-radius-300 bg-components-fill-standard-secondary" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
   if (error || !stats) {
