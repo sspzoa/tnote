@@ -2,6 +2,7 @@
 
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { ko } from "date-fns/locale";
+import { BookOpen, ClipboardList, Hospital, ScrollText, UserCog, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -607,7 +608,7 @@ export default function Home() {
             className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
             <div className="mb-spacing-500 flex items-center gap-spacing-300">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-core-accent-translucent">
-                <span className="text-core-accent text-heading">📝</span>
+                <ClipboardList className="h-6 w-6 text-core-accent" />
               </div>
               <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
                 재시험 관리
@@ -624,7 +625,7 @@ export default function Home() {
             className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
             <div className="mb-spacing-500 flex items-center gap-spacing-300">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-green">
-                <span className="text-heading text-solid-green">👥</span>
+                <Users className="h-6 w-6 text-solid-green" />
               </div>
               <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
                 학생 관리
@@ -639,7 +640,7 @@ export default function Home() {
             className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
             <div className="mb-spacing-500 flex items-center gap-spacing-300">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-purple">
-                <span className="text-heading text-solid-purple">📚</span>
+                <BookOpen className="h-6 w-6 text-solid-purple" />
               </div>
               <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
                 수업 관리
@@ -654,7 +655,7 @@ export default function Home() {
             className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
             <div className="mb-spacing-500 flex items-center gap-spacing-300">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-orange">
-                <span className="text-heading text-solid-orange">🏥</span>
+                <Hospital className="h-6 w-6 text-solid-orange" />
               </div>
               <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
                 클리닉 관리
@@ -671,7 +672,7 @@ export default function Home() {
                 className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
                 <div className="mb-spacing-500 flex items-center gap-spacing-300">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-blue">
-                    <span className="text-heading text-solid-blue">👨‍💼</span>
+                    <UserCog className="h-6 w-6 text-solid-blue" />
                   </div>
                   <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
                     관리자 관리
@@ -687,8 +688,8 @@ export default function Home() {
                 href="/logs"
                 className="group rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
                 <div className="mb-spacing-500 flex items-center gap-spacing-300">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-gray">
-                    <span className="text-heading text-solid-gray">📋</span>
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-radius-400 bg-solid-translucent-brown">
+                    <ScrollText className="h-6 w-6 text-solid-brown" />
                   </div>
                   <h2 className="font-bold text-content-standard-primary text-heading transition-colors group-hover:text-core-accent">
                     시스템 로그
