@@ -47,6 +47,22 @@ interface EnrollmentData {
   course: CourseData;
 }
 
+interface AssignmentData {
+  id: string;
+  status: string;
+  note: string | null;
+  exam: {
+    id: string;
+    name: string;
+    exam_number: number;
+    course: {
+      id: string;
+      name: string;
+      workspace: string;
+    };
+  };
+}
+
 const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
   const studentId = params?.id;
   if (!studentId) {
@@ -163,6 +179,42 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     },
   }));
 
+  const { data: assignments, error: assignmentsError } = await supabase
+    .from("CourseAssignments")
+    .select(`
+      id,
+      status,
+      note,
+      updated_at,
+      exam:Exams!inner(
+        id,
+        name,
+        exam_number,
+        course:Courses!inner(id, name, workspace)
+      )
+    `)
+    .eq("student_id", studentId)
+    .eq("exam.course.workspace", session.workspace)
+    .order("updated_at", { ascending: false })
+    .limit(10);
+
+  if (assignmentsError) throw assignmentsError;
+
+  const assignmentHistory = ((assignments as unknown as AssignmentData[]) || []).map((record) => ({
+    id: record.id,
+    status: record.status,
+    note: record.note,
+    exam: {
+      id: record.exam.id,
+      name: record.exam.name,
+      examNumber: record.exam.exam_number,
+      course: {
+        id: record.exam.course.id,
+        name: record.exam.course.name,
+      },
+    },
+  }));
+
   await logger.info("read", "student-detail", `Retrieved detail for student: ${student.name}`, {
     resourceId: studentId,
   });
@@ -182,6 +234,7 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
       courses,
       examScores: scoresWithRank,
       clinicHistory,
+      assignmentHistory,
     },
   });
 };

@@ -163,6 +163,47 @@ export default function StudentInfoModal() {
           </section>
 
           <section>
+            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 과제 상태</h3>
+            {studentDetail.assignmentHistory.length === 0 ? (
+              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+                과제 기록이 없습니다.
+              </div>
+            ) : (
+              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+                {studentDetail.assignmentHistory.map((assignment) => (
+                  <div
+                    key={assignment.id}
+                    className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex flex-col gap-spacing-50">
+                      <span className="font-medium text-body text-content-standard-primary">
+                        {assignment.exam.course.name} - {assignment.exam.name}
+                      </span>
+                      {assignment.note && (
+                        <span className="text-content-standard-tertiary text-footnote">{assignment.note}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-spacing-200">
+                      <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                        {assignment.exam.examNumber}회차
+                      </span>
+                      <span
+                        className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
+                          assignment.status === "완료"
+                            ? "bg-solid-translucent-green text-solid-green"
+                            : assignment.status === "미흡"
+                              ? "bg-solid-translucent-orange text-solid-orange"
+                              : "bg-solid-translucent-red text-core-status-negative"
+                        }`}>
+                        {assignment.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section>
             <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 클리닉 출석</h3>
             {studentDetail.clinicHistory.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">

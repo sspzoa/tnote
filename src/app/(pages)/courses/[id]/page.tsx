@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { SearchInput } from "@/shared/components/ui/searchInput";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -70,6 +71,15 @@ export default function CourseDetailPage() {
   const [loadingScores, setLoadingScores] = useState(false);
   const [savingScores, setSavingScores] = useState(false);
   const [scoreSearchQuery, setScoreSearchQuery] = useState("");
+
+  // 과제 관리 모달 상태
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+  const [assignmentExam, setAssignmentExam] = useState<Exam | null>(null);
+  const [assignmentStudents, setAssignmentStudents] = useState<Student[]>([]);
+  const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
+  const [loadingAssignments, setLoadingAssignments] = useState(false);
+  const [savingAssignments, setSavingAssignments] = useState(false);
+  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
 
   useEffect(() => {
     if (courseId) {
@@ -384,7 +394,6 @@ export default function CourseDetailPage() {
     }
   };
 
-  // 커트라인 미달 학생 수 계산
   const getBelowCutlineCount = () => {
     if (!scoreExam) return 0;
     const cutlineValue = scoreExam.cutline || 80;
@@ -392,6 +401,102 @@ export default function CourseDetailPage() {
       const score = Number.parseInt(value);
       return !Number.isNaN(score) && score < cutlineValue;
     }).length;
+  };
+
+  const openAssignmentModal = async (exam: Exam) => {
+    setAssignmentExam(exam);
+    setShowAssignmentModal(true);
+    setLoadingAssignments(true);
+    setAssignmentInputs({});
+
+    try {
+      const [studentsRes, assignmentsRes] = await Promise.all([
+        fetch(`/api/courses/${courseId}/students`),
+        fetch(`/api/exams/${exam.id}/assignments`),
+      ]);
+
+      const studentsResult = await studentsRes.json();
+      if (studentsRes.ok) {
+        setAssignmentStudents(studentsResult.data || []);
+      }
+
+      const assignmentsResult = await assignmentsRes.json();
+      if (assignmentsRes.ok && assignmentsResult.data) {
+        const initialInputs: Record<string, string> = {};
+        for (const assignment of assignmentsResult.data) {
+          initialInputs[assignment.student.id] = assignment.status;
+        }
+        setAssignmentInputs(initialInputs);
+      }
+    } catch {
+      alert("데이터를 불러오는데 실패했습니다.");
+    } finally {
+      setLoadingAssignments(false);
+    }
+  };
+
+  const closeAssignmentModal = () => {
+    setShowAssignmentModal(false);
+    setAssignmentExam(null);
+    setAssignmentStudents([]);
+    setAssignmentInputs({});
+    setAssignmentSearchQuery("");
+  };
+
+  const handleAssignmentChange = (studentId: string, status: string) => {
+    setAssignmentInputs((prev) => {
+      if (prev[studentId] === status) {
+        const newInputs = { ...prev };
+        delete newInputs[studentId];
+        return newInputs;
+      }
+      return {
+        ...prev,
+        [studentId]: status,
+      };
+    });
+  };
+
+  const handleSaveAssignments = async () => {
+    if (!assignmentExam) return;
+
+    const assignments = Object.entries(assignmentInputs)
+      .filter(([, status]) => status !== "")
+      .map(([studentId, status]) => ({
+        studentId,
+        status,
+      }));
+
+    setSavingAssignments(true);
+    try {
+      const response = await fetch(`/api/exams/${assignmentExam.id}/assignments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignments }),
+      });
+
+      if (response.ok) {
+        alert("과제 상태가 저장되었습니다.");
+        closeAssignmentModal();
+      } else {
+        const result = await response.json();
+        alert(result.error || "과제 상태 저장에 실패했습니다.");
+      }
+    } catch {
+      alert("오류가 발생했습니다.");
+    } finally {
+      setSavingAssignments(false);
+    }
+  };
+
+  const getAssignmentStatusCounts = () => {
+    const counts = { 완료: 0, 미흡: 0, 미제출: 0 };
+    for (const status of Object.values(assignmentInputs)) {
+      if (status === "완료" || status === "미흡" || status === "미제출") {
+        counts[status]++;
+      }
+    }
+    return counts;
   };
 
   if (loading || !course) {
@@ -514,11 +619,18 @@ export default function CourseDetailPage() {
                       )}
                     </td>
                     <td className="px-spacing-500 py-spacing-400">
-                      <button
-                        onClick={() => openScoreModal(exam)}
-                        className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
-                        점수 입력
-                      </button>
+                      <div className="flex gap-spacing-200">
+                        <button
+                          onClick={() => openScoreModal(exam)}
+                          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                          점수 입력
+                        </button>
+                        <button
+                          onClick={() => openAssignmentModal(exam)}
+                          className="rounded-radius-300 border border-core-accent bg-transparent px-spacing-400 py-spacing-200 font-medium text-core-accent text-footnote transition-colors hover:bg-core-accent-translucent">
+                          과제
+                        </button>
+                      </div>
                     </td>
                     <td className="relative px-spacing-500 py-spacing-400">
                       <button
@@ -859,6 +971,134 @@ export default function CourseDetailPage() {
                       disabled={savingScores}
                       className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                       {savingScores ? "저장 중..." : "저장"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {showAssignmentModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+            onClick={closeAssignmentModal}>
+            <div
+              className="flex max-h-[80vh] w-full max-w-2xl flex-col rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">과제 관리</h2>
+                <p className="mt-spacing-100 text-content-standard-secondary text-label">
+                  {assignmentExam?.name} ({assignmentExam?.exam_number}회차)
+                </p>
+              </div>
+
+              <div className="flex min-h-0 flex-1 flex-col p-spacing-600">
+                {loadingAssignments ? (
+                  <StudentListContainer>
+                    <StudentListLoading />
+                  </StudentListContainer>
+                ) : assignmentStudents.length === 0 ? (
+                  <StudentListContainer>
+                    <StudentListEmpty message="수강생이 없습니다." />
+                  </StudentListContainer>
+                ) : (
+                  <>
+                    <div className="mb-spacing-400 shrink-0">
+                      <SearchInput
+                        value={assignmentSearchQuery}
+                        onChange={(e) => setAssignmentSearchQuery(e.target.value)}
+                        placeholder="학생 검색..."
+                      />
+                    </div>
+
+                    <StudentListContainer>
+                      {assignmentStudents.filter((student) =>
+                        student.name.toLowerCase().includes(assignmentSearchQuery.toLowerCase()),
+                      ).length === 0 ? (
+                        <StudentListEmpty message="검색 결과가 없습니다." />
+                      ) : (
+                        assignmentStudents
+                          .filter((student) => student.name.toLowerCase().includes(assignmentSearchQuery.toLowerCase()))
+                          .map((student) => {
+                            const currentStatus = assignmentInputs[student.id] || "";
+
+                            return (
+                              <StudentListItem
+                                key={student.id}
+                                student={student}
+                                rightContent={
+                                  <div className="flex items-center gap-spacing-100">
+                                    <button
+                                      onClick={() => handleAssignmentChange(student.id, "완료")}
+                                      className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-all ${
+                                        currentStatus === "완료"
+                                          ? "bg-solid-translucent-green text-solid-green"
+                                          : "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-interactive-hover"
+                                      }`}>
+                                      완료
+                                    </button>
+                                    <button
+                                      onClick={() => handleAssignmentChange(student.id, "미흡")}
+                                      className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-all ${
+                                        currentStatus === "미흡"
+                                          ? "bg-solid-translucent-orange text-solid-orange"
+                                          : "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-interactive-hover"
+                                      }`}>
+                                      미흡
+                                    </button>
+                                    <button
+                                      onClick={() => handleAssignmentChange(student.id, "미제출")}
+                                      className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-all ${
+                                        currentStatus === "미제출"
+                                          ? "bg-solid-translucent-red text-core-status-negative"
+                                          : "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-interactive-hover"
+                                      }`}>
+                                      미제출
+                                    </button>
+                                  </div>
+                                }
+                              />
+                            );
+                          })
+                      )}
+                    </StudentListContainer>
+                  </>
+                )}
+              </div>
+
+              {!loadingAssignments && assignmentStudents.length > 0 && (
+                <div className="border-line-divider border-t px-spacing-600 py-spacing-400">
+                  <div className="mb-spacing-300 flex items-center justify-between text-body">
+                    <span className="text-content-standard-secondary">
+                      입력됨: {Object.values(assignmentInputs).filter((v) => v !== "").length}명 /{" "}
+                      {assignmentStudents.length}명
+                    </span>
+                    <div className="flex items-center gap-spacing-400">
+                      {getAssignmentStatusCounts()["완료"] > 0 && (
+                        <span className="text-solid-green">완료: {getAssignmentStatusCounts()["완료"]}명</span>
+                      )}
+                      {getAssignmentStatusCounts()["미흡"] > 0 && (
+                        <span className="text-solid-orange">미흡: {getAssignmentStatusCounts()["미흡"]}명</span>
+                      )}
+                      {getAssignmentStatusCounts()["미제출"] > 0 && (
+                        <span className="text-core-status-negative">
+                          미제출: {getAssignmentStatusCounts()["미제출"]}명
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-spacing-300">
+                    <button
+                      onClick={closeAssignmentModal}
+                      className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                      취소
+                    </button>
+                    <button
+                      onClick={handleSaveAssignments}
+                      disabled={savingAssignments}
+                      className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+                      {savingAssignments ? "저장 중..." : "저장"}
                     </button>
                   </div>
                 </div>

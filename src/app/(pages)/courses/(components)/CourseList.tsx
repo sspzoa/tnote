@@ -92,7 +92,7 @@ export default function CourseList({ courses }: CourseListProps) {
                 <div className="flex gap-spacing-200">
                   <Link href={`/courses/${course.id}`}>
                     <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
-                      시험 관리
+                      시험 및 과제 관리
                     </button>
                   </Link>
                   <button

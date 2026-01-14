@@ -38,6 +38,21 @@ interface ClinicHistoryInfo {
   };
 }
 
+interface AssignmentHistoryInfo {
+  id: string;
+  status: "완료" | "미흡" | "미제출";
+  note: string | null;
+  exam: {
+    id: string;
+    name: string;
+    examNumber: number;
+    course: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
 interface StudentInfo {
   id: string;
   phoneNumber: string;
@@ -54,6 +69,7 @@ export interface StudentDetail {
   courses: CourseInfo[];
   examScores: ExamScoreInfo[];
   clinicHistory: ClinicHistoryInfo[];
+  assignmentHistory: AssignmentHistoryInfo[];
 }
 
 export const useStudentDetail = (studentId: string | null) => {
