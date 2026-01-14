@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { setTokens } from "@/shared/lib/supabase/auth";
 import { createAdminClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
 
@@ -41,8 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
-    const cookieStore = await cookies();
-    const sessionData = {
+    const tokenPayload = {
       userId: user.id,
       phoneNumber: user.phone_number,
       name: user.name,
@@ -50,15 +49,9 @@ export async function POST(request: Request) {
       workspace: user.workspace,
     };
 
-    cookieStore.set("session", JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
+    await setTokens(tokenPayload);
 
-    const loggerWithSession = createLogger(request, sessionData);
+    const loggerWithSession = createLogger(request, tokenPayload);
     await loggerWithSession.logAuth("login", `User logged in: ${user.name} (${user.role})`, true);
 
     return NextResponse.json({
