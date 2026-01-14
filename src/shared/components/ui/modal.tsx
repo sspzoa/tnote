@@ -47,27 +47,25 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxW
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-300 md:p-spacing-400"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}>
       <div
-        className={`flex max-h-[90dvh] w-full md:max-h-[80dvh] ${maxWidthStyles[maxWidth]} flex-col overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary md:rounded-radius-600`}
+        className={`flex max-h-[80vh] w-full ${maxWidthStyles[maxWidth]} flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary`}
         onClick={(e) => e.stopPropagation()}>
-        <div className="border-line-divider border-b px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
-          <h2 id={titleId} className="font-bold text-body text-content-standard-primary md:text-heading">
+        <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+          <h2 id={titleId} className="font-bold text-content-standard-primary text-heading">
             {title}
           </h2>
-          {subtitle && (
-            <p className="mt-spacing-100 text-content-standard-secondary text-footnote md:text-label">{subtitle}</p>
-          )}
+          {subtitle && <p className="mt-spacing-100 text-content-standard-secondary text-label">{subtitle}</p>}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-spacing-400 md:p-spacing-600">{children}</div>
+        <div className="flex-1 overflow-y-auto p-spacing-600">{children}</div>
 
         {footer && (
-          <div className="flex gap-spacing-200 border-line-divider border-t px-spacing-400 py-spacing-400 md:gap-spacing-300 md:px-spacing-600 md:py-spacing-500">
+          <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
             {footer}
           </div>
         )}

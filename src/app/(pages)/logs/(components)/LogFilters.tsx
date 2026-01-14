@@ -56,7 +56,7 @@ export default function LogFilters() {
     filters.level || filters.action || filters.resource || filters.search || filters.startDate || filters.endDate;
 
   return (
-    <div className="space-y-spacing-300 md:space-y-spacing-400">
+    <div className="space-y-spacing-400">
       {/* 통합 검색 */}
       <SearchInput
         size="lg"
@@ -66,29 +66,27 @@ export default function LogFilters() {
       />
 
       {/* 필터 */}
-      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400 md:p-spacing-500">
-        <div className="mb-spacing-300 flex items-center justify-between md:mb-spacing-400">
-          <h3 className="font-semibold text-content-standard-primary text-label md:text-body">필터</h3>
+      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+        <div className="mb-spacing-400 flex items-center justify-between">
+          <h3 className="font-semibold text-body text-content-standard-primary">필터</h3>
           {hasFilters && (
-            <button onClick={handleReset} className="text-core-accent text-footnote hover:underline md:text-label">
+            <button onClick={handleReset} className="text-core-accent text-label hover:underline">
               초기화
             </button>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-spacing-300 md:grid-cols-2 md:gap-spacing-400 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-spacing-400 md:grid-cols-2 lg:grid-cols-5">
           {/* 레벨 */}
           <div>
-            <label
-              htmlFor="level"
-              className="mb-spacing-100 block text-content-standard-tertiary text-footnote md:mb-spacing-200 md:text-label">
+            <label htmlFor="level" className="mb-spacing-200 block text-content-standard-tertiary text-label">
               레벨
             </label>
             <select
               id="level"
               value={filters.level}
               onChange={(e) => setFilters({ ...filters, level: e.target.value, page: 0 })}
-              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-label outline-none focus:border-core-accent md:px-spacing-400 md:py-spacing-300 md:text-body">
+              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary outline-none focus:border-core-accent">
               {levels.map((level) => (
                 <option key={level.value} value={level.value}>
                   {level.label}
@@ -99,16 +97,14 @@ export default function LogFilters() {
 
           {/* 액션 */}
           <div>
-            <label
-              htmlFor="action"
-              className="mb-spacing-100 block text-content-standard-tertiary text-footnote md:mb-spacing-200 md:text-label">
+            <label htmlFor="action" className="mb-spacing-200 block text-content-standard-tertiary text-label">
               액션
             </label>
             <select
               id="action"
               value={filters.action}
               onChange={(e) => setFilters({ ...filters, action: e.target.value, page: 0 })}
-              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-label outline-none focus:border-core-accent md:px-spacing-400 md:py-spacing-300 md:text-body">
+              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary outline-none focus:border-core-accent">
               {actions.map((action) => (
                 <option key={action.value} value={action.value}>
                   {action.label}
@@ -119,16 +115,14 @@ export default function LogFilters() {
 
           {/* 리소스 */}
           <div>
-            <label
-              htmlFor="resource"
-              className="mb-spacing-100 block text-content-standard-tertiary text-footnote md:mb-spacing-200 md:text-label">
+            <label htmlFor="resource" className="mb-spacing-200 block text-content-standard-tertiary text-label">
               리소스
             </label>
             <select
               id="resource"
               value={filters.resource}
               onChange={(e) => setFilters({ ...filters, resource: e.target.value, page: 0 })}
-              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-label outline-none focus:border-core-accent md:px-spacing-400 md:py-spacing-300 md:text-body">
+              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary outline-none focus:border-core-accent">
               {resources.map((resource) => (
                 <option key={resource.value} value={resource.value}>
                   {resource.label}
@@ -139,9 +133,7 @@ export default function LogFilters() {
 
           {/* 시작일 */}
           <div>
-            <label
-              htmlFor="startDate"
-              className="mb-spacing-100 block text-content-standard-tertiary text-footnote md:mb-spacing-200 md:text-label">
+            <label htmlFor="startDate" className="mb-spacing-200 block text-content-standard-tertiary text-label">
               시작일
             </label>
             <input
@@ -149,15 +141,13 @@ export default function LogFilters() {
               id="startDate"
               value={filters.startDate}
               onChange={(e) => setFilters({ ...filters, startDate: e.target.value, page: 0 })}
-              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-label outline-none focus:border-core-accent md:px-spacing-400 md:py-spacing-300 md:text-body"
+              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary outline-none focus:border-core-accent"
             />
           </div>
 
           {/* 종료일 */}
-          <div className="col-span-2 lg:col-span-1">
-            <label
-              htmlFor="endDate"
-              className="mb-spacing-100 block text-content-standard-tertiary text-footnote md:mb-spacing-200 md:text-label">
+          <div>
+            <label htmlFor="endDate" className="mb-spacing-200 block text-content-standard-tertiary text-label">
               종료일
             </label>
             <input
@@ -165,7 +155,7 @@ export default function LogFilters() {
               id="endDate"
               value={filters.endDate}
               onChange={(e) => setFilters({ ...filters, endDate: e.target.value, page: 0 })}
-              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-label outline-none focus:border-core-accent md:px-spacing-400 md:py-spacing-300 md:text-body"
+              className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary outline-none focus:border-core-accent"
             />
           </div>
         </div>

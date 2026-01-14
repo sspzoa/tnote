@@ -115,143 +115,80 @@ export default function StudentList({ students }: StudentListProps) {
   );
 
   return (
-    <>
-      {/* 모바일 카드 뷰 */}
-      <div className="space-y-spacing-300 md:hidden">
-        {students.map((student) => (
-          <div
-            key={student.id}
-            className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
-            <div className="mb-spacing-300 flex items-start justify-between">
-              <div className="flex items-center gap-spacing-200">
-                <button
-                  onClick={(e) => handleToggleFavorite(student, e)}
-                  className="transition-colors hover:scale-110"
-                  aria-label={student.is_favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}>
-                  <Star
-                    className={`h-5 w-5 ${student.is_favorite ? "fill-solid-yellow text-solid-yellow" : "text-content-standard-tertiary"}`}
-                  />
-                </button>
-                <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+      <table className="w-full rounded-radius-400">
+        <thead className="bg-components-fill-standard-secondary">
+          <tr>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              이름
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              학년
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              전화번호
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              학부모 번호
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              학교
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              상담
+            </th>
+            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => (
+            <tr
+              key={student.id}
+              className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+              <td className="px-spacing-500 py-spacing-400">
+                <div className="flex items-center gap-spacing-200">
+                  <button
+                    onClick={(e) => handleToggleFavorite(student, e)}
+                    className="transition-colors hover:scale-110"
+                    aria-label={student.is_favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}>
+                    <Star
+                      className={`h-5 w-5 ${student.is_favorite ? "fill-solid-yellow text-solid-yellow" : "text-content-standard-tertiary"}`}
+                    />
+                  </button>
+                  <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+                </div>
+              </td>
+              <td className="px-spacing-500 py-spacing-400">
                 {student.birth_year && getGrade(student.birth_year) && (
-                  <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 font-semibold text-footnote text-solid-blue">
+                  <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                     {getGrade(student.birth_year)}
                   </span>
                 )}
-              </div>
-              <div className="relative">
+              </td>
+              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                {formatPhoneNumber(student.phone_number)}
+              </td>
+              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
+              </td>
+              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                {student.school || "-"}
+              </td>
+              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                {student.consultation_count !== undefined ? `${student.consultation_count}회` : "-"}
+              </td>
+              <td className="relative px-spacing-500 py-spacing-400">
                 <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />
                 <DropdownMenu
                   isOpen={openMenuId === student.id}
                   onClose={() => setOpenMenuId(null)}
                   items={getMenuItems(student)}
                 />
-              </div>
-            </div>
-            <div className="space-y-spacing-150 text-content-standard-secondary text-label">
-              <div className="flex items-center justify-between">
-                <span className="text-content-standard-tertiary">전화번호</span>
-                <span>{formatPhoneNumber(student.phone_number)}</span>
-              </div>
-              {student.parent_phone_number && (
-                <div className="flex items-center justify-between">
-                  <span className="text-content-standard-tertiary">학부모</span>
-                  <span>{formatPhoneNumber(student.parent_phone_number)}</span>
-                </div>
-              )}
-              {student.school && (
-                <div className="flex items-center justify-between">
-                  <span className="text-content-standard-tertiary">학교</span>
-                  <span>{student.school}</span>
-                </div>
-              )}
-              {student.consultation_count !== undefined && student.consultation_count > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-content-standard-tertiary">상담</span>
-                  <span>{student.consultation_count}회</span>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 데스크탑 테이블 뷰 */}
-      <div className="hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary md:block">
-        <table className="w-full rounded-radius-400">
-          <thead className="bg-components-fill-standard-secondary">
-            <tr>
-              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                이름
-              </th>
-              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                학년
-              </th>
-              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                전화번호
-              </th>
-              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                학부모 번호
-              </th>
-              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                학교
-              </th>
-              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                상담
-              </th>
-              <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => (
-              <tr
-                key={student.id}
-                className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                <td className="px-spacing-500 py-spacing-400">
-                  <div className="flex items-center gap-spacing-200">
-                    <button
-                      onClick={(e) => handleToggleFavorite(student, e)}
-                      className="transition-colors hover:scale-110"
-                      aria-label={student.is_favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}>
-                      <Star
-                        className={`h-5 w-5 ${student.is_favorite ? "fill-solid-yellow text-solid-yellow" : "text-content-standard-tertiary"}`}
-                      />
-                    </button>
-                    <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
-                  </div>
-                </td>
-                <td className="px-spacing-500 py-spacing-400">
-                  {student.birth_year && getGrade(student.birth_year) && (
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                      {getGrade(student.birth_year)}
-                    </span>
-                  )}
-                </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                  {formatPhoneNumber(student.phone_number)}
-                </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                  {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
-                </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                  {student.school || "-"}
-                </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                  {student.consultation_count !== undefined ? `${student.consultation_count}회` : "-"}
-                </td>
-                <td className="relative px-spacing-500 py-spacing-400">
-                  <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />
-                  <DropdownMenu
-                    isOpen={openMenuId === student.id}
-                    onClose={() => setOpenMenuId(null)}
-                    items={getMenuItems(student)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

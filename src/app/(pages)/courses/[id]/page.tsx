@@ -406,16 +406,14 @@ export default function CourseDetailPage() {
           <Link href="/courses" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 수업 목록으로 돌아가기
           </Link>
-          <div className="flex flex-col gap-spacing-400 md:flex-row md:items-end md:justify-between">
+          <div className="flex items-end justify-between">
             <div>
-              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-heading md:text-title">
-                {course.name}
-              </h1>
-              <p className="text-content-standard-secondary text-label md:text-body">총 {exams.length}개의 시험</p>
+              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{course.name}</h1>
+              <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
             </div>
             <button
               onClick={openCreateModal}
-              className="w-full rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-label text-solid-white transition-opacity hover:opacity-90 md:w-auto md:py-spacing-400 md:text-body">
+              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
               + 시험 생성
             </button>
           </div>
@@ -432,27 +430,97 @@ export default function CourseDetailPage() {
             </button>
           </div>
         ) : (
-          <>
-            {/* 모바일 카드 뷰 */}
-            <div className="flex flex-col gap-spacing-300 md:hidden">
-              {exams.map((exam) => (
-                <div
-                  key={exam.id}
-                  className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
-                  <div className="mb-spacing-300 flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="mb-spacing-100 flex items-center gap-spacing-200">
-                        <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                          {exam.exam_number}회차
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+            <table className="w-full rounded-radius-400">
+              <thead className="bg-components-fill-standard-secondary">
+                <tr>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    시험명
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    회차
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    만점
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    커트라인
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    최고점
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    평균
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    중앙값
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    재시험자
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    관리
+                  </th>
+                  <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {exams.map((exam) => (
+                  <tr
+                    key={exam.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                    <td className="px-spacing-500 py-spacing-400">
+                      <div className="font-medium text-body text-content-standard-primary">{exam.name}</div>
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                        {exam.exam_number}회차
+                      </span>
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <span className="text-body text-content-standard-primary">{exam.max_score || 8}점</span>
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <span className="text-body text-content-standard-primary">{exam.cutline || 4}점</span>
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      {exam.highest_score !== null && exam.highest_score !== undefined ? (
+                        <span className="text-body text-content-standard-primary">{exam.highest_score}점</span>
+                      ) : (
+                        <span className="text-body text-content-standard-tertiary">-</span>
+                      )}
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      {exam.average_score !== null && exam.average_score !== undefined ? (
+                        <span className="text-body text-content-standard-primary">{exam.average_score}점</span>
+                      ) : (
+                        <span className="text-body text-content-standard-tertiary">-</span>
+                      )}
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      {exam.median_score !== null && exam.median_score !== undefined ? (
+                        <span className="text-body text-content-standard-primary">{exam.median_score}점</span>
+                      ) : (
+                        <span className="text-body text-content-standard-tertiary">-</span>
+                      )}
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      {exam.below_cutline_count !== null && exam.below_cutline_count !== undefined ? (
+                        <span className="text-body text-content-standard-primary">
+                          {exam.below_cutline_count}명 / {exam.total_score_count}명
                         </span>
-                        <span className="font-medium text-content-standard-primary text-label">{exam.name}</span>
-                      </div>
-                      <div className="flex gap-spacing-300 text-content-standard-secondary text-footnote">
-                        <span>만점: {exam.max_score || 8}점</span>
-                        <span>커트라인: {exam.cutline || 4}점</span>
-                      </div>
-                    </div>
-                    <div className="relative">
+                      ) : (
+                        <span className="text-body text-content-standard-tertiary">-</span>
+                      )}
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <button
+                        onClick={() => openScoreModal(exam)}
+                        className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                        점수 입력
+                      </button>
+                    </td>
+                    <td className="relative px-spacing-500 py-spacing-400">
                       <button
                         onClick={() => setOpenMenuId(openMenuId === exam.id ? null : exam.id)}
                         className="rounded-radius-200 px-spacing-200 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
@@ -484,206 +552,30 @@ export default function CourseDetailPage() {
                           </div>
                         </>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="mb-spacing-300 grid grid-cols-2 gap-spacing-200">
-                    <div className="rounded-radius-200 bg-components-fill-standard-secondary p-spacing-200">
-                      <div className="text-content-standard-tertiary text-footnote">최고점</div>
-                      <div className="font-medium text-content-standard-primary text-label">
-                        {exam.highest_score !== null && exam.highest_score !== undefined
-                          ? `${exam.highest_score}점`
-                          : "-"}
-                      </div>
-                    </div>
-                    <div className="rounded-radius-200 bg-components-fill-standard-secondary p-spacing-200">
-                      <div className="text-content-standard-tertiary text-footnote">평균</div>
-                      <div className="font-medium text-content-standard-primary text-label">
-                        {exam.average_score !== null && exam.average_score !== undefined
-                          ? `${exam.average_score}점`
-                          : "-"}
-                      </div>
-                    </div>
-                    <div className="rounded-radius-200 bg-components-fill-standard-secondary p-spacing-200">
-                      <div className="text-content-standard-tertiary text-footnote">중앙값</div>
-                      <div className="font-medium text-content-standard-primary text-label">
-                        {exam.median_score !== null && exam.median_score !== undefined ? `${exam.median_score}점` : "-"}
-                      </div>
-                    </div>
-                    <div className="rounded-radius-200 bg-components-fill-standard-secondary p-spacing-200">
-                      <div className="text-content-standard-tertiary text-footnote">재시험자</div>
-                      <div className="font-medium text-content-standard-primary text-label">
-                        {exam.below_cutline_count !== null && exam.below_cutline_count !== undefined
-                          ? `${exam.below_cutline_count}/${exam.total_score_count}명`
-                          : "-"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => openScoreModal(exam)}
-                    className="w-full rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-300 font-medium text-label text-solid-white transition-opacity hover:opacity-90">
-                    점수 입력
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* 데스크탑 테이블 뷰 */}
-            <div className="hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary md:block">
-              <table className="w-full rounded-radius-400">
-                <thead className="bg-components-fill-standard-secondary">
-                  <tr>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      시험명
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      회차
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      만점
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      커트라인
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      최고점
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      평균
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      중앙값
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      재시험자
-                    </th>
-                    <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      관리
-                    </th>
-                    <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {exams.map((exam) => (
-                    <tr
-                      key={exam.id}
-                      className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                      <td className="px-spacing-500 py-spacing-400">
-                        <div className="font-medium text-body text-content-standard-primary">{exam.name}</div>
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                          {exam.exam_number}회차
-                        </span>
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        <span className="text-body text-content-standard-primary">{exam.max_score || 8}점</span>
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        <span className="text-body text-content-standard-primary">{exam.cutline || 4}점</span>
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        {exam.highest_score !== null && exam.highest_score !== undefined ? (
-                          <span className="text-body text-content-standard-primary">{exam.highest_score}점</span>
-                        ) : (
-                          <span className="text-body text-content-standard-tertiary">-</span>
-                        )}
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        {exam.average_score !== null && exam.average_score !== undefined ? (
-                          <span className="text-body text-content-standard-primary">{exam.average_score}점</span>
-                        ) : (
-                          <span className="text-body text-content-standard-tertiary">-</span>
-                        )}
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        {exam.median_score !== null && exam.median_score !== undefined ? (
-                          <span className="text-body text-content-standard-primary">{exam.median_score}점</span>
-                        ) : (
-                          <span className="text-body text-content-standard-tertiary">-</span>
-                        )}
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        {exam.below_cutline_count !== null && exam.below_cutline_count !== undefined ? (
-                          <span className="text-body text-content-standard-primary">
-                            {exam.below_cutline_count}명 / {exam.total_score_count}명
-                          </span>
-                        ) : (
-                          <span className="text-body text-content-standard-tertiary">-</span>
-                        )}
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        <button
-                          onClick={() => openScoreModal(exam)}
-                          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
-                          점수 입력
-                        </button>
-                      </td>
-                      <td className="relative px-spacing-500 py-spacing-400">
-                        <button
-                          onClick={() => setOpenMenuId(openMenuId === exam.id ? null : exam.id)}
-                          className="rounded-radius-200 px-spacing-200 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                          <svg
-                            className="h-5 w-5 text-content-standard-tertiary"
-                            fill="currentColor"
-                            viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
-                        </button>
-                        {openMenuId === exam.id && (
-                          <>
-                            <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                            <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
-                              <button
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  openEditModal(exam);
-                                }}
-                                className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                                수정
-                              </button>
-                              <div className="my-spacing-100 border-line-divider border-t" />
-                              <button
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  handleDelete(exam);
-                                }}
-                                className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                                삭제
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* 생성 모달 */}
         {showCreateModal && (
           <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-solid-black/50 p-0 md:items-center md:p-spacing-400"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
             onClick={() => setShowCreateModal(false)}>
             <div
-              className="max-h-[90dvh] w-full overflow-y-auto rounded-t-radius-600 border border-line-outline bg-components-fill-standard-primary md:max-w-md md:rounded-radius-600"
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
               onClick={(e) => e.stopPropagation()}>
-              <div className="border-line-divider border-b px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
-                <h2 className="font-bold text-content-standard-primary text-label md:text-heading">시험 생성</h2>
-                {course && (
-                  <p className="mt-spacing-100 text-content-standard-secondary text-footnote md:text-label">
-                    {course.name}
-                  </p>
-                )}
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">시험 생성</h2>
+                {course && <p className="mt-spacing-100 text-content-standard-secondary text-label">{course.name}</p>}
               </div>
 
-              <div className="space-y-spacing-400 p-spacing-400 md:p-spacing-600">
+              <div className="space-y-spacing-400 p-spacing-600">
                 <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     회차 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -692,12 +584,12 @@ export default function CourseDetailPage() {
                     onChange={(e) => setExamNumber(e.target.value)}
                     placeholder="ex. 1"
                     min="1"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     시험 이름 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -705,13 +597,13 @@ export default function CourseDetailPage() {
                     value={examName}
                     onChange={(e) => setExamName(e.target.value)}
                     placeholder="예: 복습테스트"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 <div className="flex gap-spacing-400">
                   <div className="flex-1">
-                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                       만점 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
@@ -720,11 +612,11 @@ export default function CourseDetailPage() {
                       onChange={(e) => setMaxScore(e.target.value)}
                       placeholder="8"
                       min="1"
-                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                       커트라인 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
@@ -733,13 +625,13 @@ export default function CourseDetailPage() {
                       onChange={(e) => setCutline(e.target.value)}
                       placeholder="4"
                       min="0"
-                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
@@ -748,13 +640,13 @@ export default function CourseDetailPage() {
                     setMaxScore("8");
                     setCutline("4");
                   }}
-                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-content-standard-primary text-label transition-colors hover:bg-components-interactive-hover md:text-body">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleCreate}
                   disabled={saving || !examNumber || !examName.trim() || !maxScore || !cutline}
-                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-label text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:text-body">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "생성 중..." : "생성"}
                 </button>
               </div>
@@ -765,18 +657,18 @@ export default function CourseDetailPage() {
         {/* 수정 모달 */}
         {showEditModal && selectedExam && (
           <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-solid-black/50 p-0 md:items-center md:p-spacing-400"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
             onClick={() => setShowEditModal(false)}>
             <div
-              className="max-h-[90dvh] w-full overflow-y-auto rounded-t-radius-600 border border-line-outline bg-components-fill-standard-primary md:max-w-md md:rounded-radius-600"
+              className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
               onClick={(e) => e.stopPropagation()}>
-              <div className="border-line-divider border-b px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
-                <h2 className="font-bold text-content-standard-primary text-label md:text-heading">시험 수정</h2>
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">시험 수정</h2>
               </div>
 
-              <div className="space-y-spacing-400 p-spacing-400 md:p-spacing-600">
+              <div className="space-y-spacing-400 p-spacing-600">
                 <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     회차 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
@@ -784,25 +676,25 @@ export default function CourseDetailPage() {
                     value={examNumber}
                     onChange={(e) => setExamNumber(e.target.value)}
                     min="1"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                     시험 이름 <span className="text-core-status-negative">*</span>
                   </label>
                   <input
                     type="text"
                     value={examName}
                     onChange={(e) => setExamName(e.target.value)}
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                   />
                 </div>
 
                 <div className="flex gap-spacing-400">
                   <div className="flex-1">
-                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                       만점 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
@@ -811,11 +703,11 @@ export default function CourseDetailPage() {
                       onChange={(e) => setMaxScore(e.target.value)}
                       placeholder="8"
                       min="1"
-                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-footnote md:text-label">
+                    <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
                       커트라인 <span className="text-core-status-negative">*</span>
                     </label>
                     <input
@@ -824,22 +716,22 @@ export default function CourseDetailPage() {
                       onChange={(e) => setCutline(e.target.value)}
                       placeholder="4"
                       min="0"
-                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                      className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
+              <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-content-standard-primary text-label transition-colors hover:bg-components-interactive-hover md:text-body">
+                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                   취소
                 </button>
                 <button
                   onClick={handleEdit}
                   disabled={saving || !examNumber || !examName.trim() || !maxScore || !cutline}
-                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-label text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:text-body">
+                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                   {saving ? "저장 중..." : "저장"}
                 </button>
               </div>
@@ -850,20 +742,20 @@ export default function CourseDetailPage() {
         {/* 점수 입력 모달 */}
         {showScoreModal && scoreExam && (
           <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-solid-black/50 p-0 md:items-center md:p-spacing-400"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
             onClick={closeScoreModal}>
             <div
-              className="flex h-[90dvh] w-full flex-col rounded-t-radius-600 border border-line-outline bg-components-fill-standard-primary md:h-auto md:max-h-[80dvh] md:max-w-2xl md:rounded-radius-600"
+              className="flex max-h-[80vh] w-full max-w-2xl flex-col rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
               onClick={(e) => e.stopPropagation()}>
-              <div className="border-line-divider border-b px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
-                <h2 className="font-bold text-content-standard-primary text-label md:text-heading">점수 입력</h2>
-                <p className="mt-spacing-100 text-content-standard-secondary text-footnote md:text-label">
+              <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+                <h2 className="font-bold text-content-standard-primary text-heading">점수 입력</h2>
+                <p className="mt-spacing-100 text-content-standard-secondary text-label">
                   {scoreExam.name} ({scoreExam.exam_number}회차) - 만점: {scoreExam.max_score || 8}점, 커트라인:{" "}
                   {scoreExam.cutline || 4}점
                 </p>
               </div>
 
-              <div className="flex min-h-0 flex-1 flex-col p-spacing-400 md:p-spacing-600">
+              <div className="flex min-h-0 flex-1 flex-col p-spacing-600">
                 {loadingScores ? (
                   <StudentListContainer>
                     <StudentListLoading />
@@ -874,13 +766,14 @@ export default function CourseDetailPage() {
                   </StudentListContainer>
                 ) : (
                   <>
+                    {/* 검색창 - 고정 */}
                     <div className="relative mb-spacing-400 shrink-0">
                       <input
                         type="text"
                         value={scoreSearchQuery}
                         onChange={(e) => setScoreSearchQuery(e.target.value)}
                         placeholder="학생 검색..."
-                        className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary py-spacing-300 pr-spacing-400 pl-spacing-900 text-content-standard-primary text-label transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:text-body"
+                        className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary py-spacing-300 pr-spacing-400 pl-spacing-900 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
                       />
                       <svg
                         className="-translate-y-1/2 absolute top-1/2 left-spacing-300 h-5 w-5 text-content-standard-tertiary"
@@ -896,6 +789,7 @@ export default function CourseDetailPage() {
                       </svg>
                     </div>
 
+                    {/* 학생 목록 - 스크롤 */}
                     <StudentListContainer>
                       {students.filter((student) => student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()))
                         .length === 0 ? (
@@ -914,7 +808,7 @@ export default function CourseDetailPage() {
                                 student={student}
                                 highlighted={isBelowCutline}
                                 rightContent={
-                                  <div className="flex items-center gap-spacing-100 md:gap-spacing-200">
+                                  <div className="flex items-center gap-spacing-200">
                                     <input
                                       type="number"
                                       value={scoreValue}
@@ -922,13 +816,13 @@ export default function CourseDetailPage() {
                                       placeholder="-"
                                       min="0"
                                       max={scoreExam.max_score || 8}
-                                      className={`w-16 rounded-radius-300 border px-spacing-200 py-spacing-200 text-center text-label transition-all focus:outline-none focus:ring-2 md:w-20 md:px-spacing-300 md:text-body ${
+                                      className={`w-20 rounded-radius-300 border px-spacing-300 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
                                         isBelowCutline
                                           ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
                                           : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
                                       }`}
                                     />
-                                    <span className="text-content-standard-tertiary text-footnote md:text-body">
+                                    <span className="text-body text-content-standard-tertiary">
                                       / {scoreExam.max_score || 8}
                                     </span>
                                   </div>
@@ -943,8 +837,8 @@ export default function CourseDetailPage() {
               </div>
 
               {!loadingScores && students.length > 0 && (
-                <div className="border-line-divider border-t px-spacing-400 py-spacing-400 md:px-spacing-600">
-                  <div className="mb-spacing-300 flex flex-col gap-spacing-100 text-footnote md:flex-row md:items-center md:justify-between md:text-body">
+                <div className="border-line-divider border-t px-spacing-600 py-spacing-400">
+                  <div className="mb-spacing-300 flex items-center justify-between text-body">
                     <span className="text-content-standard-secondary">
                       입력된 점수:{" "}
                       {Object.values(scoreInputs).filter((v) => v !== "" && !Number.isNaN(Number.parseInt(v))).length}명
@@ -957,13 +851,13 @@ export default function CourseDetailPage() {
                   <div className="flex gap-spacing-300">
                     <button
                       onClick={closeScoreModal}
-                      className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-content-standard-primary text-label transition-colors hover:bg-components-interactive-hover md:text-body">
+                      className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
                       취소
                     </button>
                     <button
                       onClick={handleSaveScores}
                       disabled={savingScores}
-                      className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-label text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:text-body">
+                      className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                       {savingScores ? "저장 중..." : "저장"}
                     </button>
                   </div>

@@ -7,19 +7,12 @@
 
 /* Header */
 .rbc-header {
-  padding: 8px 4px;
+  padding: 12px 8px;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--content-standard-secondary);
   border-bottom: 1px solid var(--line-outline);
   background: var(--components-fill-standard-secondary);
-}
-
-@media (min-width: 768px) {
-  .rbc-header {
-    padding: 12px 8px;
-    font-size: 0.875rem;
-  }
 }
 
 .rbc-header + .rbc-header {
@@ -91,17 +84,10 @@
 }
 
 .rbc-date-cell {
-  padding: 2px 4px;
+  padding: 4px 8px;
   text-align: right;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: var(--content-standard-tertiary);
-}
-
-@media (min-width: 768px) {
-  .rbc-date-cell {
-    padding: 4px 8px;
-    font-size: 0.75rem;
-  }
 }
 
 .rbc-date-cell.rbc-now {
@@ -115,24 +101,15 @@
 
 /* Events */
 .rbc-event {
-  border-radius: 4px !important;
-  padding: 2px 4px !important;
-  font-size: 0.625rem !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  font-size: 0.75rem !important;
   font-weight: 500 !important;
-  margin: 1px 0 !important;
+  margin: 2px 0 !important;
   border: none !important;
   box-shadow: none !important;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-@media (min-width: 768px) {
-  .rbc-event {
-    border-radius: 6px !important;
-    padding: 4px 8px !important;
-    font-size: 0.75rem !important;
-    margin: 2px 0 !important;
-  }
 }
 
 .rbc-event:hover {

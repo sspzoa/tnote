@@ -1,7 +1,7 @@
 export default function LoadingComponent() {
   return (
     <div
-      className="flex min-h-[50dvh] flex-col items-center justify-center gap-spacing-400"
+      className="flex min-h-[50vh] flex-col items-center justify-center gap-spacing-400"
       role="status"
       aria-live="polite">
       <div

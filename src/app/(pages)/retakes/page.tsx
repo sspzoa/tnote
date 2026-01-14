@@ -204,30 +204,30 @@ export default function RetakesPage() {
         action={
           <button
             onClick={handleAssignClick}
-            className="rounded-radius-400 bg-core-accent px-spacing-400 py-spacing-300 font-semibold text-label text-solid-white transition-opacity hover:opacity-90 md:px-spacing-500 md:py-spacing-400 md:text-body">
+            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
             + 재시험 할당
           </button>
         }
       />
 
       {/* 필터 드롭다운 */}
-      <div className="mb-spacing-300 flex flex-wrap gap-spacing-200 md:mb-spacing-400 md:gap-spacing-300">
+      <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
         {/* 완료된 재시험 보기 토글 */}
         <button
           onClick={() => setShowCompleted(!showCompleted)}
-          className={`rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-footnote transition-colors md:px-spacing-400 md:py-spacing-200 md:text-label ${
+          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
             showCompleted
               ? "bg-solid-translucent-green text-solid-green"
               : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
           }`}>
-          {showCompleted ? "완료 숨기기" : "완료 보기"}
+          {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
         </button>
 
         {/* 상태 필터 */}
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value as typeof filter)}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-primary text-footnote transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:px-spacing-400 md:py-spacing-200 md:text-label">
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
           <option value="all">전체 상태</option>
           <option value="pending">대기중</option>
           <option value="completed">완료</option>
@@ -238,7 +238,7 @@ export default function RetakesPage() {
         <select
           value={selectedCourse}
           onChange={(e) => handleCourseChange(e.target.value)}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-primary text-footnote transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:px-spacing-400 md:py-spacing-200 md:text-label">
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
           <option value="all">전체 반</option>
           {courses.map((course) => (
             <option key={course.id} value={course.id}>
@@ -247,12 +247,12 @@ export default function RetakesPage() {
           ))}
         </select>
 
-        {/* 시험 필터 - 모바일에서 숨김 */}
+        {/* 시험 필터 */}
         <select
           value={selectedExam}
           onChange={(e) => setSelectedExam(e.target.value)}
           disabled={selectedCourse === "all"}
-          className="hidden rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50 md:block">
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50">
           <option value="all">전체 시험</option>
           {exams.map((exam) => (
             <option key={exam.id} value={exam.id}>
@@ -261,11 +261,11 @@ export default function RetakesPage() {
           ))}
         </select>
 
-        {/* 관리상태 필터 - 모바일에서 숨김 */}
+        {/* 관리상태 필터 */}
         <select
           value={selectedManagementStatus}
           onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}
-          className="hidden rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:block">
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
           <option value="all">전체 관리 상태</option>
           {managementStatusOptions.map((status) => (
             <option key={status} value={status}>
@@ -279,14 +279,14 @@ export default function RetakesPage() {
           type="date"
           value={selectedDate === "all" ? "" : selectedDate}
           onChange={(e) => setSelectedDate(e.target.value || "all")}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-primary text-footnote transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent md:px-spacing-400 md:py-spacing-200 md:text-label"
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
         />
 
         {/* 필터 초기화 버튼 */}
         {isFilterActive && (
           <button
             onClick={handleResetFilters}
-            className="px-spacing-200 font-medium text-content-standard-tertiary text-footnote transition-colors hover:text-content-standard-primary md:text-label">
+            className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-colors hover:text-content-standard-primary">
             초기화
           </button>
         )}
@@ -294,7 +294,7 @@ export default function RetakesPage() {
 
       {/* 반별 필터 버튼 */}
       {courses.length > 0 && (
-        <div className="mb-spacing-300 hidden flex-wrap gap-spacing-300 md:mb-spacing-400 md:flex">
+        <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
           <button
             onClick={() => handleCourseChange("all")}
             className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
@@ -320,7 +320,7 @@ export default function RetakesPage() {
       )}
 
       {/* 검색 */}
-      <div className="mb-spacing-400 md:mb-spacing-600">
+      <div className="mb-spacing-600">
         <SearchInput
           placeholder="학생 이름 검색..."
           size="lg"

@@ -228,9 +228,9 @@ export default function CalendarPage() {
 
       <Header title="캘린더" subtitle="수업, 재시험, 클리닉 일정을 확인하세요" />
 
-      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-300 md:rounded-radius-600 md:p-spacing-600">
+      <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
         {isLoading ? (
-          <div className="flex min-h-[400px] items-center justify-center md:min-h-[600px]">
+          <div className="flex min-h-[600px] items-center justify-center">
             <p className="text-body text-content-standard-tertiary">로딩 중...</p>
           </div>
         ) : (
@@ -272,7 +272,7 @@ export default function CalendarPage() {
             views={["month"]}
             defaultView="month"
             popup
-            style={{ height: "100%", minHeight: "400px" }}
+            style={{ height: "600px" }}
           />
         )}
       </div>
@@ -280,10 +280,10 @@ export default function CalendarPage() {
       {/* Event detail modal */}
       {selectedEvent && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-300 md:p-spacing-400"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
           onClick={() => setSelectedEvent(null)}>
           <div
-            className="w-full max-w-md rounded-radius-500 border border-line-outline bg-components-fill-standard-primary md:rounded-radius-600"
+            className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
             onClick={(e) => e.stopPropagation()}>
             <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
               <h2 className="font-bold text-content-standard-primary text-heading">일정 상세</h2>
