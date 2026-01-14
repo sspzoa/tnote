@@ -371,7 +371,7 @@ export default function CalendarPage() {
                       selectedEvent.metadata.status === "attended"
                         ? "bg-solid-translucent-green text-solid-green"
                         : selectedEvent.metadata.status === "absent"
-                          ? "bg-solid-translucent-gray text-solid-gray"
+                          ? "bg-solid-translucent-red text-solid-red"
                           : "bg-solid-translucent-purple text-solid-purple"
                     }`}>
                     {selectedEvent.metadata.status === "attended"
@@ -393,7 +393,7 @@ export default function CalendarPage() {
                       selectedEvent.metadata.status === "completed"
                         ? "bg-solid-translucent-green text-solid-green"
                         : selectedEvent.metadata.status === "absent"
-                          ? "bg-solid-translucent-gray text-solid-gray"
+                          ? "bg-solid-translucent-red text-solid-red"
                           : selectedEvent.metadata.status === "postponed"
                             ? "bg-solid-translucent-yellow text-solid-yellow"
                             : "bg-solid-translucent-blue text-solid-blue"

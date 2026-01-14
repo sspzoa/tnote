@@ -97,8 +97,8 @@ export default function Home() {
       icon: ClipboardList,
       value: stats?.pendingRetakeCount || 0,
       label: "남은 재시험",
-      bgColor: "bg-core-accent-translucent",
-      iconColor: "text-core-accent",
+      bgColor: "bg-solid-translucent-red",
+      iconColor: "text-solid-red",
     },
   ];
 

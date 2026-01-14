@@ -14,11 +14,18 @@ interface UserInfo {
 
 const menuItems = [
   {
+    href: "/calendar",
+    icon: Calendar,
+    label: "캘린더",
+    bgColor: "bg-solid-translucent-blue",
+    iconColor: "text-solid-blue",
+  },
+  {
     href: "/retakes",
     icon: ClipboardList,
     label: "재시험 관리",
-    bgColor: "bg-core-accent-translucent",
-    iconColor: "text-core-accent",
+    bgColor: "bg-solid-translucent-red",
+    iconColor: "text-solid-red",
   },
   {
     href: "/students",
@@ -48,15 +55,15 @@ const ownerMenuItems = [
     href: "/admins",
     icon: UserCog,
     label: "관리자 관리",
-    bgColor: "bg-solid-translucent-blue",
-    iconColor: "text-solid-blue",
+    bgColor: "bg-solid-translucent-brown",
+    iconColor: "text-solid-brown",
   },
   {
     href: "/logs",
     icon: ScrollText,
     label: "시스템 로그",
-    bgColor: "bg-solid-translucent-brown",
-    iconColor: "text-solid-brown",
+    bgColor: "bg-solid-translucent-yellow",
+    iconColor: "text-solid-yellow",
   },
 ];
 
