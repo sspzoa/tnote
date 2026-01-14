@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingComponent from "@/shared/components/common/loadingComponent";
-import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import {
+  StudentListContainer,
+  StudentListEmpty,
+  StudentListItem,
+  StudentListLoading,
+} from "@/shared/components/ui/studentList";
 
 interface Course {
   id: string;
@@ -752,9 +757,13 @@ export default function CourseDetailPage() {
 
               <div className="flex min-h-0 flex-1 flex-col p-spacing-600">
                 {loadingScores ? (
-                  <div className="py-spacing-600 text-center text-content-standard-tertiary">로딩중...</div>
+                  <StudentListContainer>
+                    <StudentListLoading />
+                  </StudentListContainer>
                 ) : students.length === 0 ? (
-                  <div className="py-spacing-600 text-center text-content-standard-tertiary">수강생이 없습니다.</div>
+                  <StudentListContainer>
+                    <StudentListEmpty message="수강생이 없습니다." />
+                  </StudentListContainer>
                 ) : (
                   <>
                     {/* 검색창 - 고정 */}
@@ -781,9 +790,12 @@ export default function CourseDetailPage() {
                     </div>
 
                     {/* 학생 목록 - 스크롤 */}
-                    <div className="h-80 overflow-y-auto rounded-radius-400 border border-line-outline">
-                      <div>
-                        {students
+                    <StudentListContainer>
+                      {students.filter((student) => student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()))
+                        .length === 0 ? (
+                        <StudentListEmpty message="검색 결과가 없습니다." />
+                      ) : (
+                        students
                           .filter((student) => student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()))
                           .map((student) => {
                             const scoreValue = scoreInputs[student.id] || "";
@@ -791,48 +803,35 @@ export default function CourseDetailPage() {
                             const isBelowCutline = !Number.isNaN(score) && score < (scoreExam.cutline || 4);
 
                             return (
-                              <div
+                              <StudentListItem
                                 key={student.id}
-                                className="flex items-center gap-spacing-400 border-line-outline border-b bg-components-fill-standard-secondary p-spacing-400">
-                                <div className="flex-1">
-                                  <div className="font-medium text-body text-content-standard-primary">
-                                    {student.name}
+                                student={student}
+                                highlighted={isBelowCutline}
+                                rightContent={
+                                  <div className="flex items-center gap-spacing-200">
+                                    <input
+                                      type="number"
+                                      value={scoreValue}
+                                      onChange={(e) => handleScoreChange(student.id, e.target.value)}
+                                      placeholder="-"
+                                      min="0"
+                                      max={scoreExam.max_score || 8}
+                                      className={`w-20 rounded-radius-300 border px-spacing-300 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
+                                        isBelowCutline
+                                          ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
+                                          : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
+                                      }`}
+                                    />
+                                    <span className="text-body text-content-standard-tertiary">
+                                      / {scoreExam.max_score || 8}
+                                    </span>
                                   </div>
-                                  <div className="text-content-standard-tertiary text-footnote">
-                                    {formatPhoneNumber(student.phone_number)}
-                                    {student.school && ` · ${student.school}`}
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-spacing-200">
-                                  <input
-                                    type="number"
-                                    value={scoreValue}
-                                    onChange={(e) => handleScoreChange(student.id, e.target.value)}
-                                    placeholder="-"
-                                    min="0"
-                                    max={scoreExam.max_score || 8}
-                                    className={`w-20 rounded-radius-300 border px-spacing-300 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
-                                      isBelowCutline
-                                        ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
-                                        : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
-                                    }`}
-                                  />
-                                  <span className="text-body text-content-standard-tertiary">
-                                    / {scoreExam.max_score || 8}
-                                  </span>
-                                </div>
-                              </div>
+                                }
+                              />
                             );
-                          })}
-                        {students.filter((student) =>
-                          student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()),
-                        ).length === 0 && (
-                          <div className="py-spacing-600 text-center text-content-standard-tertiary">
-                            검색 결과가 없습니다.
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                          })
+                      )}
+                    </StudentListContainer>
                   </>
                 )}
               </div>

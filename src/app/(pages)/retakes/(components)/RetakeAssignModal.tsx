@@ -7,7 +7,12 @@ import { FormInput } from "@/shared/components/ui/formInput";
 import { FormSelect } from "@/shared/components/ui/formSelect";
 import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
-import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import {
+  StudentListContainer,
+  StudentListEmpty,
+  StudentListItem,
+  StudentListLoading,
+} from "@/shared/components/ui/studentList";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
 import { useExamsForAssign } from "../(hooks)/useExamsForAssign";
@@ -255,56 +260,44 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
               className="mb-spacing-300"
             />
 
-            <div className="max-h-64 overflow-y-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary">
+            <StudentListContainer>
               {studentsLoading || loadingScores ? (
-                <div className="py-spacing-600 text-center text-content-standard-tertiary">로딩중...</div>
+                <StudentListLoading />
               ) : filteredStudents.length === 0 ? (
-                <div className="py-spacing-600 text-center text-content-standard-tertiary">
-                  {students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."}
-                </div>
+                <StudentListEmpty message={students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."} />
               ) : (
-                <div className="divide-y divide-line-divider">
-                  {filteredStudents.map((student) => {
-                    const score = getStudentScore(student.id);
-                    const belowCutline = isBelowCutline(student.id);
+                filteredStudents.map((student) => {
+                  const score = getStudentScore(student.id);
+                  const belowCutline = isBelowCutline(student.id);
 
-                    return (
-                      <label
-                        key={student.id}
-                        className={`flex cursor-pointer items-center gap-spacing-300 px-spacing-400 py-spacing-300 transition-colors hover:bg-components-interactive-hover ${
-                          belowCutline ? "bg-solid-translucent-red/30" : ""
-                        }`}>
-                        <input
-                          type="checkbox"
-                          checked={selectedStudentIds.includes(student.id)}
-                          onChange={() => handleStudentToggle(student.id)}
-                          className="size-4 cursor-pointer accent-core-accent"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-spacing-200">
-                            <span className="font-medium text-body text-content-standard-primary">{student.name}</span>
-                            {belowCutline && (
-                              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
-                                재시험 대상
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-content-standard-tertiary text-footnote">
-                            {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
-                            {score !== null && selectedExam && (
-                              <span className={belowCutline ? "text-core-status-negative" : ""}>
-                                {" "}
-                                · {score}/{selectedExam.max_score || 8}점
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
+                  return (
+                    <StudentListItem
+                      key={student.id}
+                      student={student}
+                      selected={selectedStudentIds.includes(student.id)}
+                      onToggle={() => handleStudentToggle(student.id)}
+                      highlighted={belowCutline}
+                      badge={
+                        belowCutline && (
+                          <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
+                            재시험 대상
+                          </span>
+                        )
+                      }
+                      extraInfo={
+                        score !== null &&
+                        selectedExam && (
+                          <span className={belowCutline ? "text-core-status-negative" : ""}>
+                            {" "}
+                            · {score}/{selectedExam.max_score || 8}점
+                          </span>
+                        )
+                      }
+                    />
+                  );
+                })
               )}
-            </div>
+            </StudentListContainer>
 
             {selectedStudentIds.length > 0 && (
               <div className="mt-spacing-200 text-body text-content-standard-secondary">

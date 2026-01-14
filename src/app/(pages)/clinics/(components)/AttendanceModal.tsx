@@ -6,7 +6,12 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
-import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import {
+  StudentListContainer,
+  StudentListEmpty,
+  StudentListItem,
+  StudentListLoading,
+} from "@/shared/components/ui/studentList";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
 import { attendanceSearchQueryAtom, selectedDateAtom, selectedStudentIdsAtom } from "../(atoms)/useFormStore";
 import { showAttendanceModalAtom } from "../(atoms)/useModalStore";
@@ -97,9 +102,13 @@ export default function AttendanceModal() {
             참석 학생 선택 ({students.length}명)
           </h3>
           {loadingAttendance ? (
-            <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+            <StudentListContainer>
+              <StudentListLoading />
+            </StudentListContainer>
           ) : students.length === 0 ? (
-            <p className="text-content-standard-tertiary text-label">학생이 없습니다.</p>
+            <StudentListContainer>
+              <StudentListEmpty />
+            </StudentListContainer>
           ) : (
             <>
               <SearchInput
@@ -108,32 +117,20 @@ export default function AttendanceModal() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="mb-spacing-300"
               />
-              {filteredStudents.length === 0 ? (
-                <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
-              ) : (
-                <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary">
-                  <div className="max-h-80 overflow-y-auto">
-                    {filteredStudents.map((student) => (
-                      <label
-                        key={student.id}
-                        className="flex cursor-pointer items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 transition-colors last:border-b-0 hover:bg-components-interactive-hover">
-                        <input
-                          type="checkbox"
-                          checked={selectedStudentIds.includes(student.id)}
-                          onChange={() => toggleStudent(student.id)}
-                          className="h-4 w-4 cursor-pointer rounded border-line-outline text-core-accent focus:ring-2 focus:ring-core-accent-translucent"
-                        />
-                        <div className="flex-1">
-                          <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
-                          <div className="text-content-standard-tertiary text-footnote">
-                            {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
-                          </div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <StudentListContainer>
+                {filteredStudents.length === 0 ? (
+                  <StudentListEmpty message="검색 결과가 없습니다." />
+                ) : (
+                  filteredStudents.map((student) => (
+                    <StudentListItem
+                      key={student.id}
+                      student={student}
+                      selected={selectedStudentIds.includes(student.id)}
+                      onToggle={() => toggleStudent(student.id)}
+                    />
+                  ))
+                )}
+              </StudentListContainer>
             </>
           )}
         </div>

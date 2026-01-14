@@ -3,7 +3,12 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
-import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import {
+  StudentListContainer,
+  StudentListEmpty,
+  StudentListItem,
+  StudentListLoading,
+} from "@/shared/components/ui/studentList";
 import { enrolledSearchQueryAtom, selectedCourseAtom, unenrolledSearchQueryAtom } from "../(atoms)/useCoursesStore";
 import { showEnrollModalAtom } from "../(atoms)/useModalStore";
 import { useAllStudents } from "../(hooks)/useAllStudents";
@@ -74,7 +79,9 @@ export default function EnrollmentModal() {
         </Button>
       }>
       {isLoadingEnrolled ? (
-        <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+        <StudentListContainer>
+          <StudentListLoading />
+        </StudentListContainer>
       ) : (
         <>
           {/* 등록된 학생 */}
@@ -83,7 +90,9 @@ export default function EnrollmentModal() {
               등록된 학생 ({enrolledStudents.length}명)
             </h3>
             {enrolledStudents.length === 0 ? (
-              <p className="text-content-standard-tertiary text-label">등록된 학생이 없습니다.</p>
+              <StudentListContainer>
+                <StudentListEmpty message="등록된 학생이 없습니다." />
+              </StudentListContainer>
             ) : (
               <>
                 <SearchInput
@@ -92,32 +101,26 @@ export default function EnrollmentModal() {
                   onChange={(e) => setEnrolledSearchQuery(e.target.value)}
                   className="mb-spacing-300"
                 />
-                {filteredEnrolledStudents.length === 0 ? (
-                  <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
-                ) : (
-                  <div className="max-h-36 overflow-y-auto">
-                    <div className="grid grid-cols-2 gap-spacing-200">
-                      {filteredEnrolledStudents.map((student) => (
-                        <div
-                          key={student.id}
-                          className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                          <div>
-                            <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
-                            <div className="text-content-standard-tertiary text-footnote">
-                              {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
-                            </div>
-                          </div>
+                <StudentListContainer>
+                  {filteredEnrolledStudents.length === 0 ? (
+                    <StudentListEmpty message="검색 결과가 없습니다." />
+                  ) : (
+                    filteredEnrolledStudents.map((student) => (
+                      <StudentListItem
+                        key={student.id}
+                        student={student}
+                        rightContent={
                           <button
                             onClick={() => handleUnenroll(student.id)}
                             disabled={loadingStudentId === student.id}
                             className="rounded-radius-200 bg-solid-translucent-red px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-red transition-colors hover:bg-solid-translucent-pink disabled:cursor-not-allowed disabled:opacity-50">
                             {loadingStudentId === student.id ? "제거 중..." : "제거"}
                           </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                        }
+                      />
+                    ))
+                  )}
+                </StudentListContainer>
               </>
             )}
           </div>
@@ -128,7 +131,9 @@ export default function EnrollmentModal() {
               학생 추가 ({unenrolledStudents.length}명)
             </h3>
             {unenrolledStudents.length === 0 ? (
-              <p className="text-content-standard-tertiary text-label">모든 학생이 등록되었습니다.</p>
+              <StudentListContainer>
+                <StudentListEmpty message="모든 학생이 등록되었습니다." />
+              </StudentListContainer>
             ) : (
               <>
                 <SearchInput
@@ -137,32 +142,26 @@ export default function EnrollmentModal() {
                   onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
                   className="mb-spacing-300"
                 />
-                {filteredUnenrolledStudents.length === 0 ? (
-                  <p className="text-content-standard-tertiary text-label">검색 결과가 없습니다.</p>
-                ) : (
-                  <div className="max-h-36 overflow-y-auto">
-                    <div className="grid grid-cols-2 gap-spacing-200">
-                      {filteredUnenrolledStudents.map((student) => (
-                        <div
-                          key={student.id}
-                          className="flex items-center justify-between rounded-radius-200 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                          <div>
-                            <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
-                            <div className="text-content-standard-tertiary text-footnote">
-                              {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
-                            </div>
-                          </div>
+                <StudentListContainer>
+                  {filteredUnenrolledStudents.length === 0 ? (
+                    <StudentListEmpty message="검색 결과가 없습니다." />
+                  ) : (
+                    filteredUnenrolledStudents.map((student) => (
+                      <StudentListItem
+                        key={student.id}
+                        student={student}
+                        rightContent={
                           <button
                             onClick={() => handleEnroll(student.id)}
                             disabled={loadingStudentId === student.id}
                             className="rounded-radius-200 bg-solid-translucent-green px-spacing-300 py-spacing-150 font-medium text-footnote text-solid-green transition-colors hover:bg-solid-translucent-green disabled:cursor-not-allowed disabled:opacity-50">
                             {loadingStudentId === student.id ? "추가 중..." : "추가"}
                           </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                        }
+                      />
+                    ))
+                  )}
+                </StudentListContainer>
               </>
             )}
           </div>
