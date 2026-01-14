@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface UpdateCourseData {
   id: string;
@@ -13,7 +14,7 @@ export const useCourseUpdate = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ id, name, startDate, endDate, daysOfWeek }: UpdateCourseData) => {
-      const response = await fetch(`/api/courses/${id}`, {
+      const response = await fetchWithAuth(`/api/courses/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, startDate, endDate, daysOfWeek }),

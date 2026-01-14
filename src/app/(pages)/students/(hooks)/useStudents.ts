@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { type Student, selectedCourseAtom } from "../(atoms)/useStudentsStore";
 
 export const useStudents = () => {
@@ -9,7 +10,7 @@ export const useStudents = () => {
     queryKey: ["students", selectedCourse],
     queryFn: async () => {
       const url = selectedCourse === "all" ? "/api/students" : `/api/students?courseId=${selectedCourse}`;
-      const response = await fetch(url);
+      const response = await fetchWithAuth(url);
       const result = await response.json();
 
       if (!response.ok) {

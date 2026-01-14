@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 export const useRetakeEditDate = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ retakeId, newDate }: { retakeId: string; newDate: string }) => {
-      const response = await fetch(`/api/retakes/${retakeId}/edit-date`, {
+      const response = await fetchWithAuth(`/api/retakes/${retakeId}/edit-date`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ newDate }),

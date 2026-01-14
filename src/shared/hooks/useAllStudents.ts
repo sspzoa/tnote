@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { Student } from "@/shared/types";
 
@@ -6,7 +7,7 @@ export const useAllStudents = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.students.all,
     queryFn: async () => {
-      const response = await fetch("/api/students");
+      const response = await fetchWithAuth("/api/students");
       const result = await response.json();
 
       if (!response.ok) {

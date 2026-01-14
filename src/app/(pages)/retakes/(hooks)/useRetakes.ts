@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { Retake } from "../(atoms)/useRetakesStore";
 
 export const useRetakes = (filter: "all" | "pending" | "completed" | "absent") => {
@@ -6,7 +7,7 @@ export const useRetakes = (filter: "all" | "pending" | "completed" | "absent") =
     queryKey: ["retakes", filter],
     queryFn: async () => {
       const url = filter === "all" ? "/api/retakes" : `/api/retakes?status=${filter}`;
-      const response = await fetch(url);
+      const response = await fetchWithAuth(url);
       const result = await response.json();
 
       if (!response.ok) {

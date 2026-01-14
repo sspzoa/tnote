@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { Clinic } from "../(atoms)/useClinicsStore";
 
 export const useClinics = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["clinics"],
     queryFn: async () => {
-      const response = await fetch("/api/clinics");
+      const response = await fetchWithAuth("/api/clinics");
       const result = await response.json();
 
       if (!response.ok) {

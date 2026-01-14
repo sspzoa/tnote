@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { Course } from "@/shared/types";
 
 interface UseCoursesOptions {
@@ -12,7 +13,7 @@ export const useCourses = (options: UseCoursesOptions = {}) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
-      const response = await fetch("/api/courses");
+      const response = await fetchWithAuth("/api/courses");
       const result = await response.json();
 
       if (!response.ok) {

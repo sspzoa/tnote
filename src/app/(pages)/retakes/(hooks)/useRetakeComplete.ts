@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface CompleteData {
   note?: string | null;
@@ -9,7 +10,7 @@ export const useRetakeComplete = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ retakeId, data }: { retakeId: string; data: CompleteData }) => {
-      const response = await fetch(`/api/retakes/${retakeId}/complete`, {
+      const response = await fetchWithAuth(`/api/retakes/${retakeId}/complete`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

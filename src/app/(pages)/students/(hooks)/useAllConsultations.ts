@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { ConsultationWithDetails } from "@/shared/types";
 
@@ -6,7 +7,7 @@ export const useAllConsultations = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.consultations.all,
     queryFn: async () => {
-      const response = await fetch("/api/consultations");
+      const response = await fetchWithAuth("/api/consultations");
       const result = await response.json();
 
       if (!response.ok) {

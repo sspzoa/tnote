@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface UpdateClinicData {
   clinicId: string;
@@ -13,7 +14,7 @@ export const useClinicUpdate = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ clinicId, ...data }: UpdateClinicData) => {
-      const response = await fetch(`/api/clinics/${clinicId}`, {
+      const response = await fetchWithAuth(`/api/clinics/${clinicId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

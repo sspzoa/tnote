@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 export const useRetakeUndo = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ retakeId, historyId }: { retakeId: string; historyId: string }) => {
-      const response = await fetch(`/api/retakes/${retakeId}/history/${historyId}/undo`, {
+      const response = await fetchWithAuth(`/api/retakes/${retakeId}/history/${historyId}/undo`, {
         method: "POST",
       });
 

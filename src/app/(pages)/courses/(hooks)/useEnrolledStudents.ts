@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { Student } from "../(atoms)/useCoursesStore";
 
 export const useEnrolledStudents = (courseId: string | null) => {
@@ -7,7 +8,7 @@ export const useEnrolledStudents = (courseId: string | null) => {
     queryFn: async () => {
       if (!courseId) return [];
 
-      const response = await fetch(`/api/courses/${courseId}/students`);
+      const response = await fetchWithAuth(`/api/courses/${courseId}/students`);
       const result = await response.json();
 
       if (!response.ok) {

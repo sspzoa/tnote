@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 export const useAdminDelete = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (adminId: string) => {
-      const response = await fetch(`/api/admins/${adminId}`, {
+      const response = await fetchWithAuth(`/api/admins/${adminId}`, {
         method: "DELETE",
       });
 

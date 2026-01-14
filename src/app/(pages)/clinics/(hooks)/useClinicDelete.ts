@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 export const useClinicDelete = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (clinicId: string) => {
-      const response = await fetch(`/api/clinics/${clinicId}`, {
+      const response = await fetchWithAuth(`/api/clinics/${clinicId}`, {
         method: "DELETE",
       });
 

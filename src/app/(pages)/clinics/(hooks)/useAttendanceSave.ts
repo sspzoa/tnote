@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface SaveAttendanceData {
   clinicId: string;
@@ -11,7 +12,7 @@ export const useAttendanceSave = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ clinicId, studentIds, date }: SaveAttendanceData) => {
-      const response = await fetch(`/api/clinics/${clinicId}/attendance`, {
+      const response = await fetchWithAuth(`/api/clinics/${clinicId}/attendance`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentIds, date }),

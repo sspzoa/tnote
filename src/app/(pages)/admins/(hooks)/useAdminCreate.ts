@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface CreateAdminData {
   name: string;
@@ -11,7 +12,7 @@ export const useAdminCreate = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: CreateAdminData) => {
-      const response = await fetch("/api/admins", {
+      const response = await fetchWithAuth("/api/admins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

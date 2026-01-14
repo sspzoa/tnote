@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 export const useStudentPasswordReset = () => {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (studentId: string) => {
-      const response = await fetch(`/api/students/${studentId}/reset-password`, {
+      const response = await fetchWithAuth(`/api/students/${studentId}/reset-password`, {
         method: "POST",
       });
 

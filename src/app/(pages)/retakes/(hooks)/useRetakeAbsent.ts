@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface AbsentData {
   note?: string | null;
@@ -9,7 +10,7 @@ export const useRetakeAbsent = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ retakeId, data }: { retakeId: string; data: AbsentData }) => {
-      const response = await fetch(`/api/retakes/${retakeId}/absent`, {
+      const response = await fetchWithAuth(`/api/retakes/${retakeId}/absent`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

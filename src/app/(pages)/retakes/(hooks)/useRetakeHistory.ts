@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { History } from "../(atoms)/useRetakesStore";
 
 export const useRetakeHistory = (retakeId: string | null) => {
@@ -7,7 +8,7 @@ export const useRetakeHistory = (retakeId: string | null) => {
     queryFn: async () => {
       if (!retakeId) return [];
 
-      const response = await fetch(`/api/retakes/${retakeId}/history`);
+      const response = await fetchWithAuth(`/api/retakes/${retakeId}/history`);
       const result = await response.json();
 
       if (!response.ok) {

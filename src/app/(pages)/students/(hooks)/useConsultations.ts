@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { ConsultationLog } from "../(atoms)/useConsultationStore";
 
 export const useConsultations = (studentId: string | null) => {
@@ -7,7 +8,7 @@ export const useConsultations = (studentId: string | null) => {
     queryFn: async () => {
       if (!studentId) return [];
 
-      const response = await fetch(`/api/students/${studentId}/consultations`);
+      const response = await fetchWithAuth(`/api/students/${studentId}/consultations`);
       const result = await response.json();
 
       if (!response.ok) {

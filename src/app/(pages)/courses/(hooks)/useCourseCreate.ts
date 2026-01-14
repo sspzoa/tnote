@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface CreateCourseData {
   name: string;
@@ -12,7 +13,7 @@ export const useCourseCreate = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: CreateCourseData) => {
-      const response = await fetch("/api/courses", {
+      const response = await fetchWithAuth("/api/courses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

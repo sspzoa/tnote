@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { CalendarEvent } from "@/shared/types";
 
 export const useCalendarEvents = (currentDate: Date) => {
@@ -8,7 +9,7 @@ export const useCalendarEvents = (currentDate: Date) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["calendarEvents", start.toISOString().split("T")[0], end.toISOString().split("T")[0]],
     queryFn: async () => {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `/api/calendar?start=${start.toISOString().split("T")[0]}&end=${end.toISOString().split("T")[0]}`,
       );
       const result = await response.json();

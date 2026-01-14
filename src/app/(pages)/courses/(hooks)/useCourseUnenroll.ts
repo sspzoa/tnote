@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface UnenrollData {
   courseId: string;
@@ -10,7 +11,7 @@ export const useCourseUnenroll = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ courseId, studentId }: UnenrollData) => {
-      const response = await fetch(`/api/courses/${courseId}/enroll`, {
+      const response = await fetchWithAuth(`/api/courses/${courseId}/enroll`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentId }),

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { AttendanceRecord } from "../(atoms)/useClinicsStore";
 
 export const useAttendance = (clinicId: string | null, date: string | null) => {
@@ -7,7 +8,7 @@ export const useAttendance = (clinicId: string | null, date: string | null) => {
     queryFn: async () => {
       if (!clinicId || !date) return [];
 
-      const response = await fetch(`/api/clinics/${clinicId}/attendance?date=${date}`);
+      const response = await fetchWithAuth(`/api/clinics/${clinicId}/attendance?date=${date}`);
       const result = await response.json();
 
       if (!response.ok) {

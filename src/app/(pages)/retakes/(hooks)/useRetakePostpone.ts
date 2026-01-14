@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface PostponeData {
   newDate: string;
@@ -10,7 +11,7 @@ export const useRetakePostpone = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ retakeId, data }: { retakeId: string; data: PostponeData }) => {
-      const response = await fetch(`/api/retakes/${retakeId}/postpone`, {
+      const response = await fetchWithAuth(`/api/retakes/${retakeId}/postpone`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

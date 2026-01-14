@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { Course, Exam } from "../(atoms)/useRetakesStore";
 
 export const useCoursesForAssign = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["courses-for-assign"],
     queryFn: async () => {
-      const response = await fetch("/api/exams");
+      const response = await fetchWithAuth("/api/exams");
       const result = await response.json();
 
       if (!response.ok) {

@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import type { Admin } from "../(atoms)/useAdminsStore";
 
 export const useAdmins = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["admins"],
     queryFn: async () => {
-      const response = await fetch("/api/admins");
+      const response = await fetchWithAuth("/api/admins");
       const result = await response.json();
 
       if (!response.ok) {

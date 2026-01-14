@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 export interface LogEntry {
   id: string;
@@ -67,7 +68,7 @@ export const useLogs = (filters: LogFilters = {}) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["logs", filters],
     queryFn: async () => {
-      const response = await fetch(`/api/logs?${queryString.toString()}`);
+      const response = await fetchWithAuth(`/api/logs?${queryString.toString()}`);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
       return result as {
@@ -95,7 +96,7 @@ export const useLogStats = (days: number = 7) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["logStats", days],
     queryFn: async () => {
-      const response = await fetch(`/api/logs/stats?days=${days}`);
+      const response = await fetchWithAuth(`/api/logs/stats?days=${days}`);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
       return result.data as LogStats;
