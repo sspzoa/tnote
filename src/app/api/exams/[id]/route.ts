@@ -22,11 +22,13 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
 
 const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
   const id = params?.id;
-  const { examNumber, name } = await request.json();
+  const { examNumber, name, maxScore, cutline } = await request.json();
 
   const updateData: Record<string, unknown> = {};
   if (examNumber !== undefined) updateData.exam_number = examNumber;
   if (name !== undefined) updateData.name = name;
+  if (maxScore !== undefined) updateData.max_score = maxScore;
+  if (cutline !== undefined) updateData.cutline = cutline;
 
   const { data: exam } = await supabase
     .from("Exams")

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormSelect } from "@/shared/components/ui/formSelect";
@@ -18,6 +18,11 @@ interface RetakeAssignModalProps {
   onSuccess?: () => void;
 }
 
+interface ExamScore {
+  student_id: string;
+  score: number;
+}
+
 export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps) {
   const [isOpen, setIsOpen] = useAtom(showAssignModalAtom);
   const [selectedCourseId, setSelectedCourseId] = useState<string>("");
@@ -25,11 +30,57 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [scheduledDate, setScheduledDate] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [examScores, setExamScores] = useState<ExamScore[]>([]);
+  const [loadingScores, setLoadingScores] = useState(false);
 
   const { courses, isLoading: coursesLoading } = useCoursesForAssign();
   const { exams, isLoading: examsLoading } = useExamsForAssign(selectedCourseId || null);
   const { students, isLoading: studentsLoading } = useStudentsForAssign(selectedCourseId || null);
   const { assignRetake, isAssigning } = useRetakeAssign();
+
+  // 선택된 시험 정보
+  const selectedExam = exams.find((e) => e.id === selectedExamId);
+
+  // 시험 선택 시 점수 불러오기
+  useEffect(() => {
+    const fetchScores = async () => {
+      if (!selectedExamId) {
+        setExamScores([]);
+        return;
+      }
+
+      setLoadingScores(true);
+      try {
+        const response = await fetch(`/api/exams/${selectedExamId}/scores`);
+        const result = await response.json();
+        if (response.ok && result.data) {
+          setExamScores(result.data.scores || []);
+        }
+      } catch {
+        // 점수 불러오기 실패 시 무시
+      } finally {
+        setLoadingScores(false);
+      }
+    };
+
+    fetchScores();
+  }, [selectedExamId]);
+
+  // 학생별 점수 조회
+  const getStudentScore = (studentId: string): number | null => {
+    const score = examScores.find((s) => s.student_id === studentId);
+    return score ? score.score : null;
+  };
+
+  // 커트라인 미달 학생인지 확인
+  const isBelowCutline = (studentId: string): boolean => {
+    const score = getStudentScore(studentId);
+    if (score === null || !selectedExam) return false;
+    return score < (selectedExam.cutline || 4);
+  };
+
+  // 커트라인 미달 학생 목록
+  const studentsBelowCutline = students.filter((s) => isBelowCutline(s.id));
 
   const handleClose = () => {
     setIsOpen(false);
@@ -38,12 +89,14 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     setSelectedStudentIds([]);
     setScheduledDate("");
     setSearchQuery("");
+    setExamScores([]);
   };
 
   const handleCourseChange = (courseId: string) => {
     setSelectedCourseId(courseId);
     setSelectedExamId("");
     setSelectedStudentIds([]);
+    setExamScores([]);
   };
 
   const handleStudentToggle = (studentId: string) => {
@@ -58,6 +111,24 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       setSelectedStudentIds([]);
     } else {
       setSelectedStudentIds(filteredStudents.map((s) => s.id));
+    }
+  };
+
+  // 재시험자(커트라인 미달) 전체 선택
+  const handleSelectBelowCutline = () => {
+    const filteredBelowCutline = studentsBelowCutline.filter((s) =>
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+    const allSelected =
+      filteredBelowCutline.length > 0 && filteredBelowCutline.every((s) => selectedStudentIds.includes(s.id));
+
+    if (allSelected) {
+      // 재시험자만 해제
+      setSelectedStudentIds((prev) => prev.filter((id) => !filteredBelowCutline.some((s) => s.id === id)));
+    } else {
+      // 재시험자 전체 선택 (기존 선택 유지하면서 추가)
+      const newIds = filteredBelowCutline.map((s) => s.id);
+      setSelectedStudentIds((prev) => [...new Set([...prev, ...newIds])]);
     }
   };
 
@@ -145,15 +216,36 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             <div className="mb-spacing-200 flex items-center justify-between">
               <label className="font-semibold text-body text-content-standard-primary">
                 학생 선택 <span className="text-core-status-negative">*</span>
+                {selectedExam && examScores.length > 0 && (
+                  <span className="ml-spacing-200 font-normal text-content-standard-tertiary text-footnote">
+                    (커트라인: {selectedExam.cutline || 4}점)
+                  </span>
+                )}
               </label>
-              <button
-                onClick={handleSelectAll}
-                className="text-body text-core-accent hover:underline"
-                disabled={studentsLoading || filteredStudents.length === 0}>
-                {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
-                  ? "전체 해제"
-                  : "전체 선택"}
-              </button>
+              <div className="flex gap-spacing-300">
+                {selectedExamId && examScores.length > 0 && studentsBelowCutline.length > 0 && (
+                  <button
+                    onClick={handleSelectBelowCutline}
+                    className="text-body text-core-status-negative hover:underline"
+                    disabled={studentsLoading || loadingScores}>
+                    {studentsBelowCutline.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .length > 0 &&
+                    studentsBelowCutline
+                      .filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .every((s) => selectedStudentIds.includes(s.id))
+                      ? "재시험자 해제"
+                      : `재시험자 전체 선택 (${studentsBelowCutline.length}명)`}
+                  </button>
+                )}
+                <button
+                  onClick={handleSelectAll}
+                  className="text-body text-core-accent hover:underline"
+                  disabled={studentsLoading || filteredStudents.length === 0}>
+                  {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
+                    ? "전체 해제"
+                    : "전체 선택"}
+                </button>
+              </div>
             </div>
 
             <SearchInput
@@ -164,7 +256,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             />
 
             <div className="max-h-64 overflow-y-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary">
-              {studentsLoading ? (
+              {studentsLoading || loadingScores ? (
                 <div className="py-spacing-600 text-center text-content-standard-tertiary">로딩중...</div>
               ) : filteredStudents.length === 0 ? (
                 <div className="py-spacing-600 text-center text-content-standard-tertiary">
@@ -172,24 +264,44 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
                 </div>
               ) : (
                 <div className="divide-y divide-line-divider">
-                  {filteredStudents.map((student) => (
-                    <label
-                      key={student.id}
-                      className="flex cursor-pointer items-center gap-spacing-300 px-spacing-400 py-spacing-300 transition-colors hover:bg-components-interactive-hover">
-                      <input
-                        type="checkbox"
-                        checked={selectedStudentIds.includes(student.id)}
-                        onChange={() => handleStudentToggle(student.id)}
-                        className="size-4 cursor-pointer accent-core-accent"
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
-                        <div className="text-content-standard-tertiary text-footnote">
-                          {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
+                  {filteredStudents.map((student) => {
+                    const score = getStudentScore(student.id);
+                    const belowCutline = isBelowCutline(student.id);
+
+                    return (
+                      <label
+                        key={student.id}
+                        className={`flex cursor-pointer items-center gap-spacing-300 px-spacing-400 py-spacing-300 transition-colors hover:bg-components-interactive-hover ${
+                          belowCutline ? "bg-solid-translucent-red/30" : ""
+                        }`}>
+                        <input
+                          type="checkbox"
+                          checked={selectedStudentIds.includes(student.id)}
+                          onChange={() => handleStudentToggle(student.id)}
+                          className="size-4 cursor-pointer accent-core-accent"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-spacing-200">
+                            <span className="font-medium text-body text-content-standard-primary">{student.name}</span>
+                            {belowCutline && (
+                              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
+                                재시험 대상
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-content-standard-tertiary text-footnote">
+                            {formatPhoneNumber(student.phone_number)} {student.school && `· ${student.school}`}
+                            {score !== null && selectedExam && (
+                              <span className={belowCutline ? "text-core-status-negative" : ""}>
+                                {" "}
+                                · {score}/{selectedExam.max_score || 8}점
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </label>
-                  ))}
+                      </label>
+                    );
+                  })}
                 </div>
               )}
             </div>

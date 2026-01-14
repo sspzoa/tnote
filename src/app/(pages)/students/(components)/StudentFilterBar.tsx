@@ -1,7 +1,8 @@
 import { useAtom } from "jotai";
 import { Star } from "lucide-react";
 import { SearchInput } from "@/shared/components/ui";
-import { type Course, searchQueryAtom, selectedCourseAtom, showFavoritesOnlyAtom } from "../(atoms)/useStudentsStore";
+import type { Course } from "@/shared/types";
+import { searchQueryAtom, selectedCourseAtom, showFavoritesOnlyAtom } from "../(atoms)/useStudentsStore";
 
 interface StudentFilterBarProps {
   courses: Course[];

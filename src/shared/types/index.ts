@@ -57,6 +57,8 @@ export interface Exam {
   id: string;
   name: string;
   exam_number: number;
+  max_score?: number;
+  cutline?: number;
   course: Course;
 }
 

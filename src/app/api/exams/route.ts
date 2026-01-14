@@ -27,7 +27,7 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 };
 
 const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
-  const { courseId, examNumber, name } = await request.json();
+  const { courseId, examNumber, name, maxScore, cutline } = await request.json();
 
   if (!courseId || !examNumber || !name) {
     return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
@@ -50,6 +50,8 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
       course_id: courseId,
       exam_number: examNumber,
       name,
+      max_score: maxScore || 100,
+      cutline: cutline || 80,
     })
     .select(`
       *,
