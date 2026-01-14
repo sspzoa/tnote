@@ -126,7 +126,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center p-spacing-600">
+    <div className="flex min-h-screen items-center justify-center p-spacing-600">
       <div className="w-full max-w-md">
         <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-800">
           {/* 탭 */}

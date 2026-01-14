@@ -6,7 +6,7 @@ interface ContainerProps {
 }
 
 export default function Container({ children, className = "" }: ContainerProps) {
-  const baseClasses = "min-h-dvh p-spacing-600 md:p-spacing-800";
+  const baseClasses = "min-h-screen p-spacing-600 md:p-spacing-800";
 
   return (
     <div className={`${baseClasses} ${className}`}>
