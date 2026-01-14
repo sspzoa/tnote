@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue } from "jotai";
-import { Plus } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import type { ConsultationLog } from "@/shared/types";
@@ -58,7 +57,6 @@ export default function ConsultationListModal() {
             닫기
           </Button>
           <Button onClick={openAddModal} className="flex-1">
-            <Plus className="mr-spacing-100 size-4" />
             상담일지 추가
           </Button>
         </>
@@ -71,8 +69,8 @@ export default function ConsultationListModal() {
           <p className="mb-spacing-500 text-content-standard-quaternary text-footnote">첫 상담일지를 작성해보세요.</p>
           <button
             onClick={openAddModal}
-            className="inline-flex items-center gap-spacing-200 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            <Plus className="size-4" />첫 상담일지 작성
+            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+            첫 상담일지 작성
           </button>
         </div>
       ) : (
