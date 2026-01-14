@@ -103,26 +103,28 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-spacing-600">
+    <div className="flex min-h-screen items-center justify-center p-spacing-400 md:p-spacing-600">
       <div className="w-full max-w-2xl text-center">
-        <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-display">
+        <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title md:text-display">
           안녕하세요, {userName}님
         </h1>
-        <p className="text-body text-content-standard-secondary">티노트에 오신 것을 환영합니다</p>
+        <p className="text-content-standard-secondary text-label md:text-body">티노트에 오신 것을 환영합니다</p>
 
         {!isStudent && stats && (
-          <div className="mt-spacing-800 grid grid-cols-3 gap-spacing-400">
+          <div className="mt-spacing-600 grid grid-cols-1 gap-spacing-300 sm:grid-cols-3 sm:gap-spacing-400 md:mt-spacing-800">
             {statItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex flex-col items-center gap-spacing-300 rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
+                className="group flex flex-row items-center gap-spacing-400 rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-400 transition-all hover:border-core-accent hover:shadow-lg sm:flex-col sm:gap-spacing-300 sm:p-spacing-600">
                 <div
-                  className={`flex size-16 items-center justify-center rounded-full ${item.bgColor} transition-transform group-hover:scale-110`}>
-                  <item.icon className={`size-8 ${item.iconColor}`} />
+                  className={`flex size-12 shrink-0 items-center justify-center rounded-full sm:size-16 ${item.bgColor} transition-transform group-hover:scale-110`}>
+                  <item.icon className={`size-6 sm:size-8 ${item.iconColor}`} />
                 </div>
-                <div className="font-bold text-content-standard-primary text-display">{item.value}</div>
-                <div className="text-body text-content-standard-secondary">{item.label}</div>
+                <div className="flex flex-col sm:items-center">
+                  <div className="font-bold text-content-standard-primary text-title sm:text-display">{item.value}</div>
+                  <div className="text-content-standard-secondary text-label sm:text-body">{item.label}</div>
+                </div>
               </Link>
             ))}
           </div>

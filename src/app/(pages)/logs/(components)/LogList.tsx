@@ -166,6 +166,13 @@ function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
     second: "2-digit",
   });
 
+  const shortTimestamp = new Date(log.created_at).toLocaleString("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <div
       className={`rounded-radius-400 border bg-components-fill-standard-primary transition-colors ${
@@ -177,32 +184,59 @@ function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
       }`}>
       <button
         onClick={onToggle}
-        className="flex w-full flex-col gap-spacing-200 p-spacing-500 text-left hover:bg-components-interactive-hover/50">
-        {/* 첫 번째 줄: 레벨, 시간, 유저, 액션, 경로, 상태코드, 처리시간 */}
-        <div className="flex w-full items-center gap-spacing-500">
-          {/* 레벨 */}
+        className="flex w-full flex-col gap-spacing-200 p-spacing-400 text-left hover:bg-components-interactive-hover/50 md:p-spacing-500">
+        {/* 모바일 레이아웃 */}
+        <div className="flex w-full flex-col gap-spacing-200 md:hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-spacing-200">
+              <span
+                className={`shrink-0 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-caption ${levelStyles[log.level]}`}>
+                {log.level.toUpperCase()}
+              </span>
+              {log.status_code && (
+                <span
+                  className={`text-footnote ${
+                    log.status_code >= 500
+                      ? "text-solid-red"
+                      : log.status_code >= 400
+                        ? "text-solid-yellow"
+                        : "text-solid-green"
+                  }`}>
+                  {log.status_code}
+                </span>
+              )}
+            </div>
+            <span className="text-caption text-content-standard-tertiary">{shortTimestamp}</span>
+          </div>
+          <div className="flex items-center gap-spacing-200">
+            <span className="font-medium text-content-standard-primary text-label">{log.user_name || "-"}</span>
+            <span className="text-caption text-content-standard-tertiary">
+              {actionLabels[log.action] || log.action}
+            </span>
+          </div>
+          <div className="truncate font-mono text-content-standard-secondary text-footnote">
+            {log.method} {log.path}
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="truncate text-content-standard-tertiary text-footnote">{log.message}</span>
+            <span className="shrink-0 text-caption text-content-standard-tertiary">{isExpanded ? "▲" : "▼"}</span>
+          </div>
+        </div>
+
+        {/* 데스크탑 레이아웃 */}
+        <div className="hidden w-full items-center gap-spacing-500 md:flex">
           <span
             className={`shrink-0 rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote ${levelStyles[log.level]}`}>
             {log.level.toUpperCase()}
           </span>
-
-          {/* 시간 */}
           <span className="shrink-0 text-content-standard-tertiary text-footnote">{timestamp}</span>
-
-          {/* 유저 */}
           <span className="shrink-0 font-medium text-content-standard-primary text-label">{log.user_name || "-"}</span>
-
-          {/* 액션 */}
           <span className="shrink-0 text-content-standard-secondary text-footnote">
             {actionLabels[log.action] || log.action}
           </span>
-
-          {/* 경로 */}
           <span className="min-w-0 flex-1 truncate font-mono text-content-standard-primary text-label">
             {log.method} {log.path}
           </span>
-
-          {/* 상태코드 */}
           {log.status_code && (
             <span
               className={`shrink-0 text-label ${
@@ -215,18 +249,14 @@ function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
               {log.status_code}
             </span>
           )}
-
-          {/* 처리시간 */}
           {log.duration_ms !== null && (
             <span className="shrink-0 text-content-standard-tertiary text-footnote">{log.duration_ms}ms</span>
           )}
-
-          {/* 확장 아이콘 */}
           <span className="shrink-0 text-content-standard-tertiary">{isExpanded ? "▲" : "▼"}</span>
         </div>
 
-        {/* 두 번째 줄: 메시지 */}
-        <div className="flex items-center gap-spacing-300 pl-spacing-100">
+        {/* 데스크탑 메시지 줄 */}
+        <div className="hidden items-center gap-spacing-300 pl-spacing-100 md:flex">
           <span className="truncate text-body text-content-standard-secondary">{log.message}</span>
         </div>
       </button>

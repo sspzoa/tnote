@@ -53,12 +53,12 @@ export default function StudentsPage() {
         title="학생 관리"
         subtitle={`전체 학생 ${students.length}명`}
         action={
-          <div className="flex items-center gap-spacing-300">
+          <>
             <button
               onClick={() => setShowConsultationPanel(true)}
-              className="flex items-center gap-spacing-200 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+              className="flex items-center gap-spacing-200 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-semibold text-content-standard-primary text-label transition-colors hover:bg-components-interactive-hover md:px-spacing-500 md:py-spacing-400 md:text-body">
               <MessageSquare className="size-4" />
-              최근 상담
+              <span className="hidden sm:inline">최근 상담</span>
               {consultations.length > 0 && (
                 <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
                   {consultations.length}
@@ -67,10 +67,10 @@ export default function StudentsPage() {
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+              className="rounded-radius-400 bg-core-accent px-spacing-400 py-spacing-300 font-semibold text-label text-solid-white transition-opacity hover:opacity-90 md:px-spacing-500 md:py-spacing-400 md:text-body">
               + 학생 추가
             </button>
-          </div>
+          </>
         }
       />
 
@@ -120,7 +120,7 @@ export default function StudentsPage() {
           />
 
           {/* 사이드 패널 */}
-          <div className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-line-outline border-l bg-components-fill-standard-primary shadow-xl">
+          <div className="fixed inset-0 z-50 flex flex-col bg-components-fill-standard-primary shadow-xl md:inset-auto md:top-0 md:right-0 md:h-full md:w-full md:max-w-md md:border-line-outline md:border-l">
             {/* 헤더 */}
             <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
               <div>

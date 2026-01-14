@@ -16,10 +16,10 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
   return (
     <>
       {/* 반 필터 */}
-      <div className="mb-spacing-600 flex flex-wrap gap-spacing-300">
+      <div className="mb-spacing-400 flex flex-wrap gap-spacing-200 md:mb-spacing-600 md:gap-spacing-300">
         <button
           onClick={() => setSelectedCourse("all")}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+          className={`rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-footnote transition-colors md:px-spacing-400 md:py-spacing-200 md:text-label ${
             selectedCourse === "all"
               ? "bg-core-accent text-solid-white"
               : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
@@ -28,19 +28,19 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
         </button>
         <button
           onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-          className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+          className={`flex items-center gap-spacing-150 rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-footnote transition-colors md:gap-spacing-200 md:px-spacing-400 md:py-spacing-200 md:text-label ${
             showFavoritesOnly
               ? "bg-solid-yellow text-solid-white"
               : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
           }`}>
-          <Star className={`h-4 w-4 ${showFavoritesOnly ? "fill-current" : ""}`} />
+          <Star className={`h-3.5 w-3.5 md:h-4 md:w-4 ${showFavoritesOnly ? "fill-current" : ""}`} />
           즐겨찾기
         </button>
         {courses.map((course) => (
           <button
             key={course.id}
             onClick={() => setSelectedCourse(course.id)}
-            className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+            className={`rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-footnote transition-colors md:px-spacing-400 md:py-spacing-200 md:text-label ${
               selectedCourse === course.id
                 ? "bg-core-accent text-solid-white"
                 : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
@@ -51,7 +51,7 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
       </div>
 
       {/* 검색 */}
-      <div className="mb-spacing-600">
+      <div className="mb-spacing-400 md:mb-spacing-600">
         <SearchInput
           placeholder="학생 이름 검색..."
           size="lg"

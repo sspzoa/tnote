@@ -24,10 +24,10 @@ export default function LogsPage() {
       </div>
 
       {/* 탭 */}
-      <div className="mb-spacing-500 flex gap-spacing-200 border-line-divider border-b pb-spacing-400">
+      <div className="mb-spacing-400 flex gap-spacing-200 border-line-divider border-b pb-spacing-300 md:mb-spacing-500 md:pb-spacing-400">
         <button
           onClick={() => setActiveTab("list")}
-          className={`rounded-radius-300 px-spacing-500 py-spacing-300 font-medium text-body transition-colors ${
+          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors md:px-spacing-500 md:py-spacing-300 md:text-body ${
             activeTab === "list"
               ? "bg-core-accent text-solid-white"
               : "bg-components-fill-standard-secondary text-content-standard-primary hover:bg-components-interactive-hover"
@@ -36,7 +36,7 @@ export default function LogsPage() {
         </button>
         <button
           onClick={() => setActiveTab("stats")}
-          className={`rounded-radius-300 px-spacing-500 py-spacing-300 font-medium text-body transition-colors ${
+          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors md:px-spacing-500 md:py-spacing-300 md:text-body ${
             activeTab === "stats"
               ? "bg-core-accent text-solid-white"
               : "bg-components-fill-standard-secondary text-content-standard-primary hover:bg-components-interactive-hover"

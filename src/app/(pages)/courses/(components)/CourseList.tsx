@@ -55,65 +55,112 @@ export default function CourseList({ courses }: CourseListProps) {
   ];
 
   return (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
-          <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              수업명
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              학생 수
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              관리
-            </th>
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {courses.map((course) => (
-            <tr
-              key={course.id}
-              className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="px-spacing-500 py-spacing-400">
-                <Link href={`/courses/${course.id}`}>
-                  <div className="cursor-pointer font-medium text-body text-content-standard-primary transition-colors hover:text-core-accent">
-                    {course.name}
-                  </div>
-                </Link>
-              </td>
-              <td className="px-spacing-500 py-spacing-400">
-                <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                  {course.student_count || 0}명
-                </span>
-              </td>
-              <td className="px-spacing-500 py-spacing-400">
-                <div className="flex gap-spacing-200">
-                  <Link href={`/courses/${course.id}`}>
-                    <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
-                      시험 관리
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => openEnrollModal(course)}
-                    className="rounded-radius-300 bg-solid-translucent-blue px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-blue transition-colors hover:bg-solid-translucent-indigo">
-                    학생 관리
-                  </button>
+    <>
+      {/* 모바일 카드 뷰 */}
+      <div className="space-y-spacing-300 md:hidden">
+        {courses.map((course) => (
+          <div
+            key={course.id}
+            className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
+            <div className="mb-spacing-300 flex items-start justify-between">
+              <Link href={`/courses/${course.id}`}>
+                <div className="font-medium text-body text-content-standard-primary transition-colors hover:text-core-accent">
+                  {course.name}
                 </div>
-              </td>
-              <td className="relative px-spacing-500 py-spacing-400">
+              </Link>
+              <div className="relative">
                 <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)} />
                 <DropdownMenu
                   isOpen={openMenuId === course.id}
                   onClose={() => setOpenMenuId(null)}
                   items={getMenuItems(course)}
                 />
-              </td>
+              </div>
+            </div>
+
+            <div className="mb-spacing-300">
+              <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                {course.student_count || 0}명
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-spacing-200">
+              <Link href={`/courses/${course.id}`}>
+                <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                  시험 관리
+                </button>
+              </Link>
+              <button
+                onClick={() => openEnrollModal(course)}
+                className="rounded-radius-300 bg-solid-translucent-blue px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-blue transition-colors hover:bg-solid-translucent-indigo">
+                학생 관리
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 데스크탑 테이블 뷰 */}
+      <div className="hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary md:block">
+        <table className="w-full rounded-radius-400">
+          <thead className="bg-components-fill-standard-secondary">
+            <tr>
+              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                수업명
+              </th>
+              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                학생 수
+              </th>
+              <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                관리
+              </th>
+              <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {courses.map((course) => (
+              <tr
+                key={course.id}
+                className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                <td className="px-spacing-500 py-spacing-400">
+                  <Link href={`/courses/${course.id}`}>
+                    <div className="cursor-pointer font-medium text-body text-content-standard-primary transition-colors hover:text-core-accent">
+                      {course.name}
+                    </div>
+                  </Link>
+                </td>
+                <td className="px-spacing-500 py-spacing-400">
+                  <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                    {course.student_count || 0}명
+                  </span>
+                </td>
+                <td className="px-spacing-500 py-spacing-400">
+                  <div className="flex gap-spacing-200">
+                    <Link href={`/courses/${course.id}`}>
+                      <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                        시험 관리
+                      </button>
+                    </Link>
+                    <button
+                      onClick={() => openEnrollModal(course)}
+                      className="rounded-radius-300 bg-solid-translucent-blue px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-blue transition-colors hover:bg-solid-translucent-indigo">
+                      학생 관리
+                    </button>
+                  </div>
+                </td>
+                <td className="relative px-spacing-500 py-spacing-400">
+                  <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)} />
+                  <DropdownMenu
+                    isOpen={openMenuId === course.id}
+                    onClose={() => setOpenMenuId(null)}
+                    items={getMenuItems(course)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
