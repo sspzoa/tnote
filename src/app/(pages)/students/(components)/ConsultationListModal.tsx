@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { Plus } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import type { ConsultationLog } from "@/shared/types";
@@ -10,6 +11,13 @@ import {
 } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useConsultations } from "../(hooks)/useConsultations";
+
+interface ConsultationWithCreator extends ConsultationLog {
+  creator?: {
+    id: string;
+    name: string;
+  } | null;
+}
 
 export default function ConsultationListModal() {
   const [showModal, setShowModal] = useAtom(showConsultationModalAtom);
@@ -42,15 +50,16 @@ export default function ConsultationListModal() {
       isOpen={showModal}
       onClose={() => setShowModal(false)}
       title={`${selectedStudent.name} - 상담일지`}
-      subtitle="학생의 상담 기록을 관리합니다"
-      maxWidth="xl"
+      subtitle={`총 ${consultations.length}건의 상담 기록`}
+      maxWidth="lg"
       footer={
         <>
           <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">
             닫기
           </Button>
           <Button onClick={openAddModal} className="flex-1">
-            + 상담일지 추가
+            <Plus className="mr-spacing-100 size-4" />
+            상담일지 추가
           </Button>
         </>
       }>
@@ -58,39 +67,43 @@ export default function ConsultationListModal() {
         <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
       ) : consultations.length === 0 ? (
         <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">상담일지가 없습니다.</p>
+          <p className="mb-spacing-200 text-body text-content-standard-tertiary">상담일지가 없습니다.</p>
+          <p className="mb-spacing-500 text-content-standard-quaternary text-footnote">첫 상담일지를 작성해보세요.</p>
           <button
             onClick={openAddModal}
-            className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            첫 상담일지 작성
+            className="inline-flex items-center gap-spacing-200 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+            <Plus className="size-4" />첫 상담일지 작성
           </button>
         </div>
       ) : (
-        <div className="space-y-spacing-300">
-          {consultations.map((log) => (
-            <div
-              key={log.id}
-              onClick={() => openEditConsultationModal(log)}
-              className="cursor-pointer rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-400 transition-colors hover:bg-components-interactive-hover">
-              <div className="flex items-start justify-between gap-spacing-300">
-                <div className="flex-1">
-                  <div className="mb-spacing-100 flex items-center gap-spacing-300">
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                      {log.consultation_date}
-                    </span>
-                  </div>
-                  <h3 className="font-medium text-body text-content-standard-primary">{log.title}</h3>
+        <div className="max-h-96 divide-y divide-line-divider overflow-y-auto rounded-radius-300 border border-line-outline">
+          {(consultations as ConsultationWithCreator[]).map((log) => {
+            const createdAt = new Date(log.created_at);
+            const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+
+            return (
+              <button
+                key={log.id}
+                onClick={() => openEditConsultationModal(log)}
+                className="w-full px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-interactive-hover">
+                <div className="mb-spacing-100 flex items-center justify-between">
+                  <span className="font-medium text-body text-content-standard-primary">{log.title}</span>
+                  <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                    {log.consultation_date}
+                  </span>
                 </div>
-                <svg
-                  className="h-5 w-5 flex-shrink-0 text-content-standard-tertiary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          ))}
+                <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                  <span>{timeStr}</span>
+                  {log.creator?.name && (
+                    <>
+                      <span>·</span>
+                      <span>{log.creator.name}</span>
+                    </>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </Modal>

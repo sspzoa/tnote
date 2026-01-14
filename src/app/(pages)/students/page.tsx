@@ -1,6 +1,7 @@
 "use client";
 
 import { useAtom, useAtomValue } from "jotai";
+import { MessageSquare, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Container from "@/shared/components/common/container";
@@ -48,6 +49,7 @@ export default function StudentsPage() {
   const showFavoritesOnly = useAtomValue(showFavoritesOnlyAtom);
   const [, setShowCreateModal] = useAtom(showCreateModalAtom);
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null);
+  const [showConsultationPanel, setShowConsultationPanel] = useState(false);
 
   const filteredStudents = students
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -69,75 +71,26 @@ export default function StudentsPage() {
         title="학생 관리"
         subtitle={`전체 학생 ${students.length}명`}
         action={
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            + 학생 추가
-          </button>
+          <div className="flex items-center gap-spacing-300">
+            <button
+              onClick={() => setShowConsultationPanel(true)}
+              className="flex items-center gap-spacing-200 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+              <MessageSquare className="size-4" />
+              최근 상담
+              {consultations.length > 0 && (
+                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
+                  {consultations.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+              + 학생 추가
+            </button>
+          </div>
         }
       />
-
-      {/* 상담 내역 섹션 */}
-      <div className="mb-spacing-700">
-        <h2 className="mb-spacing-400 font-bold text-content-standard-primary text-heading">최근 상담 내역</h2>
-        {consultationsLoading ? (
-          <div className="py-spacing-600 text-center text-content-standard-tertiary">로딩중...</div>
-        ) : consultations.length === 0 ? (
-          <div className="py-spacing-600 text-center text-content-standard-tertiary">상담 내역이 없습니다.</div>
-        ) : (
-          <div className="h-52 overflow-y-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-            <table className="w-full">
-              <thead className="sticky top-0 bg-components-fill-standard-secondary">
-                <tr>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    일시
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    학생
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    제목
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                    작성자
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {consultations.map((consultation) => {
-                  const createdAt = new Date(consultation.created_at);
-                  const dateStr = consultation.consultation_date;
-                  const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
-
-                  return (
-                    <tr
-                      key={consultation.id}
-                      onClick={() => setSelectedConsultation(consultation)}
-                      className="cursor-pointer border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                      <td className="px-spacing-500 py-spacing-400">
-                        <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
-                          {dateStr} {timeStr}
-                        </span>
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400">
-                        <div className="font-medium text-body text-content-standard-primary">
-                          {consultation.student?.name || "-"}
-                        </div>
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                        {consultation.title}
-                      </td>
-                      <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                        {consultation.creator?.name || "-"}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
 
       <StudentFilterBar courses={courses} />
 
@@ -174,6 +127,81 @@ export default function StudentsPage() {
       <StudentEditModal />
       <ConsultationListModal />
       <ConsultationFormModal />
+
+      {/* 최근 상담 사이드 패널 */}
+      {showConsultationPanel && (
+        <>
+          {/* 오버레이 */}
+          <div
+            className="fixed inset-0 z-40 bg-solid-black/30 transition-opacity"
+            onClick={() => setShowConsultationPanel(false)}
+          />
+
+          {/* 사이드 패널 */}
+          <div className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-line-outline border-l bg-components-fill-standard-primary shadow-xl">
+            {/* 헤더 */}
+            <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
+              <div>
+                <h2 className="font-bold text-content-standard-primary text-heading">최근 상담 내역</h2>
+                <p className="text-content-standard-tertiary text-label">최근 50건</p>
+              </div>
+              <button
+                onClick={() => setShowConsultationPanel(false)}
+                className="rounded-radius-200 p-spacing-200 transition-colors hover:bg-components-interactive-hover">
+                <X className="size-5 text-content-standard-tertiary" />
+              </button>
+            </div>
+
+            {/* 상담 목록 */}
+            <div className="flex-1 overflow-y-auto">
+              {consultationsLoading ? (
+                <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+              ) : consultations.length === 0 ? (
+                <div className="py-spacing-900 text-center text-content-standard-tertiary">상담 내역이 없습니다.</div>
+              ) : (
+                <div className="divide-y divide-line-divider">
+                  {consultations.map((consultation) => {
+                    const createdAt = new Date(consultation.created_at);
+                    const dateStr = consultation.consultation_date;
+                    const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+
+                    return (
+                      <button
+                        key={consultation.id}
+                        onClick={() => {
+                          setSelectedConsultation(consultation);
+                          setShowConsultationPanel(false);
+                        }}
+                        className="w-full px-spacing-600 py-spacing-400 text-left transition-colors hover:bg-components-interactive-hover">
+                        <div className="mb-spacing-100 flex items-center justify-between">
+                          <span className="font-medium text-body text-content-standard-primary">
+                            {consultation.student?.name || "-"}
+                          </span>
+                          <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                            {dateStr}
+                          </span>
+                        </div>
+                        <div className="mb-spacing-100 truncate text-body text-content-standard-secondary">
+                          {consultation.title}
+                        </div>
+                        <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                          <span>{timeStr}</span>
+                          {consultation.creator?.name && (
+                            <>
+                              <span>·</span>
+                              <span>{consultation.creator.name}</span>
+                            </>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </Container>
   );
 }

@@ -6,7 +6,10 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("ConsultationLogs")
-    .select("*")
+    .select(`
+      *,
+      creator:Users!ConsultationLogs_created_by_fkey(id, name)
+    `)
     .eq("student_id", studentId)
     .eq("workspace", session.workspace)
     .order("consultation_date", { ascending: false });
