@@ -99,7 +99,16 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
 
       return response;
     } catch (error: unknown) {
-      const err = error instanceof Error ? error : new Error(String(error));
+      let err: Error;
+      if (error instanceof Error) {
+        err = error;
+      } else if (error && typeof error === "object" && "message" in error) {
+        err = new Error(String(error.message));
+      } else if (error && typeof error === "object") {
+        err = new Error(JSON.stringify(error));
+      } else {
+        err = new Error(String(error));
+      }
 
       await logger.logError(resource, err, 500);
 
@@ -146,7 +155,16 @@ export const withPublicLogging = (
 
       return response;
     } catch (error: unknown) {
-      const err = error instanceof Error ? error : new Error(String(error));
+      let err: Error;
+      if (error instanceof Error) {
+        err = error;
+      } else if (error && typeof error === "object" && "message" in error) {
+        err = new Error(String(error.message));
+      } else if (error && typeof error === "object") {
+        err = new Error(JSON.stringify(error));
+      } else {
+        err = new Error(String(error));
+      }
 
       await logger.logError(resource, err, 500);
 
