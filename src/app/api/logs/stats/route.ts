@@ -7,75 +7,101 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
+  const startDateStr = startDate.toISOString();
 
-  // 레벨별 통계
-  const { data: levelStats, error: levelError } = await supabase
+  // 전체 로그 수 (count only)
+  const { count: totalCount, error: totalError } = await supabase
     .from("ApiLogs")
-    .select("level")
+    .select("*", { count: "exact", head: true })
     .eq("workspace", session.workspace)
-    .gte("created_at", startDate.toISOString());
+    .gte("created_at", startDateStr);
 
-  if (levelError) throw levelError;
+  if (totalError) throw totalError;
 
-  const levelCounts = levelStats.reduce(
-    (acc, log) => {
-      acc[log.level] = (acc[log.level] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  // 레벨별 통계 - 각 레벨별로 count 쿼리
+  const levels = ["info", "warn", "error", "debug"];
+  const levelCounts: Record<string, number> = {};
 
-  // 액션별 통계
-  const { data: actionStats, error: actionError } = await supabase
-    .from("ApiLogs")
-    .select("action")
-    .eq("workspace", session.workspace)
-    .gte("created_at", startDate.toISOString());
+  for (const level of levels) {
+    const { count, error } = await supabase
+      .from("ApiLogs")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace", session.workspace)
+      .eq("level", level)
+      .gte("created_at", startDateStr);
 
-  if (actionError) throw actionError;
+    if (error) throw error;
+    if (count && count > 0) {
+      levelCounts[level] = count;
+    }
+  }
 
-  const actionCounts = actionStats.reduce(
-    (acc, log) => {
-      acc[log.action] = (acc[log.action] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  // 액션별 통계 - RPC 또는 group by 대신 주요 액션만 count
+  const actions = ["create", "read", "update", "delete", "login", "logout", "auth", "error"];
+  const actionCounts: Record<string, number> = {};
 
-  // 리소스별 통계
-  const { data: resourceStats, error: resourceError } = await supabase
-    .from("ApiLogs")
-    .select("resource")
-    .eq("workspace", session.workspace)
-    .gte("created_at", startDate.toISOString());
+  for (const action of actions) {
+    const { count, error } = await supabase
+      .from("ApiLogs")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace", session.workspace)
+      .eq("action", action)
+      .gte("created_at", startDateStr);
 
-  if (resourceError) throw resourceError;
+    if (error) throw error;
+    if (count && count > 0) {
+      actionCounts[action] = count;
+    }
+  }
 
-  const resourceCounts = resourceStats.reduce(
-    (acc, log) => {
-      acc[log.resource] = (acc[log.resource] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  // 리소스별 통계 - 주요 리소스만
+  const resources = [
+    "students",
+    "courses",
+    "retakes",
+    "clinics",
+    "consultations",
+    "exams",
+    "admins",
+    "auth",
+    "calendar",
+  ];
+  const resourceCounts: Record<string, number> = {};
 
-  // 일별 통계
-  const { data: dailyStats, error: dailyError } = await supabase
-    .from("ApiLogs")
-    .select("created_at")
-    .eq("workspace", session.workspace)
-    .gte("created_at", startDate.toISOString());
+  for (const resource of resources) {
+    const { count, error } = await supabase
+      .from("ApiLogs")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace", session.workspace)
+      .eq("resource", resource)
+      .gte("created_at", startDateStr);
 
-  if (dailyError) throw dailyError;
+    if (error) throw error;
+    if (count && count > 0) {
+      resourceCounts[resource] = count;
+    }
+  }
 
-  const dailyCounts = dailyStats.reduce(
-    (acc, log) => {
-      const date = log.created_at.split("T")[0];
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  // 일별 통계 - 각 날짜별로 count
+  const dailyCounts: Record<string, number> = {};
+  for (let i = 0; i < days; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split("T")[0];
+
+    const dayStart = `${dateStr}T00:00:00.000Z`;
+    const dayEnd = `${dateStr}T23:59:59.999Z`;
+
+    const { count, error } = await supabase
+      .from("ApiLogs")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace", session.workspace)
+      .gte("created_at", dayStart)
+      .lte("created_at", dayEnd);
+
+    if (error) throw error;
+    dailyCounts[dateStr] = count || 0;
+  }
 
   // 에러 로그 (최근 10개)
   const { data: recentErrors, error: errorsError } = await supabase
@@ -83,7 +109,7 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
     .select("*")
     .eq("workspace", session.workspace)
     .eq("level", "error")
-    .gte("created_at", startDate.toISOString())
+    .gte("created_at", startDateStr)
     .order("created_at", { ascending: false })
     .limit(10);
 
@@ -95,17 +121,17 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
     data: {
       period: {
         days,
-        startDate: startDate.toISOString(),
+        startDate: startDateStr,
         endDate: new Date().toISOString(),
       },
       summary: {
-        total: levelStats.length,
+        total: totalCount || 0,
         byLevel: levelCounts,
         byAction: actionCounts,
         byResource: resourceCounts,
       },
       dailyActivity: dailyCounts,
-      recentErrors,
+      recentErrors: recentErrors || [],
     },
   });
 };

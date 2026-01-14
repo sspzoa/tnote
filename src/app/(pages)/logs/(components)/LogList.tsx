@@ -158,6 +158,7 @@ interface LogItemProps {
 
 function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
   const timestamp = new Date(log.created_at).toLocaleString("ko-KR", {
+    year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
@@ -233,35 +234,129 @@ function LogItem({ log, isExpanded, onToggle }: LogItemProps) {
       {/* 상세 정보 */}
       {isExpanded && (
         <div className="border-line-divider border-t bg-components-fill-standard-secondary p-spacing-500">
-          <div className="grid grid-cols-1 gap-spacing-400 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-spacing-400 md:grid-cols-2 lg:grid-cols-3">
+            {/* 기본 정보 */}
             <div>
-              <p className="mb-spacing-100 text-content-standard-tertiary text-label">사용자</p>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">로그 ID</p>
+              <p className="break-all font-mono text-body text-content-standard-primary">{log.id}</p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">생성 시간</p>
               <p className="text-body text-content-standard-primary">
-                {log.user_name || "익명"} {log.user_role && `(${log.user_role})`}
+                {new Date(log.created_at).toLocaleString("ko-KR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  fractionalSecondDigits: 3,
+                })}
               </p>
             </div>
 
             <div>
-              <p className="mb-spacing-100 text-content-standard-tertiary text-label">IP 주소</p>
-              <p className="text-body text-content-standard-primary">{log.ip_address || "-"}</p>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">레벨</p>
+              <span
+                className={`inline-block rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-label ${levelStyles[log.level]}`}>
+                {log.level.toUpperCase()}
+              </span>
+            </div>
+
+            {/* 요청 정보 */}
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">HTTP 메서드</p>
+              <p className="font-mono text-body text-content-standard-primary">{log.method || "-"}</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">경로</p>
+              <p className="break-all font-mono text-body text-content-standard-primary">{log.path || "-"}</p>
             </div>
 
             <div>
-              <p className="mb-spacing-100 text-content-standard-tertiary text-label">리소스 ID</p>
-              <p className="font-mono text-body text-content-standard-primary">{log.resource_id || "-"}</p>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">액션</p>
+              <p className="text-body text-content-standard-primary">{actionLabels[log.action] || log.action}</p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">리소스</p>
+              <p className="text-body text-content-standard-primary">{log.resource}</p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">리소스 ID</p>
+              <p className="break-all font-mono text-body text-content-standard-primary">{log.resource_id || "-"}</p>
+            </div>
+
+            {/* 응답 정보 */}
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">상태 코드</p>
+              <p
+                className={`font-mono text-body ${
+                  log.status_code && log.status_code >= 500
+                    ? "text-solid-red"
+                    : log.status_code && log.status_code >= 400
+                      ? "text-solid-yellow"
+                      : "text-solid-green"
+                }`}>
+                {log.status_code || "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">처리 시간</p>
+              <p className="text-body text-content-standard-primary">
+                {log.duration_ms !== null ? `${log.duration_ms}ms` : "-"}
+              </p>
+            </div>
+
+            {/* 사용자 정보 */}
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">사용자 ID</p>
+              <p className="break-all font-mono text-body text-content-standard-primary">{log.user_id || "-"}</p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">사용자 이름</p>
+              <p className="text-body text-content-standard-primary">{log.user_name || "익명"}</p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">사용자 역할</p>
+              <p className="text-body text-content-standard-primary">{log.user_role || "-"}</p>
+            </div>
+
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">워크스페이스</p>
+              <p className="break-all font-mono text-body text-content-standard-primary">{log.workspace || "-"}</p>
+            </div>
+
+            {/* 클라이언트 정보 */}
+            <div>
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">IP 주소</p>
+              <p className="font-mono text-body text-content-standard-primary">{log.ip_address || "-"}</p>
             </div>
 
             {log.user_agent && (
-              <div className="md:col-span-2">
-                <p className="mb-spacing-100 text-content-standard-tertiary text-label">User Agent</p>
-                <p className="truncate text-content-standard-secondary text-footnote">{log.user_agent}</p>
+              <div className="md:col-span-2 lg:col-span-3">
+                <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">User Agent</p>
+                <p className="break-all text-body text-content-standard-secondary">{log.user_agent}</p>
               </div>
             )}
 
+            {/* 메시지 */}
+            <div className="md:col-span-2 lg:col-span-3">
+              <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">메시지</p>
+              <p className="text-body text-content-standard-primary">{log.message}</p>
+            </div>
+
+            {/* 메타데이터 */}
             {log.metadata && Object.keys(log.metadata).length > 0 && (
-              <div className="md:col-span-2">
-                <p className="mb-spacing-100 text-content-standard-tertiary text-label">메타데이터</p>
-                <pre className="overflow-auto rounded-radius-300 bg-components-fill-standard-primary p-spacing-300 text-content-standard-secondary text-footnote">
+              <div className="md:col-span-2 lg:col-span-3">
+                <p className="mb-spacing-100 font-medium text-content-standard-tertiary text-label">메타데이터</p>
+                <pre className="overflow-auto rounded-radius-300 bg-components-fill-standard-primary p-spacing-400 font-mono text-body text-content-standard-secondary">
                   {JSON.stringify(log.metadata, null, 2)}
                 </pre>
               </div>
