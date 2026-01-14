@@ -18,7 +18,7 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
   const [isOpen, setIsOpen] = useAtom(showAbsentModalAtom);
   const [selectedRetake] = useAtom(selectedRetakeAtom);
   const [absentNote, setAbsentNote] = useAtom(absentNoteAtom);
-  const { markAbsent } = useRetakeAbsent();
+  const { markAbsent, isMarkingAbsent } = useRetakeAbsent();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
 
   const handleClose = () => {
@@ -55,10 +55,15 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
       subtitle={subtitle}
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose} className="flex-1">
+          <Button variant="secondary" onClick={handleClose} disabled={isMarkingAbsent} className="flex-1">
             취소
           </Button>
-          <Button variant="danger" onClick={handleAbsent} className="flex-1">
+          <Button
+            variant="danger"
+            onClick={handleAbsent}
+            disabled={isMarkingAbsent}
+            isLoading={isMarkingAbsent}
+            className="flex-1">
             결석 처리
           </Button>
         </>

@@ -18,7 +18,7 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
   const [isOpen, setIsOpen] = useAtom(showCompleteModalAtom);
   const [selectedRetake] = useAtom(selectedRetakeAtom);
   const [completeNote, setCompleteNote] = useAtom(completeNoteAtom);
-  const { completeRetake } = useRetakeComplete();
+  const { completeRetake, isCompleting } = useRetakeComplete();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
 
   const handleClose = () => {
@@ -55,10 +55,15 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
       subtitle={subtitle}
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose} className="flex-1">
+          <Button variant="secondary" onClick={handleClose} disabled={isCompleting} className="flex-1">
             취소
           </Button>
-          <Button variant="success" onClick={handleComplete} className="flex-1">
+          <Button
+            variant="success"
+            onClick={handleComplete}
+            disabled={isCompleting}
+            isLoading={isCompleting}
+            className="flex-1">
             완료 처리
           </Button>
         </>

@@ -58,11 +58,11 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
       subtitle={subtitle}
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose} className="flex-1">
+          <Button variant="secondary" onClick={handleClose} disabled={isEditing} className="flex-1">
             취소
           </Button>
-          <Button onClick={handleSave} disabled={!editDate || isEditing} className="flex-1">
-            {isEditing ? "저장 중..." : "저장"}
+          <Button onClick={handleSave} disabled={!editDate || isEditing} isLoading={isEditing} className="flex-1">
+            저장
           </Button>
         </>
       }>

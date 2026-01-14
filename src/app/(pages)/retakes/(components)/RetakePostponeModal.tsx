@@ -20,7 +20,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
   const [selectedRetake] = useAtom(selectedRetakeAtom);
   const [postponeDate, setPostponeDate] = useAtom(postponeDateAtom);
   const [postponeNote, setPostponeNote] = useAtom(postponeNoteAtom);
-  const { postponeRetake } = useRetakePostpone();
+  const { postponeRetake, isPostponing } = useRetakePostpone();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
 
   const handleClose = () => {
@@ -61,10 +61,14 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
       subtitle={subtitle}
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose} className="flex-1">
+          <Button variant="secondary" onClick={handleClose} disabled={isPostponing} className="flex-1">
             취소
           </Button>
-          <Button onClick={handlePostpone} disabled={!postponeDate} className="flex-1">
+          <Button
+            onClick={handlePostpone}
+            disabled={!postponeDate || isPostponing}
+            isLoading={isPostponing}
+            className="flex-1">
             연기
           </Button>
         </>

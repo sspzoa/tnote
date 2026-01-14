@@ -50,7 +50,6 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
       setShowModal(false);
       onSuccess();
     } catch (error) {
-      console.error("Update error:", error);
       alert(error instanceof Error ? error.message : "관리 상태 변경에 실패했습니다.");
     } finally {
       setIsUpdating(false);
@@ -65,15 +64,15 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
       subtitle={`${selectedRetake.student.name} 학생의 재시험 관리 상태를 변경합니다`}
       footer={
         <>
-          <Button variant="secondary" className="flex-1" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" className="flex-1" onClick={() => setShowModal(false)} disabled={isUpdating}>
             취소
           </Button>
           <Button
             variant="primary"
             className="flex-1"
             onClick={handleUpdate}
-            isLoading={isUpdating}
-            loadingText="변경 중...">
+            disabled={isUpdating}
+            isLoading={isUpdating}>
             변경
           </Button>
         </>
