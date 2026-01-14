@@ -69,7 +69,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center">
         <div className="text-body text-content-standard-tertiary">로딩중...</div>
       </div>
     );
@@ -103,7 +103,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-spacing-400 md:p-spacing-600">
+    <div className="flex min-h-dvh items-center justify-center p-spacing-400 md:p-spacing-600">
       <div className="w-full max-w-2xl text-center">
         <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title md:text-display">
           안녕하세요, {userName}님

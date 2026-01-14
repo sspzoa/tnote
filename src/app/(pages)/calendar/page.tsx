@@ -1,16 +1,24 @@
 "use client";
 
-import { format, getDay, parse, startOfWeek } from "date-fns";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
 import { ko } from "date-fns/locale";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import "@/app/calendar-custom.css";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
 import type { CalendarEvent } from "@/shared/types";
-import { useCalendarEvents } from "./(hooks)/useCalendarEvents";
 
 interface FilterState {
   course: boolean;
@@ -18,207 +26,122 @@ interface FilterState {
   clinic: boolean;
 }
 
-const locales = {
-  ko: ko,
-};
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
-
-const CustomToolbar = ({
-  onNavigate,
-  date,
-  currentDate,
-  setCurrentDate,
-  filters,
-  setFilters,
-}: {
-  onNavigate: (action: "PREV" | "NEXT" | "TODAY" | "DATE", newDate?: Date) => void;
-  date: Date;
-  currentDate: Date;
-  setCurrentDate: (date: Date) => void;
-  filters: FilterState;
-  setFilters: (filters: FilterState) => void;
-}) => {
-  const goToBack = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    setCurrentDate(newDate);
-    onNavigate("PREV");
-  };
-
-  const goToNext = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    setCurrentDate(newDate);
-    onNavigate("NEXT");
-  };
-
-  const goToToday = () => {
-    const today = new Date();
-    setCurrentDate(today);
-    onNavigate("TODAY");
-  };
-
-  return (
-    <div className="mb-spacing-500 flex flex-col gap-spacing-400 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-spacing-300">
-        <button
-          onClick={goToBack}
-          className="rounded-radius-300 bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
-          type="button">
-          ←
-        </button>
-        <button
-          onClick={goToToday}
-          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-body text-solid-white transition-opacity hover:opacity-90"
-          type="button">
-          오늘
-        </button>
-        <button
-          onClick={goToNext}
-          className="rounded-radius-300 bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
-          type="button">
-          →
-        </button>
-      </div>
-
-      <h2 className="font-bold text-content-standard-primary text-heading">
-        {format(date, "yyyy년 M월", { locale: ko })}
-      </h2>
-
-      <div className="flex flex-wrap gap-spacing-200">
-        <button
-          type="button"
-          onClick={() => setFilters({ ...filters, course: !filters.course })}
-          className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
-            filters.course
-              ? "bg-[#3B82F6]/20 ring-1 ring-[#3B82F6]"
-              : "bg-components-fill-standard-secondary opacity-50"
-          }`}>
-          <div className="h-3 w-3 rounded-radius-100 bg-[#3B82F6]" />
-          <span className="text-content-standard-secondary text-footnote">수업</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilters({ ...filters, retake: !filters.retake })}
-          className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
-            filters.retake
-              ? "bg-[#EF4444]/20 ring-1 ring-[#EF4444]"
-              : "bg-components-fill-standard-secondary opacity-50"
-          }`}>
-          <div className="h-3 w-3 rounded-radius-100 bg-[#EF4444]" />
-          <span className="text-content-standard-secondary text-footnote">재시험</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilters({ ...filters, clinic: !filters.clinic })}
-          className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
-            filters.clinic
-              ? "bg-[#8B5CF6]/20 ring-1 ring-[#8B5CF6]"
-              : "bg-components-fill-standard-secondary opacity-50"
-          }`}>
-          <div className="h-3 w-3 rounded-radius-100 bg-[#8B5CF6]" />
-          <span className="text-content-standard-secondary text-footnote">클리닉</span>
-        </button>
-      </div>
-    </div>
-  );
+const getEventStyle = (event: CalendarEvent) => {
+  switch (event.type) {
+    case "course":
+      return {
+        color: "#2563EB",
+        backgroundColor: "rgba(59, 130, 246, 0.12)",
+        borderColor: "rgba(59, 130, 246, 0.3)",
+      };
+    case "retake":
+      if (event.metadata?.status === "completed") {
+        return {
+          color: "#059669",
+          backgroundColor: "rgba(16, 185, 129, 0.12)",
+          borderColor: "rgba(16, 185, 129, 0.3)",
+        };
+      }
+      if (event.metadata?.status === "absent") {
+        return {
+          color: "#4B5563",
+          backgroundColor: "rgba(107, 114, 128, 0.12)",
+          borderColor: "rgba(107, 114, 128, 0.3)",
+        };
+      }
+      return {
+        color: "#DC2626",
+        backgroundColor: "rgba(239, 68, 68, 0.12)",
+        borderColor: "rgba(239, 68, 68, 0.3)",
+      };
+    case "clinic":
+      if (event.metadata?.status === "attended") {
+        return {
+          color: "#059669",
+          backgroundColor: "rgba(16, 185, 129, 0.12)",
+          borderColor: "rgba(16, 185, 129, 0.3)",
+        };
+      }
+      if (event.metadata?.status === "absent") {
+        return {
+          color: "#4B5563",
+          backgroundColor: "rgba(107, 114, 128, 0.12)",
+          borderColor: "rgba(107, 114, 128, 0.3)",
+        };
+      }
+      return {
+        color: "#7C3AED",
+        backgroundColor: "rgba(139, 92, 246, 0.12)",
+        borderColor: "rgba(139, 92, 246, 0.3)",
+      };
+    default:
+      return {
+        color: "#6B7280",
+        backgroundColor: "rgba(107, 114, 128, 0.12)",
+        borderColor: "rgba(107, 114, 128, 0.3)",
+      };
+  }
 };
 
 export default function CalendarPage() {
+  const [loading, setLoading] = useState(false);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [expandedDay, setExpandedDay] = useState<Date | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     course: true,
     retake: true,
     clinic: true,
   });
 
-  const { events, isLoading } = useCalendarEvents(currentDate);
-
-  // Hide overlay when modal opens
   useEffect(() => {
-    if (selectedEvent) {
-      document.body.classList.add("modal-open");
-    } else {
-      document.body.classList.remove("modal-open");
-    }
-    return () => {
-      document.body.classList.remove("modal-open");
-    };
-  }, [selectedEvent]);
+    fetchCalendarEvents();
+  }, [currentDate]);
 
-  const handleNavigate = (newDate: Date) => {
-    setCurrentDate(newDate);
+  const fetchCalendarEvents = async () => {
+    setLoading(true);
+    try {
+      const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+      const response = await fetch(
+        `/api/calendar?start=${start.toISOString().split("T")[0]}&end=${end.toISOString().split("T")[0]}`,
+      );
+      const result = await response.json();
+
+      if (response.ok) {
+        setCalendarEvents(result.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch calendar events:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const eventStyleGetter = (event: CalendarEvent) => {
-    let color = "";
-    let backgroundColor = "";
-    let borderColor = "";
+  const goToPrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const goToNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+  const goToToday = () => setCurrentDate(new Date());
 
-    switch (event.type) {
-      case "course":
-        color = "#2563EB";
-        backgroundColor = "rgba(59, 130, 246, 0.12)";
-        borderColor = "rgba(59, 130, 246, 0.3)";
-        break;
-      case "retake":
-        if (event.metadata?.status === "completed") {
-          color = "#059669";
-          backgroundColor = "rgba(16, 185, 129, 0.12)";
-          borderColor = "rgba(16, 185, 129, 0.3)";
-        } else if (event.metadata?.status === "absent") {
-          color = "#4B5563";
-          backgroundColor = "rgba(107, 114, 128, 0.12)";
-          borderColor = "rgba(107, 114, 128, 0.3)";
-        } else {
-          color = "#DC2626";
-          backgroundColor = "rgba(239, 68, 68, 0.12)";
-          borderColor = "rgba(239, 68, 68, 0.3)";
-        }
-        break;
-      case "clinic":
-        if (event.metadata?.status === "attended") {
-          color = "#059669";
-          backgroundColor = "rgba(16, 185, 129, 0.12)";
-          borderColor = "rgba(16, 185, 129, 0.3)";
-        } else if (event.metadata?.status === "absent") {
-          color = "#4B5563";
-          backgroundColor = "rgba(107, 114, 128, 0.12)";
-          borderColor = "rgba(107, 114, 128, 0.3)";
-        } else {
-          color = "#7C3AED";
-          backgroundColor = "rgba(139, 92, 246, 0.12)";
-          borderColor = "rgba(139, 92, 246, 0.3)";
-        }
-        break;
-    }
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-    return {
-      style: {
-        backgroundColor,
-        color,
-        borderLeft: `3px solid ${color}`,
-        borderTop: `1px solid ${borderColor}`,
-        borderRight: `1px solid ${borderColor}`,
-        borderBottom: `1px solid ${borderColor}`,
-      },
-    };
-  };
-
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = calendarEvents.filter((event) => {
     if (event.type === "course" && !filters.course) return false;
     if (event.type === "retake" && !filters.retake) return false;
     if (event.type === "clinic" && !filters.clinic) return false;
     return true;
   });
+
+  const getEventsForDay = (day: Date) => {
+    return filteredEvents.filter((event) => isSameDay(new Date(event.date), day));
+  };
 
   return (
     <Container>
@@ -229,74 +152,183 @@ export default function CalendarPage() {
       <Header title="캘린더" subtitle="수업, 재시험, 클리닉 일정을 확인하세요" />
 
       <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-300 md:rounded-radius-600 md:p-spacing-600">
-        {isLoading ? (
-          <div className="flex min-h-[400px] items-center justify-center md:min-h-[600px]">
-            <p className="text-body text-content-standard-tertiary">로딩 중...</p>
+        <div className="mb-spacing-400 flex flex-col gap-spacing-300 md:mb-spacing-500 md:flex-row md:items-center md:justify-between md:gap-spacing-400">
+          <div className="flex items-center justify-between gap-spacing-300 md:justify-start">
+            <div className="flex items-center gap-spacing-200 md:gap-spacing-300">
+              <button
+                onClick={goToPrevMonth}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-300 bg-components-fill-standard-secondary font-medium text-content-standard-primary text-label transition-colors hover:bg-components-interactive-hover md:min-h-0 md:min-w-0 md:px-spacing-400 md:py-spacing-200 md:text-body"
+                type="button">
+                ←
+              </button>
+              <button
+                onClick={goToToday}
+                className="min-h-[44px] rounded-radius-300 bg-core-accent px-spacing-300 py-spacing-200 font-medium text-label text-solid-white transition-opacity hover:opacity-90 md:min-h-0 md:px-spacing-400 md:text-body"
+                type="button">
+                오늘
+              </button>
+              <button
+                onClick={goToNextMonth}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-300 bg-components-fill-standard-secondary font-medium text-content-standard-primary text-label transition-colors hover:bg-components-interactive-hover md:min-h-0 md:min-w-0 md:px-spacing-400 md:py-spacing-200 md:text-body"
+                type="button">
+                →
+              </button>
+            </div>
+
+            <h2 className="font-bold text-body text-content-standard-primary md:hidden">
+              {format(currentDate, "yyyy년 M월", { locale: ko })}
+            </h2>
+          </div>
+
+          <h2 className="hidden font-bold text-content-standard-primary text-heading md:block">
+            {format(currentDate, "yyyy년 M월", { locale: ko })}
+          </h2>
+
+          <div className="flex flex-wrap gap-spacing-150 md:gap-spacing-200">
+            <button
+              type="button"
+              onClick={() => setFilters({ ...filters, course: !filters.course })}
+              className={`flex min-h-[36px] items-center gap-spacing-150 rounded-radius-300 px-spacing-200 py-spacing-100 transition-all md:min-h-0 md:gap-spacing-200 md:px-spacing-300 ${
+                filters.course
+                  ? "bg-[#3B82F6]/20 ring-1 ring-[#3B82F6]"
+                  : "bg-components-fill-standard-secondary opacity-50"
+              }`}>
+              <div className="h-2.5 w-2.5 rounded-radius-100 bg-[#3B82F6] md:h-3 md:w-3" />
+              <span className="text-caption text-content-standard-secondary md:text-footnote">수업</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilters({ ...filters, retake: !filters.retake })}
+              className={`flex min-h-[36px] items-center gap-spacing-150 rounded-radius-300 px-spacing-200 py-spacing-100 transition-all md:min-h-0 md:gap-spacing-200 md:px-spacing-300 ${
+                filters.retake
+                  ? "bg-[#EF4444]/20 ring-1 ring-[#EF4444]"
+                  : "bg-components-fill-standard-secondary opacity-50"
+              }`}>
+              <div className="h-2.5 w-2.5 rounded-radius-100 bg-[#EF4444] md:h-3 md:w-3" />
+              <span className="text-caption text-content-standard-secondary md:text-footnote">재시험</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilters({ ...filters, clinic: !filters.clinic })}
+              className={`flex min-h-[36px] items-center gap-spacing-150 rounded-radius-300 px-spacing-200 py-spacing-100 transition-all md:min-h-0 md:gap-spacing-200 md:px-spacing-300 ${
+                filters.clinic
+                  ? "bg-[#8B5CF6]/20 ring-1 ring-[#8B5CF6]"
+                  : "bg-components-fill-standard-secondary opacity-50"
+              }`}>
+              <div className="h-2.5 w-2.5 rounded-radius-100 bg-[#8B5CF6] md:h-3 md:w-3" />
+              <span className="text-caption text-content-standard-secondary md:text-footnote">클리닉</span>
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-spacing-600">
+            <p className="text-content-standard-tertiary text-label md:text-body">로딩 중...</p>
           </div>
         ) : (
-          <Calendar
-            localizer={localizer}
-            events={filteredEvents}
-            startAccessor="start"
-            endAccessor="end"
-            date={currentDate}
-            onNavigate={handleNavigate}
-            onSelectEvent={(event) => setSelectedEvent(event)}
-            eventPropGetter={eventStyleGetter}
-            components={{
-              toolbar: (props) => (
-                <CustomToolbar
-                  {...props}
-                  currentDate={currentDate}
-                  setCurrentDate={setCurrentDate}
-                  filters={filters}
-                  setFilters={setFilters}
-                />
-              ),
-            }}
-            messages={{
-              today: "오늘",
-              previous: "이전",
-              next: "다음",
-              month: "월",
-              week: "주",
-              day: "일",
-              agenda: "일정",
-              date: "날짜",
-              time: "시간",
-              event: "이벤트",
-              noEventsInRange: "이 범위에 일정이 없습니다.",
-              showMore: (total: number) => `+${total} 더보기`,
-            }}
-            culture="ko"
-            views={["month"]}
-            defaultView="month"
-            popup
-            style={{ height: "100%", minHeight: "400px" }}
-          />
+          <div className="overflow-hidden rounded-radius-300 border border-line-outline">
+            <div className="grid grid-cols-7 border-line-outline border-b bg-components-fill-standard-secondary">
+              {WEEKDAYS.map((day) => (
+                <div
+                  key={day}
+                  className="border-line-outline border-r px-spacing-100 py-spacing-200 text-center font-semibold text-content-standard-secondary text-footnote last:border-r-0 md:px-spacing-200 md:py-spacing-300 md:text-label">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7">
+              {calendarDays.map((day, idx) => {
+                const dayEvents = getEventsForDay(day);
+                const isCurrentMonth = isSameMonth(day, currentDate);
+                const isTodayDate = isToday(day);
+                const isExpanded = expandedDay && isSameDay(day, expandedDay);
+                const maxVisibleEvents = 2;
+                const hasMoreEvents = dayEvents.length > maxVisibleEvents;
+
+                return (
+                  <div
+                    key={day.toISOString()}
+                    className={`relative flex min-h-[80px] flex-col border-line-outline border-b border-r p-spacing-100 md:min-h-[100px] md:p-spacing-200 ${
+                      idx % 7 === 6 ? "border-r-0" : ""
+                    } ${idx >= calendarDays.length - 7 ? "border-b-0" : ""} ${
+                      !isCurrentMonth ? "bg-components-fill-standard-secondary/50" : ""
+                    } ${isTodayDate ? "bg-core-accent/10" : ""}`}>
+                    <div
+                      className={`mb-spacing-100 text-right text-footnote ${
+                        !isCurrentMonth
+                          ? "text-content-standard-quaternary"
+                          : isTodayDate
+                            ? "font-bold text-core-accent"
+                            : "text-content-standard-tertiary"
+                      }`}>
+                      {format(day, "d")}
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-spacing-50">
+                      {dayEvents.slice(0, isExpanded ? dayEvents.length : maxVisibleEvents).map((event) => {
+                        const style = getEventStyle(event);
+                        return (
+                          <button
+                            key={event.id}
+                            type="button"
+                            onClick={() => setSelectedEvent(event)}
+                            className="w-full truncate rounded-radius-200 px-spacing-100 py-spacing-50 text-left text-caption transition-transform hover:scale-[1.02] md:px-spacing-150 md:text-footnote"
+                            style={{
+                              backgroundColor: style.backgroundColor,
+                              color: style.color,
+                              borderLeft: `2px solid ${style.color}`,
+                            }}>
+                            {event.title}
+                          </button>
+                        );
+                      })}
+
+                      {hasMoreEvents && !isExpanded && (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedDay(day)}
+                          className="rounded-radius-200 px-spacing-100 py-spacing-50 text-left text-caption text-core-accent transition-colors hover:bg-core-accent/10 md:text-footnote">
+                          +{dayEvents.length - maxVisibleEvents}
+                        </button>
+                      )}
+
+                      {isExpanded && (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedDay(null)}
+                          className="rounded-radius-200 px-spacing-100 py-spacing-50 text-left text-caption text-content-standard-tertiary transition-colors hover:bg-components-fill-standard-secondary md:text-footnote">
+                          접기
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Event detail modal */}
       {selectedEvent && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-300 md:p-spacing-400"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-solid-black/50 p-spacing-300 md:items-center md:p-spacing-400"
           onClick={() => setSelectedEvent(null)}>
           <div
-            className="w-full max-w-md rounded-radius-500 border border-line-outline bg-components-fill-standard-primary md:rounded-radius-600"
+            className="w-full max-w-md rounded-t-radius-600 border border-line-outline bg-components-fill-standard-primary md:rounded-radius-600"
             onClick={(e) => e.stopPropagation()}>
-            <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-              <h2 className="font-bold text-content-standard-primary text-heading">일정 상세</h2>
+            <div className="border-line-divider border-b px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
+              <h2 className="font-bold text-body text-content-standard-primary md:text-heading">일정 상세</h2>
             </div>
 
-            <div className="space-y-spacing-400 p-spacing-600">
+            <div className="space-y-spacing-300 p-spacing-400 md:space-y-spacing-400 md:p-spacing-600">
               <div>
-                <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-footnote md:text-label">
                   타입
                 </label>
                 <div className="flex items-center gap-spacing-200">
                   <div
-                    className="h-4 w-4 rounded-radius-100"
+                    className="h-3.5 w-3.5 rounded-radius-100 md:h-4 md:w-4"
                     style={{
                       backgroundColor:
                         selectedEvent.type === "course"
@@ -310,41 +342,39 @@ export default function CalendarPage() {
                                 : "#8B5CF6",
                     }}
                   />
-                  <span className="text-body text-content-standard-primary">
+                  <span className="text-content-standard-primary text-label md:text-body">
                     {selectedEvent.type === "course" ? "수업" : selectedEvent.type === "retake" ? "재시험" : "클리닉"}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-footnote md:text-label">
                   제목
                 </label>
-                <p className="text-body text-content-standard-primary">{selectedEvent.title}</p>
+                <p className="text-content-standard-primary text-label md:text-body">{selectedEvent.title}</p>
               </div>
 
               <div>
-                <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-footnote md:text-label">
                   날짜
                 </label>
-                <p className="text-body text-content-standard-primary">
-                  {format(selectedEvent.start ?? new Date(selectedEvent.date), "yyyy년 M월 d일 (EEE)", {
-                    locale: ko,
-                  })}
+                <p className="text-content-standard-primary text-label md:text-body">
+                  {format(new Date(selectedEvent.date), "yyyy년 M월 d일 (EEE)", { locale: ko })}
                 </p>
               </div>
 
               {selectedEvent.type === "clinic" && selectedEvent.metadata?.status && (
                 <div>
-                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-footnote md:text-label">
                     상태
                   </label>
                   <span
-                    className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${
+                    className={`inline-block rounded-radius-300 px-spacing-200 py-spacing-100 font-medium text-caption md:px-spacing-300 md:text-footnote ${
                       selectedEvent.metadata.status === "attended"
                         ? "bg-solid-translucent-green text-solid-green"
                         : selectedEvent.metadata.status === "absent"
-                          ? "bg-solid-translucent-red text-solid-red"
+                          ? "bg-solid-translucent-gray text-solid-gray"
                           : "bg-solid-translucent-purple text-solid-purple"
                     }`}>
                     {selectedEvent.metadata.status === "attended"
@@ -358,15 +388,15 @@ export default function CalendarPage() {
 
               {selectedEvent.type === "retake" && selectedEvent.metadata?.status && (
                 <div>
-                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+                  <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-footnote md:text-label">
                     상태
                   </label>
                   <span
-                    className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${
+                    className={`inline-block rounded-radius-300 px-spacing-200 py-spacing-100 font-medium text-caption md:px-spacing-300 md:text-footnote ${
                       selectedEvent.metadata.status === "completed"
                         ? "bg-solid-translucent-green text-solid-green"
                         : selectedEvent.metadata.status === "absent"
-                          ? "bg-solid-translucent-red text-solid-red"
+                          ? "bg-solid-translucent-gray text-solid-gray"
                           : selectedEvent.metadata.status === "postponed"
                             ? "bg-solid-translucent-yellow text-solid-yellow"
                             : "bg-solid-translucent-blue text-solid-blue"
@@ -383,10 +413,10 @@ export default function CalendarPage() {
               )}
             </div>
 
-            <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
+            <div className="border-line-divider border-t px-spacing-400 py-spacing-400 md:px-spacing-600 md:py-spacing-500">
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="w-full rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+                className="min-h-[44px] w-full rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-300 font-semibold text-label text-solid-white transition-opacity hover:opacity-90 md:min-h-0 md:px-spacing-500 md:text-body">
                 닫기
               </button>
             </div>

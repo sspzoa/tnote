@@ -399,7 +399,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="min-h-screen p-spacing-600 md:p-spacing-800">
+    <div className="min-h-dvh p-spacing-600 md:p-spacing-800">
       <div className="mx-auto max-w-7xl">
         {/* 헤더 */}
         <div className="mb-spacing-700">
