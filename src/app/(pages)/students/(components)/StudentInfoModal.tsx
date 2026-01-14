@@ -146,12 +146,12 @@ export default function StudentInfoModal() {
                         </span>
                         {isPassed && (
                           <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 text-footnote text-solid-green">
-                            합격
+                            통과
                           </span>
                         )}
                         {isFailed && (
                           <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
-                            불합격
+                            재시험
                           </span>
                         )}
                       </div>
