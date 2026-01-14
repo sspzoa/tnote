@@ -40,9 +40,25 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
     if (error) throw error;
 
+    const studentIds = data.map((enrollment) => enrollment.student_id);
+
+    const { data: consultationCounts, error: countError } = await supabase
+      .from("ConsultationLogs")
+      .select("student_id")
+      .eq("workspace", session.workspace)
+      .in("student_id", studentIds);
+
+    if (countError) throw countError;
+
+    const countMap = new Map<string, number>();
+    for (const log of consultationCounts) {
+      countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
+    }
+
     const students = data.map((enrollment) => ({
       ...enrollment.student,
       enrolled_at: enrollment.enrolled_at,
+      consultation_count: countMap.get(enrollment.student_id) || 0,
     }));
 
     await logger.info("read", "students", `Retrieved ${students.length} students for course ${courseId}`);
@@ -58,8 +74,28 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
 
   if (error) throw error;
 
-  await logger.info("read", "students", `Retrieved ${data.length} students`);
-  return NextResponse.json({ data });
+  const studentIds = data.map((student) => student.id);
+
+  const { data: consultationCounts, error: countError } = await supabase
+    .from("ConsultationLogs")
+    .select("student_id")
+    .eq("workspace", session.workspace)
+    .in("student_id", studentIds);
+
+  if (countError) throw countError;
+
+  const countMap = new Map<string, number>();
+  for (const log of consultationCounts) {
+    countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
+  }
+
+  const studentsWithCount = data.map((student) => ({
+    ...student,
+    consultation_count: countMap.get(student.id) || 0,
+  }));
+
+  await logger.info("read", "students", `Retrieved ${studentsWithCount.length} students`);
+  return NextResponse.json({ data: studentsWithCount });
 };
 
 const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {

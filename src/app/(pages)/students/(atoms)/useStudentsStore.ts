@@ -10,6 +10,7 @@ export interface Student {
   is_favorite: boolean;
   enrolled_at?: string;
   created_at?: string;
+  consultation_count?: number;
 }
 
 export interface Course {

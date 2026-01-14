@@ -116,6 +116,9 @@ export default function StudentList({ students }: StudentListProps) {
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               학교
             </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              상담
+            </th>
             <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
           </tr>
         </thead>
@@ -151,6 +154,9 @@ export default function StudentList({ students }: StudentListProps) {
               </td>
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {student.school || "-"}
+              </td>
+              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                {student.consultation_count !== undefined ? `${student.consultation_count}회` : "-"}
               </td>
               <td className="relative px-spacing-500 py-spacing-400">
                 <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />

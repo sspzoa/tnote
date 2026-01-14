@@ -19,7 +19,7 @@ export function DropdownMenu({ isOpen, onClose, items }: DropdownMenuProps) {
   return (
     <>
       <div className="fixed inset-0 z-10" onClick={onClose} />
-      <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
+      <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] whitespace-nowrap rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
         {items.map((item, index) => (
           <div key={index}>
             <button
