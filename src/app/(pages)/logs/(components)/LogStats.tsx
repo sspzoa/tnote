@@ -49,9 +49,7 @@ export default function LogStats() {
     );
   }
 
-  const sortedDailyActivity = Object.entries(stats.dailyActivity)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .slice(-7);
+  const sortedDailyActivity = Object.entries(stats.dailyActivity).sort(([a], [b]) => a.localeCompare(b));
 
   const maxActivity = Math.max(...sortedDailyActivity.map(([, count]) => count), 1);
 
@@ -101,18 +99,21 @@ export default function LogStats() {
       {/* 일별 활동 차트 */}
       <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
         <p className="mb-spacing-400 font-semibold text-body text-content-standard-primary">일별 활동</p>
-        <div className="flex h-32 items-end gap-spacing-200">
-          {sortedDailyActivity.map(([date, count]) => (
-            <div key={date} className="flex flex-1 flex-col items-center gap-spacing-200">
-              <div
-                className="w-full rounded-radius-200 bg-core-accent transition-all"
-                style={{ height: `${(count / maxActivity) * 100}%`, minHeight: count > 0 ? "4px" : "0" }}
-              />
-              <span className="text-center text-content-standard-tertiary text-footnote">
-                {date.slice(5).replace("-", "/")}
-              </span>
-            </div>
-          ))}
+        <div className="flex items-end gap-spacing-200">
+          {sortedDailyActivity.map(([date, count]) => {
+            const heightPx = maxActivity > 0 ? Math.max((count / maxActivity) * 128, count > 0 ? 4 : 0) : 0;
+            return (
+              <div key={date} className="flex flex-1 flex-col items-center gap-spacing-200">
+                <div
+                  className="w-full rounded-radius-200 bg-core-accent transition-all"
+                  style={{ height: `${heightPx}px` }}
+                />
+                <span className="text-center text-content-standard-tertiary text-footnote">
+                  {date.slice(5).replace("-", "/")}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 

@@ -59,7 +59,7 @@ export default function CalendarDayCell({
           <button
             type="button"
             onClick={onExpand}
-            className="rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-footnote text-core-accent transition-colors hover:bg-core-accent/10">
+            className="rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-core-accent text-footnote transition-colors hover:bg-core-accent/10">
             +{events.length - MAX_VISIBLE_EVENTS}
           </button>
         )}
@@ -68,7 +68,7 @@ export default function CalendarDayCell({
           <button
             type="button"
             onClick={onCollapse}
-            className="rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-footnote text-content-standard-tertiary transition-colors hover:bg-components-fill-standard-secondary">
+            className="rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-content-standard-tertiary text-footnote transition-colors hover:bg-components-fill-standard-secondary">
             접기
           </button>
         )}
