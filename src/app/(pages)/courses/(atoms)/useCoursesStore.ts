@@ -1,31 +1,10 @@
 import { atom } from "jotai";
+import type { Course, Student } from "@/shared/types";
 
-export interface Course {
-  id: string;
-  name: string;
-  created_at: string;
-  student_count?: number;
-  start_date?: string | null;
-  end_date?: string | null;
-  days_of_week?: number[] | null;
-}
+export type { Course, Student };
 
-export interface Student {
-  id: string;
-  phone_number: string;
-  name: string;
-  school: string | null;
-}
-
-export const coursesAtom = atom<Course[]>([]);
 export const allStudentsAtom = atom<Student[]>([]);
 export const enrolledStudentsAtom = atom<Student[]>([]);
-
 export const selectedCourseAtom = atom<Course | null>(null);
-
 export const enrolledSearchQueryAtom = atom<string>("");
 export const unenrolledSearchQueryAtom = atom<string>("");
-
-export const coursesLoadingAtom = atom<boolean>(true);
-export const enrolledStudentsLoadingAtom = atom<boolean>(false);
-export const loadingStudentIdAtom = atom<string | null>(null);

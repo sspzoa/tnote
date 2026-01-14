@@ -9,7 +9,7 @@ export const useClinics = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch clinics");
+        throw new Error(result.error || "클리닉 목록을 불러오는데 실패했습니다.");
       }
 
       return result.data as Clinic[];

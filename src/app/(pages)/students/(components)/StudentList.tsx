@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Star } from "lucide-react";
+import { useCallback } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
@@ -25,76 +26,93 @@ export default function StudentList({ students }: StudentListProps) {
   const { toggleFavorite } = useStudentFavorite();
   const { resetPassword } = useStudentPasswordReset();
 
-  const handleEditClick = (student: Student) => {
-    setSelectedStudent(student);
-    setEditForm({
-      name: student.name,
-      phoneNumber: student.phone_number,
-      parentPhoneNumber: student.parent_phone_number || "",
-      school: student.school || "",
-      birthYear: student.birth_year?.toString() || "",
-    });
-    setShowEditModal(true);
-  };
-
-  const handleResetPassword = async (student: Student) => {
-    if (
-      !confirm(
-        `${student.name} 학생의 비밀번호를 전화번호(${formatPhoneNumber(student.phone_number)})로 초기화하시겠습니까?`,
-      )
-    ) {
-      return;
-    }
-
-    try {
-      await resetPassword(student.id);
-      alert("비밀번호가 전화번호로 초기화되었습니다.");
-    } catch (error) {
-      console.error("Password reset error:", error);
-      alert("비밀번호 재설정에 실패했습니다.");
-    }
-  };
-
-  const handleDelete = async (student: Student) => {
-    if (
-      !confirm(`${student.name} 학생을 삭제하시겠습니까?\n관련된 모든 데이터(수강 정보, 재시험 등)가 함께 삭제됩니다.`)
-    ) {
-      return;
-    }
-
-    try {
-      await deleteStudent(student.id);
-      alert("학생이 삭제되었습니다.");
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert(error instanceof Error ? error.message : "학생 삭제에 실패했습니다.");
-    }
-  };
-
-  const openConsultationModal = (student: Student) => {
-    setSelectedStudent(student);
-    setShowConsultationModal(true);
-  };
-
-  const handleToggleFavorite = async (student: Student, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await toggleFavorite({
-        studentId: student.id,
-        isFavorite: !student.is_favorite,
+  const handleEditClick = useCallback(
+    (student: Student) => {
+      setSelectedStudent(student);
+      setEditForm({
+        name: student.name,
+        phoneNumber: student.phone_number,
+        parentPhoneNumber: student.parent_phone_number || "",
+        school: student.school || "",
+        birthYear: student.birth_year?.toString() || "",
       });
-    } catch (error) {
-      console.error("Toggle favorite error:", error);
-      alert("즐겨찾기 업데이트에 실패했습니다.");
-    }
-  };
+      setShowEditModal(true);
+    },
+    [setSelectedStudent, setEditForm, setShowEditModal],
+  );
 
-  const getMenuItems = (student: Student): DropdownMenuItem[] => [
-    { label: "상담일지", onClick: () => openConsultationModal(student), dividerAfter: true },
-    { label: "정보 수정", onClick: () => handleEditClick(student) },
-    { label: "비밀번호 초기화", onClick: () => handleResetPassword(student), dividerAfter: true },
-    { label: "학생 삭제", onClick: () => handleDelete(student), variant: "danger" },
-  ];
+  const handleResetPassword = useCallback(
+    async (student: Student) => {
+      if (
+        !confirm(
+          `${student.name} 학생의 비밀번호를 전화번호(${formatPhoneNumber(student.phone_number)})로 초기화하시겠습니까?`,
+        )
+      ) {
+        return;
+      }
+
+      try {
+        await resetPassword(student.id);
+        alert("비밀번호가 전화번호로 초기화되었습니다.");
+      } catch {
+        alert("비밀번호 재설정에 실패했습니다.");
+      }
+    },
+    [resetPassword],
+  );
+
+  const handleDelete = useCallback(
+    async (student: Student) => {
+      if (
+        !confirm(
+          `${student.name} 학생을 삭제하시겠습니까?\n관련된 모든 데이터(수강 정보, 재시험 등)가 함께 삭제됩니다.`,
+        )
+      ) {
+        return;
+      }
+
+      try {
+        await deleteStudent(student.id);
+        alert("학생이 삭제되었습니다.");
+      } catch (error) {
+        alert(error instanceof Error ? error.message : "학생 삭제에 실패했습니다.");
+      }
+    },
+    [deleteStudent],
+  );
+
+  const openConsultationModal = useCallback(
+    (student: Student) => {
+      setSelectedStudent(student);
+      setShowConsultationModal(true);
+    },
+    [setSelectedStudent, setShowConsultationModal],
+  );
+
+  const handleToggleFavorite = useCallback(
+    async (student: Student, e: React.MouseEvent) => {
+      e.stopPropagation();
+      try {
+        await toggleFavorite({
+          studentId: student.id,
+          isFavorite: !student.is_favorite,
+        });
+      } catch {
+        alert("즐겨찾기 업데이트에 실패했습니다.");
+      }
+    },
+    [toggleFavorite],
+  );
+
+  const getMenuItems = useCallback(
+    (student: Student): DropdownMenuItem[] => [
+      { label: "상담일지", onClick: () => openConsultationModal(student), dividerAfter: true },
+      { label: "정보 수정", onClick: () => handleEditClick(student) },
+      { label: "비밀번호 초기화", onClick: () => handleResetPassword(student), dividerAfter: true },
+      { label: "학생 삭제", onClick: () => handleDelete(student), variant: "danger" },
+    ],
+    [openConsultationModal, handleEditClick, handleResetPassword, handleDelete],
+  );
 
   return (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
@@ -131,7 +149,8 @@ export default function StudentList({ students }: StudentListProps) {
                 <div className="flex items-center gap-spacing-200">
                   <button
                     onClick={(e) => handleToggleFavorite(student, e)}
-                    className="transition-colors hover:scale-110">
+                    className="transition-colors hover:scale-110"
+                    aria-label={student.is_favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}>
                     <Star
                       className={`h-5 w-5 ${student.is_favorite ? "fill-solid-yellow text-solid-yellow" : "text-content-standard-tertiary"}`}
                     />

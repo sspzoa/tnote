@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { isValidBirthYear, isValidPhoneNumber, removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 const handleGet = async ({ request, supabase, session, logger }: ApiContext) => {
   const { searchParams } = new URL(request.url);
@@ -105,15 +106,38 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     return NextResponse.json({ error: "이름과 전화번호는 필수입니다." }, { status: 400 });
   }
 
-  const hashedPassword = await bcrypt.hash(phoneNumber, 10);
+  if (typeof name !== "string" || name.trim().length === 0 || name.length > 50) {
+    return NextResponse.json({ error: "이름은 1~50자 사이여야 합니다." }, { status: 400 });
+  }
+
+  const cleanedPhoneNumber = removePhoneHyphens(phoneNumber);
+  if (!isValidPhoneNumber(cleanedPhoneNumber)) {
+    return NextResponse.json({ error: "올바른 전화번호 형식이 아닙니다." }, { status: 400 });
+  }
+
+  if (parentPhoneNumber) {
+    const cleanedParentPhone = removePhoneHyphens(parentPhoneNumber);
+    if (!isValidPhoneNumber(cleanedParentPhone)) {
+      return NextResponse.json({ error: "올바른 학부모 전화번호 형식이 아닙니다." }, { status: 400 });
+    }
+  }
+
+  if (birthYear) {
+    const year = Number.parseInt(birthYear);
+    if (Number.isNaN(year) || !isValidBirthYear(year)) {
+      return NextResponse.json({ error: "올바른 출생연도가 아닙니다." }, { status: 400 });
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(cleanedPhoneNumber, 10);
 
   const { data, error } = await supabase
     .from("Users")
     .insert({
-      name,
-      phone_number: phoneNumber,
-      parent_phone_number: parentPhoneNumber || null,
-      school: school || null,
+      name: name.trim(),
+      phone_number: cleanedPhoneNumber,
+      parent_phone_number: parentPhoneNumber ? removePhoneHyphens(parentPhoneNumber) : null,
+      school: school?.trim() || null,
       birth_year: birthYear ? Number.parseInt(birthYear) : null,
       password: hashedPassword,
       role: "student",

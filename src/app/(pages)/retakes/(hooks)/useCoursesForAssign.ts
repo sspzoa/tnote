@@ -9,7 +9,7 @@ export const useCoursesForAssign = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch courses");
+        throw new Error(result.error || "강좌 목록을 불러오는데 실패했습니다.");
       }
 
       const uniqueCourses = result.data.reduce((acc: Course[], exam: Exam) => {

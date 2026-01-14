@@ -11,7 +11,7 @@ export const useEnrolledStudents = (courseId: string | null) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch enrolled students");
+        throw new Error(result.error || "수강 학생 목록을 불러오는데 실패했습니다.");
       }
 
       return result.data as Student[];

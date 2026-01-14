@@ -11,7 +11,7 @@ export const useAttendance = (clinicId: string | null, date: string | null) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch attendance");
+        throw new Error(result.error || "출석 정보를 불러오는데 실패했습니다.");
       }
 
       return result.data as AttendanceRecord[];

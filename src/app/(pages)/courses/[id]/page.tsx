@@ -56,8 +56,7 @@ export default function CourseDetailPage() {
         alert("수업을 찾을 수 없습니다.");
         router.push("/courses");
       }
-    } catch (error) {
-      console.error("Failed to fetch course:", error);
+    } catch {
       alert("수업 정보를 불러오는데 실패했습니다.");
       router.push("/courses");
     }
@@ -69,8 +68,8 @@ export default function CourseDetailPage() {
       const response = await fetch(`/api/exams?courseId=${courseId}`);
       const result = await response.json();
       setExams(result.data || []);
-    } catch (error) {
-      console.error("Failed to fetch exams:", error);
+    } catch {
+      // 에러 무시
     } finally {
       setLoading(false);
     }
@@ -104,8 +103,7 @@ export default function CourseDetailPage() {
         const result = await response.json();
         alert(result.error || "시험 생성에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("Create error:", error);
+    } catch {
       alert("오류가 발생했습니다.");
     } finally {
       setSaving(false);
@@ -137,8 +135,7 @@ export default function CourseDetailPage() {
         const result = await response.json();
         alert(result.error || "시험 수정에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("Edit error:", error);
+    } catch {
       alert("오류가 발생했습니다.");
     } finally {
       setSaving(false);
@@ -164,8 +161,7 @@ export default function CourseDetailPage() {
         const result = await response.json();
         alert(result.error || "시험 삭제에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("Delete error:", error);
+    } catch {
       alert("오류가 발생했습니다.");
     }
   };

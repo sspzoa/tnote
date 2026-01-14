@@ -20,3 +20,15 @@ export const formatPhoneNumber = (phone: string): string => {
 
   return phone;
 };
+
+export const isValidPhoneNumber = (phone: string): boolean => {
+  if (!phone) return false;
+  const cleaned = phone.replace(/[-\s]/g, "");
+  const phoneRegex = /^01[0-9]{8,9}$/;
+  return phoneRegex.test(cleaned);
+};
+
+export const isValidBirthYear = (year: number): boolean => {
+  const currentYear = new Date().getFullYear();
+  return year >= 1900 && year <= currentYear;
+};

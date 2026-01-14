@@ -19,7 +19,7 @@ export const useStudentInfo = (studentId: string | null) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch student info");
+        throw new Error(result.error || "학생 정보를 불러오는데 실패했습니다.");
       }
 
       return result.data as StudentInfo;

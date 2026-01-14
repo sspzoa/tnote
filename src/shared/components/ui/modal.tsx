@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { type ReactNode, useEffect, useId } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -21,17 +23,42 @@ const maxWidthStyles = {
 };
 
 export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "md" }: ModalProps) {
+  const titleId = useId();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-      onClick={onClose}>
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}>
       <div
         className={`flex max-h-[80vh] w-full ${maxWidthStyles[maxWidth]} flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary`}
         onClick={(e) => e.stopPropagation()}>
         <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-          <h2 className="font-bold text-content-standard-primary text-heading">{title}</h2>
+          <h2 id={titleId} className="font-bold text-content-standard-primary text-heading">
+            {title}
+          </h2>
           {subtitle && <p className="mt-spacing-100 text-content-standard-secondary text-label">{subtitle}</p>}
         </div>
 

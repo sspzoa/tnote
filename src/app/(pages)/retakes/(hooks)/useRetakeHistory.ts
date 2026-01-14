@@ -11,7 +11,7 @@ export const useRetakeHistory = (retakeId: string | null) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch history");
+        throw new Error(result.error || "히스토리를 불러오는데 실패했습니다.");
       }
 
       return result.data as History[];

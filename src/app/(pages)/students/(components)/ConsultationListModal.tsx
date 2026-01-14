@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import type { ConsultationLog } from "@/shared/types";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import {
   showAddConsultationModalAtom,
@@ -21,7 +22,7 @@ export default function ConsultationListModal() {
 
   if (!selectedStudent) return null;
 
-  const openEditConsultationModal = (consultation: any) => {
+  const openEditConsultationModal = (consultation: ConsultationLog) => {
     setSelectedConsultation(consultation);
     setConsultationForm({
       date: consultation.consultation_date,

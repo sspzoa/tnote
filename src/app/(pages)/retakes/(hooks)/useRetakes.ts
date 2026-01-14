@@ -10,7 +10,7 @@ export const useRetakes = (filter: "all" | "pending" | "completed" | "absent") =
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch retakes");
+        throw new Error(result.error || "재시험 목록을 불러오는데 실패했습니다.");
       }
 
       return result.data as Retake[];

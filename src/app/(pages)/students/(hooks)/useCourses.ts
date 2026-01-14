@@ -1,39 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import type { Course } from "../(atoms)/useStudentsStore";
+import { useCourses as useCoursesBase } from "@/shared/hooks/useCourses";
 
 export const useCourses = () => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["courses-for-filter"],
-    queryFn: async () => {
-      const response = await fetch("/api/courses");
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch courses");
-      }
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const activeCourses = result.data.filter((course: Course) => {
-        if (!course.start_date || !course.end_date) {
-          return false;
-        }
-        const startDate = new Date(course.start_date);
-        const endDate = new Date(course.end_date);
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(0, 0, 0, 0);
-
-        return today >= startDate && today <= endDate;
-      });
-
-      return activeCourses as Course[];
-    },
-  });
-
-  return {
-    courses: data || [],
-    isLoading,
-    error,
-  };
+  return useCoursesBase({ activeOnly: true, queryKey: "courses-for-students-filter" });
 };
