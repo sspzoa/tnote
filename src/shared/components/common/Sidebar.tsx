@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, ClipboardList, Hospital, LogOut, ScrollText, UserCog, Users } from "lucide-react";
+import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, ScrollText, UserCog, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -102,7 +102,21 @@ export default function Sidebar() {
     }
   };
 
-  const allMenuItems = userInfo?.role === "owner" ? [...menuItems, ...ownerMenuItems] : menuItems;
+  const isAdmin = userInfo?.role === "admin" || userInfo?.role === "owner";
+  const studentMenuItems = [
+    {
+      href: "/calendar",
+      icon: Calendar,
+      label: "캘린더",
+      bgColor: "bg-solid-translucent-blue",
+      iconColor: "text-solid-blue",
+    },
+  ];
+  const allMenuItems = isAdmin
+    ? userInfo?.role === "owner"
+      ? [...menuItems, ...ownerMenuItems]
+      : menuItems
+    : studentMenuItems;
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -162,7 +176,7 @@ export default function Sidebar() {
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium text-body text-content-standard-primary">{userInfo.name}</div>
                 <div className="text-content-standard-tertiary text-footnote">
-                  {userInfo.role === "owner" ? "오너" : "관리자"}
+                  {userInfo.role === "owner" ? "오너" : userInfo.role === "student" ? "학생" : "관리자"}
                 </div>
               </div>
             </div>

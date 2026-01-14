@@ -12,13 +12,19 @@ interface Stats {
 
 export default function Home() {
   const [userName, setUserName] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("");
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchUserInfo();
-    fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (userRole && userRole !== "student") {
+      fetchStats();
+    }
+  }, [userRole]);
 
   const fetchUserInfo = async () => {
     try {
@@ -26,6 +32,7 @@ export default function Home() {
       const result = await response.json();
       if (result.user) {
         setUserName(result.user.name);
+        setUserRole(result.user.role);
       }
     } catch (error) {
       console.error("Failed to fetch user info:", error);
@@ -57,6 +64,8 @@ export default function Home() {
       console.error("Failed to fetch stats:", error);
     }
   };
+
+  const isStudent = userRole === "student";
 
   if (loading) {
     return (
@@ -99,10 +108,10 @@ export default function Home() {
         <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-display">
           안녕하세요, {userName}님
         </h1>
-        <p className="mb-spacing-800 text-body text-content-standard-secondary">티노트에 오신 것을 환영합니다</p>
+        <p className="text-body text-content-standard-secondary">티노트에 오신 것을 환영합니다</p>
 
-        {stats && (
-          <div className="grid grid-cols-3 gap-spacing-400">
+        {!isStudent && stats && (
+          <div className="mt-spacing-800 grid grid-cols-3 gap-spacing-400">
             {statItems.map((item) => (
               <Link
                 key={item.href}

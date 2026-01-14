@@ -89,24 +89,25 @@ const handleApiRoute = (request: NextRequest, pathname: string, sessionCookie: s
   return NextResponse.json({ error: "Not Found" }, { status: 404 });
 };
 
-const handlePageRoute = (pathname: string, sessionData: SessionData): NextResponse | null => {
+const handlePageRoute = (request: NextRequest, sessionData: SessionData): NextResponse | null => {
+  const { pathname } = request.nextUrl;
   const { role } = sessionData;
 
   if (role === "student") {
     if (!STUDENT_ALLOWED_PATHS.some((path) => pathname.startsWith(path))) {
-      return NextResponse.redirect(new URL("/", "http://temp.com"));
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
   if (ADMIN_PATHS.some((path) => pathname.startsWith(path))) {
     if (role === "student") {
-      return NextResponse.redirect(new URL("/", "http://temp.com"));
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
   if (OWNER_ONLY_PATHS.some((path) => pathname.startsWith(path))) {
     if (role !== "owner") {
-      return NextResponse.redirect(new URL("/", "http://temp.com"));
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
@@ -134,9 +135,9 @@ export const proxy = (request: NextRequest): NextResponse => {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  const redirectResponse = handlePageRoute(pathname, sessionData);
+  const redirectResponse = handlePageRoute(request, sessionData);
   if (redirectResponse) {
-    return NextResponse.redirect(new URL(redirectResponse.headers.get("location") || "/", request.url));
+    return redirectResponse;
   }
 
   return NextResponse.next();
