@@ -51,6 +51,7 @@ const handlePost = async ({ request, supabase, session, logger, params }: ApiCon
       title: title,
       content: content,
       workspace: session.workspace,
+      created_by: session.userId,
     })
     .select()
     .single();
