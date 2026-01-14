@@ -18,6 +18,7 @@ import ConsultationListModal from "./(components)/ConsultationListModal";
 import StudentCreateModal from "./(components)/StudentCreateModal";
 import StudentEditModal from "./(components)/StudentEditModal";
 import StudentFilterBar from "./(components)/StudentFilterBar";
+import StudentInfoModal from "./(components)/StudentInfoModal";
 import StudentList from "./(components)/StudentList";
 import { useAllConsultations } from "./(hooks)/useAllConsultations";
 import { useCourses } from "./(hooks)/useCourses";
@@ -107,6 +108,7 @@ export default function StudentsPage() {
 
       <StudentCreateModal />
       <StudentEditModal />
+      <StudentInfoModal />
       <ConsultationListModal />
       <ConsultationFormModal />
 

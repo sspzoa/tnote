@@ -5,7 +5,12 @@ import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { editFormAtom } from "../(atoms)/useFormStore";
-import { openMenuIdAtom, showConsultationModalAtom, showEditModalAtom } from "../(atoms)/useModalStore";
+import {
+  openMenuIdAtom,
+  showConsultationModalAtom,
+  showEditModalAtom,
+  showInfoModalAtom,
+} from "../(atoms)/useModalStore";
 import type { Student } from "../(atoms)/useStudentsStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useStudentDelete } from "../(hooks)/useStudentDelete";
@@ -21,6 +26,7 @@ export default function StudentList({ students }: StudentListProps) {
   const [, setSelectedStudent] = useAtom(selectedStudentAtom);
   const [, setShowEditModal] = useAtom(showEditModalAtom);
   const [, setShowConsultationModal] = useAtom(showConsultationModalAtom);
+  const [, setShowInfoModal] = useAtom(showInfoModalAtom);
   const [, setEditForm] = useAtom(editFormAtom);
   const { deleteStudent } = useStudentDelete();
   const { toggleFavorite } = useStudentFavorite();
@@ -89,6 +95,14 @@ export default function StudentList({ students }: StudentListProps) {
     [setSelectedStudent, setShowConsultationModal],
   );
 
+  const openInfoModal = useCallback(
+    (student: Student) => {
+      setSelectedStudent(student);
+      setShowInfoModal(true);
+    },
+    [setSelectedStudent, setShowInfoModal],
+  );
+
   const handleToggleFavorite = useCallback(
     async (student: Student, e: React.MouseEvent) => {
       e.stopPropagation();
@@ -106,12 +120,13 @@ export default function StudentList({ students }: StudentListProps) {
 
   const getMenuItems = useCallback(
     (student: Student): DropdownMenuItem[] => [
+      { label: "정보 보기", onClick: () => openInfoModal(student) },
       { label: "상담일지", onClick: () => openConsultationModal(student), dividerAfter: true },
       { label: "정보 수정", onClick: () => handleEditClick(student) },
       { label: "비밀번호 초기화", onClick: () => handleResetPassword(student), dividerAfter: true },
       { label: "학생 삭제", onClick: () => handleDelete(student), variant: "danger" },
     ],
-    [openConsultationModal, handleEditClick, handleResetPassword, handleDelete],
+    [openInfoModal, openConsultationModal, handleEditClick, handleResetPassword, handleDelete],
   );
 
   return (
