@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, Menu, UserCog, Users, X } from "lucide-react";
+import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, UserCog, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -218,53 +218,56 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile header with hamburger menu */}
-      <header className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-line-outline border-b bg-components-fill-standard-primary px-spacing-400 md:hidden">
-        <Link href="/" className="flex items-center gap-spacing-200">
-          <h1 className="font-bold text-content-standard-primary text-title">Tnote</h1>
-          {userInfo?.workspaceName && (
-            <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
-              {userInfo.workspaceName}
-            </span>
+      <div className="fixed inset-0 z-50 flex flex-col bg-components-fill-standard-primary md:hidden">
+        <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
+          <div className="flex items-center gap-spacing-300">
+            <h1 className="font-bold text-content-standard-primary text-heading">Tnote</h1>
+            {userInfo?.workspaceName && (
+              <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
+                {userInfo.workspaceName}
+              </span>
+            )}
+          </div>
+          {userInfo && (
+            <div className="flex items-center gap-spacing-200 text-body text-content-standard-primary">
+              <span className="text-content-standard-tertiary">
+                {userInfo.role === "owner" ? "오너" : userInfo.role === "student" ? "학생" : "관리자"}
+              </span>
+              <span className="font-medium">{userInfo.name}</span>
+            </div>
           )}
-        </Link>
-        <button
-          onClick={() => setIsOpen(true)}
-          className="flex size-10 items-center justify-center rounded-radius-300 text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
-          aria-label="메뉴 열기">
-          <Menu className="size-6" />
-        </button>
-      </header>
+        </div>
 
-      {/* Desktop sidebar (always visible on md+) */}
+        <div className="flex flex-1 flex-col items-center justify-center p-spacing-600">
+          <div className="flex flex-col items-center gap-spacing-600 text-center">
+            <p className="text-body text-content-standard-secondary">
+              모바일 환경은 지원하지 않습니다.
+              <br />
+              PC에서 이용해 주세요.
+            </p>
+
+            {userInfo && (
+              <div className="flex w-full max-w-xs flex-col gap-spacing-300">
+                <button
+                  onClick={() => setShowPasswordModal(true)}
+                  className="w-full rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  비밀번호 변경
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center justify-center gap-spacing-200 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  <LogOut className="size-4" />
+                  로그아웃
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <aside className="fixed top-0 left-0 hidden h-full w-64 flex-col border-line-outline border-r bg-components-fill-standard-primary md:flex">
         {sidebarContent}
       </aside>
-
-      {/* Mobile sidebar overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50 transition-opacity"
-            onClick={() => setIsOpen(false)}
-            onKeyDown={(e) => e.key === "Escape" && setIsOpen(false)}
-          />
-
-          {/* Sidebar panel */}
-          <aside className="absolute top-0 left-0 flex h-full w-64 flex-col bg-components-fill-standard-primary shadow-xl transition-transform">
-            {/* Close button */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-spacing-400 right-spacing-400 flex size-8 items-center justify-center rounded-radius-300 text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary"
-              aria-label="메뉴 닫기">
-              <X className="size-5" />
-            </button>
-
-            {sidebarContent}
-          </aside>
-        </div>
-      )}
 
       <PasswordChangeModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
     </>
