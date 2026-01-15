@@ -1,16 +1,99 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
+interface ScoreData {
+  score: number;
+}
+
+interface ExamWithScores {
+  id: string;
+  course_id: string;
+  exam_number: number;
+  name: string;
+  max_score: number;
+  cutline: number;
+  created_at: string;
+  course: {
+    id: string;
+    name: string;
+    workspace: string;
+  };
+  scores: ScoreData[];
+}
+
+const calculateStats = (scores: ScoreData[], cutline: number) => {
+  if (scores.length === 0) {
+    return {
+      average_score: null,
+      highest_score: null,
+      median_score: null,
+      below_cutline_count: null,
+      total_score_count: null,
+    };
+  }
+
+  const scoreValues = scores.map((s) => s.score);
+  const avg = scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length;
+  const highest = Math.max(...scoreValues);
+
+  const sorted = [...scoreValues].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+
+  const belowCutlineCount = scoreValues.filter((s) => s < cutline).length;
+
+  return {
+    average_score: Math.round(avg * 10) / 10,
+    highest_score: highest,
+    median_score: Math.round(median * 10) / 10,
+    below_cutline_count: belowCutlineCount,
+    total_score_count: scoreValues.length,
+  };
+};
+
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams.get("courseId");
+  const includeStats = searchParams.get("include") === "stats";
+
+  if (includeStats) {
+    let query = supabase
+      .from("Exams")
+      .select(
+        `
+        *,
+        course:Courses!inner(id, name, workspace),
+        scores:ExamScores(score)
+      `,
+      )
+      .eq("course.workspace", session.workspace)
+      .order("exam_number", { ascending: true });
+
+    if (courseId) {
+      query = query.eq("course_id", courseId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const examsWithStats = (data as ExamWithScores[]).map((exam) => {
+      const { scores, ...examData } = exam;
+      const stats = calculateStats(scores, exam.cutline || 4);
+      return { ...examData, ...stats };
+    });
+
+    return NextResponse.json({ data: examsWithStats });
+  }
 
   let query = supabase
     .from("Exams")
-    .select(`
+    .select(
+      `
       *,
       course:Courses!inner(id, name, workspace)
-    `)
+    `,
+    )
     .eq("course.workspace", session.workspace)
     .order("exam_number", { ascending: true });
 
@@ -51,10 +134,12 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       max_score: maxScore || 100,
       cutline: cutline || 80,
     })
-    .select(`
+    .select(
+      `
       *,
       course:Courses(id, name)
-    `)
+    `,
+    )
     .single();
 
   if (error) {

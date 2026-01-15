@@ -12,22 +12,13 @@ export const useHomeStats = (enabled: boolean) => {
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.home.stats,
     queryFn: async (): Promise<HomeStats> => {
-      const [coursesRes, studentsRes, retakesRes] = await Promise.all([
-        fetchWithAuth("/api/courses"),
-        fetchWithAuth("/api/students"),
-        fetchWithAuth("/api/retakes?status=pending"),
-      ]);
-
-      const [coursesData, studentsData, retakesData] = await Promise.all([
-        coursesRes.json(),
-        studentsRes.json(),
-        retakesRes.json(),
-      ]);
+      const res = await fetchWithAuth("/api/stats/home");
+      const result = await res.json();
 
       return {
-        courseCount: coursesData.data?.length || 0,
-        studentCount: studentsData.data?.length || 0,
-        pendingRetakeCount: retakesData.data?.length || 0,
+        courseCount: result.data?.courseCount || 0,
+        studentCount: result.data?.studentCount || 0,
+        pendingRetakeCount: result.data?.pendingRetakeCount || 0,
       };
     },
     enabled,
