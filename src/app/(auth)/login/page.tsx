@@ -223,7 +223,7 @@ export default function LoginPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
           onClick={() => setShowRegisterModal(false)}>
           <div
-            className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+            className="flex max-h-[80dvh] w-full max-w-md flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
             onClick={(e) => e.stopPropagation()}>
             <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
               <h2 className="font-bold text-content-standard-primary text-heading">선생님 회원가입</h2>
