@@ -11,47 +11,30 @@ import {
   StudentListItem,
   StudentListLoading,
 } from "@/shared/components/ui/studentList";
-
-interface Course {
-  id: string;
-  name: string;
-  student_count?: number;
-}
-
-interface Exam {
-  id: string;
-  course_id: string;
-  exam_number: number;
-  name: string;
-  max_score: number;
-  cutline: number;
-  created_at: string;
-  average_score?: number | null;
-  highest_score?: number | null;
-  median_score?: number | null;
-  below_cutline_count?: number | null;
-  total_score_count?: number | null;
-  course: {
-    id: string;
-    name: string;
-  };
-}
-
-interface Student {
-  id: string;
-  name: string;
-  phone_number: string;
-  school: string | null;
-}
+import { useCourseDetail } from "./(hooks)/useCourseDetail";
+import { useCourseStudents } from "./(hooks)/useCourseStudents";
+import { useExamAssignments, useExamAssignmentsSave } from "./(hooks)/useExamAssignments";
+import { useExamCreate } from "./(hooks)/useExamCreate";
+import { useExamDelete } from "./(hooks)/useExamDelete";
+import { useExamScores, useExamScoresSave } from "./(hooks)/useExamScores";
+import { type Exam, useExams } from "./(hooks)/useExams";
+import { useExamUpdate } from "./(hooks)/useExamUpdate";
 
 export default function CourseDetailPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.id as string;
 
-  const [course, setCourse] = useState<Course | null>(null);
-  const [exams, setExams] = useState<Exam[]>([]);
-  const [loading, setLoading] = useState(true);
+  // React Query hooks
+  const { course, isLoading: courseLoading, error: courseError } = useCourseDetail(courseId);
+  const { exams, isLoading: examsLoading } = useExams(courseId);
+  const { createExam, isPending: isCreating } = useExamCreate(courseId);
+  const { updateExam, isPending: isUpdating } = useExamUpdate(courseId);
+  const { deleteExam } = useExamDelete(courseId);
+  const { saveScores, isPending: isSavingScores } = useExamScoresSave(courseId);
+  const { saveAssignments, isPending: isSavingAssignments } = useExamAssignmentsSave();
+
+  // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
@@ -59,108 +42,66 @@ export default function CourseDetailPage() {
   const [examName, setExamName] = useState("");
   const [maxScore, setMaxScore] = useState("8");
   const [cutline, setCutline] = useState("4");
-  const [saving, setSaving] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-  // 점수 입력 모달 상태
+  // Score modal states
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [scoreExam, setScoreExam] = useState<Exam | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
   const [existingScoreStudentIds, setExistingScoreStudentIds] = useState<string[]>([]);
   const [scoreInputs, setScoreInputs] = useState<Record<string, string>>({});
-  const [loadingScores, setLoadingScores] = useState(false);
-  const [savingScores, setSavingScores] = useState(false);
   const [scoreSearchQuery, setScoreSearchQuery] = useState("");
 
-  // 과제 관리 모달 상태
+  // Assignment modal states
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [assignmentExam, setAssignmentExam] = useState<Exam | null>(null);
-  const [assignmentStudents, setAssignmentStudents] = useState<Student[]>([]);
   const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
-  const [loadingAssignments, setLoadingAssignments] = useState(false);
-  const [savingAssignments, setSavingAssignments] = useState(false);
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourse();
-      fetchExams();
-    }
-  }, [courseId]);
+  // Conditional hooks for modal data
+  const { students: scoreStudents, isLoading: loadingScoreStudents } = useCourseStudents(courseId, showScoreModal);
+  const { scores: existingScores, isLoading: loadingExistingScores } = useExamScores(
+    scoreExam?.id ?? "",
+    showScoreModal && !!scoreExam,
+  );
+  const { students: assignmentStudents, isLoading: loadingAssignmentStudents } = useCourseStudents(
+    courseId,
+    showAssignmentModal,
+  );
+  const { assignments: existingAssignments, isLoading: loadingExistingAssignments } = useExamAssignments(
+    assignmentExam?.id ?? "",
+    showAssignmentModal && !!assignmentExam,
+  );
 
-  const fetchCourse = async () => {
-    try {
-      const response = await fetch(`/api/courses/${courseId}`);
-      const result = await response.json();
-      if (response.ok) {
-        setCourse(result.data);
-      } else {
-        alert("수업을 찾을 수 없습니다.");
-        router.push("/courses");
+  // Initialize score inputs when existing scores are loaded
+  useEffect(() => {
+    if (existingScores.length > 0 && showScoreModal) {
+      setExistingScoreStudentIds(existingScores.map((s) => s.student_id));
+      const initialScores: Record<string, string> = {};
+      for (const score of existingScores) {
+        initialScores[score.student_id] = score.score.toString();
       }
-    } catch {
-      alert("수업 정보를 불러오는데 실패했습니다.");
+      setScoreInputs(initialScores);
+    }
+  }, [existingScores, showScoreModal]);
+
+  // Initialize assignment inputs when existing assignments are loaded
+  useEffect(() => {
+    if (existingAssignments.length > 0 && showAssignmentModal) {
+      const initialInputs: Record<string, string> = {};
+      for (const assignment of existingAssignments) {
+        initialInputs[assignment.student.id] = assignment.status;
+      }
+      setAssignmentInputs(initialInputs);
+    }
+  }, [existingAssignments, showAssignmentModal]);
+
+  // Redirect on course error
+  useEffect(() => {
+    if (courseError) {
+      alert("수업을 찾을 수 없습니다.");
       router.push("/courses");
     }
-  };
-
-  const fetchExams = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/exams?courseId=${courseId}`);
-      const result = await response.json();
-      const examsData = result.data || [];
-
-      // 각 시험의 통계 가져오기
-      const examsWithStats = await Promise.all(
-        examsData.map(async (exam: Exam) => {
-          try {
-            const scoresRes = await fetch(`/api/exams/${exam.id}/scores`);
-            const scoresResult = await scoresRes.json();
-            if (scoresRes.ok && scoresResult.data?.scores?.length > 0) {
-              const scores = scoresResult.data.scores.map((s: { score: number }) => s.score);
-              const avg = scores.reduce((a: number, b: number) => a + b, 0) / scores.length;
-              const highest = Math.max(...scores);
-
-              // 중앙값 계산
-              const sorted = [...scores].sort((a: number, b: number) => a - b);
-              const mid = Math.floor(sorted.length / 2);
-              const median = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-
-              // 재시험자 수 (커트라인 미달)
-              const cutline = exam.cutline || 4;
-              const belowCutlineCount = scores.filter((s: number) => s < cutline).length;
-
-              return {
-                ...exam,
-                average_score: Math.round(avg * 10) / 10,
-                highest_score: highest,
-                median_score: Math.round(median * 10) / 10,
-                below_cutline_count: belowCutlineCount,
-                total_score_count: scores.length,
-              };
-            }
-          } catch {
-            // 점수 불러오기 실패 시 무시
-          }
-          return {
-            ...exam,
-            average_score: null,
-            highest_score: null,
-            median_score: null,
-            below_cutline_count: null,
-            total_score_count: null,
-          };
-        }),
-      );
-
-      setExams(examsWithStats);
-    } catch {
-      // 에러 무시
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [courseError, router]);
 
   const handleCreate = async () => {
     if (!examNumber || !examName.trim() || !maxScore || !cutline) {
@@ -168,36 +109,22 @@ export default function CourseDetailPage() {
       return;
     }
 
-    setSaving(true);
     try {
-      const response = await fetch("/api/exams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          courseId,
-          examNumber: Number.parseInt(examNumber),
-          name: examName,
-          maxScore: Number.parseInt(maxScore),
-          cutline: Number.parseInt(cutline),
-        }),
+      await createExam({
+        courseId,
+        examNumber: Number.parseInt(examNumber),
+        name: examName,
+        maxScore: Number.parseInt(maxScore),
+        cutline: Number.parseInt(cutline),
       });
-
-      if (response.ok) {
-        alert("시험이 생성되었습니다.");
-        setShowCreateModal(false);
-        setExamNumber("");
-        setExamName("");
-        setMaxScore("8");
-        setCutline("4");
-        fetchExams();
-      } else {
-        const result = await response.json();
-        alert(result.error || "시험 생성에 실패했습니다.");
-      }
-    } catch {
-      alert("오류가 발생했습니다.");
-    } finally {
-      setSaving(false);
+      alert("시험이 생성되었습니다.");
+      setShowCreateModal(false);
+      setExamNumber("");
+      setExamName("");
+      setMaxScore("8");
+      setCutline("4");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
     }
   };
 
@@ -207,31 +134,18 @@ export default function CourseDetailPage() {
       return;
     }
 
-    setSaving(true);
     try {
-      const response = await fetch(`/api/exams/${selectedExam.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          examNumber: Number.parseInt(examNumber),
-          name: examName,
-          maxScore: Number.parseInt(maxScore),
-          cutline: Number.parseInt(cutline),
-        }),
+      await updateExam({
+        examId: selectedExam.id,
+        examNumber: Number.parseInt(examNumber),
+        name: examName,
+        maxScore: Number.parseInt(maxScore),
+        cutline: Number.parseInt(cutline),
       });
-
-      if (response.ok) {
-        alert("시험이 수정되었습니다.");
-        setShowEditModal(false);
-        fetchExams();
-      } else {
-        const result = await response.json();
-        alert(result.error || "시험 수정에 실패했습니다.");
-      }
-    } catch {
-      alert("오류가 발생했습니다.");
-    } finally {
-      setSaving(false);
+      alert("시험이 수정되었습니다.");
+      setShowEditModal(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
     }
   };
 
@@ -243,19 +157,10 @@ export default function CourseDetailPage() {
     }
 
     try {
-      const response = await fetch(`/api/exams/${exam.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        alert("시험이 삭제되었습니다.");
-        fetchExams();
-      } else {
-        const result = await response.json();
-        alert(result.error || "시험 삭제에 실패했습니다.");
-      }
-    } catch {
-      alert("오류가 발생했습니다.");
+      await deleteExam(exam.id);
+      alert("시험이 삭제되었습니다.");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
     }
   };
 
@@ -277,47 +182,17 @@ export default function CourseDetailPage() {
     setShowEditModal(true);
   };
 
-  const openScoreModal = async (exam: Exam) => {
+  const openScoreModal = (exam: Exam) => {
     setScoreExam(exam);
+    setScoreInputs({});
+    setExistingScoreStudentIds([]);
+    setScoreSearchQuery("");
     setShowScoreModal(true);
-    setLoadingScores(true);
-
-    try {
-      // 학생 목록과 기존 점수 동시에 불러오기
-      const [studentsRes, scoresRes] = await Promise.all([
-        fetch(`/api/courses/${courseId}/students`),
-        fetch(`/api/exams/${exam.id}/scores`),
-      ]);
-
-      const studentsResult = await studentsRes.json();
-      const scoresResult = await scoresRes.json();
-
-      if (studentsRes.ok) {
-        setStudents(studentsResult.data || []);
-      }
-
-      if (scoresRes.ok && scoresResult.data) {
-        const scoresData = scoresResult.data.scores || [];
-        // 기존 점수가 있는 학생 ID 저장
-        setExistingScoreStudentIds(scoresData.map((s: { student_id: string }) => s.student_id));
-        // 기존 점수로 입력값 초기화
-        const initialScores: Record<string, string> = {};
-        for (const score of scoresData) {
-          initialScores[score.student_id] = score.score.toString();
-        }
-        setScoreInputs(initialScores);
-      }
-    } catch {
-      alert("데이터를 불러오는데 실패했습니다.");
-    } finally {
-      setLoadingScores(false);
-    }
   };
 
   const closeScoreModal = () => {
     setShowScoreModal(false);
     setScoreExam(null);
-    setStudents([]);
     setExistingScoreStudentIds([]);
     setScoreInputs({});
     setScoreSearchQuery("");
@@ -333,7 +208,6 @@ export default function CourseDetailPage() {
   const handleSaveScores = async () => {
     if (!scoreExam) return;
 
-    // 점수 데이터 수집 (입력값이 있는 것만)
     const scores = Object.entries(scoreInputs)
       .filter(([, value]) => value !== "" && !Number.isNaN(Number.parseInt(value)))
       .map(([studentId, value]) => ({
@@ -341,7 +215,6 @@ export default function CourseDetailPage() {
         score: Number.parseInt(value),
       }));
 
-    // 삭제할 점수 (기존에 있었는데 이제 빈 값인 것)
     const scoreStudentIds = scores.map((s) => s.studentId);
     const toDelete = existingScoreStudentIds.filter((id) => !scoreStudentIds.includes(id));
 
@@ -350,7 +223,6 @@ export default function CourseDetailPage() {
       return;
     }
 
-    // 만점 초과 검사
     const maxScoreValue = scoreExam.max_score || 8;
     const invalidScores = scores.filter((s) => s.score > maxScoreValue);
     if (invalidScores.length > 0) {
@@ -358,39 +230,12 @@ export default function CourseDetailPage() {
       return;
     }
 
-    setSavingScores(true);
     try {
-      // 점수 삭제
-      for (const studentId of toDelete) {
-        await fetch(`/api/exams/${scoreExam.id}/scores`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ studentId }),
-        });
-      }
-
-      // 점수 저장/업데이트
-      if (scores.length > 0) {
-        const response = await fetch(`/api/exams/${scoreExam.id}/scores`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ scores }),
-        });
-
-        if (!response.ok) {
-          const result = await response.json();
-          alert(result.error || "점수 저장에 실패했습니다.");
-          return;
-        }
-      }
-
+      await saveScores({ examId: scoreExam.id, scores, toDelete });
       alert("점수가 저장되었습니다.");
       closeScoreModal();
-      fetchExams(); // 평균 점수 갱신
-    } catch {
-      alert("오류가 발생했습니다.");
-    } finally {
-      setSavingScores(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
     }
   };
 
@@ -403,42 +248,16 @@ export default function CourseDetailPage() {
     }).length;
   };
 
-  const openAssignmentModal = async (exam: Exam) => {
+  const openAssignmentModal = (exam: Exam) => {
     setAssignmentExam(exam);
-    setShowAssignmentModal(true);
-    setLoadingAssignments(true);
     setAssignmentInputs({});
-
-    try {
-      const [studentsRes, assignmentsRes] = await Promise.all([
-        fetch(`/api/courses/${courseId}/students`),
-        fetch(`/api/exams/${exam.id}/assignments`),
-      ]);
-
-      const studentsResult = await studentsRes.json();
-      if (studentsRes.ok) {
-        setAssignmentStudents(studentsResult.data || []);
-      }
-
-      const assignmentsResult = await assignmentsRes.json();
-      if (assignmentsRes.ok && assignmentsResult.data) {
-        const initialInputs: Record<string, string> = {};
-        for (const assignment of assignmentsResult.data) {
-          initialInputs[assignment.student.id] = assignment.status;
-        }
-        setAssignmentInputs(initialInputs);
-      }
-    } catch {
-      alert("데이터를 불러오는데 실패했습니다.");
-    } finally {
-      setLoadingAssignments(false);
-    }
+    setAssignmentSearchQuery("");
+    setShowAssignmentModal(true);
   };
 
   const closeAssignmentModal = () => {
     setShowAssignmentModal(false);
     setAssignmentExam(null);
-    setAssignmentStudents([]);
     setAssignmentInputs({});
     setAssignmentSearchQuery("");
   };
@@ -467,25 +286,12 @@ export default function CourseDetailPage() {
         status,
       }));
 
-    setSavingAssignments(true);
     try {
-      const response = await fetch(`/api/exams/${assignmentExam.id}/assignments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assignments }),
-      });
-
-      if (response.ok) {
-        alert("과제 상태가 저장되었습니다.");
-        closeAssignmentModal();
-      } else {
-        const result = await response.json();
-        alert(result.error || "과제 상태 저장에 실패했습니다.");
-      }
-    } catch {
-      alert("오류가 발생했습니다.");
-    } finally {
-      setSavingAssignments(false);
+      await saveAssignments({ examId: assignmentExam.id, assignments });
+      alert("과제 상태가 저장되었습니다.");
+      closeAssignmentModal();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
     }
   };
 
@@ -499,7 +305,11 @@ export default function CourseDetailPage() {
     return counts;
   };
 
-  if (loading || !course) {
+  // Loading states
+  const loadingScores = loadingScoreStudents || loadingExistingScores;
+  const loadingAssignments = loadingAssignmentStudents || loadingExistingAssignments;
+
+  if (courseLoading || examsLoading || !course) {
     return <LoadingComponent />;
   }
 
@@ -757,9 +567,9 @@ export default function CourseDetailPage() {
                 </button>
                 <button
                   onClick={handleCreate}
-                  disabled={saving || !examNumber || !examName.trim() || !maxScore || !cutline}
+                  disabled={isCreating || !examNumber || !examName.trim() || !maxScore || !cutline}
                   className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                  {saving ? "생성 중..." : "생성"}
+                  {isCreating ? "생성 중..." : "생성"}
                 </button>
               </div>
             </div>
@@ -842,9 +652,9 @@ export default function CourseDetailPage() {
                 </button>
                 <button
                   onClick={handleEdit}
-                  disabled={saving || !examNumber || !examName.trim() || !maxScore || !cutline}
+                  disabled={isUpdating || !examNumber || !examName.trim() || !maxScore || !cutline}
                   className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                  {saving ? "저장 중..." : "저장"}
+                  {isUpdating ? "저장 중..." : "저장"}
                 </button>
               </div>
             </div>
@@ -872,7 +682,7 @@ export default function CourseDetailPage() {
                   <StudentListContainer>
                     <StudentListLoading />
                   </StudentListContainer>
-                ) : students.length === 0 ? (
+                ) : scoreStudents.length === 0 ? (
                   <StudentListContainer>
                     <StudentListEmpty message="수강생이 없습니다." />
                   </StudentListContainer>
@@ -903,11 +713,12 @@ export default function CourseDetailPage() {
 
                     {/* 학생 목록 - 스크롤 */}
                     <StudentListContainer>
-                      {students.filter((student) => student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()))
-                        .length === 0 ? (
+                      {scoreStudents.filter((student) =>
+                        student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()),
+                      ).length === 0 ? (
                         <StudentListEmpty message="검색 결과가 없습니다." />
                       ) : (
-                        students
+                        scoreStudents
                           .filter((student) => student.name.toLowerCase().includes(scoreSearchQuery.toLowerCase()))
                           .map((student) => {
                             const scoreValue = scoreInputs[student.id] || "";
@@ -948,13 +759,13 @@ export default function CourseDetailPage() {
                 )}
               </div>
 
-              {!loadingScores && students.length > 0 && (
+              {!loadingScores && scoreStudents.length > 0 && (
                 <div className="border-line-divider border-t px-spacing-600 py-spacing-400">
                   <div className="mb-spacing-300 flex items-center justify-between text-body">
                     <span className="text-content-standard-secondary">
                       입력된 점수:{" "}
                       {Object.values(scoreInputs).filter((v) => v !== "" && !Number.isNaN(Number.parseInt(v))).length}명
-                      / {students.length}명
+                      / {scoreStudents.length}명
                     </span>
                     {getBelowCutlineCount() > 0 && (
                       <span className="text-core-status-negative">커트라인 미달: {getBelowCutlineCount()}명</span>
@@ -968,9 +779,9 @@ export default function CourseDetailPage() {
                     </button>
                     <button
                       onClick={handleSaveScores}
-                      disabled={savingScores}
+                      disabled={isSavingScores}
                       className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                      {savingScores ? "저장 중..." : "저장"}
+                      {isSavingScores ? "저장 중..." : "저장"}
                     </button>
                   </div>
                 </div>
@@ -1096,9 +907,9 @@ export default function CourseDetailPage() {
                     </button>
                     <button
                       onClick={handleSaveAssignments}
-                      disabled={savingAssignments}
+                      disabled={isSavingAssignments}
                       className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                      {savingAssignments ? "저장 중..." : "저장"}
+                      {isSavingAssignments ? "저장 중..." : "저장"}
                     </button>
                   </div>
                 </div>

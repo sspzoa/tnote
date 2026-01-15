@@ -2,64 +2,17 @@
 
 import { BookOpen, ClipboardList, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
-
-interface Stats {
-  courseCount: number;
-  studentCount: number;
-  pendingRetakeCount: number;
-}
+import { useUser } from "@/shared/hooks/useUser";
+import { useHomeStats } from "./(hooks)/useHomeStats";
 
 export default function Home() {
-  const [userName, setUserName] = useState<string>("");
-  const [userRole, setUserRole] = useState<string>("");
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isLoading: userLoading, isStudent } = useUser();
+  const { stats, isLoading: statsLoading } = useHomeStats(!isStudent && !!user);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/auth/me");
-        const result = await response.json();
+  const isLoading = userLoading || (!isStudent && statsLoading);
 
-        if (result.user) {
-          setUserName(result.user.name);
-          setUserRole(result.user.role);
-
-          if (result.user.role !== "student") {
-            const [coursesRes, studentsRes, retakesRes] = await Promise.all([
-              fetch("/api/courses"),
-              fetch("/api/students"),
-              fetch("/api/retakes?status=pending"),
-            ]);
-
-            const [coursesData, studentsData, retakesData] = await Promise.all([
-              coursesRes.json(),
-              studentsRes.json(),
-              retakesRes.json(),
-            ]);
-
-            setStats({
-              courseCount: coursesData.data?.length || 0,
-              studentCount: studentsData.data?.length || 0,
-              pendingRetakeCount: retakesData.data?.length || 0,
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const isStudent = userRole === "student";
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <LoadingComponent />
@@ -98,7 +51,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center p-spacing-600">
       <div className="w-full max-w-2xl text-center">
         <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-display">
-          안녕하세요, {userName}님
+          안녕하세요, {user?.name}님
         </h1>
         <p className="text-body text-content-standard-secondary">티노트에 오신 것을 환영합니다</p>
 

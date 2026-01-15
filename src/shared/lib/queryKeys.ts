@@ -1,4 +1,10 @@
 export const QUERY_KEYS = {
+  auth: {
+    me: ["auth", "me"] as const,
+  },
+  home: {
+    stats: ["home", "stats"] as const,
+  },
   students: {
     all: ["students"] as const,
     byCourse: (courseId: string) => ["students", "byCourse", courseId] as const,
@@ -23,7 +29,9 @@ export const QUERY_KEYS = {
   exams: {
     all: ["exams"] as const,
     byCourse: (courseId: string) => ["exams", "byCourse", courseId] as const,
+    detail: (examId: string) => ["exams", "detail", examId] as const,
     scores: (examId: string) => ["exams", "scores", examId] as const,
+    assignments: (examId: string) => ["exams", "assignments", examId] as const,
   },
   consultations: {
     all: ["consultations"] as const,

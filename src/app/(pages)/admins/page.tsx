@@ -2,11 +2,11 @@
 
 import { useSetAtom } from "jotai";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { useUser } from "@/shared/hooks/useUser";
 import { showInviteModalAtom } from "./(atoms)/useModalStore";
 import AdminInviteModal from "./(components)/AdminInviteModal";
 import AdminList from "./(components)/AdminList";
@@ -15,19 +15,14 @@ import { useAdmins } from "./(hooks)/useAdmins";
 export default function AdminsPage() {
   const { admins, isLoading, error } = useAdmins();
   const setShowInviteModal = useSetAtom(showInviteModalAtom);
-  const [isOwner, setIsOwner] = useState(false);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      setIsOwner(data.user?.role === "owner");
-    };
-    fetchUserRole();
-  }, []);
+  const { isOwner, isLoading: userLoading } = useUser();
 
   if (error) {
     return <ErrorComponent errorMessage="관리자 목록을 불러오는데 실패했습니다." />;
+  }
+
+  if (userLoading) {
+    return <LoadingComponent />;
   }
 
   return (
