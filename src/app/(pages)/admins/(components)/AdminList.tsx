@@ -3,6 +3,7 @@ import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
+import { useAdminResetPassword } from "../(hooks)/useAdminResetPassword";
 
 interface AdminListProps {
   admins: Admin[];
@@ -12,6 +13,7 @@ interface AdminListProps {
 export default function AdminList({ admins, isOwner }: AdminListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const { deleteAdmin } = useAdminDelete();
+  const { resetPassword } = useAdminResetPassword();
 
   const handleDelete = async (admin: Admin) => {
     if (admin.role === "owner") {
@@ -27,12 +29,25 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
       await deleteAdmin(admin.id);
       alert("관리자가 삭제되었습니다.");
     } catch (error) {
-      console.error("Delete error:", error);
       alert(error instanceof Error ? error.message : "관리자 삭제에 실패했습니다.");
     }
   };
 
+  const handleResetPassword = async (admin: Admin) => {
+    if (!confirm(`${admin.name} 관리자의 비밀번호를 전화번호로 초기화하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      await resetPassword(admin.id);
+      alert("비밀번호가 전화번호로 초기화되었습니다.");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "비밀번호 초기화에 실패했습니다.");
+    }
+  };
+
   const getMenuItems = (admin: Admin): DropdownMenuItem[] => [
+    { label: "비밀번호 초기화", onClick: () => handleResetPassword(admin) },
     { label: "삭제", onClick: () => handleDelete(admin), variant: "danger" },
   ];
 
