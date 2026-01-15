@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormSelect } from "@/shared/components/ui/formSelect";
+import { Modal } from "@/shared/components/ui/modal";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 interface Workspace {
@@ -218,88 +219,73 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {showRegisterModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-          onClick={() => setShowRegisterModal(false)}>
-          <div
-            className="flex max-h-[80dvh] w-full max-w-md flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-            onClick={(e) => e.stopPropagation()}>
-            <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-              <h2 className="font-bold text-content-standard-primary text-heading">선생님 회원가입</h2>
-              <p className="mt-spacing-100 text-content-standard-secondary text-label">
-                계정과 함께 새로운 워크스페이스가 만들어집니다.
-              </p>
-            </div>
+      <Modal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        title="선생님 회원가입"
+        subtitle="계정과 함께 새로운 워크스페이스가 만들어집니다."
+        footer={
+          <>
+            <Button type="button" variant="secondary" onClick={() => setShowRegisterModal(false)} className="flex-1">
+              취소
+            </Button>
+            <Button
+              type="submit"
+              form="register-form"
+              disabled={registering}
+              isLoading={registering}
+              loadingText="가입 중..."
+              className="flex-1">
+              회원가입
+            </Button>
+          </>
+        }>
+        <form id="register-form" onSubmit={handleRegister} className="space-y-spacing-400">
+          <FormInput
+            label="이름"
+            required
+            type="text"
+            value={registerForm.name}
+            onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+          />
 
-            <form onSubmit={handleRegister} className="flex-1 overflow-y-auto p-spacing-600">
-              <div className="space-y-spacing-400">
-                <FormInput
-                  label="이름"
-                  required
-                  type="text"
-                  value={registerForm.name}
-                  onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                />
+          <FormInput
+            label="워크스페이스 이름"
+            required
+            type="text"
+            value={registerForm.workspaceName}
+            onChange={(e) => setRegisterForm({ ...registerForm, workspaceName: e.target.value })}
+            placeholder="ex. 러셀부천 김희창T"
+          />
 
-                <FormInput
-                  label="워크스페이스 이름"
-                  required
-                  type="text"
-                  value={registerForm.workspaceName}
-                  onChange={(e) => setRegisterForm({ ...registerForm, workspaceName: e.target.value })}
-                  placeholder="ex. 러셀부천 김희창T"
-                />
+          <FormInput
+            label="전화번호"
+            required
+            type="tel"
+            value={registerForm.phoneNumber}
+            onChange={(e) => setRegisterForm({ ...registerForm, phoneNumber: e.target.value })}
+            placeholder="01012345678"
+          />
 
-                <FormInput
-                  label="전화번호"
-                  required
-                  type="tel"
-                  value={registerForm.phoneNumber}
-                  onChange={(e) => setRegisterForm({ ...registerForm, phoneNumber: e.target.value })}
-                  placeholder="01012345678"
-                />
+          <FormInput
+            label="비밀번호"
+            required
+            type="password"
+            value={registerForm.password}
+            onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+            placeholder="8자 이상"
+          />
 
-                <FormInput
-                  label="비밀번호"
-                  required
-                  type="password"
-                  value={registerForm.password}
-                  onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                  placeholder="8자 이상"
-                />
-
-                <FormInput
-                  label="비밀번호 확인"
-                  required
-                  type="password"
-                  value={registerForm.confirmPassword}
-                  onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
-                  placeholder="비밀번호를 다시 입력하세요"
-                />
-              </div>
-
-              <div className="mt-spacing-600 flex gap-spacing-300">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setShowRegisterModal(false)}
-                  className="flex-1">
-                  취소
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={registering}
-                  isLoading={registering}
-                  loadingText="가입 중..."
-                  className="flex-1">
-                  회원가입
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+          <FormInput
+            label="비밀번호 확인"
+            required
+            type="password"
+            value={registerForm.confirmPassword}
+            onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+            placeholder="비밀번호를 다시 입력하세요"
+          />
+        </form>
+      </Modal>
     </div>
   );
 }
