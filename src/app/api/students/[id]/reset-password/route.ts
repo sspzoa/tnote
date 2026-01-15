@@ -31,4 +31,8 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
   });
 };
 
-export const POST = withLogging(handlePost, { resource: "student-password", action: "update" });
+export const POST = withLogging(handlePost, {
+  resource: "student-password",
+  action: "update",
+  allowedRoles: ["owner", "admin"],
+});

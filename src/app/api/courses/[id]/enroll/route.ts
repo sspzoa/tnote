@@ -75,5 +75,13 @@ const handleDelete = async ({ request, supabase, session, params }: ApiContext) 
   return NextResponse.json({ success: true });
 };
 
-export const POST = withLogging(handlePost, { resource: "course-enrollment", action: "create" });
-export const DELETE = withLogging(handleDelete, { resource: "course-enrollment", action: "delete" });
+export const POST = withLogging(handlePost, {
+  resource: "course-enrollment",
+  action: "create",
+  allowedRoles: ["owner", "admin"],
+});
+export const DELETE = withLogging(handleDelete, {
+  resource: "course-enrollment",
+  action: "delete",
+  allowedRoles: ["owner", "admin"],
+});

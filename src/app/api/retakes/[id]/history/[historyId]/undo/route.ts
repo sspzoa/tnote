@@ -9,11 +9,10 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "필수 정보가 누락되었습니다." }, { status: 400 });
   }
 
-  // 재시험 권한 확인
   const { data: retake, error: retakeError } = await supabase
     .from("RetakeAssignments")
     .select(`
-      *,
+      id, status, postpone_count, absent_count,
       exam:Exams!inner(course:Courses!inner(workspace)),
       student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
     `)
@@ -26,10 +25,9 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
   }
 
-  // 가장 최근 이력 조회
   const { data: latestHistory, error: latestHistoryError } = await supabase
     .from("RetakeHistory")
-    .select("*")
+    .select("id, action_type, previous_date, previous_status, previous_management_status")
     .eq("retake_assignment_id", retakeId)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -116,4 +114,8 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
   return NextResponse.json({ success: true });
 };
 
-export const POST = withLogging(handlePost, { resource: "retake-undo", action: "update" });
+export const POST = withLogging(handlePost, {
+  resource: "retake-undo",
+  action: "update",
+  allowedRoles: ["owner", "admin"],
+});

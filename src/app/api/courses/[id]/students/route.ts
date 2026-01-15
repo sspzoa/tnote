@@ -29,4 +29,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   return NextResponse.json({ data: students });
 };
 
-export const GET = withLogging(handleGet, { resource: "course-students", action: "read" });
+export const GET = withLogging(handleGet, {
+  resource: "course-students",
+  action: "read",
+  allowedRoles: ["owner", "admin"],
+});

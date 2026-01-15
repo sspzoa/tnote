@@ -59,5 +59,5 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   return NextResponse.json({ success: true, data: newAdmin });
 };
 
-export const GET = withLogging(handleGet, { resource: "admins", action: "read" });
-export const POST = withLogging(handlePost, { resource: "admins", action: "create" });
+export const GET = withLogging(handleGet, { resource: "admins", action: "read", allowedRoles: ["owner", "admin"] });
+export const POST = withLogging(handlePost, { resource: "admins", action: "create", allowedRoles: ["owner"] });

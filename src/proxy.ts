@@ -1,3 +1,4 @@
+import * as jose from "jose";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -25,68 +26,53 @@ const PUBLIC_APIS: PublicApi[] = [
   { path: "/api/workspaces", methods: ["GET"] },
 ];
 
-const AUTHENTICATED_APIS = ["/api/auth/me", "/api/auth/logout", "/api/auth/change-password"];
-const ADMIN_ONLY_APIS = [
-  "/api/students",
-  "/api/courses",
-  "/api/exams",
-  "/api/clinics",
-  "/api/consultations",
-  "/api/stats",
-];
-const OWNER_ONLY_APIS: string[] = [];
 const STUDENT_ALLOWED_PATHS = ["/", "/my-retakes", "/calendar"];
 const ADMIN_PATHS = ["/students", "/courses", "/exams", "/retakes", "/admins", "/clinics"];
-const OWNER_ONLY_PATHS: string[] = [];
-
-const MUTATING_METHODS = ["POST", "PATCH", "DELETE"];
 
 const ACCESS_TOKEN_COOKIE = "access_token";
 const REFRESH_TOKEN_COOKIE = "refresh_token";
 
-/**
- * JWT 토큰을 디코딩합니다 (검증 없이 페이로드만 추출)
- * 실제 검증은 서버사이드에서 수행됩니다
- */
-const decodeToken = (token: string): TokenPayload | null => {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
+const getJwtSecret = (): Uint8Array => {
+  const secret = process.env.JWT_ACCESS_SECRET || process.env.SUPABASE_JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT secret not configured");
+  }
+  return new TextEncoder().encode(secret);
+};
 
-    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf-8"));
-    return payload as TokenPayload;
+const getRefreshSecret = (): Uint8Array => {
+  const secret = process.env.JWT_REFRESH_SECRET || process.env.SUPABASE_JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT refresh secret not configured");
+  }
+  return new TextEncoder().encode(secret);
+};
+
+const verifyToken = async (token: string, secret: Uint8Array): Promise<TokenPayload | null> => {
+  try {
+    const { payload } = await jose.jwtVerify(token, secret);
+    return payload as unknown as TokenPayload;
   } catch {
     return null;
   }
 };
 
-/**
- * 토큰이 만료되었는지 확인합니다
- */
-const isTokenExpired = (payload: TokenPayload): boolean => {
-  const now = Math.floor(Date.now() / 1000);
-  return payload.exp < now;
-};
-
-/**
- * 세션 데이터를 가져옵니다 (access_token 또는 refresh_token에서)
- */
-const getSessionFromTokens = (request: NextRequest): { payload: TokenPayload | null; needsRefresh: boolean } => {
+const getSessionFromTokens = async (
+  request: NextRequest,
+): Promise<{ payload: TokenPayload | null; needsRefresh: boolean }> => {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
-  // Access token 확인
   if (accessToken) {
-    const payload = decodeToken(accessToken);
-    if (payload && !isTokenExpired(payload)) {
+    const payload = await verifyToken(accessToken, getJwtSecret());
+    if (payload) {
       return { payload, needsRefresh: false };
     }
   }
 
-  // Refresh token 확인 (access token이 없거나 만료된 경우)
   if (refreshToken) {
-    const payload = decodeToken(refreshToken);
-    if (payload && !isTokenExpired(payload)) {
+    const payload = await verifyToken(refreshToken, getRefreshSecret());
+    if (payload) {
       return { payload, needsRefresh: true };
     }
   }
@@ -99,9 +85,7 @@ const isPublicApi = (pathname: string, method: string): boolean => {
 };
 
 const handleApiRoute = (request: NextRequest, pathname: string, payload: TokenPayload | null): NextResponse => {
-  const method = request.method;
-
-  if (isPublicApi(pathname, method)) {
+  if (isPublicApi(pathname, request.method)) {
     return NextResponse.next();
   }
 
@@ -109,41 +93,7 @@ const handleApiRoute = (request: NextRequest, pathname: string, payload: TokenPa
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { role } = payload;
-
-  if (AUTHENTICATED_APIS.some((path) => pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
-
-  if (pathname.startsWith("/api/admins")) {
-    if (method === "GET") {
-      return role === "student" ? NextResponse.json({ error: "Forbidden" }, { status: 403 }) : NextResponse.next();
-    }
-    return role === "owner" ? NextResponse.next() : NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  if (OWNER_ONLY_APIS.some((path) => pathname.startsWith(path))) {
-    return role === "owner" ? NextResponse.next() : NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  if (ADMIN_ONLY_APIS.some((path) => pathname.startsWith(path))) {
-    return role === "student" ? NextResponse.json({ error: "Forbidden" }, { status: 403 }) : NextResponse.next();
-  }
-
-  if (pathname.startsWith("/api/calendar")) {
-    return NextResponse.next();
-  }
-
-  if (pathname.startsWith("/api/retakes")) {
-    if (method === "GET") {
-      return NextResponse.next();
-    }
-    if (MUTATING_METHODS.includes(method)) {
-      return role === "student" ? NextResponse.json({ error: "Forbidden" }, { status: 403 }) : NextResponse.next();
-    }
-  }
-
-  return NextResponse.json({ error: "Not Found" }, { status: 404 });
+  return NextResponse.next();
 };
 
 const handlePageRoute = (request: NextRequest, payload: TokenPayload): NextResponse | null => {
@@ -151,7 +101,8 @@ const handlePageRoute = (request: NextRequest, payload: TokenPayload): NextRespo
   const { role } = payload;
 
   if (role === "student") {
-    if (!STUDENT_ALLOWED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+    const isAllowedPath = STUDENT_ALLOWED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+    if (!isAllowedPath) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
@@ -162,18 +113,12 @@ const handlePageRoute = (request: NextRequest, payload: TokenPayload): NextRespo
     }
   }
 
-  if (OWNER_ONLY_PATHS.some((path) => pathname.startsWith(path))) {
-    if (role !== "owner") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
-
   return null;
 };
 
-export const proxy = (request: NextRequest): NextResponse => {
+export const proxy = async (request: NextRequest): Promise<NextResponse> => {
   const { pathname } = request.nextUrl;
-  const { payload, needsRefresh } = getSessionFromTokens(request);
+  const { payload, needsRefresh } = await getSessionFromTokens(request);
 
   // 로그인 페이지 처리
   if (pathname === "/login") {

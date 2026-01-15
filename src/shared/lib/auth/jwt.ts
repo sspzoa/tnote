@@ -1,8 +1,14 @@
 import jwt from "jsonwebtoken";
 
-// JWT 시크릿 키: 기존 SUPABASE_JWT_SECRET을 사용하거나 별도로 설정
-const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || process.env.SUPABASE_JWT_SECRET || "access-secret-key";
-const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || process.env.SUPABASE_JWT_SECRET || "refresh-secret-key";
+// JWT 시크릿 키: 환경변수 필수
+const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET || process.env.SUPABASE_JWT_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || process.env.SUPABASE_JWT_SECRET;
+
+if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
+  throw new Error(
+    "JWT_ACCESS_SECRET and JWT_REFRESH_SECRET (or SUPABASE_JWT_SECRET) must be set in environment variables",
+  );
+}
 
 const ACCESS_TOKEN_EXPIRY = "15m";
 const REFRESH_TOKEN_EXPIRY = "7d";

@@ -113,6 +113,14 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   return NextResponse.json({ success: true });
 };
 
-export const GET = withLogging(handleGet, { resource: "students", action: "read" });
-export const PATCH = withLogging(handlePatch, { resource: "students", action: "update" });
-export const DELETE = withLogging(handleDelete, { resource: "students", action: "delete" });
+export const GET = withLogging(handleGet, { resource: "students", action: "read", allowedRoles: ["owner", "admin"] });
+export const PATCH = withLogging(handlePatch, {
+  resource: "students",
+  action: "update",
+  allowedRoles: ["owner", "admin"],
+});
+export const DELETE = withLogging(handleDelete, {
+  resource: "students",
+  action: "delete",
+  allowedRoles: ["owner", "admin"],
+});

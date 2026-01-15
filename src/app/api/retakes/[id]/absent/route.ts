@@ -45,4 +45,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   return NextResponse.json({ success: true, data: updated });
 };
 
-export const PATCH = withLogging(handlePatch, { resource: "retake-absent", action: "update" });
+export const PATCH = withLogging(handlePatch, {
+  resource: "retake-absent",
+  action: "update",
+  allowedRoles: ["owner", "admin"],
+});

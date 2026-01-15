@@ -24,7 +24,10 @@ export async function POST(request: Request) {
 
     const supabase = await createAdminClient();
 
-    let query = supabase.from("Users").select("*").eq("phone_number", phoneNumber);
+    let query = supabase
+      .from("Users")
+      .select("id, phone_number, name, password, role, workspace, school")
+      .eq("phone_number", phoneNumber);
 
     if (!isTeacher) {
       query = query.eq("workspace", workspaceId).eq("role", "student");

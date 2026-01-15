@@ -92,5 +92,9 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   return NextResponse.json({ data });
 };
 
-export const POST = withLogging(handlePost, { resource: "retakes", action: "create" });
+export const POST = withLogging(handlePost, {
+  resource: "retakes",
+  action: "create",
+  allowedRoles: ["owner", "admin"],
+});
 export const GET = withLogging(handleGet, { resource: "retakes", action: "read" });

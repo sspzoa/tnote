@@ -29,4 +29,4 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
   });
 };
 
-export const GET = withLogging(handleGet, { resource: "home-stats", action: "read" });
+export const GET = withLogging(handleGet, { resource: "home-stats", action: "read", allowedRoles: ["owner", "admin"] });

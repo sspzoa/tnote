@@ -22,7 +22,9 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("RetakeHistory")
-    .select("*")
+    .select(
+      "id, retake_assignment_id, action_type, previous_date, new_date, previous_status, new_status, previous_management_status, new_management_status, note, created_at",
+    )
     .eq("retake_assignment_id", id)
     .order("created_at", { ascending: false });
 
@@ -30,4 +32,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   return NextResponse.json({ data });
 };
 
-export const GET = withLogging(handleGet, { resource: "retake-history", action: "read" });
+export const GET = withLogging(handleGet, {
+  resource: "retake-history",
+  action: "read",
+  allowedRoles: ["owner", "admin"],
+});

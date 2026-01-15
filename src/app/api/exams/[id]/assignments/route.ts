@@ -99,5 +99,13 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   return NextResponse.json({ success: true, removed: toDelete.length, total: assignments.length });
 };
 
-export const GET = withLogging(handleGet, { resource: "exam-assignments", action: "read" });
-export const POST = withLogging(handlePost, { resource: "exam-assignments", action: "create" });
+export const GET = withLogging(handleGet, {
+  resource: "exam-assignments",
+  action: "read",
+  allowedRoles: ["owner", "admin"],
+});
+export const POST = withLogging(handlePost, {
+  resource: "exam-assignments",
+  action: "create",
+  allowedRoles: ["owner", "admin"],
+});

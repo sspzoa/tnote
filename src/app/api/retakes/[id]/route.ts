@@ -46,4 +46,8 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
 };
 
 export const GET = withLogging(handleGet, { resource: "retakes", action: "read" });
-export const DELETE = withLogging(handleDelete, { resource: "retakes", action: "delete" });
+export const DELETE = withLogging(handleDelete, {
+  resource: "retakes",
+  action: "delete",
+  allowedRoles: ["owner", "admin"],
+});

@@ -4,7 +4,7 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
     .from("Clinics")
-    .select("*")
+    .select("id, name, operating_days, start_date, end_date, created_at")
     .eq("workspace", session.workspace)
     .order("created_at", { ascending: false });
 
@@ -52,5 +52,9 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   return NextResponse.json({ success: true, data });
 };
 
-export const GET = withLogging(handleGet, { resource: "clinics", action: "read" });
-export const POST = withLogging(handlePost, { resource: "clinics", action: "create" });
+export const GET = withLogging(handleGet, { resource: "clinics", action: "read", allowedRoles: ["owner", "admin"] });
+export const POST = withLogging(handlePost, {
+  resource: "clinics",
+  action: "create",
+  allowedRoles: ["owner", "admin"],
+});
