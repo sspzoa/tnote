@@ -229,12 +229,15 @@ export default function LoginPage() {
             </button>
 
             {tab === "teacher" && (
-              <button
-                type="button"
-                onClick={() => setShowRegisterModal(true)}
-                className="w-full rounded-radius-400 bg-transparent py-spacing-500 font-bold text-body text-core-accent transition-all hover:bg-components-interactive-hover">
-                회원가입
-              </button>
+              <div className="text-center text-body text-content-standard-secondary">
+                계정이 없으신가요?{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterModal(true)}
+                  className="font-medium text-core-accent hover:underline">
+                  회원가입
+                </button>
+              </div>
             )}
           </form>
         </div>
