@@ -2,6 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { FormInput } from "@/shared/components/ui/formInput";
+import { FormSelect } from "@/shared/components/ui/formSelect";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 interface Workspace {
@@ -125,6 +128,11 @@ export default function LoginPage() {
     }
   };
 
+  const workspaceOptions = [
+    { value: "", label: "워크스페이스를 선택하세요" },
+    ...workspaces.map((w) => ({ value: w.id, label: w.name })),
+  ];
+
   return (
     <div className="flex h-dvh items-center justify-center p-spacing-400 md:p-spacing-600">
       <div className="w-full max-w-md">
@@ -133,7 +141,6 @@ export default function LoginPage() {
           <p className="mt-spacing-200 text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
         </div>
         <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          {/* 탭 */}
           <div className="mb-spacing-600 flex gap-spacing-300">
             <button
               onClick={() => {
@@ -160,73 +167,41 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-spacing-600">
+          <form onSubmit={handleLogin} className="space-y-spacing-500">
             {tab === "student" && (
-              <div>
-                <label
-                  htmlFor="workspace"
-                  className="mb-spacing-300 block font-semibold text-body text-content-standard-primary">
-                  워크스페이스
-                </label>
-                <select
-                  id="workspace"
-                  value={workspaceId}
-                  onChange={(e) => setWorkspaceId(e.target.value)}
-                  required
-                  className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:opacity-50"
-                  disabled={loading}>
-                  <option value="">워크스페이스를 선택하세요</option>
-                  {workspaces.map((workspace) => (
-                    <option key={workspace.id} value={workspace.id}>
-                      {workspace.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <FormSelect
+                label="워크스페이스"
+                required
+                value={workspaceId}
+                onChange={(e) => setWorkspaceId(e.target.value)}
+                options={workspaceOptions}
+                disabled={loading}
+              />
             )}
 
-            <div>
-              <label
-                htmlFor="phoneNumber"
-                className="mb-spacing-300 block font-semibold text-body text-content-standard-primary">
-                전화번호
-              </label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="01012345678"
-                required
-                className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:opacity-50"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-spacing-300 block font-semibold text-body text-content-standard-primary">
-                비밀번호
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                required
-                className="w-full rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 text-body text-content-standard-primary placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:opacity-50"
-                disabled={loading}
-              />
-            </div>
-
-            <button
-              type="submit"
+            <FormInput
+              label="전화번호"
+              required
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="01012345678"
               disabled={loading}
-              className="w-full rounded-radius-400 bg-core-accent py-spacing-500 font-bold text-body text-solid-white transition-all hover:opacity-90 disabled:opacity-50">
-              {loading ? "로그인 중..." : "로그인"}
-            </button>
+            />
+
+            <FormInput
+              label="비밀번호"
+              required
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호를 입력하세요"
+              disabled={loading}
+            />
+
+            <Button type="submit" disabled={loading} isLoading={loading} loadingText="로그인 중..." className="w-full">
+              로그인
+            </Button>
 
             {tab === "teacher" && (
               <div className="text-center text-body text-content-standard-secondary">
@@ -243,7 +218,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* 회원가입 모달 */}
       {showRegisterModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
@@ -260,85 +234,67 @@ export default function LoginPage() {
 
             <form onSubmit={handleRegister} className="flex-1 overflow-y-auto p-spacing-600">
               <div className="space-y-spacing-400">
-                <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                    이름 *
-                  </label>
-                  <input
-                    type="text"
-                    value={registerForm.name}
-                    onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                    required
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body focus:border-core-accent focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                    워크스페이스 이름 *
-                  </label>
-                  <input
-                    type="text"
-                    value={registerForm.workspaceName}
-                    onChange={(e) => setRegisterForm({ ...registerForm, workspaceName: e.target.value })}
-                    required
-                    placeholder="ex. 러셀부천 김희창T"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body focus:border-core-accent focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                    전화번호 *
-                  </label>
-                  <input
-                    type="tel"
-                    value={registerForm.phoneNumber}
-                    onChange={(e) => setRegisterForm({ ...registerForm, phoneNumber: e.target.value })}
-                    required
-                    placeholder="01012345678"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body focus:border-core-accent focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                    비밀번호 *
-                  </label>
-                  <input
-                    type="password"
-                    value={registerForm.password}
-                    onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                    required
-                    placeholder="최소 8자 이상"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body focus:border-core-accent focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-                    비밀번호 확인 *
-                  </label>
-                  <input
-                    type="password"
-                    value={registerForm.confirmPassword}
-                    onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
-                    required
-                    placeholder="비밀번호를 다시 입력하세요"
-                    className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body focus:border-core-accent focus:outline-none"
-                  />
-                </div>
+                <FormInput
+                  label="이름"
+                  required
+                  type="text"
+                  value={registerForm.name}
+                  onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                />
+
+                <FormInput
+                  label="워크스페이스 이름"
+                  required
+                  type="text"
+                  value={registerForm.workspaceName}
+                  onChange={(e) => setRegisterForm({ ...registerForm, workspaceName: e.target.value })}
+                  placeholder="ex. 러셀부천 김희창T"
+                />
+
+                <FormInput
+                  label="전화번호"
+                  required
+                  type="tel"
+                  value={registerForm.phoneNumber}
+                  onChange={(e) => setRegisterForm({ ...registerForm, phoneNumber: e.target.value })}
+                  placeholder="01012345678"
+                />
+
+                <FormInput
+                  label="비밀번호"
+                  required
+                  type="password"
+                  value={registerForm.password}
+                  onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                  placeholder="8자 이상"
+                />
+
+                <FormInput
+                  label="비밀번호 확인"
+                  required
+                  type="password"
+                  value={registerForm.confirmPassword}
+                  onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                  placeholder="비밀번호를 다시 입력하세요"
+                />
               </div>
 
               <div className="mt-spacing-600 flex gap-spacing-300">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => setShowRegisterModal(false)}
-                  className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body">
+                  className="flex-1">
                   취소
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={registering}
-                  className="flex-1 rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white disabled:opacity-50">
-                  {registering ? "가입 중..." : "회원가입"}
-                </button>
+                  isLoading={registering}
+                  loadingText="가입 중..."
+                  className="flex-1">
+                  회원가입
+                </Button>
               </div>
             </form>
           </div>
