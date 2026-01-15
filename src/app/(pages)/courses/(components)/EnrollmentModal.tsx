@@ -47,7 +47,6 @@ export default function EnrollmentModal() {
     try {
       await enrollStudent({ courseId: selectedCourse.id, studentId });
     } catch (error) {
-      console.error("Enroll error:", error);
       alert(error instanceof Error ? error.message : "학생 등록에 실패했습니다.");
     } finally {
       setLoadingStudentId(null);
@@ -58,8 +57,7 @@ export default function EnrollmentModal() {
     setLoadingStudentId(studentId);
     try {
       await unenrollStudent({ courseId: selectedCourse.id, studentId });
-    } catch (error) {
-      console.error("Unenroll error:", error);
+    } catch {
       alert("학생 제거에 실패했습니다.");
     } finally {
       setLoadingStudentId(null);

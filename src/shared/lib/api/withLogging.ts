@@ -96,8 +96,6 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
       await logger.log("error", 500, err, resourceId);
       await logger.flush();
 
-      console.error(`[${resource}] Error: ${err.message}`, err.stack);
-
       return createErrorResponse(err, 500, `${resource} 처리 중 오류가 발생했습니다.`);
     }
   };
@@ -138,8 +136,6 @@ export const withPublicLogging = (
 
       await logger.log("error", 500, err);
       await logger.flush();
-
-      console.error(`[${resource}] Error: ${err.message}`, err.stack);
 
       return NextResponse.json({ error: `${resource} 처리 중 오류가 발생했습니다.` }, { status: 500 });
     }

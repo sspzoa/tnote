@@ -103,8 +103,8 @@ export default function Sidebar() {
           workspaceName: result.user.workspaceName || "",
         });
       }
-    } catch (error) {
-      console.error("Failed to fetch user info:", error);
+    } catch {
+      // noop
     }
   };
 
@@ -119,8 +119,7 @@ export default function Sidebar() {
       } else {
         alert("로그아웃에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
       alert("로그아웃에 실패했습니다.");
     }
   };

@@ -91,7 +91,6 @@ export default function ConsultationFormModal() {
       setForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
       setIsNewStudentConsultation(false);
     } catch (error) {
-      console.error("Add consultation error:", error);
       alert(error instanceof Error ? error.message : "상담일지 추가에 실패했습니다.");
     }
   };
@@ -113,7 +112,6 @@ export default function ConsultationFormModal() {
       alert("상담일지가 수정되었습니다.");
       setShowEditModal(false);
     } catch (error) {
-      console.error("Edit consultation error:", error);
       alert(error instanceof Error ? error.message : "상담일지 수정에 실패했습니다.");
     }
   };
@@ -132,8 +130,7 @@ export default function ConsultationFormModal() {
       });
       alert("상담일지가 삭제되었습니다.");
       setShowEditModal(false);
-    } catch (error) {
-      console.error("Delete consultation error:", error);
+    } catch {
       alert("상담일지 삭제에 실패했습니다.");
     }
   };

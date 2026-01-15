@@ -43,8 +43,7 @@ export default function CourseList({ courses }: CourseListProps) {
     try {
       await deleteCourse(course.id);
       alert("수업이 삭제되었습니다.");
-    } catch (error) {
-      console.error("Delete error:", error);
+    } catch {
       alert("수업 삭제에 실패했습니다.");
     }
   };

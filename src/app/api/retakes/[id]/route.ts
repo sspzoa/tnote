@@ -4,7 +4,7 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("RetakeAssignments")
     .select(`
       *,
@@ -13,8 +13,13 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     `)
     .eq("id", id)
     .eq("exam.course.workspace", session.workspace)
-    .eq("student.workspace", session.workspace)
-    .single();
+    .eq("student.workspace", session.workspace);
+
+  if (session.role === "student") {
+    query = query.eq("student_id", session.userId);
+  }
+
+  const { data, error } = await query.single();
 
   if (error) throw error;
   return NextResponse.json({ data });

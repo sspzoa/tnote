@@ -42,8 +42,8 @@ export default function LoginPage() {
       const response = await fetch("/api/workspaces");
       const result = await response.json();
       setWorkspaces(result.data || []);
-    } catch (error) {
-      console.error("Failed to fetch workspaces:", error);
+    } catch {
+      // noop
     }
   };
 
@@ -74,9 +74,8 @@ export default function LoginPage() {
 
       router.push("/");
       router.refresh();
-    } catch (err) {
+    } catch {
       alert("로그인에 실패했습니다.");
-      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -121,9 +120,8 @@ export default function LoginPage() {
       alert(data.message || "회원가입이 완료되었습니다.");
       setShowRegisterModal(false);
       setRegisterForm({ name: "", phoneNumber: "", password: "", confirmPassword: "", workspaceName: "" });
-    } catch (err) {
+    } catch {
       alert("회원가입에 실패했습니다.");
-      console.error("Registration error:", err);
     } finally {
       setRegistering(false);
     }

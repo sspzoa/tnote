@@ -23,7 +23,6 @@ export default function StudentCreateModal() {
       setShowModal(false);
       setForm({ name: "", phoneNumber: "", parentPhoneNumber: "", school: "", birthYear: "" });
     } catch (error) {
-      console.error("Create error:", error);
       alert(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
     }
   };

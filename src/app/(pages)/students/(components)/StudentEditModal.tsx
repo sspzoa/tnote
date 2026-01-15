@@ -26,8 +26,7 @@ export default function StudentEditModal() {
       });
       alert("학생 정보가 수정되었습니다.");
       setShowModal(false);
-    } catch (error) {
-      console.error("Save error:", error);
+    } catch {
       alert("정보 수정에 실패했습니다.");
     }
   };

@@ -59,6 +59,8 @@ const formatConsoleLog = (entry: LogEntry): string => {
 };
 
 const consoleLog = (entry: LogEntry) => {
+  if (process.env.NODE_ENV !== "development") return;
+
   const message = formatConsoleLog(entry);
 
   if (entry.level === "error") {
