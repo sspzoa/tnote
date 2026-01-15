@@ -21,7 +21,7 @@ export default function AdminInviteModal() {
     }
 
     if (form.password.length < 8) {
-      setError("비밀번호는 최소 8자 이상이어야 합니다.");
+      setError("비밀번호는 8자 이상이어야 합니다.");
       return;
     }
 

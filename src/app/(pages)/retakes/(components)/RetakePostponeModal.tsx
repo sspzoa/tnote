@@ -31,7 +31,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
 
   const handlePostpone = async () => {
     if (!selectedRetake || !postponeDate) {
-      alert("새로운 날짜를 입력해주세요.");
+      alert("새로운 날짜를 입력해 주세요.");
       return;
     }
 

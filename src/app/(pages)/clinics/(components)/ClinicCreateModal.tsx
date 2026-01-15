@@ -27,17 +27,17 @@ export default function ClinicCreateModal() {
 
   const handleCreate = async () => {
     if (!clinicName.trim()) {
-      alert("클리닉 이름을 입력해주세요.");
+      alert("클리닉 이름을 입력해 주세요.");
       return;
     }
 
     if (operatingDays.length === 0) {
-      alert("운영 요일을 선택해주세요.");
+      alert("운영 요일을 선택해 주세요.");
       return;
     }
 
     if (!startDate || !endDate) {
-      alert("시작 날짜와 종료 날짜를 입력해주세요.");
+      alert("시작 날짜와 종료 날짜를 입력해 주세요.");
       return;
     }
 

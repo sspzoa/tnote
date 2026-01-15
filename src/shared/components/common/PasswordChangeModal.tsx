@@ -51,7 +51,7 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
         alert(result.error || "비밀번호 변경에 실패했습니다.");
       }
     } catch {
-      alert("오류가 발생했습니다.");
+      alert("비밀번호 변경에 실패했습니다.");
     } finally {
       setPasswordChanging(false);
     }

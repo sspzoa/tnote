@@ -105,7 +105,7 @@ export default function CourseDetailPage() {
 
   const handleCreate = async () => {
     if (!examNumber || !examName.trim() || !maxScore || !cutline) {
-      alert("모든 정보를 입력해주세요.");
+      alert("모든 정보를 입력해 주세요.");
       return;
     }
 
@@ -124,13 +124,13 @@ export default function CourseDetailPage() {
       setMaxScore("8");
       setCutline("4");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
+      alert(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
     }
   };
 
   const handleEdit = async () => {
     if (!selectedExam || !examNumber || !examName.trim() || !maxScore || !cutline) {
-      alert("모든 정보를 입력해주세요.");
+      alert("모든 정보를 입력해 주세요.");
       return;
     }
 
@@ -145,7 +145,7 @@ export default function CourseDetailPage() {
       alert("시험이 수정되었습니다.");
       setShowEditModal(false);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
+      alert(error instanceof Error ? error.message : "시험 수정에 실패했습니다.");
     }
   };
 
@@ -160,7 +160,7 @@ export default function CourseDetailPage() {
       await deleteExam(exam.id);
       alert("시험이 삭제되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
+      alert(error instanceof Error ? error.message : "시험 삭제에 실패했습니다.");
     }
   };
 
@@ -235,7 +235,7 @@ export default function CourseDetailPage() {
       alert("점수가 저장되었습니다.");
       closeScoreModal();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
+      alert(error instanceof Error ? error.message : "점수 저장에 실패했습니다.");
     }
   };
 
@@ -291,7 +291,7 @@ export default function CourseDetailPage() {
       alert("과제 상태가 저장되었습니다.");
       closeAssignmentModal();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "오류가 발생했습니다.");
+      alert(error instanceof Error ? error.message : "과제 상태 저장에 실패했습니다.");
     }
   };
 

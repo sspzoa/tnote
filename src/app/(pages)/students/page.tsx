@@ -2,13 +2,13 @@
 
 import { useAtom, useAtomValue } from "jotai";
 import { MessageSquare, X } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
+import { EmptyState } from "@/shared/components/ui/emptyState";
 import { Modal } from "@/shared/components/ui/modal";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
@@ -46,18 +46,16 @@ export default function StudentsPage() {
 
   return (
     <Container>
-      <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-        ← 홈으로 돌아가기
-      </Link>
-
       <Header
         title="학생 관리"
         subtitle={`전체 학생 ${students.length}명`}
+        backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
           <div className="flex items-center gap-spacing-300">
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setShowConsultationPanel(true)}
-              className="flex items-center gap-spacing-200 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+              className="flex items-center gap-spacing-200">
               <MessageSquare className="size-4" />
               최근 상담
               {consultations.length > 0 && (
@@ -65,12 +63,8 @@ export default function StudentsPage() {
                   {consultations.length}
                 </span>
               )}
-            </button>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-              + 학생 추가
-            </button>
+            </Button>
+            <Button onClick={() => setShowCreateModal(true)}>+ 학생 추가</Button>
           </div>
         }
       />
@@ -80,16 +74,15 @@ export default function StudentsPage() {
       {isLoading ? (
         <LoadingComponent />
       ) : filteredStudents.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">
-            {students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
-          </p>
-        </div>
+        <EmptyState
+          message={students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
+          actionLabel={students.length === 0 ? "학생 추가" : undefined}
+          onAction={students.length === 0 ? () => setShowCreateModal(true) : undefined}
+        />
       ) : (
         <StudentList students={filteredStudents} />
       )}
 
-      {/* 상담 상세 모달 */}
       <Modal
         isOpen={!!selectedConsultation}
         onClose={() => setSelectedConsultation(null)}
@@ -112,18 +105,14 @@ export default function StudentsPage() {
       <ConsultationListModal />
       <ConsultationFormModal />
 
-      {/* 최근 상담 사이드 패널 */}
       {showConsultationPanel && (
         <>
-          {/* 오버레이 */}
           <div
             className="fixed inset-0 z-40 bg-solid-black/30 transition-opacity"
             onClick={() => setShowConsultationPanel(false)}
           />
 
-          {/* 사이드 패널 */}
           <div className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-line-outline border-l bg-components-fill-standard-primary shadow-xl">
-            {/* 헤더 */}
             <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
               <div>
                 <h2 className="font-bold text-content-standard-primary text-heading">최근 상담 내역</h2>
@@ -136,7 +125,6 @@ export default function StudentsPage() {
               </button>
             </div>
 
-            {/* 상담 목록 */}
             <div className="flex-1 overflow-y-auto">
               {consultationsLoading ? (
                 <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, Menu, UserCog, Users, X } from "lucide-react";
 import Link from "next/link";
@@ -65,6 +66,7 @@ const ownerMenuItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isOpen, setIsOpen] = useAtom(sidebarOpenAtom);
@@ -112,13 +114,14 @@ export default function Sidebar() {
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });
       if (response.ok) {
+        queryClient.clear();
         router.push("/login");
       } else {
         alert("로그아웃에 실패했습니다.");
       }
     } catch (error) {
       console.error("Logout error:", error);
-      alert("오류가 발생했습니다.");
+      alert("로그아웃에 실패했습니다.");
     }
   };
 

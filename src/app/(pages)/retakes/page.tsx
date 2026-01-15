@@ -1,11 +1,14 @@
 "use client";
 
 import { useAtom } from "jotai";
-import Link from "next/link";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { Button } from "@/shared/components/ui/button";
+import { EmptyState } from "@/shared/components/ui/emptyState";
+import { FilterButton } from "@/shared/components/ui/filterButton";
+import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { SearchInput } from "@/shared/components/ui/searchInput";
 import { editDateAtom, postponeDateAtom, postponeNoteAtom } from "./(atoms)/useFormStore";
 import {
@@ -123,7 +126,7 @@ export default function RetakesPage() {
       await deleteRetake(retake.id);
       alert("재시험이 삭제되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "삭제에 실패했습니다.");
+      alert(error instanceof Error ? error.message : "재시험 삭제에 실패했습니다.");
     }
   };
 
@@ -186,7 +189,11 @@ export default function RetakesPage() {
   if (error) {
     return (
       <Container>
-        <Header title="재시험 관리" subtitle="학생들의 재시험을 관리합니다" />
+        <Header
+          title="재시험 관리"
+          subtitle="학생들의 재시험을 관리합니다"
+          backLink={{ href: "/", label: "홈으로 돌아가기" }}
+        />
         <ErrorComponent errorMessage={error.message} />
       </Container>
     );
@@ -194,87 +201,57 @@ export default function RetakesPage() {
 
   return (
     <Container>
-      <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-        ← 홈으로 돌아가기
-      </Link>
-
       <Header
         title="재시험 관리"
         subtitle="학생들의 재시험을 관리합니다"
-        action={
-          <button
-            onClick={handleAssignClick}
-            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            + 재시험 할당
-          </button>
-        }
+        backLink={{ href: "/", label: "홈으로 돌아가기" }}
+        action={<Button onClick={handleAssignClick}>+ 재시험 할당</Button>}
       />
 
-      {/* 필터 드롭다운 */}
       <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
-        {/* 완료된 재시험 보기 토글 */}
-        <button
-          onClick={() => setShowCompleted(!showCompleted)}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
-            showCompleted
-              ? "bg-solid-translucent-green text-solid-green"
-              : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
-          }`}>
+        <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
           {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
-        </button>
+        </FilterButton>
 
-        {/* 상태 필터 */}
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as typeof filter)}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+        <FilterSelect value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
           <option value="all">전체 상태</option>
           <option value="pending">대기중</option>
           <option value="completed">완료</option>
           <option value="absent">결석</option>
-        </select>
+        </FilterSelect>
 
-        {/* 반 필터 */}
-        <select
-          value={selectedCourse}
-          onChange={(e) => handleCourseChange(e.target.value)}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+        <FilterSelect value={selectedCourse} onChange={(e) => handleCourseChange(e.target.value)}>
           <option value="all">전체 반</option>
           {courses.map((course) => (
             <option key={course.id} value={course.id}>
               {course.name}
             </option>
           ))}
-        </select>
+        </FilterSelect>
 
-        {/* 시험 필터 */}
-        <select
+        <FilterSelect
           value={selectedExam}
           onChange={(e) => setSelectedExam(e.target.value)}
-          disabled={selectedCourse === "all"}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent disabled:cursor-not-allowed disabled:opacity-50">
+          disabled={selectedCourse === "all"}>
           <option value="all">전체 시험</option>
           {exams.map((exam) => (
             <option key={exam.id} value={exam.id}>
               {exam.name}
             </option>
           ))}
-        </select>
+        </FilterSelect>
 
-        {/* 관리상태 필터 */}
-        <select
+        <FilterSelect
           value={selectedManagementStatus}
-          onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+          onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
           <option value="all">전체 관리 상태</option>
           {managementStatusOptions.map((status) => (
             <option key={status} value={status}>
               {status}
             </option>
           ))}
-        </select>
+        </FilterSelect>
 
-        {/* 날짜 필터 */}
         <input
           type="date"
           value={selectedDate === "all" ? "" : selectedDate}
@@ -282,7 +259,6 @@ export default function RetakesPage() {
           className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
         />
 
-        {/* 필터 초기화 버튼 */}
         {isFilterActive && (
           <button
             onClick={handleResetFilters}
@@ -292,34 +268,22 @@ export default function RetakesPage() {
         )}
       </div>
 
-      {/* 반별 필터 버튼 */}
       {courses.length > 0 && (
         <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
-          <button
-            onClick={() => handleCourseChange("all")}
-            className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
-              selectedCourse === "all"
-                ? "bg-core-accent text-solid-white"
-                : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
-            }`}>
+          <FilterButton active={selectedCourse === "all"} onClick={() => handleCourseChange("all")}>
             전체 반
-          </button>
+          </FilterButton>
           {courses.map((course) => (
-            <button
+            <FilterButton
               key={course.id}
-              onClick={() => handleCourseChange(course.id)}
-              className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
-                selectedCourse === course.id
-                  ? "bg-core-accent text-solid-white"
-                  : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
-              }`}>
+              active={selectedCourse === course.id}
+              onClick={() => handleCourseChange(course.id)}>
               {course.name}
-            </button>
+            </FilterButton>
           ))}
         </div>
       )}
 
-      {/* 검색 */}
       <div className="mb-spacing-600">
         <SearchInput
           placeholder="학생 이름 검색..."
@@ -329,17 +293,12 @@ export default function RetakesPage() {
         />
       </div>
 
-      {/* 재시험 목록 */}
       {isLoading ? (
         <LoadingComponent />
       ) : fetchedRetakes.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">재시험이 없습니다.</p>
-        </div>
+        <EmptyState message="재시험이 없습니다." />
       ) : filteredRetakes.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">검색 결과가 없습니다.</p>
-        </div>
+        <EmptyState message="검색 결과가 없습니다." />
       ) : (
         <RetakeList
           retakes={filteredRetakes}
@@ -354,7 +313,6 @@ export default function RetakesPage() {
         />
       )}
 
-      {/* 모달들 */}
       <RetakePostponeModal onSuccess={handleActionSuccess} />
       <RetakeAbsentModal onSuccess={handleActionSuccess} />
       <RetakeCompleteModal onSuccess={handleActionSuccess} />

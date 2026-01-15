@@ -27,7 +27,7 @@ export default function CourseCreateModal() {
 
   const handleCreate = async () => {
     if (!courseName.trim()) {
-      alert("수업 이름을 입력해주세요.");
+      alert("수업 이름을 입력해 주세요.");
       return;
     }
 

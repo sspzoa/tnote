@@ -71,7 +71,7 @@ export default function LoginPage() {
       router.push("/");
       router.refresh();
     } catch (err) {
-      alert("로그인 중 오류가 발생했습니다.");
+      alert("로그인에 실패했습니다.");
       console.error("Login error:", err);
     } finally {
       setLoading(false);
@@ -87,7 +87,7 @@ export default function LoginPage() {
     }
 
     if (registerForm.password.length < 8) {
-      alert("비밀번호는 최소 8자 이상이어야 합니다.");
+      alert("비밀번호는 8자 이상이어야 합니다.");
       return;
     }
 
@@ -118,7 +118,7 @@ export default function LoginPage() {
       setShowRegisterModal(false);
       setRegisterForm({ name: "", phoneNumber: "", password: "", confirmPassword: "", workspaceName: "" });
     } catch (err) {
-      alert("회원가입 중 오류가 발생했습니다.");
+      alert("회원가입에 실패했습니다.");
       console.error("Registration error:", err);
     } finally {
       setRegistering(false);

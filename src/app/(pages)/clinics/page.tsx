@@ -1,11 +1,12 @@
 "use client";
 
 import { useSetAtom } from "jotai";
-import Link from "next/link";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { Button } from "@/shared/components/ui/button";
+import { EmptyState } from "@/shared/components/ui/emptyState";
 import { type Clinic, selectedClinicAtom } from "./(atoms)/useClinicsStore";
 import {
   clinicNameAtom,
@@ -70,33 +71,21 @@ export default function ClinicsPage() {
 
   return (
     <Container>
-      <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-        ← 홈으로 돌아가기
-      </Link>
-
       <Header
         title="클리닉 관리"
         subtitle={`전체 ${clinics.length}개 클리닉`}
-        action={
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            + 클리닉 생성
-          </button>
-        }
+        backLink={{ href: "/", label: "홈으로 돌아가기" }}
+        action={<Button onClick={() => setShowCreateModal(true)}>+ 클리닉 생성</Button>}
       />
 
       {isLoading ? (
         <LoadingComponent />
       ) : clinics.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">클리닉이 없습니다.</p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            첫 클리닉 만들기
-          </button>
-        </div>
+        <EmptyState
+          message="클리닉이 없습니다."
+          actionLabel="첫 클리닉 만들기"
+          onAction={() => setShowCreateModal(true)}
+        />
       ) : (
         <ClinicList clinics={clinics} onEdit={handleEdit} onDelete={handleDelete} onAttendance={handleAttendance} />
       )}

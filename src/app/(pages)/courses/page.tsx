@@ -1,11 +1,12 @@
 "use client";
 
 import { useSetAtom } from "jotai";
-import Link from "next/link";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { Button } from "@/shared/components/ui/button";
+import { EmptyState } from "@/shared/components/ui/emptyState";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import CourseCreateModal from "./(components)/CourseCreateModal";
 import CourseEditModal from "./(components)/CourseEditModal";
@@ -23,33 +24,17 @@ export default function CoursesPage() {
 
   return (
     <Container>
-      <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-        ← 홈으로 돌아가기
-      </Link>
-
       <Header
         title="수업 관리"
         subtitle={`전체 ${courses.length}개 수업`}
-        action={
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            + 수업 생성
-          </button>
-        }
+        backLink={{ href: "/", label: "홈으로 돌아가기" }}
+        action={<Button onClick={() => setShowCreateModal(true)}>+ 수업 생성</Button>}
       />
 
       {isLoading ? (
         <LoadingComponent />
       ) : courses.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">수업이 없습니다.</p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="mt-spacing-500 rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            첫 수업 만들기
-          </button>
-        </div>
+        <EmptyState message="수업이 없습니다." actionLabel="첫 수업 만들기" onAction={() => setShowCreateModal(true)} />
       ) : (
         <CourseList courses={courses} />
       )}

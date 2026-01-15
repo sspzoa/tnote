@@ -139,7 +139,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
 
   const handleAssign = async () => {
     if (!selectedExamId || selectedStudentIds.length === 0) {
-      alert("모든 필수 항목을 입력해주세요.");
+      alert("모든 필수 항목을 입력해 주세요.");
       return;
     }
 

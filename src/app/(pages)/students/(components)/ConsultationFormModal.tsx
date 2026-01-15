@@ -75,7 +75,7 @@ export default function ConsultationFormModal() {
 
   const handleAdd = async () => {
     if (!form.title.trim() || !form.content.trim()) {
-      alert("제목과 상담 내용을 입력해주세요.");
+      alert("제목과 상담 내용을 입력해 주세요.");
       return;
     }
 
@@ -98,7 +98,7 @@ export default function ConsultationFormModal() {
 
   const handleEdit = async () => {
     if (!selectedConsultation || !form.title.trim() || !form.content.trim()) {
-      alert("제목과 상담 내용을 입력해주세요.");
+      alert("제목과 상담 내용을 입력해 주세요.");
       return;
     }
 

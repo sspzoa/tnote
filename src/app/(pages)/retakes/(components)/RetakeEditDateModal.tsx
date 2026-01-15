@@ -28,7 +28,7 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
 
   const handleSave = async () => {
     if (!selectedRetake || !editDate) {
-      alert("새로운 날짜를 입력해주세요.");
+      alert("새로운 날짜를 입력해 주세요.");
       return;
     }
 

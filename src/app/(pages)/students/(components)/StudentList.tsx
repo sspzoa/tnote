@@ -61,7 +61,7 @@ export default function StudentList({ students }: StudentListProps) {
         await resetPassword(student.id);
         alert("비밀번호가 전화번호로 초기화되었습니다.");
       } catch {
-        alert("비밀번호 재설정에 실패했습니다.");
+        alert("비밀번호 초기화에 실패했습니다.");
       }
     },
     [resetPassword],
