@@ -126,9 +126,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-spacing-600">
+    <div className="flex h-dvh items-center justify-center p-spacing-400 md:p-spacing-600">
       <div className="w-full max-w-md">
-        <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-800">
+        <div className="mb-spacing-600 text-center">
+          <h1 className="font-bold text-content-standard-primary text-title">Tnote</h1>
+          <p className="mt-spacing-200 text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
+        </div>
+        <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
           {/* 탭 */}
           <div className="mb-spacing-600 flex gap-spacing-300">
             <button
@@ -228,7 +232,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowRegisterModal(true)}
-                className="w-full font-medium text-body text-core-accent hover:underline">
+                className="w-full rounded-radius-400 bg-transparent py-spacing-500 font-bold text-body text-core-accent transition-all hover:bg-components-interactive-hover">
                 회원가입
               </button>
             )}
@@ -242,7 +246,7 @@ export default function LoginPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
           onClick={() => setShowRegisterModal(false)}>
           <div
-            className="flex w-full max-w-md flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+            className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
             onClick={(e) => e.stopPropagation()}>
             <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
               <h2 className="font-bold text-content-standard-primary text-heading">선생님 회원가입</h2>

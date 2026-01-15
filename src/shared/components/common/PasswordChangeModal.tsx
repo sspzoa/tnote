@@ -60,8 +60,8 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-radius-500 bg-components-fill-standard-primary p-spacing-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-spacing-400">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-radius-500 bg-components-fill-standard-primary p-spacing-700">
         <h2 className="mb-spacing-600 font-bold text-content-standard-primary text-heading">비밀번호 변경</h2>
 
         <div className="space-y-spacing-500">
