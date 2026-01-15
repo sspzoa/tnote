@@ -6,9 +6,10 @@ import { useAdminDelete } from "../(hooks)/useAdminDelete";
 
 interface AdminListProps {
   admins: Admin[];
+  isOwner: boolean;
 }
 
-export default function AdminList({ admins }: AdminListProps) {
+export default function AdminList({ admins, isOwner }: AdminListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const { deleteAdmin } = useAdminDelete();
 
@@ -52,7 +53,9 @@ export default function AdminList({ admins }: AdminListProps) {
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               가입일
             </th>
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+            {isOwner && (
+              <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            )}
           </tr>
         </thead>
         <tbody>
@@ -79,18 +82,20 @@ export default function AdminList({ admins }: AdminListProps) {
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {new Date(admin.created_at).toLocaleDateString("ko-KR")}
               </td>
-              <td className="relative px-spacing-500 py-spacing-400">
-                {admin.role !== "owner" && (
-                  <>
-                    <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)} />
-                    <DropdownMenu
-                      isOpen={openMenuId === admin.id}
-                      onClose={() => setOpenMenuId(null)}
-                      items={getMenuItems(admin)}
-                    />
-                  </>
-                )}
-              </td>
+              {isOwner && (
+                <td className="relative px-spacing-500 py-spacing-400">
+                  {admin.role !== "owner" && (
+                    <>
+                      <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)} />
+                      <DropdownMenu
+                        isOpen={openMenuId === admin.id}
+                        onClose={() => setOpenMenuId(null)}
+                        items={getMenuItems(admin)}
+                      />
+                    </>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -30,7 +30,7 @@ const ADMIN_ONLY_APIS = ["/api/students", "/api/courses", "/api/exams", "/api/cl
 const OWNER_ONLY_APIS: string[] = [];
 const STUDENT_ALLOWED_PATHS = ["/", "/my-retakes", "/calendar"];
 const ADMIN_PATHS = ["/students", "/courses", "/exams", "/retakes", "/admins", "/clinics"];
-const OWNER_ONLY_PATHS = ["/admins"];
+const OWNER_ONLY_PATHS: string[] = [];
 
 const MUTATING_METHODS = ["POST", "PATCH", "DELETE"];
 
@@ -109,6 +109,9 @@ const handleApiRoute = (request: NextRequest, pathname: string, payload: TokenPa
   }
 
   if (pathname.startsWith("/api/admins")) {
+    if (method === "GET") {
+      return role === "student" ? NextResponse.json({ error: "Forbidden" }, { status: 403 }) : NextResponse.next();
+    }
     return role === "owner" ? NextResponse.next() : NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

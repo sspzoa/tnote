@@ -132,11 +132,7 @@ export default function Sidebar() {
       iconColor: "text-solid-blue",
     },
   ];
-  const allMenuItems = isAdmin
-    ? userInfo?.role === "owner"
-      ? [...menuItems, ...ownerMenuItems]
-      : menuItems
-    : studentMenuItems;
+  const allMenuItems = isAdmin ? [...menuItems, ...ownerMenuItems] : studentMenuItems;
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
