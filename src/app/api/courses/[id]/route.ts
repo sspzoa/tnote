@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
   if (!id) {
     return NextResponse.json({ error: "수업 ID가 필요합니다." }, { status: 400 });
@@ -23,12 +23,10 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     ...data,
     student_count: data.student_count?.[0]?.count || 0,
   };
-
-  await logger.info("read", "courses", `Retrieved course: ${data.name}`, { resourceId: id });
   return NextResponse.json({ data: courseData });
 };
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   if (!id) {
     return NextResponse.json({ error: "수업 ID가 필요합니다." }, { status: 400 });
@@ -79,12 +77,10 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     .single();
 
   if (error) throw error;
-
-  await logger.logUpdate("courses", id, `Course updated: ${data.name}`);
   return NextResponse.json({ success: true, data });
 };
 
-const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
   if (!id) {
     return NextResponse.json({ error: "수업 ID가 필요합니다." }, { status: 400 });
@@ -93,8 +89,6 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
   const { error } = await supabase.from("Courses").delete().eq("id", id).eq("workspace", session.workspace);
 
   if (error) throw error;
-
-  await logger.logDelete("courses", id, "Course deleted");
   return NextResponse.json({ success: true });
 };
 

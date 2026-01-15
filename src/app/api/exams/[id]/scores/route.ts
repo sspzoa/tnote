@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 // GET - 시험의 모든 점수 조회
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const examId = params?.id;
 
   // 먼저 시험이 해당 워크스페이스에 속하는지 확인
@@ -38,11 +38,6 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     .eq("exam_id", examId);
 
   if (error) throw error;
-
-  await logger.info("read", "exam-scores", `Retrieved ${scores?.length || 0} scores for exam: ${exam.name}`, {
-    resourceId: examId,
-  });
-
   return NextResponse.json({
     data: {
       exam: {
@@ -58,7 +53,7 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
 };
 
 // POST - 점수 저장/업데이트 (upsert)
-const handlePost = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
   const examId = params?.id;
   const { scores } = await request.json();
 
@@ -115,16 +110,11 @@ const handlePost = async ({ request, supabase, session, logger, params }: ApiCon
     `);
 
   if (error) throw error;
-
-  await logger.info("update", "exam-scores", `Updated ${scores.length} scores for exam: ${exam.name}`, {
-    resourceId: examId,
-  });
-
   return NextResponse.json({ success: true, data });
 };
 
 // DELETE - 특정 학생의 점수 삭제
-const handleDelete = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ request, supabase, session, params }: ApiContext) => {
   const examId = params?.id;
   const { studentId } = await request.json();
 
@@ -151,9 +141,6 @@ const handleDelete = async ({ request, supabase, session, logger, params }: ApiC
   const { error } = await supabase.from("ExamScores").delete().eq("exam_id", examId).eq("student_id", studentId);
 
   if (error) throw error;
-
-  await logger.logDelete("exam-scores", examId!, `Deleted score for student ${studentId} from exam: ${exam.name}`);
-
   return NextResponse.json({ success: true });
 };
 

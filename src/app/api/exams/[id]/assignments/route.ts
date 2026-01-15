@@ -8,7 +8,7 @@ interface ExamWithCourse {
   };
 }
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const examId = params?.id;
 
   const { data: exam } = await supabase
@@ -33,11 +33,6 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     .eq("exam_id", examId);
 
   if (error) throw error;
-
-  await logger.info("read", "exam-assignments", `Retrieved ${data.length} assignment records for exam ${examId}`, {
-    resourceId: examId,
-  });
-
   return NextResponse.json({ data });
 };
 
@@ -47,7 +42,7 @@ interface AssignmentInput {
   note?: string;
 }
 
-const handlePost = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
   const examId = params?.id;
   const { assignments } = (await request.json()) as { assignments: AssignmentInput[] };
 
@@ -101,13 +96,6 @@ const handlePost = async ({ request, supabase, session, logger, params }: ApiCon
 
     if (error) throw error;
   }
-
-  await logger.logUpdate(
-    "exam-assignments",
-    examId!,
-    `Assignment synced: ${toDelete.length} removed, ${assignments.length} total`,
-  );
-
   return NextResponse.json({ success: true, removed: toDelete.length, total: assignments.length });
 };
 

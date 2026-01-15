@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ request, supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams.get("courseId");
 
@@ -21,12 +21,10 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
   const { data, error } = await query;
 
   if (error) throw error;
-
-  await logger.info("read", "exams", `Retrieved ${data.length} exams`);
   return NextResponse.json({ data });
 };
 
-const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { courseId, examNumber, name, maxScore, cutline } = await request.json();
 
   if (!courseId || !examNumber || !name) {
@@ -65,8 +63,6 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     }
     throw error;
   }
-
-  await logger.logCreate("exams", data.id, `Exam created: ${name}`);
   return NextResponse.json({ success: true, data });
 };
 

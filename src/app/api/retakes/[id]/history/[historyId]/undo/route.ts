@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePost = async ({ supabase, session, logger, params }: ApiContext) => {
+const handlePost = async ({ supabase, session, params }: ApiContext) => {
   const retakeId = params?.id;
   const historyId = params?.historyId;
 
@@ -113,8 +113,6 @@ const handlePost = async ({ supabase, session, logger, params }: ApiContext) => 
   if (deleteError) {
     throw new Error(`이력 삭제 실패: ${deleteError.message}`);
   }
-
-  await logger.logUpdate("retake-undo", retakeId!, `Undo action: ${history.action_type}`);
   return NextResponse.json({ success: true });
 };
 

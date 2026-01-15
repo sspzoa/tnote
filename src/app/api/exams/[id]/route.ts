@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data, error } = await supabase
@@ -15,12 +15,10 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     .single();
 
   if (error) throw error;
-
-  await logger.info("read", "exams", `Retrieved exam: ${data.name}`, { resourceId: id });
   return NextResponse.json({ data });
 };
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { examNumber, name, maxScore, cutline } = await request.json();
 
@@ -58,12 +56,10 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     }
     throw error;
   }
-
-  await logger.logUpdate("exams", id!, `Exam updated: ${data.name}`);
   return NextResponse.json({ success: true, data });
 };
 
-const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data: exam } = await supabase
@@ -80,8 +76,6 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
   const { error } = await supabase.from("Exams").delete().eq("id", id).eq("course_id", exam.course_id);
 
   if (error) throw error;
-
-  await logger.logDelete("exams", id!, `Exam deleted: ${exam.name}`);
   return NextResponse.json({ success: true });
 };
 

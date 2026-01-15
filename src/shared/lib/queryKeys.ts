@@ -35,8 +35,4 @@ export const QUERY_KEYS = {
   calendar: {
     events: (startDate: string, endDate: string) => ["calendar", "events", startDate, endDate] as const,
   },
-  logs: {
-    all: ["logs"] as const,
-    stats: ["logs", "stats"] as const,
-  },
 } as const;

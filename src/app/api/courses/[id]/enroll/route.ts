@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePost = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { studentId } = await request.json();
 
@@ -47,12 +47,10 @@ const handlePost = async ({ request, supabase, session, logger, params }: ApiCon
     }
     throw error;
   }
-
-  await logger.logCreate("course-enrollment", data.id, `Student ${studentId} enrolled to course ${id}`);
   return NextResponse.json({ success: true, data });
 };
 
-const handleDelete = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { studentId } = await request.json();
 
@@ -74,8 +72,6 @@ const handleDelete = async ({ request, supabase, session, logger, params }: ApiC
   const { error } = await supabase.from("CourseEnrollments").delete().eq("course_id", id).eq("student_id", studentId);
 
   if (error) throw error;
-
-  await logger.logDelete("course-enrollment", `${id}-${studentId}`, `Student ${studentId} removed from course ${id}`);
   return NextResponse.json({ success: true });
 };
 

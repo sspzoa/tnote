@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
     .from("Courses")
     .select(`
@@ -18,12 +18,10 @@ const handleGet = async ({ supabase, session, logger }: ApiContext) => {
     student_count: (course.enrollments as Array<{ count: number }>)[0]?.count || 0,
     enrollments: undefined,
   }));
-
-  await logger.info("read", "courses", `Retrieved ${coursesWithCount.length} courses`);
   return NextResponse.json({ data: coursesWithCount });
 };
 
-const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { name, startDate, endDate, daysOfWeek } = await request.json();
 
   if (!name) {
@@ -51,8 +49,6 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     .single();
 
   if (error) throw error;
-
-  await logger.logCreate("courses", data.id, `Course created: ${name}`);
   return NextResponse.json({ success: true, data });
 };
 

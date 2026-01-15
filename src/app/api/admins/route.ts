@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
     .from("Users")
     .select("id, phone_number, name, role, created_at")
@@ -11,12 +11,10 @@ const handleGet = async ({ supabase, session, logger }: ApiContext) => {
     .order("created_at", { ascending: true });
 
   if (error) throw error;
-
-  await logger.info("read", "admins", `Retrieved ${data.length} admins`);
   return NextResponse.json({ data });
 };
 
-const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { name, phoneNumber, password } = await request.json();
 
   if (!name || !phoneNumber || !password) {
@@ -58,8 +56,6 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     }
     throw adminError;
   }
-
-  await logger.logCreate("admins", newAdmin.id, `Admin created: ${name}`);
   return NextResponse.json({ success: true, data: newAdmin });
 };
 

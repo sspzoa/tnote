@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { currentPassword, newPassword } = await request.json();
 
   if (!currentPassword || !newPassword) {
@@ -25,7 +25,6 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
 
   const isValidPassword = await bcrypt.compare(currentPassword, user.password);
   if (!isValidPassword) {
-    await logger.warn("auth", "password-change", "Password change failed: invalid current password");
     return NextResponse.json({ error: "현재 비밀번호가 일치하지 않습니다." }, { status: 400 });
   }
 
@@ -37,8 +36,6 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     .eq("id", session.userId);
 
   if (updateError) throw updateError;
-
-  await logger.logAuth("auth", "Password changed successfully", true);
   return NextResponse.json({
     success: true,
     message: "비밀번호가 변경되었습니다.",

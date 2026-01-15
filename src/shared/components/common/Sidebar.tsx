@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, Menu, ScrollText, UserCog, Users, X } from "lucide-react";
+import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, Menu, UserCog, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -59,13 +59,6 @@ const ownerMenuItems = [
     label: "관리자 관리",
     bgColor: "bg-solid-translucent-brown",
     iconColor: "text-solid-brown",
-  },
-  {
-    href: "/logs",
-    icon: ScrollText,
-    label: "시스템 로그",
-    bgColor: "bg-solid-translucent-yellow",
-    iconColor: "text-solid-yellow",
   },
 ];
 

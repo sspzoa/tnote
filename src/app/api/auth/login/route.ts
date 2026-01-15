@@ -5,16 +5,20 @@ import { createAdminClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function POST(request: Request) {
-  const logger = createLogger(request, null);
+  const logger = createLogger(request, null, "login", "auth");
 
   try {
     const { phoneNumber, password, workspaceId, isTeacher } = await request.json();
 
     if (!phoneNumber || !password) {
+      await logger.log("warn", 400);
+      await logger.flush();
       return NextResponse.json({ error: "전화번호와 비밀번호를 입력해주세요." }, { status: 400 });
     }
 
     if (!isTeacher && !workspaceId) {
+      await logger.log("warn", 400);
+      await logger.flush();
       return NextResponse.json({ error: "워크스페이스를 선택해주세요." }, { status: 400 });
     }
 
@@ -31,13 +35,15 @@ export async function POST(request: Request) {
     const { data: user, error } = await query.single();
 
     if (error || !user) {
-      await logger.logAuth("login", `Login failed: user not found (${phoneNumber})`, false);
+      await logger.log("warn", 401);
+      await logger.flush();
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      await logger.logAuth("login", `Login failed: invalid password (${phoneNumber})`, false);
+      await logger.log("warn", 401);
+      await logger.flush();
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
@@ -51,8 +57,9 @@ export async function POST(request: Request) {
 
     await setTokens(tokenPayload);
 
-    const loggerWithSession = createLogger(request, tokenPayload);
-    await loggerWithSession.logAuth("login", `User logged in: ${user.name} (${user.role})`, true);
+    const loggerWithSession = createLogger(request, tokenPayload, "login", "auth");
+    await loggerWithSession.log("info", 200, undefined, user.id);
+    await loggerWithSession.flush();
 
     return NextResponse.json({
       success: true,
@@ -66,7 +73,9 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    await logger.logError("auth", error instanceof Error ? error : new Error(String(error)), 500);
+    const err = error instanceof Error ? error : new Error(String(error));
+    await logger.log("error", 500, err);
+    await logger.flush();
     return NextResponse.json({ error: "로그인 중 오류가 발생했습니다." }, { status: 500 });
   }
 }

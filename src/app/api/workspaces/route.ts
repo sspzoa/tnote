@@ -3,7 +3,7 @@ import { createAdminClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function GET(request: Request) {
-  const logger = createLogger(request, null);
+  const logger = createLogger(request, null, "read", "workspaces");
 
   try {
     const supabase = await createAdminClient();
@@ -12,10 +12,13 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    await logger.info("read", "workspaces", `Retrieved ${data.length} workspaces`);
+    await logger.log("info", 200);
+    await logger.flush();
     return NextResponse.json({ data });
   } catch (error) {
-    await logger.logError("workspaces", error instanceof Error ? error : new Error(String(error)), 500);
+    const err = error instanceof Error ? error : new Error(String(error));
+    await logger.log("error", 500, err);
+    await logger.flush();
     return NextResponse.json({ error: "워크스페이스 목록 조회 중 오류가 발생했습니다." }, { status: 500 });
   }
 }

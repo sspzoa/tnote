@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
     .from("ConsultationLogs")
     .select(`
@@ -16,8 +16,6 @@ const handleGet = async ({ supabase, session, logger }: ApiContext) => {
   if (error) {
     throw error;
   }
-
-  await logger.info("read", "consultations", `Retrieved ${data.length} consultations`);
   return NextResponse.json({ data });
 };
 

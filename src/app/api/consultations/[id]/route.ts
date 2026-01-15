@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const consultationId = params?.id;
   if (!consultationId) {
     return NextResponse.json({ error: "상담일지 ID가 필요합니다." }, { status: 400 });
@@ -57,12 +57,10 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
   if (!data) {
     return NextResponse.json({ error: "상담일지를 찾을 수 없습니다." }, { status: 404 });
   }
-
-  await logger.logUpdate("consultations", consultationId, `Consultation updated: ${title}`);
   return NextResponse.json({ data });
 };
 
-const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const consultationId = params?.id;
   if (!consultationId) {
     return NextResponse.json({ error: "상담일지 ID가 필요합니다." }, { status: 400 });
@@ -77,8 +75,6 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
   if (error) {
     throw error;
   }
-
-  await logger.logDelete("consultations", consultationId, "Consultation deleted");
   return NextResponse.json({ success: true });
 };
 

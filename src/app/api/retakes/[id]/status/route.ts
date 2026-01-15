@@ -3,7 +3,7 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 const VALID_STATUSES = ["pending", "completed", "absent"] as const;
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { status, note } = await request.json();
 
@@ -43,8 +43,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     new_status: status,
     note: note || null,
   });
-
-  await logger.logUpdate("retake-status", id!, `Retake status changed from ${retake.status} to ${status}`);
   return NextResponse.json({ success: true });
 };
 

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import { isValidBirthYear, isValidPhoneNumber, removePhoneHyphens } from "@/shared/lib/utils/phone";
 
-const handleGet = async ({ request, supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams.get("courseId");
 
@@ -61,8 +61,6 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
       enrolled_at: enrollment.enrolled_at,
       consultation_count: countMap.get(enrollment.student_id) || 0,
     }));
-
-    await logger.info("read", "students", `Retrieved ${students.length} students for course ${courseId}`);
     return NextResponse.json({ data: students });
   }
 
@@ -94,12 +92,10 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
     ...student,
     consultation_count: countMap.get(student.id) || 0,
   }));
-
-  await logger.info("read", "students", `Retrieved ${studentsWithCount.length} students`);
   return NextResponse.json({ data: studentsWithCount });
 };
 
-const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
 
   if (!name || !phoneNumber) {
@@ -152,8 +148,6 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     }
     throw error;
   }
-
-  await logger.logCreate("students", data.id, `Student created: ${name}`);
   return NextResponse.json({ success: true, data });
 };
 

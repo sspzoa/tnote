@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   if (!id) {
     return NextResponse.json({ error: "클리닉 ID가 필요합니다." }, { status: 400 });
@@ -59,12 +59,10 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     .single();
 
   if (error) throw error;
-
-  await logger.logUpdate("clinics", id, `Clinic updated: ${data.name}`);
   return NextResponse.json({ success: true, data });
 };
 
-const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
   if (!id) {
     return NextResponse.json({ error: "클리닉 ID가 필요합니다." }, { status: 400 });
@@ -73,8 +71,6 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
   const { error } = await supabase.from("Clinics").delete().eq("id", id).eq("workspace", session.workspace);
 
   if (error) throw error;
-
-  await logger.logDelete("clinics", id, "Clinic deleted");
   return NextResponse.json({ success: true });
 };
 

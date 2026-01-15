@@ -63,7 +63,7 @@ interface AssignmentData {
   };
 }
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const studentId = params?.id;
   if (!studentId) {
     return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
@@ -214,11 +214,6 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
       },
     },
   }));
-
-  await logger.info("read", "student-detail", `Retrieved detail for student: ${student.name}`, {
-    resourceId: studentId,
-  });
-
   return NextResponse.json({
     data: {
       student: {

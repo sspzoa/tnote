@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ request, supabase, session, params }: ApiContext) => {
   const clinicId = params?.id;
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date");
@@ -38,14 +38,10 @@ const handleGet = async ({ request, supabase, session, logger, params }: ApiCont
   const { data, error } = await query;
 
   if (error) throw error;
-
-  await logger.info("read", "clinic-attendance", `Retrieved ${data.length} attendance records for clinic ${clinicId}`, {
-    resourceId: clinicId,
-  });
   return NextResponse.json({ data });
 };
 
-const handlePost = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
   const clinicId = params?.id;
   const { studentIds, date, note } = await request.json();
 
@@ -77,16 +73,10 @@ const handlePost = async ({ request, supabase, session, logger, params }: ApiCon
     .select();
 
   if (error) throw error;
-
-  await logger.logCreate(
-    "clinic-attendance",
-    clinicId!,
-    `Attendance recorded for ${studentIds.length} students on ${date}`,
-  );
   return NextResponse.json({ success: true, data });
 };
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const clinicId = params?.id;
   const { studentIds, date, note } = await request.json();
 
@@ -137,12 +127,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
 
     if (insertError) throw insertError;
   }
-
-  await logger.logUpdate(
-    "clinic-attendance",
-    clinicId!,
-    `Attendance synced for ${date}: ${toAdd.length} added, ${toDelete.length} removed`,
-  );
   return NextResponse.json({
     success: true,
     deleted: toDelete.length,
@@ -150,7 +134,7 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
   });
 };
 
-const handleDelete = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ request, supabase, session, params }: ApiContext) => {
   const clinicId = params?.id;
   const { searchParams } = new URL(request.url);
   const attendanceId = searchParams.get("attendanceId");
@@ -173,8 +157,6 @@ const handleDelete = async ({ request, supabase, session, logger, params }: ApiC
   const { error } = await supabase.from("ClinicAttendance").delete().eq("id", attendanceId).eq("clinic_id", clinicId);
 
   if (error) throw error;
-
-  await logger.logDelete("clinic-attendance", attendanceId, `Attendance record deleted from clinic ${clinicId}`);
   return NextResponse.json({ success: true });
 };
 

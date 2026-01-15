@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { is_favorite } = await request.json();
 
@@ -30,8 +30,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
   if (updateError) {
     throw updateError;
   }
-
-  await logger.logUpdate("student-favorite", id!, `Student favorite updated to ${is_favorite}`);
   return NextResponse.json({ success: true });
 };
 

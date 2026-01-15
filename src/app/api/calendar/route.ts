@@ -147,7 +147,7 @@ const generateCourseSessions = (course: {
   return events;
 };
 
-const handleGet = async ({ request, supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
   const startDate = searchParams.get("start");
   const endDate = searchParams.get("end");
@@ -357,8 +357,6 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
   if (startDate && endDate) {
     filteredEvents = events.filter((e) => e.date >= startDate && e.date <= endDate);
   }
-
-  await logger.info("read", "calendar", `Retrieved ${filteredEvents.length} calendar events`);
   return NextResponse.json({ data: filteredEvents });
 };
 

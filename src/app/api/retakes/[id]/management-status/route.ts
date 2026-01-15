@@ -13,7 +13,7 @@ const VALID_MANAGEMENT_STATUSES = [
   "실장 집중 상담 완료",
 ] as const;
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { management_status } = await request.json();
 
@@ -47,12 +47,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
     previous_management_status: retake.management_status,
     new_management_status: management_status,
   });
-
-  await logger.logUpdate(
-    "retake-management-status",
-    id!,
-    `Management status changed from ${retake.management_status} to ${management_status}`,
-  );
   return NextResponse.json({ success: true });
 };
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
   if (!id) {
     return NextResponse.json({ error: "관리자 ID가 필요합니다." }, { status: 400 });
@@ -29,8 +29,6 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
   const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
   if (deleteError) throw deleteError;
-
-  await logger.logDelete("admins", id, `Admin deleted: ${targetUser.name}`);
   return NextResponse.json({ success: true });
 };
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { newDate, note } = await request.json();
 
@@ -51,8 +51,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
   });
 
   if (historyError) throw historyError;
-
-  await logger.logUpdate("retake-postpone", id!, `Retake postponed to ${newDate}`);
   return NextResponse.json({ success: true, data: updated });
 };
 

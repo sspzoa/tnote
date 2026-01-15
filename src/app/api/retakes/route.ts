@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePost = async ({ request, supabase, session, logger }: ApiContext) => {
+const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { examId, studentIds, scheduledDate } = await request.json();
 
   if (!examId || !studentIds || !Array.isArray(studentIds)) {
@@ -51,12 +51,10 @@ const handlePost = async ({ request, supabase, session, logger }: ApiContext) =>
     }
     throw error;
   }
-
-  await logger.logCreate("retakes", examId, `Retake assignments created for ${studentIds.length} students`);
   return NextResponse.json({ success: true, data });
 };
 
-const handleGet = async ({ request, supabase, session, logger }: ApiContext) => {
+const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
   const courseId = searchParams.get("courseId");
   let studentId = searchParams.get("studentId");
@@ -91,8 +89,6 @@ const handleGet = async ({ request, supabase, session, logger }: ApiContext) => 
   if (error) {
     throw error;
   }
-
-  await logger.info("read", "retakes", `Retrieved ${data.length} retake assignments`);
   return NextResponse.json({ data });
 };
 

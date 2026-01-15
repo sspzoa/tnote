@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data, error } = await supabase
@@ -17,12 +17,10 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     .single();
 
   if (error) throw error;
-
-  await logger.info("read", "retakes", `Retrieved retake assignment`, { resourceId: id });
   return NextResponse.json({ data });
 };
 
-const handleDelete = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data: retake } = await supabase
@@ -44,8 +42,6 @@ const handleDelete = async ({ supabase, session, logger, params }: ApiContext) =
   const { error } = await supabase.from("RetakeAssignments").delete().eq("id", id);
 
   if (error) throw error;
-
-  await logger.logDelete("retakes", id!, "Retake assignment deleted");
   return NextResponse.json({ success: true });
 };
 

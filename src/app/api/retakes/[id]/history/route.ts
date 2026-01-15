@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data: retake } = await supabase
@@ -27,10 +27,6 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-
-  await logger.info("read", "retake-history", `Retrieved ${data.length} history entries for retake ${id}`, {
-    resourceId: id,
-  });
   return NextResponse.json({ data });
 };
 

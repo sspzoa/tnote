@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data: course } = await supabase
@@ -26,10 +26,6 @@ const handleGet = async ({ supabase, session, logger, params }: ApiContext) => {
   if (error) throw error;
 
   const students = data.map((enrollment) => enrollment.student);
-
-  await logger.info("read", "course-students", `Retrieved ${students.length} students for course ${id}`, {
-    resourceId: id,
-  });
   return NextResponse.json({ data: students });
 };
 

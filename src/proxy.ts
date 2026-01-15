@@ -27,10 +27,10 @@ const PUBLIC_APIS: PublicApi[] = [
 
 const AUTHENTICATED_APIS = ["/api/auth/me", "/api/auth/logout", "/api/auth/change-password"];
 const ADMIN_ONLY_APIS = ["/api/students", "/api/courses", "/api/exams", "/api/clinics", "/api/consultations"];
-const OWNER_ONLY_APIS = ["/api/logs"];
+const OWNER_ONLY_APIS: string[] = [];
 const STUDENT_ALLOWED_PATHS = ["/", "/my-retakes", "/calendar"];
 const ADMIN_PATHS = ["/students", "/courses", "/exams", "/retakes", "/admins", "/clinics"];
-const OWNER_ONLY_PATHS = ["/admins", "/logs"];
+const OWNER_ONLY_PATHS = ["/admins"];
 
 const MUTATING_METHODS = ["POST", "PATCH", "DELETE"];
 

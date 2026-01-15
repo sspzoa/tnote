@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const handlePatch = async ({ request, supabase, session, logger, params }: ApiContext) => {
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { newDate } = await request.json();
 
@@ -57,8 +57,6 @@ const handlePatch = async ({ request, supabase, session, logger, params }: ApiCo
   if (historyError) {
     throw new Error(`이력 저장 실패: ${historyError.message}`);
   }
-
-  await logger.logUpdate("retake-edit-date", id!, `Retake date changed from ${previousDate} to ${newDate}`);
   return NextResponse.json({ success: true, data: updated });
 };
 

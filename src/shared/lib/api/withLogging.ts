@@ -1,20 +1,18 @@
 import { NextResponse } from "next/server";
 import { getSession, type Session } from "@/shared/lib/supabase/auth";
 import { createClient } from "@/shared/lib/supabase/server";
-import { type ApiLogger, createLogger, type LogAction } from "@/shared/lib/utils/logger";
+import { createLogger, type LogAction } from "@/shared/lib/utils/logger";
 
 export interface ApiContext {
   request: Request;
   session: Session;
   supabase: Awaited<ReturnType<typeof createClient>>;
-  logger: ApiLogger;
   params?: Record<string, string>;
 }
 
 export interface PublicApiContext {
   request: Request;
   session: Session | null;
-  logger: ApiLogger;
 }
 
 type ApiHandler<T extends ApiContext | PublicApiContext> = (context: T) => Promise<NextResponse>;
@@ -40,63 +38,46 @@ const createErrorResponse = (error: Error | string, statusCode: number, defaultM
   return NextResponse.json({ error: defaultMessage }, { status: statusCode });
 };
 
+const getResourceIdFromParams = (params?: Record<string, string>): string | undefined => {
+  if (!params) return undefined;
+  return params.id || params.historyId || Object.values(params)[0];
+};
+
 export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggingOptions) => {
   return async (request: Request, context?: { params?: Promise<Record<string, string>> }) => {
-    const startTime = Date.now();
     const session = await getSession();
-    const logger = createLogger(request, session);
     const { resource, action = "read", requireAuth = true, allowedRoles } = options;
+    const logger = createLogger(request, session, action, resource);
+    const resolvedParams = context?.params ? await context.params : undefined;
 
     try {
-      // 인증 확인
       if (requireAuth && !session) {
-        await logger.logAuth("auth", "Unauthorized access attempt", false);
+        await logger.log("warn", 401);
+        await logger.flush();
         return createErrorResponse("Unauthorized", 401, "로그인이 필요합니다.");
       }
 
-      // 역할 확인
       if (session && allowedRoles && !allowedRoles.includes(session.role)) {
-        await logger.logAuth("auth", `Forbidden: role ${session.role} not allowed`, false);
+        await logger.log("warn", 403);
+        await logger.flush();
         return createErrorResponse("Forbidden", 403, "접근 권한이 없습니다.");
       }
 
       const supabase = await createClient();
-      const resolvedParams = context?.params ? await context.params : undefined;
 
-      // 요청 로그
-      await logger.info(action, resource, `${request.method} ${resource} request started`);
-
-      // 핸들러 실행
       const response = await handler({
         request,
         session: session!,
         supabase,
-        logger,
         params: resolvedParams,
       });
 
-      // 응답 로그
-      const duration = Date.now() - startTime;
       const status = response.status;
       const level = status >= 500 ? "error" : status >= 400 ? "warn" : "info";
+      const resourceId = getResourceIdFromParams(resolvedParams);
 
-      if (level === "error") {
-        await logger.error(action, resource, `Request failed with status ${status}`, {
-          statusCode: status,
-          duration,
-        });
-      } else if (level === "warn") {
-        await logger.warn(action, resource, `Request completed with warning status ${status}`, {
-          statusCode: status,
-          duration,
-        });
-      } else {
-        await logger.info(action, resource, `Request completed successfully`, {
-          statusCode: status,
-          duration,
-        });
-      }
-
+      await logger.log(level, status, undefined, resourceId);
+      await logger.flush();
       return response;
     } catch (error: unknown) {
       let err: Error;
@@ -110,7 +91,10 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
         err = new Error(String(error));
       }
 
-      await logger.logError(resource, err, 500);
+      const resourceId = getResourceIdFromParams(resolvedParams);
+
+      await logger.log("error", 500, err, resourceId);
+      await logger.flush();
 
       console.error(`[${resource}] Error: ${err.message}`, err.stack);
 
@@ -124,35 +108,21 @@ export const withPublicLogging = (
   options: Omit<WithLoggingOptions, "requireAuth">,
 ) => {
   return async (request: Request) => {
-    const startTime = Date.now();
     const session = await getSession();
-    const logger = createLogger(request, session);
     const { resource, action = "read" } = options;
+    const logger = createLogger(request, session, action, resource);
 
     try {
-      await logger.info(action, resource, `${request.method} ${resource} request started`);
-
       const response = await handler({
         request,
         session,
-        logger,
       });
 
-      const duration = Date.now() - startTime;
       const status = response.status;
+      const level = status >= 500 ? "error" : status >= 400 ? "warn" : "info";
 
-      if (status >= 400) {
-        await logger.warn(action, resource, `Request completed with status ${status}`, {
-          statusCode: status,
-          duration,
-        });
-      } else {
-        await logger.info(action, resource, `Request completed successfully`, {
-          statusCode: status,
-          duration,
-        });
-      }
-
+      await logger.log(level, status);
+      await logger.flush();
       return response;
     } catch (error: unknown) {
       let err: Error;
@@ -166,7 +136,8 @@ export const withPublicLogging = (
         err = new Error(String(error));
       }
 
-      await logger.logError(resource, err, 500);
+      await logger.log("error", 500, err);
+      await logger.flush();
 
       console.error(`[${resource}] Error: ${err.message}`, err.stack);
 
