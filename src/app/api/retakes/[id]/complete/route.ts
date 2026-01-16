@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { getTodayKST } from "@/shared/lib/utils/date";
 
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
@@ -21,9 +22,12 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
   }
 
+  const today = getTodayKST();
+  const previousDate = current.current_scheduled_date;
+
   const { data: updated, error: updateError } = await supabase
     .from("RetakeAssignments")
-    .update({ status: "completed" })
+    .update({ status: "completed", current_scheduled_date: today })
     .eq("id", id)
     .select()
     .single();
@@ -33,8 +37,10 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   const { error: historyError } = await supabase.from("RetakeHistory").insert({
     retake_assignment_id: id,
     action_type: "complete",
-    previous_date: current.current_scheduled_date,
+    previous_date: previousDate,
+    new_date: today,
     note: note || null,
+    performed_by: session.userId,
   });
 
   if (historyError) throw historyError;

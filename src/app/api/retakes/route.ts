@@ -51,6 +51,21 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     }
     throw error;
   }
+
+  if (data && data.length > 0) {
+    const historyRecords = data.map((assignment) => ({
+      retake_assignment_id: assignment.id,
+      action_type: "assign",
+      new_date: scheduledDate || null,
+      performed_by: session.userId,
+    }));
+
+    const { error: historyError } = await supabase.from("RetakeHistory").insert(historyRecords);
+    if (historyError) {
+      console.error("Failed to insert history:", historyError);
+    }
+  }
+
   return NextResponse.json({ success: true, data });
 };
 

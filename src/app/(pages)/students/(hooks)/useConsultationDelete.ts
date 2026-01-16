@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface DeleteConsultationData {
   consultationId: string;
@@ -25,6 +26,7 @@ export const useConsultationDelete = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["consultations", variables.studentId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.consultations.all });
     },
   });
 

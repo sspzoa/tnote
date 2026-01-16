@@ -25,6 +25,7 @@ export const QUERY_KEYS = {
     byStatus: (status: string) => ["retakes", "status", status] as const,
     byDateRange: (startDate: string, endDate: string) => ["retakes", "dateRange", startDate, endDate] as const,
     history: (retakeId: string) => ["retakes", "history", retakeId] as const,
+    historyAll: ["retake-history-all"] as const,
   },
   exams: {
     all: ["exams"] as const,

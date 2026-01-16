@@ -48,6 +48,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     previous_status: current.status,
     new_status: "pending",
     note: note || null,
+    performed_by: session.userId,
   });
 
   if (historyError) throw historyError;

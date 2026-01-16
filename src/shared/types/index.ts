@@ -92,6 +92,7 @@ export interface Retake {
 export interface RetakeHistory {
   id: string;
   action_type:
+    | "assign"
     | "postpone"
     | "absent"
     | "complete"
@@ -107,13 +108,16 @@ export interface RetakeHistory {
   new_management_status: string | null;
   note: string | null;
   created_at: string;
+  performed_by: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 // Consultation types
 export interface ConsultationLog {
   id: string;
   student_id: string;
-  consultation_date: string;
   title: string;
   content: string;
   created_at: string;
@@ -123,7 +127,6 @@ export interface ConsultationLog {
 export interface ConsultationWithDetails {
   id: string;
   student_id: string;
-  consultation_date: string;
   title: string;
   content: string;
   created_at: string;

@@ -8,12 +8,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   }
 
   const body = await request.json();
-  const { consultationDate, title, content } = body;
-
-  // 필수 필드 검증
-  if (!consultationDate) {
-    return NextResponse.json({ error: "상담 날짜를 입력해주세요." }, { status: 400 });
-  }
+  const { title, content } = body;
 
   if (!title || typeof title !== "string" || title.trim().length === 0) {
     return NextResponse.json({ error: "제목을 입력해주세요." }, { status: 400 });
@@ -31,16 +26,9 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     return NextResponse.json({ error: "내용은 5000자 이하여야 합니다." }, { status: 400 });
   }
 
-  // 날짜 형식 검증
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(consultationDate)) {
-    return NextResponse.json({ error: "올바른 날짜 형식이 아닙니다." }, { status: 400 });
-  }
-
   const { data, error } = await supabase
     .from("ConsultationLogs")
     .update({
-      consultation_date: consultationDate,
       title: title.trim(),
       content: content.trim(),
       updated_at: new Date().toISOString(),

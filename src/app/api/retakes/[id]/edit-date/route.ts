@@ -45,13 +45,13 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     throw new Error(`재시험 업데이트 실패: ${updateError.message}`);
   }
 
-  // 이력에 날짜 수정으로 기록 (연기 횟수 증가 없이)
   const { error: historyError } = await supabase.from("RetakeHistory").insert({
     retake_assignment_id: id,
     action_type: "date_edit",
     previous_date: previousDate,
     new_date: newDate,
     note: null,
+    performed_by: session.userId,
   });
 
   if (historyError) {

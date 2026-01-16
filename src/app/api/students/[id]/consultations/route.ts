@@ -12,7 +12,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     `)
     .eq("student_id", studentId)
     .eq("workspace", session.workspace)
-    .order("consultation_date", { ascending: false });
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw error;
@@ -24,9 +24,9 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   const studentId = params?.id;
   const body = await request.json();
 
-  const { consultationDate, title, content } = body;
+  const { title, content } = body;
 
-  if (!consultationDate || !title || !content) {
+  if (!title || !content) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -46,7 +46,6 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     .from("ConsultationLogs")
     .insert({
       student_id: studentId,
-      consultation_date: consultationDate,
       title: title,
       content: content,
       workspace: session.workspace,

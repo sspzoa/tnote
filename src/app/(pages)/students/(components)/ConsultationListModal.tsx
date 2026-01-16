@@ -32,7 +32,6 @@ export default function ConsultationListModal() {
   const openEditConsultationModal = (consultation: ConsultationLog) => {
     setSelectedConsultation(consultation);
     setConsultationForm({
-      date: consultation.consultation_date,
       title: consultation.title,
       content: consultation.content,
     });
@@ -40,7 +39,7 @@ export default function ConsultationListModal() {
   };
 
   const openAddModal = () => {
-    setConsultationForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
+    setConsultationForm({ title: "", content: "" });
     setShowAddModal(true);
   };
 
@@ -77,6 +76,7 @@ export default function ConsultationListModal() {
         <div className="max-h-96 divide-y divide-line-divider overflow-y-auto rounded-radius-300 border border-line-outline">
           {(consultations as ConsultationWithCreator[]).map((log) => {
             const createdAt = new Date(log.created_at);
+            const dateStr = createdAt.toLocaleDateString("ko-KR");
             const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
 
             return (
@@ -87,7 +87,7 @@ export default function ConsultationListModal() {
                 <div className="mb-spacing-100 flex items-center justify-between">
                   <span className="font-medium text-body text-content-standard-primary">{log.title}</span>
                   <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
-                    {log.consultation_date}
+                    {dateStr}
                   </span>
                 </div>
                 <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">

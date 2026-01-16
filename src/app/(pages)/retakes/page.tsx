@@ -1,6 +1,8 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { History, X } from "lucide-react";
+import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
@@ -44,6 +46,7 @@ import RetakeHistoryModal from "./(components)/RetakeHistoryModal";
 import RetakeList from "./(components)/RetakeList";
 import RetakePostponeModal from "./(components)/RetakePostponeModal";
 import StudentInfoModal from "./(components)/StudentInfoModal";
+import { useAllRetakeHistory } from "./(hooks)/useAllRetakeHistory";
 import { useCourses } from "./(hooks)/useCourses";
 import { useExams } from "./(hooks)/useExams";
 import { useRetakeDelete } from "./(hooks)/useRetakeDelete";
@@ -60,6 +63,31 @@ const managementStatusOptions: ManagementStatus[] = [
   "실장 집중 상담 진행 중",
   "실장 집중 상담 완료",
 ];
+
+const getActionLabel = (actionType: string) => {
+  const labels: Record<string, string> = {
+    assign: "할당",
+    postpone: "연기",
+    absent: "결석",
+    complete: "완료",
+    status_change: "상태 변경",
+    management_status_change: "관리 상태 변경",
+    note_update: "메모 수정",
+    date_edit: "날짜 수정",
+  };
+  return labels[actionType] || actionType;
+};
+
+const getActionBadgeStyle = (actionType: string) => {
+  if (actionType === "assign") return "bg-solid-translucent-purple text-solid-purple";
+  if (actionType === "postpone") return "bg-solid-translucent-blue text-solid-blue";
+  if (actionType === "absent") return "bg-solid-translucent-red text-solid-red";
+  if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
+  if (actionType === "status_change") return "bg-solid-translucent-purple text-solid-purple";
+  if (actionType === "management_status_change") return "bg-solid-translucent-yellow text-solid-yellow";
+  if (actionType === "date_edit") return "bg-solid-translucent-blue text-solid-blue";
+  return "bg-components-fill-standard-secondary text-content-standard-secondary";
+};
 
 export default function RetakesPage() {
   const [filter, setFilter] = useAtom(filterAtom);
@@ -85,10 +113,13 @@ export default function RetakesPage() {
   const [, setPostponeNote] = useAtom(postponeNoteAtom);
   const [, setEditDate] = useAtom(editDateAtom);
 
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+
   const { retakes: fetchedRetakes, isLoading, error, refetch } = useRetakes(filter);
   const { courses } = useCourses();
   const { exams } = useExams(selectedCourse === "all" ? null : selectedCourse);
   const { deleteRetake } = useRetakeDelete();
+  const { history: allHistory, isLoading: historyLoading } = useAllRetakeHistory();
 
   const handlePostpone = (retake: (typeof retakes)[number]) => {
     setSelectedRetake(retake);
@@ -205,7 +236,23 @@ export default function RetakesPage() {
         title="재시험 관리"
         subtitle="학생들의 재시험을 관리합니다"
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={<Button onClick={handleAssignClick}>+ 재시험 할당</Button>}
+        action={
+          <div className="flex items-center gap-spacing-300">
+            <Button
+              variant="secondary"
+              onClick={() => setShowHistoryPanel(true)}
+              className="flex items-center gap-spacing-200">
+              <History className="size-4" />
+              최근 이력
+              {allHistory.length > 0 && (
+                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
+                  {allHistory.length}
+                </span>
+              )}
+            </Button>
+            <Button onClick={handleAssignClick}>+ 재시험 할당</Button>
+          </div>
+        }
       />
 
       <div className="flex flex-col gap-spacing-600">
@@ -325,6 +372,103 @@ export default function RetakesPage() {
       <RetakeAssignModal onSuccess={handleActionSuccess} />
       <ManagementStatusModal onSuccess={handleActionSuccess} />
       <RetakeEditDateModal onSuccess={handleActionSuccess} />
+
+      {showHistoryPanel && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-solid-black/50 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowHistoryPanel(false)}
+          />
+
+          <div className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-line-outline border-l bg-components-fill-standard-primary">
+            <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
+              <div>
+                <h2 className="font-bold text-content-standard-primary text-heading">최근 이력</h2>
+                <p className="text-content-standard-tertiary text-label">최근 50건</p>
+              </div>
+              <button
+                onClick={() => setShowHistoryPanel(false)}
+                className="rounded-radius-200 p-spacing-200 transition-all duration-150 hover:bg-core-accent-translucent hover:text-core-accent">
+                <X className="size-5 text-content-standard-tertiary" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {historyLoading ? (
+                <div className="flex flex-col items-center justify-center py-spacing-900">
+                  <div className="mb-spacing-300 size-8 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
+                  <span className="text-content-standard-tertiary text-label">로딩중...</span>
+                </div>
+              ) : allHistory.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-spacing-900">
+                  <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+                    <History className="size-6 text-core-accent" />
+                  </div>
+                  <span className="text-content-standard-tertiary text-label">이력이 없습니다.</span>
+                </div>
+              ) : (
+                <div className="divide-y divide-line-divider">
+                  {allHistory.map((item) => {
+                    const createdAt = new Date(item.created_at);
+                    const dateStr = createdAt.toLocaleDateString("ko-KR");
+                    const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+
+                    return (
+                      <div key={item.id} className="px-spacing-600 py-spacing-400">
+                        <div className="mb-spacing-100 flex items-center justify-between">
+                          <span className="font-medium text-body text-content-standard-primary">
+                            {item.retake.student.name}
+                          </span>
+                          <span
+                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
+                            {getActionLabel(item.action_type)}
+                          </span>
+                        </div>
+                        <div className="mb-spacing-100 truncate text-body text-content-standard-secondary">
+                          {item.retake.exam.course.name} - {item.retake.exam.name} {item.retake.exam.exam_number}회차
+                        </div>
+                        {item.action_type === "assign" && (
+                          <div className="mb-spacing-100 text-content-standard-secondary text-footnote">
+                            {item.new_date ? `예정일: ${item.new_date}` : "예정일 미지정"}
+                          </div>
+                        )}
+                        {(item.action_type === "postpone" ||
+                          item.action_type === "date_edit" ||
+                          item.action_type === "complete") &&
+                          item.new_date && (
+                            <div className="mb-spacing-100 text-content-standard-secondary text-footnote">
+                              {item.previous_date || "미지정"} → {item.new_date}
+                            </div>
+                          )}
+                        {item.action_type === "management_status_change" && item.new_management_status && (
+                          <div className="mb-spacing-100 text-content-standard-secondary text-footnote">
+                            {item.previous_management_status} → {item.new_management_status}
+                          </div>
+                        )}
+                        {item.note && (
+                          <div className="mb-spacing-100 truncate text-content-standard-tertiary text-footnote">
+                            {item.note}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                          <span>{dateStr}</span>
+                          <span>{timeStr}</span>
+                          {item.performed_by && (
+                            <>
+                              <span>·</span>
+                              <span>{item.performed_by.name}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </Container>
   );
 }

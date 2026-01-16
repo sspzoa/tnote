@@ -39,6 +39,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     action_type: "absent",
     previous_date: current.current_scheduled_date,
     note: note || null,
+    performed_by: session.userId,
   });
 
   if (historyError) throw historyError;

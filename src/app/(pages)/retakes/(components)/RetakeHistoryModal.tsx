@@ -30,6 +30,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
 
   const getActionLabel = (actionType: string) => {
     const labels: Record<string, string> = {
+      assign: "할당",
       postpone: "연기",
       absent: "결석",
       complete: "완료",
@@ -42,6 +43,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
   };
 
   const getActionBadgeStyle = (actionType: string) => {
+    if (actionType === "assign") return "bg-solid-translucent-purple text-solid-purple";
     if (actionType === "postpone") return "bg-solid-translucent-blue text-solid-blue";
     if (actionType === "absent") return "bg-solid-translucent-red text-solid-red";
     if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
@@ -114,11 +116,20 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
                     className={`shrink-0 rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
                     {getActionLabel(item.action_type)}
                   </span>
-                  {(item.action_type === "postpone" || item.action_type === "date_edit") && item.new_date && (
-                    <span className="truncate text-body text-content-standard-primary">
-                      {item.previous_date || "미지정"} → {item.new_date}
-                    </span>
+                  {item.action_type === "assign" && item.new_date && (
+                    <span className="truncate text-body text-content-standard-primary">예정일: {item.new_date}</span>
                   )}
+                  {item.action_type === "assign" && !item.new_date && (
+                    <span className="truncate text-body text-content-standard-tertiary">예정일 미지정</span>
+                  )}
+                  {(item.action_type === "postpone" ||
+                    item.action_type === "date_edit" ||
+                    item.action_type === "complete") &&
+                    item.new_date && (
+                      <span className="truncate text-body text-content-standard-primary">
+                        {item.previous_date || "미지정"} → {item.new_date}
+                      </span>
+                    )}
                   {item.action_type === "status_change" && item.previous_status && item.new_status && (
                     <span className="truncate text-body text-content-standard-primary">
                       {item.previous_status === "pending"
@@ -138,9 +149,14 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
                     )}
                 </div>
                 <div className="flex shrink-0 items-center gap-spacing-300">
-                  <span className="shrink-0 text-content-standard-tertiary text-footnote">
-                    {new Date(item.created_at).toLocaleString("ko-KR")}
-                  </span>
+                  <div className="flex shrink-0 flex-col items-end gap-spacing-50">
+                    <span className="text-content-standard-tertiary text-footnote">
+                      {new Date(item.created_at).toLocaleString("ko-KR")}
+                    </span>
+                    {item.performed_by && (
+                      <span className="text-content-standard-tertiary text-footnote">{item.performed_by.name}</span>
+                    )}
+                  </div>
                   {canUndo(item, index) && (
                     <button
                       onClick={() => handleUndo(item)}

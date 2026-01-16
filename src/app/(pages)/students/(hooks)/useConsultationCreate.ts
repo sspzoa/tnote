@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface CreateConsultationData {
   studentId: string;
-  consultationDate: string;
   title: string;
   content: string;
 }
@@ -29,6 +29,7 @@ export const useConsultationCreate = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["consultations", variables.studentId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.consultations.all });
     },
   });
 

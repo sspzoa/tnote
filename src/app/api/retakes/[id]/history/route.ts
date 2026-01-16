@@ -23,7 +23,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const { data, error } = await supabase
     .from("RetakeHistory")
     .select(
-      "id, retake_assignment_id, action_type, previous_date, new_date, previous_status, new_status, previous_management_status, new_management_status, note, created_at",
+      "id, retake_assignment_id, action_type, previous_date, new_date, previous_status, new_status, previous_management_status, new_management_status, note, created_at, performed_by:Users!RetakeHistory_performed_by_fkey(id, name)",
     )
     .eq("retake_assignment_id", id)
     .order("created_at", { ascending: false });

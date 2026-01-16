@@ -82,13 +82,12 @@ export default function ConsultationFormModal() {
     try {
       await createConsultation({
         studentId: selectedStudent.id,
-        consultationDate: form.date,
         title: form.title,
         content: form.content,
       });
       alert("상담일지가 추가되었습니다.");
       setShowAddModal(false);
-      setForm({ date: new Date().toISOString().split("T")[0], title: "", content: "" });
+      setForm({ title: "", content: "" });
       setIsNewStudentConsultation(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "상담일지 추가에 실패했습니다.");
@@ -105,7 +104,6 @@ export default function ConsultationFormModal() {
       await updateConsultation({
         consultationId: selectedConsultation.id,
         studentId: selectedStudent.id,
-        consultationDate: form.date,
         title: form.title,
         content: form.content,
       });
@@ -168,14 +166,6 @@ export default function ConsultationFormModal() {
             onChange={(e) => handleNewStudentCheckbox(e.target.checked)}
           />
         )}
-
-        <FormInput
-          label="상담 날짜"
-          required
-          type="date"
-          value={form.date}
-          onChange={(e) => setForm({ ...form, date: e.target.value })}
-        />
 
         <FormInput
           label="제목"

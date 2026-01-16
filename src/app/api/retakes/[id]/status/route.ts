@@ -42,6 +42,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     previous_status: retake.status,
     new_status: status,
     note: note || null,
+    performed_by: session.userId,
   });
   return NextResponse.json({ success: true });
 };

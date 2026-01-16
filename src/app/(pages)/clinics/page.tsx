@@ -7,6 +7,7 @@ import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
+import { getTodayKST } from "@/shared/lib/utils/date";
 import { type Clinic, selectedClinicAtom } from "./(atoms)/useClinicsStore";
 import {
   clinicNameAtom,
@@ -65,7 +66,7 @@ export default function ClinicsPage() {
 
   const handleAttendance = (clinic: Clinic) => {
     setSelectedClinic(clinic);
-    setSelectedDate(new Date().toISOString().split("T")[0]);
+    setSelectedDate(getTodayKST());
     setShowAttendanceModal(true);
   };
 

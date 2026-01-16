@@ -46,6 +46,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     action_type: "management_status_change",
     previous_management_status: retake.management_status,
     new_management_status: management_status,
+    performed_by: session.userId,
   });
   return NextResponse.json({ success: true });
 };
