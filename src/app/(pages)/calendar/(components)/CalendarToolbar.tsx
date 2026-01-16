@@ -26,22 +26,22 @@ export default function CalendarToolbar({
 }: Props) {
   return (
     <div className="mb-spacing-500 flex items-center justify-between">
-      <div className="flex items-center gap-spacing-300">
+      <div className="flex items-center gap-spacing-200">
         <button
           onClick={onPrevMonth}
-          className="rounded-radius-300 bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent"
           type="button">
           ←
         </button>
         <button
           onClick={onToday}
-          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-body text-solid-white transition-opacity hover:opacity-90"
+          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-body text-solid-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
           type="button">
           오늘
         </button>
         <button
           onClick={onNextMonth}
-          className="rounded-radius-300 bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover"
+          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent"
           type="button">
           →
         </button>

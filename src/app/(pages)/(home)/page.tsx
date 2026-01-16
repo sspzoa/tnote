@@ -61,13 +61,14 @@ export default function Home() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex flex-col items-center gap-spacing-300 rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all hover:border-core-accent hover:shadow-lg">
+                className="group relative flex flex-col items-center gap-spacing-300 overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all duration-200 hover:border-core-accent">
+                <div className="absolute inset-0 bg-gradient-to-b from-core-accent-translucent/0 to-core-accent-translucent/0 transition-all duration-200 group-hover:from-core-accent-translucent/30 group-hover:to-transparent" />
                 <div
-                  className={`flex size-16 items-center justify-center rounded-full ${item.bgColor} transition-transform group-hover:scale-110`}>
+                  className={`relative flex size-16 items-center justify-center rounded-full ${item.bgColor} transition-all duration-200 group-hover:scale-110`}>
                   <item.icon className={`size-8 ${item.iconColor}`} />
                 </div>
-                <div className="font-bold text-content-standard-primary text-display">{item.value}</div>
-                <div className="text-body text-content-standard-secondary">{item.label}</div>
+                <div className="relative font-bold text-content-standard-primary text-display">{item.value}</div>
+                <div className="relative text-body text-content-standard-secondary">{item.label}</div>
               </Link>
             ))}
           </div>

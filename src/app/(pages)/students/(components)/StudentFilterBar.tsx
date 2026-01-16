@@ -14,9 +14,8 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
   const [showFavoritesOnly, setShowFavoritesOnly] = useAtom(showFavoritesOnlyAtom);
 
   return (
-    <>
-      {/* 반 필터 */}
-      <div className="mb-spacing-600 flex flex-wrap gap-spacing-300">
+    <div className="flex flex-col gap-spacing-600">
+      <div className="flex flex-wrap gap-spacing-300">
         <button
           onClick={() => setSelectedCourse("all")}
           className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
@@ -50,15 +49,12 @@ export default function StudentFilterBar({ courses }: StudentFilterBarProps) {
         ))}
       </div>
 
-      {/* 검색 */}
-      <div className="mb-spacing-600">
-        <SearchInput
-          placeholder="학생 이름 검색..."
-          size="lg"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-    </>
+      <SearchInput
+        placeholder="학생 검색..."
+        size="lg"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+    </div>
   );
 }

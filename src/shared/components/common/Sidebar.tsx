@@ -164,15 +164,18 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group flex items-center gap-spacing-300 rounded-radius-300 px-spacing-400 py-spacing-300 transition-colors ${
-                  active ? "bg-core-accent-translucent" : "hover:bg-components-interactive-hover"
+                className={`group relative flex items-center gap-spacing-300 rounded-radius-300 px-spacing-400 py-spacing-300 transition-all duration-150 ${
+                  active ? "bg-core-accent-translucent" : "hover:bg-core-accent-translucent/50"
                 }`}>
+                {active && (
+                  <div className="-translate-y-1/2 absolute top-1/2 left-0 h-6 w-1 rounded-r-full bg-core-accent" />
+                )}
                 <div
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-radius-300 ${active ? "bg-core-accent" : item.bgColor}`}>
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-radius-300 transition-all duration-150 ${active ? "bg-core-accent" : `${item.bgColor} group-hover:scale-105`}`}>
                   <item.icon className={`size-5 ${active ? "text-solid-white" : item.iconColor}`} />
                 </div>
                 <span
-                  className={`font-medium text-body ${active ? "text-core-accent" : "text-content-standard-primary group-hover:text-core-accent"}`}>
+                  className={`font-medium text-body transition-colors duration-150 ${active ? "text-core-accent" : "text-content-standard-primary group-hover:text-core-accent"}`}>
                   {item.label}
                 </span>
               </Link>
@@ -200,12 +203,12 @@ export default function Sidebar() {
           <div className="flex gap-spacing-200">
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="flex-1 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-footnote transition-colors hover:bg-components-interactive-hover">
+              className="flex-1 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-footnote transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent">
               비밀번호 변경
             </button>
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-spacing-100 rounded-radius-300 bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-footnote transition-colors hover:bg-components-interactive-hover">
+              className="flex items-center justify-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-footnote transition-all duration-150 hover:border-core-status-negative/30 hover:bg-solid-translucent-red hover:text-core-status-negative">
               <LogOut className="size-3" />
               로그아웃
             </button>

@@ -157,7 +157,7 @@ export default function RetakeList({
                 {openMenuId === retake.id && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[140px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200 shadow-lg">
+                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[140px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200">
                       {retake.status !== "completed" && (
                         <>
                           <button

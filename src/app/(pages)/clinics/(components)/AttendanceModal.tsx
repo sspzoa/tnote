@@ -112,7 +112,7 @@ export default function AttendanceModal() {
           ) : (
             <>
               <SearchInput
-                placeholder="이름 검색..."
+                placeholder="학생 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="mb-spacing-300"

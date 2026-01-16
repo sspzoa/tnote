@@ -38,13 +38,16 @@ export default function CalendarPage() {
 
   return (
     <Container>
-      <Link href="/" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-        ← 홈으로 돌아가기
+      <Link
+        href="/"
+        className="group mb-spacing-400 inline-flex items-center gap-spacing-100 text-body text-core-accent transition-all duration-150 hover:gap-spacing-200">
+        <span className="group-hover:-translate-x-spacing-50 transition-transform duration-150">←</span>
+        <span>홈으로 돌아가기</span>
       </Link>
 
       <Header title="캘린더" subtitle="수업, 재시험, 클리닉 일정을 확인하세요" />
 
-      <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
+      <div className="overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
         <CalendarToolbar
           currentDate={currentDate}
           filters={filters}

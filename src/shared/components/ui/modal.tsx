@@ -22,7 +22,7 @@ const maxWidthStyles = {
   "4xl": "max-w-4xl",
 };
 
-export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "md" }: ModalProps) {
+export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "2xl" }: ModalProps) {
   const titleId = useId();
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxW
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/60 p-spacing-400 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -65,7 +65,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxW
         <div className="flex-1 overflow-y-auto p-spacing-600">{children}</div>
 
         {footer && (
-          <div className="flex gap-spacing-300 border-line-divider border-t px-spacing-600 py-spacing-500">
+          <div className="flex gap-spacing-300 border-line-divider border-t bg-components-fill-standard-secondary/50 px-spacing-600 py-spacing-500">
             {footer}
           </div>
         )}

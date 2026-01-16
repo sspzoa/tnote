@@ -28,10 +28,10 @@ export function DayOfWeekPicker({ label, required = false, selectedDays, onChang
             key={index}
             type="button"
             onClick={() => toggleDay(index)}
-            className={`rounded-radius-300 py-spacing-200 font-medium text-footnote transition-colors ${
+            className={`rounded-radius-300 py-spacing-200 font-medium text-footnote transition-all duration-150 ${
               selectedDays.includes(index)
                 ? "bg-core-accent text-solid-white"
-                : "border border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary"
+                : "border border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:border-core-accent/30 hover:bg-components-interactive-hover"
             }`}>
             {day}
           </button>

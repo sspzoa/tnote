@@ -1,5 +1,7 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { Button } from "@/shared/components/ui/button";
+import { Modal } from "@/shared/components/ui/modal";
 import type { CalendarEvent } from "@/shared/types";
 
 interface Props {
@@ -76,76 +78,60 @@ const getRetakeStatusStyle = (status: string) => {
 
 export default function EventDetailModal({ event, onClose }: Props) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/50 p-spacing-400"
-      onClick={onClose}>
-      <div
-        className="w-full max-w-md rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
-        onClick={(e) => e.stopPropagation()}>
-        <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-          <h2 className="font-bold text-content-standard-primary text-heading">일정 상세</h2>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="일정 상세"
+      footer={
+        <Button onClick={onClose} className="w-full">
+          닫기
+        </Button>
+      }>
+      <div className="space-y-spacing-400">
+        <div>
+          <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">타입</label>
+          <div className="flex items-center gap-spacing-200">
+            <div className="h-4 w-4 rounded-radius-100" style={{ backgroundColor: getEventColor(event) }} />
+            <span className="text-body text-content-standard-primary">{getEventTypeLabel(event.type)}</span>
+          </div>
         </div>
 
-        <div className="space-y-spacing-400 p-spacing-600">
-          <div>
-            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-              타입
-            </label>
-            <div className="flex items-center gap-spacing-200">
-              <div className="h-4 w-4 rounded-radius-100" style={{ backgroundColor: getEventColor(event) }} />
-              <span className="text-body text-content-standard-primary">{getEventTypeLabel(event.type)}</span>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-              제목
-            </label>
-            <p className="text-body text-content-standard-primary">{event.title}</p>
-          </div>
-
-          <div>
-            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-              날짜
-            </label>
-            <p className="text-body text-content-standard-primary">
-              {format(new Date(event.date), "yyyy년 M월 d일 (EEE)", { locale: ko })}
-            </p>
-          </div>
-
-          {event.type === "clinic" && event.metadata?.status && (
-            <div>
-              <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-                상태
-              </label>
-              <span
-                className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${getClinicStatusStyle(event.metadata.status)}`}>
-                {getClinicStatusLabel(event.metadata.status)}
-              </span>
-            </div>
-          )}
-
-          {event.type === "retake" && event.metadata?.status && (
-            <div>
-              <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-                상태
-              </label>
-              <span
-                className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${getRetakeStatusStyle(event.metadata.status)}`}>
-                {getRetakeStatusLabel(event.metadata.status)}
-              </span>
-            </div>
-          )}
+        <div>
+          <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">제목</label>
+          <p className="text-body text-content-standard-primary">{event.title}</p>
         </div>
 
-        <div className="border-line-divider border-t px-spacing-600 py-spacing-500">
-          <button
-            onClick={onClose}
-            className="w-full rounded-radius-300 bg-core-accent px-spacing-500 py-spacing-300 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
-            닫기
-          </button>
+        <div>
+          <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">날짜</label>
+          <p className="text-body text-content-standard-primary">
+            {format(new Date(event.date), "yyyy년 M월 d일 (EEE)", { locale: ko })}
+          </p>
         </div>
+
+        {event.type === "clinic" && event.metadata?.status && (
+          <div>
+            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+              상태
+            </label>
+            <span
+              className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${getClinicStatusStyle(event.metadata.status)}`}>
+              {getClinicStatusLabel(event.metadata.status)}
+            </span>
+          </div>
+        )}
+
+        {event.type === "retake" && event.metadata?.status && (
+          <div>
+            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
+              상태
+            </label>
+            <span
+              className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${getRetakeStatusStyle(event.metadata.status)}`}>
+              {getRetakeStatusLabel(event.metadata.status)}
+            </span>
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 }

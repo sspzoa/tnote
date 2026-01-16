@@ -17,15 +17,15 @@ interface DataTableProps<T> {
 
 export function DataTable<T>({ data, columns, keyExtractor, onRowClick, actionColumn }: DataTableProps<T>) {
   return (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+    <div className="overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full">
-        <thead className="bg-components-fill-standard-secondary">
+        <thead className="border-line-divider border-b bg-components-fill-standard-secondary">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
                 className={`px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary ${col.width || ""}`}>
-                {col.header}
+                <span className="relative">{col.header}</span>
               </th>
             ))}
             {actionColumn && (
@@ -33,14 +33,14 @@ export function DataTable<T>({ data, columns, keyExtractor, onRowClick, actionCo
             )}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-line-divider">
           {data.map((item) => (
             <tr
               key={keyExtractor(item)}
               onClick={onRowClick ? () => onRowClick(item) : undefined}
-              className={`border-line-divider border-t transition-colors hover:bg-components-interactive-hover ${onRowClick ? "cursor-pointer" : ""}`}>
+              className={`transition-colors hover:bg-core-accent-translucent/50 ${onRowClick ? "cursor-pointer" : ""}`}>
               {columns.map((col) => (
-                <td key={col.key} className="px-spacing-500 py-spacing-400">
+                <td key={col.key} className="px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
                   {col.render(item)}
                 </td>
               ))}

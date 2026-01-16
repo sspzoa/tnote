@@ -74,7 +74,8 @@ export function StudentListItem({
 
   if (onToggle !== undefined) {
     return (
-      <label className={`${baseClassName} cursor-pointer transition-colors hover:bg-components-interactive-hover`}>
+      <label
+        className={`${baseClassName} cursor-pointer transition-all duration-150 hover:bg-core-accent-translucent/50`}>
         {content}
       </label>
     );

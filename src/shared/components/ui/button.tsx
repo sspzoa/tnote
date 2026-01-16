@@ -12,11 +12,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-core-accent text-solid-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
+  primary:
+    "bg-core-accent text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
   secondary:
-    "bg-components-fill-standard-secondary text-content-standard-primary hover:bg-components-interactive-hover disabled:cursor-not-allowed disabled:opacity-50",
-  danger: "bg-core-status-negative text-solid-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
-  success: "bg-core-status-positive text-solid-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
+    "bg-components-fill-standard-secondary text-content-standard-primary border border-line-outline hover:bg-components-interactive-hover hover:border-core-accent/30 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-line-outline disabled:active:scale-100",
+  danger:
+    "bg-core-status-negative text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
+  success:
+    "bg-core-status-positive text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -40,9 +43,16 @@ export function Button({
   return (
     <button
       disabled={isDisabled}
-      className={`rounded-radius-300 font-semibold transition-all ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      className={`rounded-radius-300 font-semibold transition-all duration-150 ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       {...props}>
-      {isLoading ? loadingText || children : children}
+      {isLoading ? (
+        <span className="flex items-center justify-center gap-spacing-200">
+          <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          {loadingText || children}
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 }

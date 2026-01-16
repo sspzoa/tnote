@@ -14,8 +14,11 @@ export default function Header({ title, subtitle, action, backLink }: HeaderProp
   return (
     <div className="mb-spacing-700">
       {backLink && (
-        <Link href={backLink.href} className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-          ← {backLink.label}
+        <Link
+          href={backLink.href}
+          className="group mb-spacing-400 inline-flex items-center gap-spacing-100 text-body text-core-accent transition-all duration-150 hover:gap-spacing-200">
+          <span className="group-hover:-translate-x-spacing-50 transition-transform duration-150">←</span>
+          <span>{backLink.label}</span>
         </Link>
       )}
       <div className="flex items-end justify-between">

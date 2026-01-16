@@ -50,7 +50,7 @@ export default function ConsultationListModal() {
       onClose={() => setShowModal(false)}
       title={`${selectedStudent.name} - 상담일지`}
       subtitle={`총 ${consultations.length}건의 상담 기록`}
-      maxWidth="lg"
+      maxWidth="2xl"
       footer={
         <>
           <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">

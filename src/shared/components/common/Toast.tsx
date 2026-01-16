@@ -27,7 +27,7 @@ const toastStyles: Record<ToastType, { bg: string; icon: typeof CheckCircle; ico
     iconColor: "text-core-status-negative",
   },
   info: {
-    bg: "bg-solid-translucent-blue border-core-accent",
+    bg: "bg-core-accent-translucent border-core-accent",
     icon: Info,
     iconColor: "text-core-accent",
   },
@@ -68,13 +68,13 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
 
   return (
     <div
-      className={`pointer-events-auto flex items-center gap-spacing-300 rounded-radius-400 border px-spacing-500 py-spacing-400 shadow-lg ${style.bg}`}
+      className={`pointer-events-auto flex items-center gap-spacing-300 rounded-radius-400 border px-spacing-500 py-spacing-400 backdrop-blur-sm ${style.bg}`}
       role="alert">
-      <Icon className={`size-5 ${style.iconColor}`} />
+      <Icon className={`size-5 shrink-0 ${style.iconColor}`} />
       <span className="text-body text-content-standard-primary">{toast.message}</span>
       <button
         onClick={() => onRemove(toast.id)}
-        className="ml-spacing-200 rounded p-spacing-100 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+        className="ml-spacing-200 shrink-0 rounded-radius-200 p-spacing-100 text-content-standard-tertiary transition-all duration-150 hover:bg-components-interactive-hover hover:text-content-standard-primary">
         <X className="size-4" />
       </button>
     </div>

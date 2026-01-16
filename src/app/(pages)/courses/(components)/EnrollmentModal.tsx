@@ -70,7 +70,7 @@ export default function EnrollmentModal() {
       onClose={() => setShowModal(false)}
       title="학생 관리"
       subtitle={selectedCourse.name}
-      maxWidth="xl"
+      maxWidth="2xl"
       footer={
         <Button variant="secondary" onClick={() => setShowModal(false)} className="w-full">
           닫기
@@ -94,7 +94,7 @@ export default function EnrollmentModal() {
             ) : (
               <>
                 <SearchInput
-                  placeholder="이름 검색..."
+                  placeholder="학생 검색..."
                   value={enrolledSearchQuery}
                   onChange={(e) => setEnrolledSearchQuery(e.target.value)}
                   className="mb-spacing-300"
@@ -135,7 +135,7 @@ export default function EnrollmentModal() {
             ) : (
               <>
                 <SearchInput
-                  placeholder="이름 검색..."
+                  placeholder="학생 검색..."
                   value={unenrolledSearchQuery}
                   onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
                   className="mb-spacing-300"

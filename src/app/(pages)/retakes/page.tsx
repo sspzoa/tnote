@@ -208,110 +208,114 @@ export default function RetakesPage() {
         action={<Button onClick={handleAssignClick}>+ 재시험 할당</Button>}
       />
 
-      <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
-        <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
-          {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
-        </FilterButton>
+      <div className="flex flex-col gap-spacing-600">
+        <div className="flex flex-col gap-spacing-600">
+          <div className="flex flex-col gap-spacing-300">
+            <div className="flex flex-wrap gap-spacing-300">
+              <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
+                {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
+              </FilterButton>
 
-        <FilterSelect value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
-          <option value="all">전체 상태</option>
-          <option value="pending">대기중</option>
-          <option value="completed">완료</option>
-          <option value="absent">결석</option>
-        </FilterSelect>
+              <FilterSelect value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
+                <option value="all">전체 상태</option>
+                <option value="pending">대기중</option>
+                <option value="completed">완료</option>
+                <option value="absent">결석</option>
+              </FilterSelect>
 
-        <FilterSelect value={selectedCourse} onChange={(e) => handleCourseChange(e.target.value)}>
-          <option value="all">전체 반</option>
-          {courses.map((course) => (
-            <option key={course.id} value={course.id}>
-              {course.name}
-            </option>
-          ))}
-        </FilterSelect>
+              <FilterSelect value={selectedCourse} onChange={(e) => handleCourseChange(e.target.value)}>
+                <option value="all">전체 반</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
+                ))}
+              </FilterSelect>
 
-        <FilterSelect
-          value={selectedExam}
-          onChange={(e) => setSelectedExam(e.target.value)}
-          disabled={selectedCourse === "all"}>
-          <option value="all">전체 시험</option>
-          {exams.map((exam) => (
-            <option key={exam.id} value={exam.id}>
-              {exam.name}
-            </option>
-          ))}
-        </FilterSelect>
+              <FilterSelect
+                value={selectedExam}
+                onChange={(e) => setSelectedExam(e.target.value)}
+                disabled={selectedCourse === "all"}>
+                <option value="all">전체 시험</option>
+                {exams.map((exam) => (
+                  <option key={exam.id} value={exam.id}>
+                    {exam.name}
+                  </option>
+                ))}
+              </FilterSelect>
 
-        <FilterSelect
-          value={selectedManagementStatus}
-          onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
-          <option value="all">전체 관리 상태</option>
-          {managementStatusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </FilterSelect>
+              <FilterSelect
+                value={selectedManagementStatus}
+                onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
+                <option value="all">전체 관리 상태</option>
+                {managementStatusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </FilterSelect>
 
-        <input
-          type="date"
-          value={selectedDate === "all" ? "" : selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value || "all")}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-        />
+              <input
+                type="date"
+                value={selectedDate === "all" ? "" : selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value || "all")}
+                className="cursor-pointer rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+              />
 
-        {isFilterActive && (
-          <button
-            onClick={handleResetFilters}
-            className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-colors hover:text-content-standard-primary">
-            초기화
-          </button>
+              {isFilterActive && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-all duration-150 hover:text-core-accent">
+                  초기화
+                </button>
+              )}
+            </div>
+
+            {courses.length > 0 && (
+              <div className="flex flex-wrap gap-spacing-300">
+                <FilterButton active={selectedCourse === "all"} onClick={() => handleCourseChange("all")}>
+                  전체 반
+                </FilterButton>
+                {courses.map((course) => (
+                  <FilterButton
+                    key={course.id}
+                    active={selectedCourse === course.id}
+                    onClick={() => handleCourseChange(course.id)}>
+                    {course.name}
+                  </FilterButton>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <SearchInput
+            placeholder="학생 검색..."
+            size="lg"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {isLoading ? (
+          <LoadingComponent />
+        ) : fetchedRetakes.length === 0 ? (
+          <EmptyState message="재시험이 없습니다." />
+        ) : filteredRetakes.length === 0 ? (
+          <EmptyState message="검색 결과가 없습니다." />
+        ) : (
+          <RetakeList
+            retakes={filteredRetakes}
+            onViewStudent={handleViewStudent}
+            onPostpone={handlePostpone}
+            onAbsent={handleAbsent}
+            onComplete={handleComplete}
+            onViewHistory={handleViewHistory}
+            onDelete={handleDelete}
+            onManagementStatusChange={handleManagementStatusChange}
+            onEditDate={handleEditDate}
+          />
         )}
       </div>
-
-      {courses.length > 0 && (
-        <div className="mb-spacing-400 flex flex-wrap gap-spacing-300">
-          <FilterButton active={selectedCourse === "all"} onClick={() => handleCourseChange("all")}>
-            전체 반
-          </FilterButton>
-          {courses.map((course) => (
-            <FilterButton
-              key={course.id}
-              active={selectedCourse === course.id}
-              onClick={() => handleCourseChange(course.id)}>
-              {course.name}
-            </FilterButton>
-          ))}
-        </div>
-      )}
-
-      <div className="mb-spacing-600">
-        <SearchInput
-          placeholder="학생 이름 검색..."
-          size="lg"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      {isLoading ? (
-        <LoadingComponent />
-      ) : fetchedRetakes.length === 0 ? (
-        <EmptyState message="재시험이 없습니다." />
-      ) : filteredRetakes.length === 0 ? (
-        <EmptyState message="검색 결과가 없습니다." />
-      ) : (
-        <RetakeList
-          retakes={filteredRetakes}
-          onViewStudent={handleViewStudent}
-          onPostpone={handlePostpone}
-          onAbsent={handleAbsent}
-          onComplete={handleComplete}
-          onViewHistory={handleViewHistory}
-          onDelete={handleDelete}
-          onManagementStatusChange={handleManagementStatusChange}
-          onEditDate={handleEditDate}
-        />
-      )}
 
       <RetakePostponeModal onSuccess={handleActionSuccess} />
       <RetakeAbsentModal onSuccess={handleActionSuccess} />
