@@ -196,7 +196,7 @@ export default function Sidebar() {
             <div className="min-w-0 flex-1">
               <div className="truncate font-medium text-body text-content-standard-primary">{userInfo.name}</div>
               <div className="text-content-standard-tertiary text-footnote">
-                {userInfo.role === "owner" ? "오너" : userInfo.role === "student" ? "학생" : "관리자"}
+                {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
               </div>
             </div>
           </div>
@@ -233,7 +233,7 @@ export default function Sidebar() {
           {userInfo && (
             <div className="flex items-center gap-spacing-200 text-body text-content-standard-primary">
               <span className="text-content-standard-tertiary">
-                {userInfo.role === "owner" ? "오너" : userInfo.role === "student" ? "학생" : "관리자"}
+                {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
               </span>
               <span className="font-medium">{userInfo.name}</span>
             </div>
@@ -252,12 +252,12 @@ export default function Sidebar() {
               <div className="flex w-full max-w-xs flex-col gap-spacing-300">
                 <button
                   onClick={() => setShowPasswordModal(true)}
-                  className="w-full rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent">
                   비밀번호 변경
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-spacing-200 rounded-radius-400 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
+                  className="flex w-full items-center justify-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-all duration-150 hover:border-core-status-negative/30 hover:bg-solid-translucent-red hover:text-core-status-negative">
                   <LogOut className="size-4" />
                   로그아웃
                 </button>
