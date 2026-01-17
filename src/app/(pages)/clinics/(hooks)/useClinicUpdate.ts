@@ -30,6 +30,7 @@ export const useClinicUpdate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clinics"] });
+      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
     },
   });
 

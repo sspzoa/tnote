@@ -28,6 +28,7 @@ export const useAttendanceSave = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["attendance", variables.clinicId, variables.date] });
+      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
     },
   });
 

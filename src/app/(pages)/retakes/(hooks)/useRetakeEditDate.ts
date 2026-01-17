@@ -25,6 +25,7 @@ export const useRetakeEditDate = () => {
       queryClient.invalidateQueries({ queryKey: ["retakes"] });
       queryClient.invalidateQueries({ queryKey: ["retake-history"] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
+      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
     },
   });
 

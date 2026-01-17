@@ -29,6 +29,7 @@ export const useClinicCreate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clinics"] });
+      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
     },
   });
 

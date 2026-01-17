@@ -30,6 +30,7 @@ export const useCourseUpdate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
     },
   });
 
