@@ -9,6 +9,10 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     return NextResponse.json({ error: "새로운 날짜를 입력해주세요." }, { status: 400 });
   }
 
+  if (!note || !note.trim()) {
+    return NextResponse.json({ error: "연기 사유를 입력해주세요." }, { status: 400 });
+  }
+
   const { data: current, error: fetchError } = await supabase
     .from("RetakeAssignments")
     .select(`

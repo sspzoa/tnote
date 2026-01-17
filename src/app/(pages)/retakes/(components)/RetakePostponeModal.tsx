@@ -34,6 +34,10 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
       alert("새로운 날짜를 입력해 주세요.");
       return;
     }
+    if (!postponeNote.trim()) {
+      alert("연기 사유를 입력해 주세요.");
+      return;
+    }
 
     try {
       await postponeRetake({
@@ -66,7 +70,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
           </Button>
           <Button
             onClick={handlePostpone}
-            disabled={!postponeDate || isPostponing}
+            disabled={!postponeDate || !postponeNote.trim() || isPostponing}
             isLoading={isPostponing}
             className="flex-1">
             연기
@@ -92,7 +96,8 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
         />
 
         <FormTextarea
-          label="연기 사유 (선택사항)"
+          label="연기 사유"
+          required
           value={postponeNote}
           onChange={(e) => setPostponeNote(e.target.value)}
           rows={3}
