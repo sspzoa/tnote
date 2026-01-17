@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
+import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import type { Exam } from "../(hooks)/useExams";
 
 interface ExamTableProps {
@@ -15,10 +16,15 @@ interface ExamTableProps {
 export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete }: ExamTableProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
+  const getMenuItems = (exam: Exam): DropdownMenuItem[] => [
+    { label: "수정", onClick: () => onEdit(exam), dividerAfter: true },
+    { label: "삭제", onClick: () => onDelete(exam), variant: "danger" },
+  ];
+
   return (
-    <div className="overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full">
-        <thead className="border-line-divider border-b bg-components-fill-standard-secondary">
+    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+      <table className="w-full rounded-radius-400">
+        <thead className="bg-components-fill-standard-secondary">
           <tr>
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               시험명
@@ -108,40 +114,12 @@ export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete 
                 </div>
               </td>
               <td className="relative px-spacing-500 py-spacing-400">
-                <button
-                  type="button"
-                  onClick={() => setOpenMenuId(openMenuId === exam.id ? null : exam.id)}
-                  className="rounded-radius-200 px-spacing-200 py-spacing-200 transition-all duration-150 hover:bg-core-accent-translucent hover:text-core-accent">
-                  <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-                {openMenuId === exam.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] overflow-hidden rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-100">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onEdit(exam);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-all duration-150 hover:bg-core-accent-translucent hover:text-core-accent">
-                        수정
-                      </button>
-                      <div className="my-spacing-100 border-line-divider border-t" />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onDelete(exam);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-all duration-150 hover:bg-solid-translucent-red">
-                        삭제
-                      </button>
-                    </div>
-                  </>
-                )}
+                <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === exam.id ? null : exam.id)} />
+                <DropdownMenu
+                  isOpen={openMenuId === exam.id}
+                  onClose={() => setOpenMenuId(null)}
+                  items={getMenuItems(exam)}
+                />
               </td>
             </tr>
           ))}
