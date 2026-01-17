@@ -410,56 +410,80 @@ export default function RetakesPage() {
                 <div className="divide-y divide-line-divider">
                   {allHistory.map((item) => {
                     const createdAt = new Date(item.created_at);
-                    const dateStr = createdAt.toLocaleDateString("ko-KR");
+                    const dateStr = createdAt.toLocaleDateString("ko-KR", {
+                      month: "short",
+                      day: "numeric",
+                    });
                     const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
 
                     return (
-                      <div key={item.id} className="px-spacing-600 py-spacing-400">
-                        <div className="mb-spacing-100 flex items-center justify-between">
-                          <span className="font-medium text-body text-content-standard-primary">
-                            {item.retake.student.name}
-                          </span>
-                          <span
-                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
-                            {getActionLabel(item.action_type)}
-                          </span>
+                      <div
+                        key={item.id}
+                        className="px-spacing-600 py-spacing-400 transition-colors hover:bg-components-fill-standard-secondary">
+                        <div className="mb-spacing-200 flex items-start justify-between gap-spacing-300">
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-spacing-50 flex items-center gap-spacing-200">
+                              <span className="font-semibold text-body text-content-standard-primary">
+                                {item.retake.student.name}
+                              </span>
+                              <span
+                                className={`shrink-0 rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
+                                {getActionLabel(item.action_type)}
+                              </span>
+                            </div>
+                            <div className="truncate text-content-standard-secondary text-label">
+                              {item.retake.exam.course.name} · {item.retake.exam.name} {item.retake.exam.exam_number}
+                              회차
+                            </div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div className="text-content-standard-tertiary text-footnote">{dateStr}</div>
+                            <div className="text-content-standard-quaternary text-footnote">{timeStr}</div>
+                          </div>
                         </div>
-                        <div className="mb-spacing-100 truncate text-body text-content-standard-secondary">
-                          {item.retake.exam.course.name} - {item.retake.exam.name} {item.retake.exam.exam_number}회차
-                        </div>
+
                         {item.action_type === "assign" && (
-                          <div className="mb-spacing-100 text-content-standard-secondary text-footnote">
-                            {item.new_date ? `예정일: ${item.new_date}` : "예정일 미지정"}
+                          <div className="mb-spacing-200 flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-purple px-spacing-300 py-spacing-200">
+                            <span className="text-footnote text-solid-purple">
+                              {item.new_date ? `예정일: ${item.new_date}` : "예정일 미지정"}
+                            </span>
                           </div>
                         )}
+
                         {(item.action_type === "postpone" ||
                           item.action_type === "date_edit" ||
                           item.action_type === "complete") &&
                           item.new_date && (
-                            <div className="mb-spacing-100 text-content-standard-secondary text-footnote">
-                              {item.previous_date || "미지정"} → {item.new_date}
+                            <div className="mb-spacing-200 flex items-center gap-spacing-200 rounded-radius-200 bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
+                              <span className="text-content-standard-tertiary text-footnote">
+                                {item.previous_date || "미지정"}
+                              </span>
+                              <span className="text-content-standard-quaternary text-footnote">→</span>
+                              <span className="font-medium text-content-standard-primary text-footnote">
+                                {item.new_date}
+                              </span>
                             </div>
                           )}
+
                         {item.action_type === "management_status_change" && item.new_management_status && (
-                          <div className="mb-spacing-100 text-content-standard-secondary text-footnote">
-                            {item.previous_management_status} → {item.new_management_status}
+                          <div className="mb-spacing-200 flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-yellow px-spacing-300 py-spacing-200">
+                            <span className="text-footnote text-solid-yellow">
+                              {item.previous_management_status} → {item.new_management_status}
+                            </span>
                           </div>
                         )}
+
                         {item.note && (
-                          <div className="mb-spacing-100 truncate text-content-standard-tertiary text-footnote">
-                            {item.note}
+                          <div className="mb-spacing-200 truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
+                            "{item.note}"
                           </div>
                         )}
-                        <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
-                          <span>{dateStr}</span>
-                          <span>{timeStr}</span>
-                          {item.performed_by && (
-                            <>
-                              <span>·</span>
-                              <span>{item.performed_by.name}</span>
-                            </>
-                          )}
-                        </div>
+
+                        {item.performed_by && (
+                          <div className="text-content-standard-quaternary text-footnote">
+                            작성자: {item.performed_by.name}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
