@@ -10,7 +10,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, birth_year")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .single();
@@ -25,7 +25,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
   }
 
-  const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
+  const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear } = await request.json();
 
   const updateData: Record<string, unknown> = {};
 
@@ -67,6 +67,14 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     updateData.school = school?.trim() || null;
   }
 
+  // 지점 검증
+  if (branch !== undefined) {
+    if (branch && typeof branch === "string" && branch.length > 100) {
+      return NextResponse.json({ error: "지점 이름은 100자 이하여야 합니다." }, { status: 400 });
+    }
+    updateData.branch = branch?.trim() || null;
+  }
+
   // 출생연도 검증
   if (birthYear !== undefined) {
     if (birthYear) {
@@ -89,7 +97,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .update(updateData)
     .eq("id", id)
     .eq("workspace", session.workspace)
-    .select("id, phone_number, name, parent_phone_number, school, birth_year")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year")
     .single();
 
   if (error) {
