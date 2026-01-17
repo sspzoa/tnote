@@ -33,6 +33,7 @@ export const QUERY_KEYS = {
     detail: (examId: string) => ["exams", "detail", examId] as const,
     scores: (examId: string) => ["exams", "scores", examId] as const,
     assignments: (examId: string) => ["exams", "assignments", examId] as const,
+    export: (examId: string) => ["exams", "export", examId] as const,
   },
   consultations: {
     all: ["consultations"] as const,
