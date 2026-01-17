@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, UserCog, Users } from "lucide-react";
+import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, MessageSquare, UserCog, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,6 +22,16 @@ const menuItems = [
     label: "캘린더",
     bgColor: "bg-solid-translucent-blue",
     iconColor: "text-solid-blue",
+  },
+];
+
+const adminMenuItems = [
+  {
+    href: "/messages",
+    icon: MessageSquare,
+    label: "문자 관리",
+    bgColor: "bg-solid-translucent-indigo",
+    iconColor: "text-solid-indigo",
   },
   {
     href: "/retakes",
@@ -125,6 +135,7 @@ export default function Sidebar() {
   };
 
   const isAdmin = userInfo?.role === "admin" || userInfo?.role === "owner";
+  const isOwner = userInfo?.role === "owner";
   const studentMenuItems = [
     {
       href: "/calendar",
@@ -134,7 +145,9 @@ export default function Sidebar() {
       iconColor: "text-solid-blue",
     },
   ];
-  const allMenuItems = isAdmin ? [...menuItems, ...ownerMenuItems] : studentMenuItems;
+  const allMenuItems = isAdmin
+    ? [...menuItems, ...adminMenuItems, ...(isOwner ? ownerMenuItems : [])]
+    : studentMenuItems;
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
