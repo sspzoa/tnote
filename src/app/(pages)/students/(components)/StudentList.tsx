@@ -40,6 +40,7 @@ export default function StudentList({ students }: StudentListProps) {
         phoneNumber: student.phone_number,
         parentPhoneNumber: student.parent_phone_number || "",
         school: student.school || "",
+        branch: student.branch || "",
         birthYear: student.birth_year?.toString() || "",
       });
       setShowEditModal(true);
@@ -138,6 +139,9 @@ export default function StudentList({ students }: StudentListProps) {
               이름
             </th>
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              지점
+            </th>
+            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               학년
             </th>
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
@@ -149,9 +153,7 @@ export default function StudentList({ students }: StudentListProps) {
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               학교
             </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              상담
-            </th>
+
             <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
           </tr>
         </thead>
@@ -173,6 +175,9 @@ export default function StudentList({ students }: StudentListProps) {
                   <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
                 </div>
               </td>
+              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                {student.branch || "-"}
+              </td>
               <td className="px-spacing-500 py-spacing-400">
                 {student.birth_year && getGrade(student.birth_year) && (
                   <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
@@ -189,9 +194,7 @@ export default function StudentList({ students }: StudentListProps) {
               <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {student.school || "-"}
               </td>
-              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                {student.consultation_count !== undefined ? `${student.consultation_count}회` : "-"}
-              </td>
+
               <td className="relative px-spacing-500 py-spacing-400">
                 <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />
                 <DropdownMenu

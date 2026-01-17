@@ -5,6 +5,7 @@ export const editFormAtom = atom({
   phoneNumber: "",
   parentPhoneNumber: "",
   school: "",
+  branch: "",
   birthYear: "",
 });
 
@@ -13,5 +14,6 @@ export const createFormAtom = atom({
   phoneNumber: "",
   parentPhoneNumber: "",
   school: "",
+  branch: "",
   birthYear: "",
 });

@@ -6,6 +6,7 @@ interface CreateStudentData {
   phoneNumber: string;
   parentPhoneNumber?: string | null;
   school?: string | null;
+  branch?: string | null;
   birthYear?: string | null;
 }
 

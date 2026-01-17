@@ -439,11 +439,16 @@ export default function RetakesPage() {
                           <div className="shrink-0 text-right">
                             <div className="text-content-standard-tertiary text-footnote">{dateStr}</div>
                             <div className="text-content-standard-quaternary text-footnote">{timeStr}</div>
+                            {item.performed_by && (
+                              <div className="text-content-standard-quaternary text-footnote">
+                                {item.performed_by.name}
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         {item.action_type === "assign" && (
-                          <div className="mb-spacing-200 flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-purple px-spacing-300 py-spacing-200">
+                          <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-purple px-spacing-300 py-spacing-200">
                             <span className="text-footnote text-solid-purple">
                               {item.new_date ? `예정일: ${item.new_date}` : "예정일 미지정"}
                             </span>
@@ -454,7 +459,7 @@ export default function RetakesPage() {
                           item.action_type === "date_edit" ||
                           item.action_type === "complete") &&
                           item.new_date && (
-                            <div className="mb-spacing-200 flex items-center gap-spacing-200 rounded-radius-200 bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
+                            <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
                               <span className="text-content-standard-tertiary text-footnote">
                                 {item.previous_date || "미지정"}
                               </span>
@@ -466,7 +471,7 @@ export default function RetakesPage() {
                           )}
 
                         {item.action_type === "management_status_change" && item.new_management_status && (
-                          <div className="mb-spacing-200 flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-yellow px-spacing-300 py-spacing-200">
+                          <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-yellow px-spacing-300 py-spacing-200">
                             <span className="text-footnote text-solid-yellow">
                               {item.previous_management_status} → {item.new_management_status}
                             </span>
@@ -474,14 +479,8 @@ export default function RetakesPage() {
                         )}
 
                         {item.note && (
-                          <div className="mb-spacing-200 truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
+                          <div className="mt-spacing-200 truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
                             "{item.note}"
-                          </div>
-                        )}
-
-                        {item.performed_by && (
-                          <div className="text-content-standard-quaternary text-footnote">
-                            작성자: {item.performed_by.name}
                           </div>
                         )}
                       </div>

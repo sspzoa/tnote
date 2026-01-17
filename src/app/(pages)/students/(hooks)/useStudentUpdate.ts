@@ -7,6 +7,7 @@ interface UpdateStudentData {
   phoneNumber: string;
   parentPhoneNumber?: string | null;
   school?: string | null;
+  branch?: string | null;
   birthYear?: number | null;
 }
 

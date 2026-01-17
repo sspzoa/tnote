@@ -22,6 +22,7 @@ export default function StudentEditModal() {
         phoneNumber: removePhoneHyphens(form.phoneNumber),
         parentPhoneNumber: form.parentPhoneNumber ? removePhoneHyphens(form.parentPhoneNumber) : null,
         school: form.school || null,
+        branch: form.branch || null,
         birthYear: form.birthYear ? Number.parseInt(form.birthYear) : null,
       });
       alert("학생 정보가 수정되었습니다.");
@@ -83,6 +84,14 @@ export default function StudentEditModal() {
           type="text"
           value={form.school}
           onChange={(e) => setForm({ ...form, school: e.target.value })}
+        />
+
+        <FormInput
+          label="지점"
+          type="text"
+          value={form.branch}
+          onChange={(e) => setForm({ ...form, branch: e.target.value })}
+          placeholder="러셀부천"
         />
 
         <FormInput

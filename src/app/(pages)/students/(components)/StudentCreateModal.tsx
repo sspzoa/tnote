@@ -17,11 +17,12 @@ export default function StudentCreateModal() {
         phoneNumber: removePhoneHyphens(form.phoneNumber),
         parentPhoneNumber: form.parentPhoneNumber ? removePhoneHyphens(form.parentPhoneNumber) : null,
         school: form.school || null,
+        branch: form.branch || null,
         birthYear: form.birthYear || null,
       });
       alert("학생이 추가되었습니다.");
       setShowModal(false);
-      setForm({ name: "", phoneNumber: "", parentPhoneNumber: "", school: "", birthYear: "" });
+      setForm({ name: "", phoneNumber: "", parentPhoneNumber: "", school: "", branch: "", birthYear: "" });
     } catch (error) {
       alert(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
     }
@@ -81,6 +82,14 @@ export default function StudentCreateModal() {
           type="text"
           value={form.school}
           onChange={(e) => setForm({ ...form, school: e.target.value })}
+        />
+
+        <FormInput
+          label="지점"
+          type="text"
+          value={form.branch}
+          onChange={(e) => setForm({ ...form, branch: e.target.value })}
+          placeholder="러셀부천"
         />
 
         <FormInput

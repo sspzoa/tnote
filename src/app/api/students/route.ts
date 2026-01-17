@@ -30,6 +30,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
           name,
           parent_phone_number,
           school,
+          branch,
           birth_year,
           is_favorite,
           workspace
@@ -66,7 +67,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, birth_year, is_favorite, created_at")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, is_favorite, created_at")
     .eq("role", "student")
     .eq("workspace", session.workspace)
     .order("name", { ascending: true });
@@ -96,7 +97,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const { name, phoneNumber, parentPhoneNumber, school, birthYear } = await request.json();
+  const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear } = await request.json();
 
   if (!name || !phoneNumber) {
     return NextResponse.json({ error: "이름과 전화번호는 필수입니다." }, { status: 400 });
@@ -134,6 +135,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       phone_number: cleanedPhoneNumber,
       parent_phone_number: parentPhoneNumber ? removePhoneHyphens(parentPhoneNumber) : null,
       school: school?.trim() || null,
+      branch: branch?.trim() || null,
       birth_year: birthYear ? Number.parseInt(birthYear) : null,
       password: hashedPassword,
       role: "student",

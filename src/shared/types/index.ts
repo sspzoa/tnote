@@ -5,6 +5,7 @@ export interface Student {
   name: string;
   parent_phone_number?: string | null;
   school?: string | null;
+  branch?: string | null;
   birth_year?: number | null;
   is_favorite?: boolean;
   enrolled_at?: string;
