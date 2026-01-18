@@ -20,3 +20,4 @@ export const openMenuIdAtom = atom<string | null>(null);
 export const searchQueryAtom = atom("");
 export const showCompletedAtom = atom<boolean>(false);
 export const selectedDateAtom = atom<string>("all");
+export const minIncompleteCountAtom = atom<number>(0);

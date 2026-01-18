@@ -27,6 +27,7 @@ import {
 import {
   filterAtom,
   type ManagementStatus,
+  minIncompleteCountAtom,
   openMenuIdAtom,
   retakesAtom,
   searchQueryAtom,
@@ -98,6 +99,7 @@ export default function RetakesPage() {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [showCompleted, setShowCompleted] = useAtom(showCompletedAtom);
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
+  const [minIncompleteCount, setMinIncompleteCount] = useAtom(minIncompleteCountAtom);
   const [, setSelectedRetake] = useAtom(selectedRetakeAtom);
   const [, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [, setShowPostponeModal] = useAtom(showPostponeModalAtom);
@@ -199,6 +201,7 @@ export default function RetakesPage() {
     setSelectedManagementStatus("all");
     setSearchQuery("");
     setSelectedDate("all");
+    setMinIncompleteCount(0);
   };
 
   const isFilterActive =
@@ -207,7 +210,18 @@ export default function RetakesPage() {
     selectedExam !== "all" ||
     selectedManagementStatus !== "all" ||
     searchQuery !== "" ||
-    selectedDate !== "all";
+    selectedDate !== "all" ||
+    minIncompleteCount > 0;
+
+  const incompleteCountByStudent = fetchedRetakes.reduce(
+    (acc, retake) => {
+      if (retake.status !== "completed") {
+        acc[retake.student.id] = (acc[retake.student.id] || 0) + 1;
+      }
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const filteredRetakes = fetchedRetakes
     .filter((retake) => showCompleted || retake.status !== "completed")
@@ -215,7 +229,22 @@ export default function RetakesPage() {
     .filter((retake) => selectedExam === "all" || retake.exam.id === selectedExam)
     .filter((retake) => selectedManagementStatus === "all" || retake.management_status === selectedManagementStatus)
     .filter((retake) => selectedDate === "all" || retake.current_scheduled_date === selectedDate)
-    .filter((retake) => retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    .filter((retake) => retake.student.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(
+      (retake) => minIncompleteCount === 0 || (incompleteCountByStudent[retake.student.id] || 0) >= minIncompleteCount,
+    )
+    .sort((a, b) => {
+      if (minIncompleteCount > 0) {
+        const nameCompare = a.student.name.localeCompare(b.student.name, "ko");
+        if (nameCompare !== 0) return nameCompare;
+        const dateA = a.current_scheduled_date || "";
+        const dateB = b.current_scheduled_date || "";
+        return dateA.localeCompare(dateB);
+      }
+      const dateA = a.current_scheduled_date || "";
+      const dateB = b.current_scheduled_date || "";
+      return dateA.localeCompare(dateB);
+    });
 
   if (error) {
     return (
@@ -258,7 +287,7 @@ export default function RetakesPage() {
       <div className="flex flex-col gap-spacing-600">
         <div className="flex flex-col gap-spacing-600">
           <div className="flex flex-col gap-spacing-300">
-            <div className="flex flex-wrap gap-spacing-300">
+            <div className="flex flex-wrap items-center gap-spacing-300">
               <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
                 {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
               </FilterButton>
@@ -270,6 +299,43 @@ export default function RetakesPage() {
                 <option value="absent">결석</option>
               </FilterSelect>
 
+              <FilterSelect
+                value={selectedManagementStatus}
+                onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
+                <option value="all">전체 관리 상태</option>
+                {managementStatusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </FilterSelect>
+
+              <FilterSelect
+                value={minIncompleteCount.toString()}
+                onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
+                <option value="0">미완료 개수</option>
+                <option value="2">2개 이상</option>
+                <option value="3">3개 이상</option>
+                <option value="4">4개 이상</option>
+              </FilterSelect>
+
+              <input
+                type="date"
+                value={selectedDate === "all" ? "" : selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value || "all")}
+                className="cursor-pointer rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+              />
+
+              {isFilterActive && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-all duration-150 hover:text-core-accent">
+                  초기화
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-spacing-300">
               <FilterSelect value={selectedCourse} onChange={(e) => handleCourseChange(e.target.value)}>
                 <option value="all">전체 반</option>
                 {courses.map((course) => (
@@ -290,32 +356,6 @@ export default function RetakesPage() {
                   </option>
                 ))}
               </FilterSelect>
-
-              <FilterSelect
-                value={selectedManagementStatus}
-                onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
-                <option value="all">전체 관리 상태</option>
-                {managementStatusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </FilterSelect>
-
-              <input
-                type="date"
-                value={selectedDate === "all" ? "" : selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value || "all")}
-                className="cursor-pointer rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-              />
-
-              {isFilterActive && (
-                <button
-                  onClick={handleResetFilters}
-                  className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-all duration-150 hover:text-core-accent">
-                  초기화
-                </button>
-              )}
             </div>
 
             {courses.length > 0 && (
