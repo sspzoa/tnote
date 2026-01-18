@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { Check, Eye, Info, Minus, Send } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { FilterButton } from "@/shared/components/ui/filterButton";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
@@ -234,9 +235,7 @@ export default function RetakeNoticeTab() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-spacing-900">
-          <div className="size-8 animate-spin rounded-full border-2 border-core-accent border-t-solid-transparent" />
-        </div>
+        <LoadingComponent />
       ) : (
         <div className="flex flex-row items-start gap-spacing-600">
           <div className="flex-1 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">

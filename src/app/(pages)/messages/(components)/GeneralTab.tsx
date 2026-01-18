@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { Check, Eye, Info, Minus, Send } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { FilterButton } from "@/shared/components/ui/filterButton";
 import { Modal } from "@/shared/components/ui/modal";
@@ -152,11 +153,7 @@ export default function GeneralTab() {
   }, [selectedIds, messageText, recipientType, sendMessage, setMessageText, setSelectedIds]);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-spacing-900">
-        <div className="size-8 animate-spin rounded-full border-2 border-core-accent border-t-solid-transparent" />
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
   return (
