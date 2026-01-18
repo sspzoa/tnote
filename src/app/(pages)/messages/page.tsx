@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { ChevronDown, ChevronUp, FileText, History, MessageSquare, RefreshCw, X } from "lucide-react";
+import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, RefreshCw, Settings, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
@@ -9,7 +9,9 @@ import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
 import RetakeNoticeTab from "./(components)/RetakeNoticeTab";
+import SenderPhoneSettings from "./(components)/SenderPhoneSettings";
 import { type MessageBatch, useMessageHistory } from "./(hooks)/useMessageHistory";
+import { useSenderPhone } from "./(hooks)/useSenderPhone";
 
 const TABS: { value: MessageTab; label: string; icon: typeof MessageSquare }[] = [
   { value: "general", label: "일반", icon: MessageSquare },
@@ -132,10 +134,24 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
   );
 };
 
+const formatPhoneNumberDisplay = (phone: string | null): string => {
+  if (!phone) return "미설정";
+  const cleaned = phone.replace(/\D/g, "");
+  if (cleaned.length === 11) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+  }
+  if (cleaned.length === 10) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+  }
+  return phone;
+};
+
 export default function MessagesPage() {
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const [showHistoryPanel, setShowHistoryPanel] = useAtom(showHistoryModalAtom);
+  const [showSenderPhoneSettings, setShowSenderPhoneSettings] = useState(false);
   const { history, isLoading, refetch } = useMessageHistory();
+  const { senderPhoneNumber, isLoading: isSenderPhoneLoading } = useSenderPhone();
 
   useEffect(() => {
     if (showHistoryPanel) {
@@ -150,12 +166,24 @@ export default function MessagesPage() {
         subtitle="학생 및 학부모에게 문자를 발송합니다"
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
-          <button
-            onClick={() => setShowHistoryPanel(true)}
-            className="flex items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
-            <History className="size-4" />
-            발송 이력
-          </button>
+          <div className="flex items-center gap-spacing-300">
+            <button
+              onClick={() => setShowSenderPhoneSettings(true)}
+              className="flex items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+              <Phone className="size-4" />
+              <span className="hidden sm:inline">발신번호:</span>
+              <span className={senderPhoneNumber ? "text-core-accent" : "text-core-status-negative"}>
+                {isSenderPhoneLoading ? "..." : formatPhoneNumberDisplay(senderPhoneNumber)}
+              </span>
+              <Settings className="size-3 text-content-standard-tertiary" />
+            </button>
+            <button
+              onClick={() => setShowHistoryPanel(true)}
+              className="flex items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+              <History className="size-4" />
+              발송 이력
+            </button>
+          </div>
         }
       />
 
@@ -229,6 +257,8 @@ export default function MessagesPage() {
           </div>
         </>
       )}
+
+      <SenderPhoneSettings isOpen={showSenderPhoneSettings} onClose={() => setShowSenderPhoneSettings(false)} />
     </Container>
   );
 }

@@ -2,9 +2,8 @@ import { SolapiMessageService } from "solapi";
 
 const apiKey = process.env.SOLAPI_API_KEY;
 const apiSecret = process.env.SOLAPI_API_SECRET;
-const senderNumber = process.env.SOLAPI_SENDER_NUMBER;
 
-if (!apiKey || !apiSecret || !senderNumber) {
+if (!apiKey || !apiSecret) {
   console.warn("SOLAPI 환경변수가 설정되지 않았습니다.");
 }
 
@@ -13,6 +12,7 @@ const messageService = apiKey && apiSecret ? new SolapiMessageService(apiKey, ap
 export interface SendSMSParams {
   to: string;
   text: string;
+  from: string;
   subject?: string;
 }
 
@@ -28,6 +28,7 @@ export interface SendSMSResult {
 export interface BulkSendSMSParams {
   recipients: string[];
   text: string;
+  from: string;
   subject?: string;
 }
 
@@ -60,17 +61,22 @@ const isDeliveryFailed = (statusCode: string): boolean => {
   return (code >= 1000 && code < 2000) || (code > 3000 && code < 4000);
 };
 
-export const sendSMS = async ({ to, text, subject }: SendSMSParams): Promise<SendSMSResult> => {
-  if (!messageService || !senderNumber) {
+export const sendSMS = async ({ to, text, from, subject }: SendSMSParams): Promise<SendSMSResult> => {
+  if (!messageService) {
     return { success: false, error: "SMS 서비스가 설정되지 않았습니다." };
+  }
+
+  if (!from) {
+    return { success: false, error: "발신번호가 설정되지 않았습니다." };
   }
 
   try {
     const cleanedTo = to.replace(/-/g, "");
+    const cleanedFrom = from.replace(/-/g, "");
 
     const result = await messageService.send({
       to: cleanedTo,
-      from: senderNumber,
+      from: cleanedFrom,
       text,
       ...(subject && { subject }),
     });
@@ -117,8 +123,13 @@ export const sendSMS = async ({ to, text, subject }: SendSMSParams): Promise<Sen
   }
 };
 
-export const sendBulkSMS = async ({ recipients, text, subject }: BulkSendSMSParams): Promise<BulkSendSMSResult> => {
-  if (!messageService || !senderNumber) {
+export const sendBulkSMS = async ({
+  recipients,
+  text,
+  from,
+  subject,
+}: BulkSendSMSParams): Promise<BulkSendSMSResult> => {
+  if (!messageService) {
     return {
       success: false,
       total: recipients.length,
@@ -128,10 +139,21 @@ export const sendBulkSMS = async ({ recipients, text, subject }: BulkSendSMSPara
     };
   }
 
+  if (!from) {
+    return {
+      success: false,
+      total: recipients.length,
+      successCount: 0,
+      failCount: recipients.length,
+      error: "발신번호가 설정되지 않았습니다.",
+    };
+  }
+
   try {
+    const cleanedFrom = from.replace(/-/g, "");
     const messages = recipients.map((to) => ({
       to: to.replace(/-/g, ""),
-      from: senderNumber,
+      from: cleanedFrom,
       text,
       ...(subject && { subject }),
     }));
@@ -162,5 +184,5 @@ export const sendBulkSMS = async ({ recipients, text, subject }: BulkSendSMSPara
 };
 
 export const isSMSServiceAvailable = (): boolean => {
-  return messageService !== null && senderNumber !== undefined;
+  return messageService !== null;
 };

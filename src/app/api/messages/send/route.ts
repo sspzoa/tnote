@@ -16,6 +16,21 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "SMS 서비스가 설정되지 않았습니다." }, { status: 503 });
   }
 
+  const { data: workspace, error: workspaceError } = await supabase
+    .from("Workspaces")
+    .select("sender_phone_number")
+    .eq("id", session.workspace)
+    .single();
+
+  if (workspaceError || !workspace?.sender_phone_number) {
+    return NextResponse.json(
+      { error: "발신번호가 설정되지 않았습니다. 문자 관리에서 발신번호를 먼저 설정해주세요." },
+      { status: 400 },
+    );
+  }
+
+  const senderPhoneNumber = workspace.sender_phone_number;
+
   const { recipientType, recipientIds, text, subject } = await request.json();
 
   if (!recipientType || !recipientIds || !Array.isArray(recipientIds) || recipientIds.length === 0) {
@@ -105,6 +120,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     const result = await sendSMS({
       to: recipient.phone,
       text: messageContent,
+      from: senderPhoneNumber,
       subject: subject?.trim(),
     });
 
