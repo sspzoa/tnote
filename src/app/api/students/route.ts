@@ -37,8 +37,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
         )
       `)
       .eq("course_id", courseId)
-      .eq("student.workspace", session.workspace)
-      .order("enrolled_at", { ascending: true });
+      .eq("student.workspace", session.workspace);
 
     if (error) throw error;
 
@@ -57,11 +56,16 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
     }
 
-    const students = data.map((enrollment) => ({
-      ...enrollment.student,
-      enrolled_at: enrollment.enrolled_at,
-      consultation_count: countMap.get(enrollment.student_id) || 0,
-    }));
+    const students = data
+      .map((enrollment) => {
+        const student = enrollment.student as unknown as { name: string; [key: string]: unknown };
+        return {
+          ...student,
+          enrolled_at: enrollment.enrolled_at,
+          consultation_count: countMap.get(enrollment.student_id) || 0,
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, "ko"));
     return NextResponse.json({ data: students });
   }
 

@@ -74,6 +74,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const courseId = searchParams.get("courseId");
   let studentId = searchParams.get("studentId");
   const status = searchParams.get("status");
+  const managementStatus = searchParams.get("managementStatus");
 
   if (session.role === "student") {
     studentId = session.userId;
@@ -84,10 +85,10 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     .select(`
       *,
       exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
-      student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
+      student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace, parent_phone_number)
     `)
     .eq("student.workspace", session.workspace)
-    .order("current_scheduled_date", { ascending: false, nullsFirst: true });
+    .order("current_scheduled_date", { ascending: true, nullsFirst: false });
 
   if (courseId) {
     query = query.eq("exam.course_id", courseId);
@@ -97,6 +98,9 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   }
   if (status) {
     query = query.eq("status", status);
+  }
+  if (managementStatus) {
+    query = query.eq("management_status", managementStatus);
   }
 
   const { data, error } = await query;

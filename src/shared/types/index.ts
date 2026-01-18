@@ -164,3 +164,24 @@ export interface CalendarEvent {
     status?: string;
   };
 }
+
+// Message types
+export type RecipientType = "student" | "parent" | "both";
+
+export interface SendMessageRequest {
+  recipientType: RecipientType;
+  recipientIds: string[];
+  text: string;
+  subject?: string;
+}
+
+export interface SendMessageResponse {
+  success: boolean;
+  data?: {
+    groupId: string;
+    total: number;
+    successCount: number;
+    failCount: number;
+  };
+  error?: string;
+}

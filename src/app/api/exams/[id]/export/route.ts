@@ -20,6 +20,7 @@ interface StudentAssignment {
 }
 
 interface ExportRow {
+  studentId: string;
   name: string;
   parentPhone: string;
   assignmentStatus: string;
@@ -99,6 +100,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   }
 
   const exportData: ExportRow[] = sortedScores.map((scoreData) => ({
+    studentId: scoreData.student_id,
     name: scoreData.student.name,
     parentPhone: scoreData.student.parent_phone_number || "",
     assignmentStatus: assignmentMap.get(scoreData.student_id) || "",

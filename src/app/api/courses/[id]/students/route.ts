@@ -25,7 +25,9 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (error) throw error;
 
-  const students = data.map((enrollment) => enrollment.student);
+  const students = data
+    .map((enrollment) => enrollment.student as unknown as { name: string; [key: string]: unknown })
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
   return NextResponse.json({ data: students });
 };
 
