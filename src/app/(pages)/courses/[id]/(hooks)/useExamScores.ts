@@ -56,7 +56,6 @@ export const useExamScoresSave = (courseId: string) => {
     onSuccess: (_, { examId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.exams.scores(examId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.exams.byCourse(courseId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.exams.export(examId) });
     },
   });
 

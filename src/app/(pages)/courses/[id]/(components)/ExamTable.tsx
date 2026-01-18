@@ -11,14 +11,12 @@ interface ExamTableProps {
   onAssignment: (exam: Exam) => void;
   onEdit: (exam: Exam) => void;
   onDelete: (exam: Exam) => void;
-  onExcelExport: (exam: Exam) => void;
 }
 
-export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete, onExcelExport }: ExamTableProps) {
+export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete }: ExamTableProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   const getMenuItems = (exam: Exam): DropdownMenuItem[] => [
-    { label: "(임시) 문자용 엑셀", onClick: () => onExcelExport(exam), dividerAfter: true },
     { label: "수정", onClick: () => onEdit(exam), dividerAfter: true },
     { label: "삭제", onClick: () => onDelete(exam), variant: "danger" },
   ];

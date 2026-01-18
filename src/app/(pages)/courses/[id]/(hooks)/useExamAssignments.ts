@@ -44,7 +44,6 @@ export const useExamAssignmentsSave = () => {
     },
     onSuccess: (_, { examId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.exams.assignments(examId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.exams.export(examId) });
     },
   });
 

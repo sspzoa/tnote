@@ -8,7 +8,6 @@ import { Button } from "@/shared/components/ui/button";
 import { AssignmentModal } from "./(components)/AssignmentModal";
 import { ExamFormModal } from "./(components)/ExamFormModal";
 import { ExamTable } from "./(components)/ExamTable";
-import { ExcelExportModal } from "./(components)/ExcelExportModal";
 import { ScoreInputModal } from "./(components)/ScoreInputModal";
 import { useCourseDetail } from "./(hooks)/useCourseDetail";
 import { useCourseStudents } from "./(hooks)/useCourseStudents";
@@ -53,10 +52,6 @@ export default function CourseDetailPage() {
   const [assignmentExam, setAssignmentExam] = useState<Exam | null>(null);
   const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
-
-  // Excel export modal states
-  const [showExcelExportModal, setShowExcelExportModal] = useState(false);
-  const [excelExportExam, setExcelExportExam] = useState<Exam | null>(null);
 
   // Conditional hooks for modal data
   const { students: scoreStudents, isLoading: loadingScoreStudents } = useCourseStudents(courseId, showScoreModal);
@@ -299,16 +294,6 @@ export default function CourseDetailPage() {
   const loadingScores = loadingScoreStudents || loadingExistingScores;
   const loadingAssignments = loadingAssignmentStudents || loadingExistingAssignments;
 
-  const openExcelExportModal = (exam: Exam) => {
-    setExcelExportExam(exam);
-    setShowExcelExportModal(true);
-  };
-
-  const closeExcelExportModal = () => {
-    setShowExcelExportModal(false);
-    setExcelExportExam(null);
-  };
-
   if (courseLoading || examsLoading || !course) {
     return <LoadingComponent />;
   }
@@ -343,7 +328,6 @@ export default function CourseDetailPage() {
             onAssignment={openAssignmentModal}
             onEdit={openEditModal}
             onDelete={handleDelete}
-            onExcelExport={openExcelExportModal}
           />
         )}
 
@@ -414,8 +398,6 @@ export default function CourseDetailPage() {
           onSave={handleSaveAssignments}
           isSaving={isSavingAssignments}
         />
-
-        <ExcelExportModal isOpen={showExcelExportModal} onClose={closeExcelExportModal} exam={excelExportExam} />
       </div>
     </div>
   );
