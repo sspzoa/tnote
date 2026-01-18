@@ -53,6 +53,24 @@ interface AssignmentHistoryInfo {
   };
 }
 
+interface RetakeHistoryInfo {
+  id: string;
+  status: "pending" | "completed" | "absent";
+  managementStatus: string;
+  scheduledDate: string | null;
+  postponeCount: number;
+  absentCount: number;
+  exam: {
+    id: string;
+    name: string;
+    examNumber: number;
+    course: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
 interface StudentInfo {
   id: string;
   phoneNumber: string;
@@ -70,6 +88,7 @@ export interface StudentDetail {
   examScores: ExamScoreInfo[];
   clinicHistory: ClinicHistoryInfo[];
   assignmentHistory: AssignmentHistoryInfo[];
+  retakeHistory: RetakeHistoryInfo[];
 }
 
 export const useStudentDetail = (studentId: string | null) => {

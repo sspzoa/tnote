@@ -11,6 +11,12 @@ import { useStudentDetail } from "../(hooks)/useStudentDetail";
 
 const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
 
+const RETAKE_STATUS_LABELS: Record<string, string> = {
+  pending: "대기",
+  completed: "완료",
+  absent: "결석",
+};
+
 const formatDaysOfWeek = (days: number[] | null): string => {
   if (!days || days.length === 0) return "-";
   return days.map((d) => DAY_NAMES[d]).join(", ");
@@ -223,6 +229,56 @@ export default function StudentInfoModal() {
                     </div>
                     <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
                       {new Date(history.attendanceDate).toLocaleDateString("ko-KR")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section>
+            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 재시험</h3>
+            {studentDetail.retakeHistory.length === 0 ? (
+              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+                재시험 기록이 없습니다.
+              </div>
+            ) : (
+              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+                {studentDetail.retakeHistory.map((retake) => (
+                  <div
+                    key={retake.id}
+                    className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex flex-col gap-spacing-50">
+                      <span className="font-medium text-body text-content-standard-primary">
+                        {retake.exam.course.name} - {retake.exam.name}
+                      </span>
+                      <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                        <span>
+                          {retake.scheduledDate
+                            ? new Date(retake.scheduledDate).toLocaleDateString("ko-KR", {
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : "날짜 미정"}
+                        </span>
+                        {(retake.postponeCount > 0 || retake.absentCount > 0) && (
+                          <span className="text-content-standard-quaternary">
+                            {retake.postponeCount > 0 && `연기 ${retake.postponeCount}회`}
+                            {retake.postponeCount > 0 && retake.absentCount > 0 && " / "}
+                            {retake.absentCount > 0 && `결석 ${retake.absentCount}회`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <span
+                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
+                        retake.status === "completed"
+                          ? "bg-solid-translucent-green text-solid-green"
+                          : retake.status === "absent"
+                            ? "bg-solid-translucent-red text-core-status-negative"
+                            : "bg-solid-translucent-blue text-solid-blue"
+                      }`}>
+                      {RETAKE_STATUS_LABELS[retake.status]}
                     </span>
                   </div>
                 ))}
