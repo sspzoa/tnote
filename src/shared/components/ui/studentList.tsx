@@ -3,28 +3,28 @@
 import type { ReactNode } from "react";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 
-export interface StudentListStudent {
+export type StudentListStudent = {
   id: string;
   name: string;
   phone_number: string;
   school?: string | null;
-}
+};
 
-interface StudentListContainerProps {
+type StudentListContainerProps = {
   children: ReactNode;
   className?: string;
-}
+};
 
-export function StudentListContainer({ children, className = "" }: StudentListContainerProps) {
+export const StudentListContainer = ({ children, className = "" }: StudentListContainerProps) => {
   return (
     <div
       className={`h-80 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary ${className}`}>
       {children}
     </div>
   );
-}
+};
 
-interface StudentListItemProps {
+type StudentListItemProps = {
   student: StudentListStudent;
   selected?: boolean;
   onToggle?: () => void;
@@ -32,9 +32,9 @@ interface StudentListItemProps {
   badge?: ReactNode;
   rightContent?: ReactNode;
   extraInfo?: ReactNode;
-}
+};
 
-export function StudentListItem({
+export const StudentListItem = ({
   student,
   selected,
   onToggle,
@@ -42,7 +42,7 @@ export function StudentListItem({
   badge,
   rightContent,
   extraInfo,
-}: StudentListItemProps) {
+}: StudentListItemProps) => {
   const content = (
     <>
       {onToggle !== undefined && (
@@ -68,7 +68,7 @@ export function StudentListItem({
     </>
   );
 
-  const baseClassName = `flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0 ${
+  const baseClassName = `flex items-center gap-spacing-300 border-line-divider px-spacing-400 py-spacing-300 [&:not(:last-child)]:border-b ${
     highlighted ? "bg-solid-translucent-red/30" : ""
   }`;
 
@@ -82,20 +82,20 @@ export function StudentListItem({
   }
 
   return <div className={baseClassName}>{content}</div>;
-}
+};
 
-interface StudentListEmptyProps {
+type StudentListEmptyProps = {
   message?: string;
-}
+};
 
-export function StudentListEmpty({ message = "학생이 없습니다." }: StudentListEmptyProps) {
+export const StudentListEmpty = ({ message = "학생이 없습니다." }: StudentListEmptyProps) => {
   return <div className="py-spacing-600 text-center text-content-standard-tertiary">{message}</div>;
-}
+};
 
-interface StudentListLoadingProps {
+type StudentListLoadingProps = {
   message?: string;
-}
+};
 
-export function StudentListLoading({ message = "로딩중..." }: StudentListLoadingProps) {
+export const StudentListLoading = ({ message = "로딩중..." }: StudentListLoadingProps) => {
   return <div className="py-spacing-600 text-center text-content-standard-tertiary">{message}</div>;
-}
+};

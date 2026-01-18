@@ -1,29 +1,22 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 
-interface FilterState {
+type FilterState = {
   course: boolean;
   retake: boolean;
   clinic: boolean;
-}
+};
 
-interface Props {
+type Props = {
   currentDate: Date;
   filters: FilterState;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onToday: () => void;
   onFilterChange: (filters: FilterState) => void;
-}
+};
 
-export default function CalendarToolbar({
-  currentDate,
-  filters,
-  onPrevMonth,
-  onNextMonth,
-  onToday,
-  onFilterChange,
-}: Props) {
+const CalendarToolbar = ({ currentDate, filters, onPrevMonth, onNextMonth, onToday, onFilterChange }: Props) => {
   return (
     <div className="mb-spacing-500 flex items-center justify-between">
       <div className="flex items-center gap-spacing-200">
@@ -57,10 +50,10 @@ export default function CalendarToolbar({
           onClick={() => onFilterChange({ ...filters, course: !filters.course })}
           className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
             filters.course
-              ? "bg-[#3B82F6]/20 ring-1 ring-[#3B82F6]"
+              ? "bg-solid-translucent-blue ring-1 ring-solid-blue"
               : "bg-components-fill-standard-secondary opacity-50"
           }`}>
-          <div className="h-3 w-3 rounded-radius-100 bg-[#3B82F6]" />
+          <div className="size-3 rounded-radius-100 bg-solid-blue" />
           <span className="text-content-standard-secondary text-footnote">수업</span>
         </button>
         <button
@@ -68,10 +61,10 @@ export default function CalendarToolbar({
           onClick={() => onFilterChange({ ...filters, retake: !filters.retake })}
           className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
             filters.retake
-              ? "bg-[#EF4444]/20 ring-1 ring-[#EF4444]"
+              ? "bg-solid-translucent-red ring-1 ring-solid-red"
               : "bg-components-fill-standard-secondary opacity-50"
           }`}>
-          <div className="h-3 w-3 rounded-radius-100 bg-[#EF4444]" />
+          <div className="size-3 rounded-radius-100 bg-solid-red" />
           <span className="text-content-standard-secondary text-footnote">재시험</span>
         </button>
         <button
@@ -79,13 +72,15 @@ export default function CalendarToolbar({
           onClick={() => onFilterChange({ ...filters, clinic: !filters.clinic })}
           className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
             filters.clinic
-              ? "bg-[#8B5CF6]/20 ring-1 ring-[#8B5CF6]"
+              ? "bg-solid-translucent-purple ring-1 ring-solid-purple"
               : "bg-components-fill-standard-secondary opacity-50"
           }`}>
-          <div className="h-3 w-3 rounded-radius-100 bg-[#8B5CF6]" />
+          <div className="size-3 rounded-radius-100 bg-solid-purple" />
           <span className="text-content-standard-secondary text-footnote">클리닉</span>
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default CalendarToolbar;

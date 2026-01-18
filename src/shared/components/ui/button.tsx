@@ -3,13 +3,13 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 type ButtonVariant = "primary" | "secondary" | "danger" | "success";
 type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
   loadingText?: string;
   children: ReactNode;
-}
+};
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
@@ -28,7 +28,7 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: "px-spacing-600 py-spacing-400 text-title",
 };
 
-export function Button({
+export const Button = ({
   variant = "primary",
   size = "md",
   isLoading = false,
@@ -37,7 +37,7 @@ export function Button({
   disabled,
   className = "",
   ...props
-}: ButtonProps) {
+}: ButtonProps) => {
   const isDisabled = disabled || isLoading;
 
   return (
@@ -47,7 +47,7 @@ export function Button({
       {...props}>
       {isLoading ? (
         <span className="flex items-center justify-center gap-spacing-200">
-          <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-solid-transparent" />
           {loadingText || children}
         </span>
       ) : (
@@ -55,4 +55,4 @@ export function Button({
       )}
     </button>
   );
-}
+};

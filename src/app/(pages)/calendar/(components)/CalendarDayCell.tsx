@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import type { CalendarEvent } from "@/shared/types";
 import CalendarEventItem from "./CalendarEventItem";
 
-interface Props {
+type Props = {
   day: Date;
   events: CalendarEvent[];
   isCurrentMonth: boolean;
@@ -13,11 +13,11 @@ interface Props {
   onEventClick: (event: CalendarEvent) => void;
   onExpand: () => void;
   onCollapse: () => void;
-}
+};
 
 const MAX_VISIBLE_EVENTS = 3;
 
-export default function CalendarDayCell({
+const CalendarDayCell = ({
   day,
   events,
   isCurrentMonth,
@@ -28,17 +28,20 @@ export default function CalendarDayCell({
   onEventClick,
   onExpand,
   onCollapse,
-}: Props) {
+}: Props) => {
   const hasMoreEvents = events.length > MAX_VISIBLE_EVENTS;
   const visibleEvents = isExpanded ? events : events.slice(0, MAX_VISIBLE_EVENTS);
 
+  const borderClasses = [isLastColumn ? "" : "border-r", isLastRow ? "" : "border-b"].join(" ");
+
+  const bgClasses = [
+    !isCurrentMonth ? "bg-components-fill-standard-secondary/50" : "",
+    isToday ? "bg-core-accent-translucent" : "",
+  ].join(" ");
+
   return (
     <div
-      className={`relative flex min-h-[120px] flex-col border-line-outline border-r border-b p-spacing-200 transition-colors duration-150 hover:bg-core-accent-translucent/30 ${
-        isLastColumn ? "border-r-0" : ""
-      } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-components-fill-standard-secondary/50" : ""} ${
-        isToday ? "bg-core-accent-translucent" : ""
-      }`}>
+      className={`relative flex min-h-[120px] flex-col border-line-outline p-spacing-200 transition-colors duration-150 hover:bg-core-accent-translucent/30 ${borderClasses} ${bgClasses}`}>
       <div
         className={`mb-spacing-100 text-right text-footnote ${
           !isCurrentMonth
@@ -81,4 +84,6 @@ export default function CalendarDayCell({
       </div>
     </div>
   );
-}
+};
+
+export default CalendarDayCell;

@@ -62,7 +62,7 @@ export default function Home() {
                 key={item.href}
                 href={item.href}
                 className="group relative flex flex-col items-center gap-spacing-300 overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all duration-200 hover:border-core-accent">
-                <div className="absolute inset-0 bg-gradient-to-b from-core-accent-translucent/0 to-core-accent-translucent/0 transition-all duration-200 group-hover:from-core-accent-translucent/30 group-hover:to-transparent" />
+                <div className="absolute top-0 right-0 bottom-0 left-0 bg-gradient-to-b from-core-accent-translucent/0 to-core-accent-translucent/0 transition-all duration-200 group-hover:from-core-accent-translucent/30 group-hover:to-transparent" />
                 <div
                   className={`relative flex size-16 items-center justify-center rounded-full ${item.bgColor} transition-all duration-200 group-hover:scale-110`}>
                   <item.icon className={`size-8 ${item.iconColor}`} />

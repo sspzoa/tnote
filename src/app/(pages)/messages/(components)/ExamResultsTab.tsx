@@ -236,7 +236,7 @@ export default function ExamResultsTab() {
 
       {exportLoading && selectedExamId ? (
         <div className="flex items-center justify-center py-spacing-900">
-          <div className="size-8 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
+          <div className="size-8 animate-spin rounded-full border-2 border-core-accent border-t-solid-transparent" />
         </div>
       ) : (
         <div className="flex flex-row items-start gap-spacing-600">

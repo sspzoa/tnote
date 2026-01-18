@@ -235,7 +235,7 @@ export default function RetakeNoticeTab() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-spacing-900">
-          <div className="size-8 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
+          <div className="size-8 animate-spin rounded-full border-2 border-core-accent border-t-solid-transparent" />
         </div>
       ) : (
         <div className="flex flex-row items-start gap-spacing-600">
@@ -298,7 +298,7 @@ export default function RetakeNoticeTab() {
                     return (
                       <label
                         key={retake.id}
-                        className="flex cursor-pointer items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 transition-all duration-150 last:border-b-0 hover:bg-core-accent-translucent/50">
+                        className="flex cursor-pointer items-center gap-spacing-300 border-line-divider px-spacing-400 py-spacing-300 transition-all duration-150 hover:bg-core-accent-translucent/50 [&:not(:last-child)]:border-b">
                         <input
                           type="checkbox"
                           checked={isSelected}

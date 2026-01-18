@@ -110,7 +110,7 @@ export default function StudentsPage() {
       {showConsultationPanel && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-solid-black/50 backdrop-blur-sm transition-opacity"
+            className="fixed top-0 right-0 bottom-0 left-0 z-40 bg-solid-black/50 backdrop-blur-sm transition-opacity"
             onClick={() => setShowConsultationPanel(false)}
           />
 
@@ -130,7 +130,7 @@ export default function StudentsPage() {
             <div className="flex-1 overflow-y-auto">
               {consultationsLoading ? (
                 <div className="flex flex-col items-center justify-center py-spacing-900">
-                  <div className="mb-spacing-300 size-8 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
+                  <div className="mb-spacing-300 size-8 animate-spin rounded-full border-2 border-core-accent border-t-solid-transparent" />
                   <span className="text-content-standard-tertiary text-label">로딩중...</span>
                 </div>
               ) : consultations.length === 0 ? (
