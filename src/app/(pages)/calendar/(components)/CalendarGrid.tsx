@@ -13,15 +13,15 @@ import CalendarDayCell from "./CalendarDayCell";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
-type Props = {
+interface Props {
   currentDate: Date;
   events: CalendarEvent[];
   expandedDay: Date | null;
   onEventClick: (event: CalendarEvent) => void;
   onExpandDay: (day: Date | null) => void;
-};
+}
 
-const CalendarGrid = ({ currentDate, events, expandedDay, onEventClick, onExpandDay }: Props) => {
+export default function CalendarGrid({ currentDate, events, expandedDay, onEventClick, onExpandDay }: Props) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -33,10 +33,10 @@ const CalendarGrid = ({ currentDate, events, expandedDay, onEventClick, onExpand
   return (
     <div className="overflow-hidden rounded-radius-300 border border-line-outline">
       <div className="grid grid-cols-7 border-line-outline border-b bg-components-fill-standard-secondary">
-        {WEEKDAYS.map((day, idx) => (
+        {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className={`px-spacing-200 py-spacing-300 text-center font-semibold text-content-standard-secondary text-label ${idx < WEEKDAYS.length - 1 ? "border-line-outline border-r" : ""}`}>
+            className="border-line-outline border-r px-spacing-200 py-spacing-300 text-center font-semibold text-content-standard-secondary text-label last:border-r-0">
             {day}
           </div>
         ))}
@@ -70,6 +70,4 @@ const CalendarGrid = ({ currentDate, events, expandedDay, onEventClick, onExpand
       </div>
     </div>
   );
-};
-
-export default CalendarGrid;
+}

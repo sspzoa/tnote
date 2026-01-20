@@ -233,7 +233,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="fixed top-0 right-0 bottom-0 left-0 z-50 flex flex-col bg-components-fill-standard-primary md:hidden">
+      <div className="fixed inset-0 z-50 flex flex-col bg-components-fill-standard-primary md:hidden">
         <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
           <div className="flex items-center gap-spacing-300">
             <h1 className="font-bold text-content-standard-primary text-heading">Tnote</h1>

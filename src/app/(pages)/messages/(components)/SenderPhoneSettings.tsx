@@ -95,7 +95,7 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
       }>
       {isLoading ? (
         <div className="flex items-center justify-center py-spacing-600">
-          <div className="size-6 animate-spin rounded-full border-2 border-core-accent border-t-solid-transparent" />
+          <div className="size-6 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
         </div>
       ) : (
         <div className="space-y-spacing-400">

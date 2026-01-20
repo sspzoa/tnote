@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect, useId } from "react";
 
-type ModalProps = {
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -10,7 +10,7 @@ type ModalProps = {
   children: ReactNode;
   footer?: ReactNode;
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
-};
+}
 
 const maxWidthStyles = {
   sm: "max-w-sm",
@@ -22,7 +22,7 @@ const maxWidthStyles = {
   "4xl": "max-w-4xl",
 };
 
-export const Modal = ({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "2xl" }: ModalProps) => {
+export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "2xl" }: ModalProps) {
   const titleId = useId();
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export const Modal = ({ isOpen, onClose, title, subtitle, children, footer, maxW
 
   return (
     <div
-      className="fixed top-0 right-0 bottom-0 left-0 z-50 flex items-center justify-center bg-solid-black/60 p-spacing-400 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/60 p-spacing-400 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -72,4 +72,4 @@ export const Modal = ({ isOpen, onClose, title, subtitle, children, footer, maxW
       </div>
     </div>
   );
-};
+}

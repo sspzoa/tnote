@@ -8,14 +8,16 @@ import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { useUser } from "@/shared/hooks/useUser";
-import { showInviteModalAtom } from "./(atoms)/useModalStore";
+import { showInviteModalAtom, showWorkspaceDeleteModalAtom } from "./(atoms)/useModalStore";
 import AdminInviteModal from "./(components)/AdminInviteModal";
 import AdminList from "./(components)/AdminList";
+import WorkspaceDeleteModal from "./(components)/WorkspaceDeleteModal";
 import { useAdmins } from "./(hooks)/useAdmins";
 
 export default function AdminsPage() {
   const { admins, isLoading, error } = useAdmins();
   const setShowInviteModal = useSetAtom(showInviteModalAtom);
+  const setShowWorkspaceDeleteModal = useSetAtom(showWorkspaceDeleteModalAtom);
   const { isOwner, isLoading: userLoading } = useUser();
 
   if (error) {
@@ -47,7 +49,23 @@ export default function AdminsPage() {
         <AdminList admins={admins} isOwner={isOwner} />
       )}
 
-      {isOwner && <AdminInviteModal />}
+      {isOwner && (
+        <>
+          <AdminInviteModal />
+          <WorkspaceDeleteModal />
+          <div className="mt-spacing-800">
+            <div className="rounded-radius-400 border border-core-status-negative/30 bg-solid-translucent-red p-spacing-600">
+              <h3 className="font-bold text-content-standard-primary text-title">위험 구역</h3>
+              <p className="mt-spacing-200 text-body text-content-standard-secondary">
+                워크스페이스를 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
+              </p>
+              <Button variant="danger" onClick={() => setShowWorkspaceDeleteModal(true)} className="mt-spacing-400">
+                워크스페이스 삭제
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </Container>
   );
 }

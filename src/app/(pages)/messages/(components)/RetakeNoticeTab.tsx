@@ -297,7 +297,7 @@ export default function RetakeNoticeTab() {
                     return (
                       <label
                         key={retake.id}
-                        className="flex cursor-pointer items-center gap-spacing-300 border-line-divider px-spacing-400 py-spacing-300 transition-all duration-150 hover:bg-core-accent-translucent/50 [&:not(:last-child)]:border-b">
+                        className="flex cursor-pointer items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 transition-all duration-150 last:border-b-0 hover:bg-core-accent-translucent/50">
                         <input
                           type="checkbox"
                           checked={isSelected}

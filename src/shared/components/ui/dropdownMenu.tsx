@@ -1,24 +1,24 @@
 "use client";
 
-export type DropdownMenuItem = {
+export interface DropdownMenuItem {
   label: string;
   onClick: () => void;
   variant?: "default" | "danger";
   dividerAfter?: boolean;
-};
+}
 
-type DropdownMenuProps = {
+interface DropdownMenuProps {
   isOpen: boolean;
   onClose: () => void;
   items: DropdownMenuItem[];
-};
+}
 
-export const DropdownMenu = ({ isOpen, onClose, items }: DropdownMenuProps) => {
+export function DropdownMenu({ isOpen, onClose, items }: DropdownMenuProps) {
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="fixed top-0 right-0 bottom-0 left-0 z-10" onClick={onClose} />
+      <div className="fixed inset-0 z-10" onClick={onClose} />
       <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[120px] overflow-hidden whitespace-nowrap rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-100">
         {items.map((item, index) => (
           <div key={index}>
@@ -40,20 +40,20 @@ export const DropdownMenu = ({ isOpen, onClose, items }: DropdownMenuProps) => {
       </div>
     </>
   );
-};
+}
 
-type MoreOptionsButtonProps = {
+interface MoreOptionsButtonProps {
   onClick: () => void;
-};
+}
 
-export const MoreOptionsButton = ({ onClick }: MoreOptionsButtonProps) => {
+export function MoreOptionsButton({ onClick }: MoreOptionsButtonProps) {
   return (
     <button
       onClick={onClick}
       className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-all duration-150 hover:bg-core-accent-translucent hover:text-core-accent">
-      <svg className="size-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
+      <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
       </svg>
     </button>
   );
-};
+}

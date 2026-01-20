@@ -1,4 +1,4 @@
-const LoadingComponent = () => {
+export default function LoadingComponent() {
   return (
     <div
       className="flex min-h-[50vh] flex-col items-center justify-center gap-spacing-400"
@@ -11,6 +11,4 @@ const LoadingComponent = () => {
       <span className="text-content-standard-tertiary text-label">로딩중...</span>
     </div>
   );
-};
-
-export default LoadingComponent;
+}
