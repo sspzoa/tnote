@@ -37,7 +37,6 @@ export default function StudentInfoModal() {
       onClose={handleClose}
       title={studentDetail?.student.name || "학생 정보"}
       subtitle="학생 상세 정보"
-      maxWidth="2xl"
       footer={
         <Button variant="secondary" onClick={handleClose} className="flex-1">
           닫기

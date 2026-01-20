@@ -40,7 +40,6 @@ export default function WorkspaceDeleteModal() {
       onClose={handleClose}
       title="워크스페이스 삭제"
       subtitle="이 작업은 되돌릴 수 없습니다"
-      maxWidth="md"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} className="flex-1">

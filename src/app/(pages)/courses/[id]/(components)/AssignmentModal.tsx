@@ -82,7 +82,6 @@ export function AssignmentModal({
       onClose={onClose}
       title="과제 관리"
       subtitle={`${exam.name} (${exam.exam_number}회차)`}
-      maxWidth="2xl"
       footer={
         !isLoading && students.length > 0 ? (
           <div className="w-full">

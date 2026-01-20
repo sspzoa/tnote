@@ -92,7 +92,6 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
       onClose={() => setIsOpen(false)}
       title="재시험 이력"
       subtitle={subtitle}
-      maxWidth="2xl"
       footer={
         <Button variant="secondary" onClick={() => setIsOpen(false)} className="w-full">
           닫기

@@ -35,7 +35,6 @@ export default function StudentInfoModal() {
       onClose={() => setShowModal(false)}
       title={`${selectedStudent.name}`}
       subtitle="학생 상세 정보"
-      maxWidth="2xl"
       footer={
         <Button variant="secondary" onClick={() => setShowModal(false)} className="flex-1">
           닫기

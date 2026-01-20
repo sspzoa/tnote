@@ -76,7 +76,6 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
       onClose={onClose}
       title="발신번호 설정"
       subtitle="문자 발송 시 사용할 발신번호를 설정합니다"
-      maxWidth="sm"
       footer={
         <div className="flex w-full justify-end gap-spacing-200">
           <Button variant="secondary" onClick={onClose}>

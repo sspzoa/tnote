@@ -1,6 +1,7 @@
 "use client";
 
 import { useSetAtom } from "jotai";
+import { AlertTriangle } from "lucide-react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
@@ -54,14 +55,24 @@ export default function AdminsPage() {
           <AdminInviteModal />
           <WorkspaceDeleteModal />
           <div className="mt-spacing-800">
-            <div className="rounded-radius-400 border border-core-status-negative/30 bg-solid-translucent-red p-spacing-600">
-              <h3 className="font-bold text-content-standard-primary text-title">위험 구역</h3>
-              <p className="mt-spacing-200 text-body text-content-standard-secondary">
-                워크스페이스를 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
-              </p>
-              <Button variant="danger" onClick={() => setShowWorkspaceDeleteModal(true)} className="mt-spacing-400">
-                워크스페이스 삭제
-              </Button>
+            <div className="overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary">
+              <div className="flex items-start gap-spacing-400 border-l-4 border-l-core-status-negative p-spacing-600">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-solid-translucent-red">
+                  <AlertTriangle className="size-6 text-solid-red" />
+                </div>
+                <div className="flex flex-col">
+                  <h3 className="font-bold text-content-standard-primary text-title">위험 구역</h3>
+                  <p className="mt-spacing-200 text-body text-content-standard-secondary">
+                    워크스페이스를 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
+                  </p>
+                  <Button
+                    variant="danger"
+                    onClick={() => setShowWorkspaceDeleteModal(true)}
+                    className="mt-spacing-400 w-fit">
+                    워크스페이스 삭제
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </>

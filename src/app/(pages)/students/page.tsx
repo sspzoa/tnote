@@ -90,7 +90,6 @@ export default function StudentsPage() {
         onClose={() => setSelectedConsultation(null)}
         title={selectedConsultation?.title || ""}
         subtitle={`${selectedConsultation?.student?.name} - ${selectedConsultation?.created_at ? new Date(selectedConsultation.created_at).toLocaleDateString("ko-KR") : ""}${selectedConsultation?.creator?.name ? ` (작성자: ${selectedConsultation.creator.name})` : ""}`}
-        maxWidth="2xl"
         footer={
           <Button variant="secondary" onClick={() => setSelectedConsultation(null)} className="flex-1">
             닫기

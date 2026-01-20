@@ -9,20 +9,9 @@ interface ModalProps {
   subtitle?: string;
   children: ReactNode;
   footer?: ReactNode;
-  maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 }
 
-const maxWidthStyles = {
-  sm: "max-w-sm",
-  md: "max-w-md",
-  lg: "max-w-lg",
-  xl: "max-w-xl",
-  "2xl": "max-w-2xl",
-  "3xl": "max-w-3xl",
-  "4xl": "max-w-4xl",
-};
-
-export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "2xl" }: ModalProps) {
+export function Modal({ isOpen, onClose, title, subtitle, children, footer }: ModalProps) {
   const titleId = useId();
 
   useEffect(() => {
@@ -53,7 +42,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer, maxW
       aria-modal="true"
       aria-labelledby={titleId}>
       <div
-        className={`flex max-h-[80vh] w-full ${maxWidthStyles[maxWidth]} flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary`}
+        className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
         onClick={(e) => e.stopPropagation()}>
         <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
           <h2 id={titleId} className="font-bold text-content-standard-primary text-heading">

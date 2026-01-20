@@ -139,7 +139,6 @@ export default function ConsultationFormModal() {
       onClose={handleClose}
       title={isEditMode ? "상담일지 수정" : "상담일지 추가"}
       subtitle={!isEditMode ? `${selectedStudent.name} 학생의 상담일지를 작성합니다` : undefined}
-      maxWidth="2xl"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} className="flex-1">

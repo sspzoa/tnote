@@ -38,7 +38,6 @@ export default function StudentEditModal() {
       onClose={() => setShowModal(false)}
       title="학생 정보 수정"
       subtitle={`${selectedStudent.name} 학생의 정보를 수정합니다`}
-      maxWidth="2xl"
       footer={
         <>
           <Button variant="secondary" className="flex-1" onClick={() => setShowModal(false)}>

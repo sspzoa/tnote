@@ -34,7 +34,6 @@ export default function StudentCreateModal() {
       onClose={() => setShowModal(false)}
       title="학생 추가"
       subtitle="새로운 학생을 추가합니다. 비밀번호는 전화번호로 자동 설정됩니다."
-      maxWidth="2xl"
       footer={
         <>
           <Button variant="secondary" className="flex-1" onClick={() => setShowModal(false)}>

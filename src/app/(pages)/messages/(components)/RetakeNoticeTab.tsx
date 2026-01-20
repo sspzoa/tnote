@@ -445,7 +445,6 @@ export default function RetakeNoticeTab() {
         onClose={() => setIsPreviewOpen(false)}
         title="메시지 미리보기"
         subtitle={previewRetake ? `${previewRetake.student.name} 학생에게 발송될 메시지입니다` : undefined}
-        maxWidth="md"
         footer={
           <Button className="ml-auto" onClick={() => setIsPreviewOpen(false)}>
             확인

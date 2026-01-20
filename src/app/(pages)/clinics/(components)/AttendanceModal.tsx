@@ -77,7 +77,6 @@ export default function AttendanceModal() {
       onClose={handleClose}
       title="출석 관리"
       subtitle={selectedClinic.name}
-      maxWidth="2xl"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} className="flex-1">

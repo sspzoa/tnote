@@ -174,7 +174,6 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       isOpen={isOpen}
       onClose={handleClose}
       title="재시험 배정"
-      maxWidth="2xl"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} className="flex-1">

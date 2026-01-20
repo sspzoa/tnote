@@ -53,7 +53,6 @@ export function ScoreInputModal({
       onClose={onClose}
       title="점수 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
-      maxWidth="2xl"
       footer={
         !isLoading && students.length > 0 ? (
           <div className="w-full">
