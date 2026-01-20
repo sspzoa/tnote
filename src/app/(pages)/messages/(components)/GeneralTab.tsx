@@ -1,15 +1,12 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { Check, Eye, Info, Minus, Send } from "lucide-react";
+import { Eye, Send } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
-import { FilterButton } from "@/shared/components/ui/filterButton";
-import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
 import { StudentListContainer, StudentListEmpty, StudentListItem } from "@/shared/components/ui/studentList";
-import type { RecipientType } from "@/shared/types";
 import {
   messageTextAtom,
   recipientTypeAtom,
@@ -19,37 +16,8 @@ import {
 import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
 import { useSendMessage } from "../(hooks)/useSendMessage";
 import { useStudents } from "../(hooks)/useStudents";
-import TemplateSelector from "./TemplateSelector";
-
-const RECIPIENT_OPTIONS: { value: RecipientType; label: string }[] = [
-  { value: "student", label: "학생" },
-  { value: "parent", label: "학부모" },
-  { value: "both", label: "둘 다" },
-];
-
-const TEMPLATE_VARIABLES = [
-  { key: "{오늘날짜}", description: "오늘 날짜" },
-  { key: "{이름}", description: "학생 이름" },
-];
-
-const getByteLength = (str: string): number => {
-  let byteLength = 0;
-  for (let i = 0; i < str.length; i++) {
-    const charCode = str.charCodeAt(i);
-    if (charCode <= 0x7f) {
-      byteLength += 1;
-    } else {
-      byteLength += 2;
-    }
-  }
-  return byteLength;
-};
-
-const getTodayFormatted = (): string => {
-  const today = new Date();
-  const days = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${today.getMonth() + 1}/${today.getDate()}(${days[today.getDay()]})`;
-};
+import { GENERAL_TEMPLATE_VARIABLES, getTodayFormatted } from "../(utils)/messageUtils";
+import { MessageComposer, MessagePreviewModal, RecipientTypeSelector, SelectAllCheckbox } from "./shared";
 
 export default function GeneralTab() {
   const { students, isLoading } = useStudents();
@@ -76,10 +44,6 @@ export default function GeneralTab() {
   const someSelected = useMemo(() => {
     return filteredStudents.some((s) => selectedIds.has(s.id)) && !allSelected;
   }, [filteredStudents, selectedIds, allSelected]);
-
-  const byteLength = useMemo(() => getByteLength(messageText), [messageText]);
-  const isLMS = byteLength > 90;
-  const maxBytes = isLMS ? 2000 : 90;
 
   const previewStudent = useMemo(() => {
     if (students.length === 0) return null;
@@ -170,30 +134,12 @@ export default function GeneralTab() {
           </p>
         </div>
 
-        <div className="border-line-divider border-b bg-components-fill-standard-secondary/50 px-spacing-500 py-spacing-300">
-          <button
-            onClick={handleSelectAll}
-            className="group flex w-full items-center gap-spacing-300 rounded-radius-200 transition-colors">
-            <div
-              className={`flex size-5 items-center justify-center rounded-radius-100 border transition-all ${
-                allSelected
-                  ? "border-core-accent bg-core-accent"
-                  : someSelected
-                    ? "border-core-accent bg-core-accent/50"
-                    : "border-line-outline bg-components-fill-standard-secondary group-hover:border-core-accent/50"
-              }`}>
-              {allSelected ? (
-                <Check className="size-3 text-solid-white" />
-              ) : someSelected ? (
-                <Minus className="size-3 text-solid-white" />
-              ) : null}
-            </div>
-            <span className="font-medium text-body text-content-standard-primary">
-              {allSelected ? "전체 해제" : "전체 선택"}{" "}
-              <span className="text-content-standard-tertiary">({filteredStudents.length}명)</span>
-            </span>
-          </button>
-        </div>
+        <SelectAllCheckbox
+          allSelected={allSelected}
+          someSelected={someSelected}
+          totalCount={filteredStudents.length}
+          onToggle={handleSelectAll}
+        />
 
         <div className="p-spacing-500">
           <SearchInput
@@ -225,74 +171,17 @@ export default function GeneralTab() {
           <p className="text-content-standard-tertiary text-footnote">발송할 메시지를 입력하세요</p>
         </div>
 
-        <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-          <label className="mb-spacing-300 block font-semibold text-content-standard-primary text-label">
-            수신자 유형
-          </label>
-          <div className="flex flex-wrap gap-spacing-200">
-            {RECIPIENT_OPTIONS.map((option) => (
-              <FilterButton
-                key={option.value}
-                active={recipientType === option.value}
-                onClick={() => setRecipientType(option.value)}>
-                {option.label}
-              </FilterButton>
-            ))}
-          </div>
-        </div>
+        <RecipientTypeSelector value={recipientType} onChange={setRecipientType} />
 
         <div className="flex flex-1 flex-col px-spacing-500 py-spacing-400">
-          <div className="mb-spacing-300 flex items-center justify-between">
-            <label className="font-semibold text-content-standard-primary text-label">메시지 내용</label>
-            <div className="flex items-center gap-spacing-300">
-              <span
-                className={`rounded-radius-200 px-spacing-200 py-spacing-100 font-semibold text-footnote ${
-                  isLMS ? "bg-solid-translucent-yellow text-solid-yellow" : "bg-solid-translucent-blue text-solid-blue"
-                }`}>
-                {isLMS ? "LMS" : "SMS"}
-              </span>
-              <span className="text-content-standard-tertiary text-footnote">
-                {byteLength} / {maxBytes} bytes
-              </span>
-            </div>
-          </div>
-
-          <TemplateSelector
+          <MessageComposer
+            messageText={messageText}
+            onMessageChange={setMessageText}
+            templateVariables={GENERAL_TEMPLATE_VARIABLES}
             templates={templates}
-            currentContent={messageText}
-            onSelect={setMessageText}
-            onSave={addTemplate}
-            onDelete={deleteTemplate}
+            onSaveTemplate={addTemplate}
+            onDeleteTemplate={deleteTemplate}
           />
-
-          <textarea
-            value={messageText}
-            onChange={(e) => {
-              if (getByteLength(e.target.value) <= 2000) {
-                setMessageText(e.target.value);
-              }
-            }}
-            placeholder="메시지를 입력하세요..."
-            className="mt-spacing-300 h-64 resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-          />
-
-          <div className="mt-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
-            <div className="mb-spacing-200 flex items-center gap-spacing-200">
-              <Info className="size-4 text-content-standard-tertiary" />
-              <span className="font-semibold text-content-standard-secondary text-footnote">사용 가능한 변수</span>
-            </div>
-            <div className="flex flex-wrap gap-spacing-200">
-              {TEMPLATE_VARIABLES.map((variable) => (
-                <button
-                  key={variable.key}
-                  onClick={() => setMessageText((prev) => prev + variable.key)}
-                  className="rounded-radius-200 bg-components-fill-standard-primary px-spacing-200 py-spacing-100 text-content-standard-secondary text-footnote transition-all hover:bg-core-accent-translucent hover:text-core-accent"
-                  title={variable.description}>
-                  {variable.key}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="mt-spacing-400 flex items-center justify-between">
             <div className="text-content-standard-tertiary text-footnote">
@@ -326,29 +215,16 @@ export default function GeneralTab() {
         </div>
       </div>
 
-      <Modal
+      <MessagePreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
-        title="메시지 미리보기"
-        subtitle={previewStudent ? `${previewStudent.name} 학생에게 발송될 메시지입니다` : undefined}
-        footer={
-          <Button className="ml-auto" onClick={() => setIsPreviewOpen(false)}>
-            확인
-          </Button>
-        }>
-        <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-400">
-          <p className="whitespace-pre-wrap text-body text-content-standard-primary">{previewMessage}</p>
-        </div>
-        {previewStudent && (
-          <div className="mt-spacing-400 rounded-radius-300 bg-solid-translucent-blue p-spacing-400">
-            <p className="font-semibold text-label text-solid-blue">적용된 변수</p>
-            <div className="mt-spacing-200 grid grid-cols-2 gap-spacing-200 text-content-standard-secondary text-footnote">
-              <span>오늘날짜: {getTodayFormatted()}</span>
-              <span>이름: {previewStudent.name}</span>
-            </div>
-          </div>
-        )}
-      </Modal>
+        recipientName={previewStudent?.name}
+        previewMessage={previewMessage}
+        variables={[
+          { label: "오늘날짜", value: getTodayFormatted() },
+          { label: "이름", value: previewStudent?.name },
+        ]}
+      />
     </div>
   );
 }

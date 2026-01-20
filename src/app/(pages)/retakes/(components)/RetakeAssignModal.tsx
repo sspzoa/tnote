@@ -13,6 +13,7 @@ import {
   StudentListItem,
   StudentListLoading,
 } from "@/shared/components/ui/studentList";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
 import { useExamsForAssign } from "../(hooks)/useExamsForAssign";
@@ -56,13 +57,13 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
 
       setLoadingScores(true);
       try {
-        const response = await fetch(`/api/exams/${selectedExamId}/scores`);
+        const response = await fetchWithAuth(`/api/exams/${selectedExamId}/scores`);
         const result = await response.json();
         if (response.ok && result.data) {
           setExamScores(result.data.scores || []);
         }
       } catch {
-        // 점수 불러오기 실패 시 무시
+        setExamScores([]);
       } finally {
         setLoadingScores(false);
       }

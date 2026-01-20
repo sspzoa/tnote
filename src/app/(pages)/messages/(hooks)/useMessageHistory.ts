@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export interface MessageRecipient {
   id: string;
@@ -33,7 +34,7 @@ interface MessageHistoryResponse {
 
 export const useMessageHistory = (type?: "general" | "exam" | "retake", limit = 50) => {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["message-history", type, limit],
+    queryKey: QUERY_KEYS.messages.history(type || "all", limit),
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set("limit", String(limit));

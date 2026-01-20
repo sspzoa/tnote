@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export interface MessageTemplate {
   id: string;
@@ -16,7 +17,7 @@ export const useMessageTemplates = (type: "general" | "exam" | "retake") => {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["message-templates", type],
+    queryKey: QUERY_KEYS.messages.templates(type),
     queryFn: async () => {
       const response = await fetchWithAuth(`/api/messages/templates?type=${type}`);
       const result = await response.json();
@@ -45,7 +46,7 @@ export const useMessageTemplates = (type: "general" | "exam" | "retake") => {
       return result.data as MessageTemplate;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["message-templates", type] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.messages.templates(type) });
     },
   });
 
@@ -63,7 +64,7 @@ export const useMessageTemplates = (type: "general" | "exam" | "retake") => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["message-templates", type] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.messages.templates(type) });
     },
   });
 

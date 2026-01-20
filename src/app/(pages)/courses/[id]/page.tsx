@@ -31,29 +31,14 @@ export default function CourseDetailPage() {
   const { saveScores, isPending: isSavingScores } = useExamScoresSave(courseId);
   const { saveAssignments, isPending: isSavingAssignments } = useExamAssignmentsSave();
 
-  // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
-  const [examNumber, setExamNumber] = useState("");
-  const [examName, setExamName] = useState("");
-  const [maxScore, setMaxScore] = useState("8");
-  const [cutline, setCutline] = useState("4");
-
-  // Score modal states
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [scoreExam, setScoreExam] = useState<Exam | null>(null);
-  const [existingScoreStudentIds, setExistingScoreStudentIds] = useState<string[]>([]);
-  const [scoreInputs, setScoreInputs] = useState<Record<string, string>>({});
-  const [scoreSearchQuery, setScoreSearchQuery] = useState("");
-
-  // Assignment modal states
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [assignmentExam, setAssignmentExam] = useState<Exam | null>(null);
-  const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
-  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
 
-  // Conditional hooks for modal data
   const { students: scoreStudents, isLoading: loadingScoreStudents } = useCourseStudents(courseId, showScoreModal);
   const { scores: existingScores, isLoading: loadingExistingScores } = useExamScores(
     scoreExam?.id ?? "",
@@ -68,30 +53,6 @@ export default function CourseDetailPage() {
     showAssignmentModal && !!assignmentExam,
   );
 
-  // Initialize score inputs when existing scores are loaded
-  useEffect(() => {
-    if (existingScores.length > 0 && showScoreModal) {
-      setExistingScoreStudentIds(existingScores.map((s) => s.student_id));
-      const initialScores: Record<string, string> = {};
-      for (const score of existingScores) {
-        initialScores[score.student_id] = score.score.toString();
-      }
-      setScoreInputs(initialScores);
-    }
-  }, [existingScores, showScoreModal]);
-
-  // Initialize assignment inputs when existing assignments are loaded
-  useEffect(() => {
-    if (existingAssignments.length > 0 && showAssignmentModal) {
-      const initialInputs: Record<string, string> = {};
-      for (const assignment of existingAssignments) {
-        initialInputs[assignment.student.id] = assignment.status;
-      }
-      setAssignmentInputs(initialInputs);
-    }
-  }, [existingAssignments, showAssignmentModal]);
-
-  // Redirect on course error
   useEffect(() => {
     if (courseError) {
       alert("수업을 찾을 수 없습니다.");
@@ -99,45 +60,21 @@ export default function CourseDetailPage() {
     }
   }, [courseError, router]);
 
-  const handleCreate = async () => {
-    if (!examNumber || !examName.trim() || !maxScore || !cutline) {
-      alert("모든 정보를 입력해 주세요.");
-      return;
-    }
-
+  const handleCreate = async (data: { examNumber: number; name: string; maxScore: number; cutline: number }) => {
     try {
-      await createExam({
-        courseId,
-        examNumber: Number.parseInt(examNumber),
-        name: examName,
-        maxScore: Number.parseInt(maxScore),
-        cutline: Number.parseInt(cutline),
-      });
+      await createExam({ courseId, ...data });
       alert("시험이 생성되었습니다.");
       setShowCreateModal(false);
-      setExamNumber("");
-      setExamName("");
-      setMaxScore("8");
-      setCutline("4");
     } catch (error) {
       alert(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
     }
   };
 
-  const handleEdit = async () => {
-    if (!selectedExam || !examNumber || !examName.trim() || !maxScore || !cutline) {
-      alert("모든 정보를 입력해 주세요.");
-      return;
-    }
+  const handleEdit = async (data: { examNumber: number; name: string; maxScore: number; cutline: number }) => {
+    if (!selectedExam) return;
 
     try {
-      await updateExam({
-        examId: selectedExam.id,
-        examNumber: Number.parseInt(examNumber),
-        name: examName,
-        maxScore: Number.parseInt(maxScore),
-        cutline: Number.parseInt(cutline),
-      });
+      await updateExam({ examId: selectedExam.id, ...data });
       alert("시험이 수정되었습니다.");
       setShowEditModal(false);
     } catch (error) {
@@ -161,70 +98,26 @@ export default function CourseDetailPage() {
   };
 
   const openCreateModal = () => {
-    const maxExamNumber = exams.length > 0 ? Math.max(...exams.map((e) => e.exam_number)) : 0;
-    setExamNumber((maxExamNumber + 1).toString());
-    setExamName("");
-    setMaxScore("8");
-    setCutline("4");
     setShowCreateModal(true);
   };
 
   const openEditModal = (exam: Exam) => {
     setSelectedExam(exam);
-    setExamNumber(exam.exam_number.toString());
-    setExamName(exam.name);
-    setMaxScore(exam.max_score?.toString() || "8");
-    setCutline(exam.cutline?.toString() || "4");
     setShowEditModal(true);
   };
 
   const openScoreModal = (exam: Exam) => {
     setScoreExam(exam);
-    setScoreInputs({});
-    setExistingScoreStudentIds([]);
-    setScoreSearchQuery("");
     setShowScoreModal(true);
   };
 
   const closeScoreModal = () => {
     setShowScoreModal(false);
     setScoreExam(null);
-    setExistingScoreStudentIds([]);
-    setScoreInputs({});
-    setScoreSearchQuery("");
   };
 
-  const handleScoreChange = (studentId: string, value: string) => {
-    setScoreInputs((prev) => ({
-      ...prev,
-      [studentId]: value,
-    }));
-  };
-
-  const handleSaveScores = async () => {
+  const handleSaveScores = async (scores: Array<{ studentId: string; score: number }>, toDelete: string[]) => {
     if (!scoreExam) return;
-
-    const scores = Object.entries(scoreInputs)
-      .filter(([, value]) => value !== "" && !Number.isNaN(Number.parseInt(value)))
-      .map(([studentId, value]) => ({
-        studentId,
-        score: Number.parseInt(value),
-      }));
-
-    const scoreStudentIds = scores.map((s) => s.studentId);
-    const toDelete = existingScoreStudentIds.filter((id) => !scoreStudentIds.includes(id));
-
-    if (scores.length === 0 && toDelete.length === 0) {
-      alert("저장할 변경사항이 없습니다.");
-      return;
-    }
-
-    const maxScoreValue = scoreExam.max_score || 8;
-    const invalidScores = scores.filter((s) => s.score > maxScoreValue);
-    if (invalidScores.length > 0) {
-      alert(`만점(${maxScoreValue}점)을 초과하는 점수가 있습니다.`);
-      return;
-    }
 
     try {
       await saveScores({ examId: scoreExam.id, scores, toDelete });
@@ -235,52 +128,18 @@ export default function CourseDetailPage() {
     }
   };
 
-  const getBelowCutlineCount = () => {
-    if (!scoreExam) return 0;
-    const cutlineValue = scoreExam.cutline || 80;
-    return Object.entries(scoreInputs).filter(([, value]) => {
-      const score = Number.parseInt(value);
-      return !Number.isNaN(score) && score < cutlineValue;
-    }).length;
-  };
-
   const openAssignmentModal = (exam: Exam) => {
     setAssignmentExam(exam);
-    setAssignmentInputs({});
-    setAssignmentSearchQuery("");
     setShowAssignmentModal(true);
   };
 
   const closeAssignmentModal = () => {
     setShowAssignmentModal(false);
     setAssignmentExam(null);
-    setAssignmentInputs({});
-    setAssignmentSearchQuery("");
   };
 
-  const handleAssignmentChange = (studentId: string, status: string) => {
-    setAssignmentInputs((prev) => {
-      if (prev[studentId] === status) {
-        const newInputs = { ...prev };
-        delete newInputs[studentId];
-        return newInputs;
-      }
-      return {
-        ...prev,
-        [studentId]: status,
-      };
-    });
-  };
-
-  const handleSaveAssignments = async () => {
+  const handleSaveAssignments = async (assignments: Array<{ studentId: string; status: string }>) => {
     if (!assignmentExam) return;
-
-    const assignments = Object.entries(assignmentInputs)
-      .filter(([, status]) => status !== "")
-      .map(([studentId, status]) => ({
-        studentId,
-        status,
-      }));
 
     try {
       await saveAssignments({ examId: assignmentExam.id, assignments });
@@ -289,6 +148,26 @@ export default function CourseDetailPage() {
     } catch (error) {
       alert(error instanceof Error ? error.message : "과제 상태 저장에 실패했습니다.");
     }
+  };
+
+  const getCreateInitialData = () => {
+    const maxExamNumber = exams.length > 0 ? Math.max(...exams.map((e) => e.exam_number)) : 0;
+    return {
+      examNumber: maxExamNumber + 1,
+      name: "",
+      maxScore: 8,
+      cutline: 4,
+    };
+  };
+
+  const getEditInitialData = () => {
+    if (!selectedExam) return undefined;
+    return {
+      examNumber: selectedExam.exam_number,
+      name: selectedExam.name,
+      maxScore: selectedExam.max_score || 8,
+      cutline: selectedExam.cutline || 4,
+    };
   };
 
   const loadingScores = loadingScoreStudents || loadingExistingScores;
@@ -333,23 +212,10 @@ export default function CourseDetailPage() {
 
         <ExamFormModal
           isOpen={showCreateModal}
-          onClose={() => {
-            setShowCreateModal(false);
-            setExamNumber("");
-            setExamName("");
-            setMaxScore("8");
-            setCutline("4");
-          }}
+          onClose={() => setShowCreateModal(false)}
           mode="create"
           courseName={course.name}
-          examNumber={examNumber}
-          examName={examName}
-          maxScore={maxScore}
-          cutline={cutline}
-          onExamNumberChange={setExamNumber}
-          onExamNameChange={setExamName}
-          onMaxScoreChange={setMaxScore}
-          onCutlineChange={setCutline}
+          initialData={showCreateModal ? getCreateInitialData() : undefined}
           onSubmit={handleCreate}
           isSubmitting={isCreating}
         />
@@ -358,14 +224,7 @@ export default function CourseDetailPage() {
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           mode="edit"
-          examNumber={examNumber}
-          examName={examName}
-          maxScore={maxScore}
-          cutline={cutline}
-          onExamNumberChange={setExamNumber}
-          onExamNameChange={setExamName}
-          onMaxScoreChange={setMaxScore}
-          onCutlineChange={setCutline}
+          initialData={getEditInitialData()}
           onSubmit={handleEdit}
           isSubmitting={isUpdating}
         />
@@ -376,13 +235,9 @@ export default function CourseDetailPage() {
           exam={scoreExam}
           students={scoreStudents}
           isLoading={loadingScores}
-          searchQuery={scoreSearchQuery}
-          onSearchChange={setScoreSearchQuery}
-          scoreInputs={scoreInputs}
-          onScoreChange={handleScoreChange}
+          existingScores={existingScores}
           onSave={handleSaveScores}
           isSaving={isSavingScores}
-          belowCutlineCount={getBelowCutlineCount()}
         />
 
         <AssignmentModal
@@ -391,10 +246,7 @@ export default function CourseDetailPage() {
           exam={assignmentExam}
           students={assignmentStudents}
           isLoading={loadingAssignments}
-          searchQuery={assignmentSearchQuery}
-          onSearchChange={setAssignmentSearchQuery}
-          assignmentInputs={assignmentInputs}
-          onAssignmentChange={handleAssignmentChange}
+          existingAssignments={existingAssignments}
           onSave={handleSaveAssignments}
           isSaving={isSavingAssignments}
         />

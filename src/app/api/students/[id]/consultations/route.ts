@@ -27,7 +27,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   const { title, content } = body;
 
   if (!title || !content) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    return NextResponse.json({ error: "제목과 내용을 입력해주세요." }, { status: 400 });
   }
 
   const { data: student, error: studentError } = await supabase
@@ -39,7 +39,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     .single();
 
   if (studentError || !student) {
-    return NextResponse.json({ error: "Student not found" }, { status: 404 });
+    return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
   }
 
   const { data, error } = await supabase

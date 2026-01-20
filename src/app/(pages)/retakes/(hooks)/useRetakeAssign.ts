@@ -28,9 +28,9 @@ export const useRetakeAssign = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["retakes"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
-      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.events("", "") });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
     },
   });

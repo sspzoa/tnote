@@ -6,7 +6,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   const { is_favorite } = await request.json();
 
   if (typeof is_favorite !== "boolean") {
-    return NextResponse.json({ error: "is_favorite must be a boolean" }, { status: 400 });
+    return NextResponse.json({ error: "is_favorite 값은 boolean이어야 합니다." }, { status: 400 });
   }
 
   const { data: student, error: fetchError } = await supabase

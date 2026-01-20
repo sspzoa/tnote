@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
@@ -14,17 +15,19 @@ import type { Exam } from "../(hooks)/useExams";
 
 type AssignmentStatus = "완료" | "미흡" | "미제출";
 
+interface ExistingAssignment {
+  student: { id: string };
+  status: string;
+}
+
 interface AssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   exam: Exam | null;
   students: StudentListStudent[];
   isLoading: boolean;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  assignmentInputs: Record<string, string>;
-  onAssignmentChange: (studentId: string, status: string) => void;
-  onSave: () => void;
+  existingAssignments: ExistingAssignment[];
+  onSave: (assignments: Array<{ studentId: string; status: string }>) => Promise<void>;
   isSaving: boolean;
 }
 
@@ -52,13 +55,50 @@ export function AssignmentModal({
   exam,
   students,
   isLoading,
-  searchQuery,
-  onSearchChange,
-  assignmentInputs,
-  onAssignmentChange,
+  existingAssignments,
   onSave,
   isSaving,
 }: AssignmentModalProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isOpen && existingAssignments.length > 0) {
+      const initialInputs: Record<string, string> = {};
+      for (const assignment of existingAssignments) {
+        initialInputs[assignment.student.id] = assignment.status;
+      }
+      setAssignmentInputs(initialInputs);
+    } else if (isOpen) {
+      setAssignmentInputs({});
+    }
+  }, [isOpen, existingAssignments]);
+
+  const handleClose = () => {
+    setSearchQuery("");
+    setAssignmentInputs({});
+    onClose();
+  };
+
+  const handleAssignmentChange = (studentId: string, status: string) => {
+    setAssignmentInputs((prev) => {
+      if (prev[studentId] === status) {
+        const newInputs = { ...prev };
+        delete newInputs[studentId];
+        return newInputs;
+      }
+      return { ...prev, [studentId]: status };
+    });
+  };
+
+  const handleSave = async () => {
+    const assignments = Object.entries(assignmentInputs)
+      .filter(([, status]) => status !== "")
+      .map(([studentId, status]) => ({ studentId, status }));
+
+    await onSave(assignments);
+  };
+
   if (!exam) return null;
 
   const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -79,7 +119,7 @@ export function AssignmentModal({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="과제 관리"
       subtitle={`${exam.name} (${exam.exam_number}회차)`}
       footer={
@@ -98,12 +138,12 @@ export function AssignmentModal({
               </div>
             </div>
             <div className="flex gap-spacing-300">
-              <Button variant="secondary" onClick={onClose} className="flex-1">
+              <Button variant="secondary" onClick={handleClose} className="flex-1">
                 취소
               </Button>
               <Button
                 variant="primary"
-                onClick={onSave}
+                onClick={handleSave}
                 isLoading={isSaving}
                 loadingText="저장 중..."
                 className="flex-1">
@@ -126,7 +166,7 @@ export function AssignmentModal({
           <div className="mb-spacing-400">
             <SearchInput
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="학생 검색..."
             />
           </div>
@@ -148,7 +188,7 @@ export function AssignmentModal({
                           <button
                             key={status}
                             type="button"
-                            onClick={() => onAssignmentChange(student.id, status)}
+                            onClick={() => handleAssignmentChange(student.id, status)}
                             className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-all ${
                               currentStatus === status ? statusStyles[status].active : statusStyles[status].inactive
                             }`}>

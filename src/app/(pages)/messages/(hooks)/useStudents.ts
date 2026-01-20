@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { Student } from "@/shared/types";
 
 export const useStudents = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["students-for-messages"],
+    queryKey: QUERY_KEYS.students.forMessages,
     queryFn: async () => {
       const response = await fetchWithAuth("/api/students");
       const result = await response.json();
@@ -40,7 +41,7 @@ interface Exam {
 
 export const useCourses = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["courses-for-messages"],
+    queryKey: QUERY_KEYS.courses.forMessages,
     queryFn: async () => {
       const response = await fetchWithAuth("/api/courses");
       const result = await response.json();
@@ -62,7 +63,7 @@ export const useCourses = () => {
 
 export const useExams = (courseId: string) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["exams-for-messages", courseId],
+    queryKey: QUERY_KEYS.exams.forMessages(courseId),
     queryFn: async () => {
       const response = await fetchWithAuth(`/api/exams?courseId=${courseId}`);
       const result = await response.json();
@@ -107,7 +108,7 @@ export interface ExamExportData {
 
 export const useExamExport = (examId: string) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["exam-export", examId],
+    queryKey: QUERY_KEYS.exams.export(examId),
     queryFn: async () => {
       const response = await fetchWithAuth(`/api/exams/${examId}/export`);
       const result = await response.json();
@@ -155,7 +156,7 @@ export interface RetakeAssignment {
 
 export const useRetakes = (status: string, managementStatus?: string) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["retakes-for-messages", status, managementStatus],
+    queryKey: QUERY_KEYS.retakes.forMessages(status, managementStatus || "all"),
     queryFn: async () => {
       let url = `/api/retakes?status=${status}`;
       if (managementStatus && managementStatus !== "all") {

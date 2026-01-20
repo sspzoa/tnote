@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
 interface CourseInfo {
   id: string;
@@ -96,7 +97,7 @@ export const useStudentDetail = (studentId: string | null) => {
     queryKey: ["studentDetail", studentId],
     queryFn: async () => {
       if (!studentId) return null;
-      const res = await fetch(`/api/students/${studentId}/detail`);
+      const res = await fetchWithAuth(`/api/students/${studentId}/detail`);
       const result = await res.json();
       if (!res.ok) throw new Error(result.error);
       return result.data as StudentDetail;

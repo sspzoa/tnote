@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { Exam } from "../(atoms)/useRetakesStore";
 
 export const useExams = (courseId: string | null) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["exams", courseId],
+    queryKey: QUERY_KEYS.exams.byCourse(courseId || "all"),
     queryFn: async () => {
       const url = courseId && courseId !== "all" ? `/api/exams?courseId=${courseId}` : "/api/exams";
       const response = await fetchWithAuth(url);
