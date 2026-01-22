@@ -7,7 +7,11 @@ import { SearchInput } from "@/shared/components/ui/searchInput";
 import {
   filterAtom,
   type ManagementStatus,
+  minAbsentCountAtom,
   minIncompleteCountAtom,
+  minPostponeAbsentCountAtom,
+  minPostponeCountAtom,
+  minTotalRetakeCountAtom,
   searchQueryAtom,
   selectedCourseAtom,
   selectedDateAtom,
@@ -39,6 +43,10 @@ export default function RetakeFilters() {
   const [showCompleted, setShowCompleted] = useAtom(showCompletedAtom);
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
   const [minIncompleteCount, setMinIncompleteCount] = useAtom(minIncompleteCountAtom);
+  const [minTotalRetakeCount, setMinTotalRetakeCount] = useAtom(minTotalRetakeCountAtom);
+  const [minPostponeCount, setMinPostponeCount] = useAtom(minPostponeCountAtom);
+  const [minAbsentCount, setMinAbsentCount] = useAtom(minAbsentCountAtom);
+  const [minPostponeAbsentCount, setMinPostponeAbsentCount] = useAtom(minPostponeAbsentCountAtom);
 
   const { courses } = useCourses();
   const { exams } = useExams(selectedCourse === "all" ? null : selectedCourse);
@@ -56,6 +64,10 @@ export default function RetakeFilters() {
     setSearchQuery("");
     setSelectedDate("all");
     setMinIncompleteCount(0);
+    setMinTotalRetakeCount(0);
+    setMinPostponeCount(0);
+    setMinAbsentCount(0);
+    setMinPostponeAbsentCount(0);
   };
 
   const isFilterActive =
@@ -65,7 +77,11 @@ export default function RetakeFilters() {
     selectedManagementStatus !== "all" ||
     searchQuery !== "" ||
     selectedDate !== "all" ||
-    minIncompleteCount > 0;
+    minIncompleteCount > 0 ||
+    minTotalRetakeCount > 0 ||
+    minPostponeCount > 0 ||
+    minAbsentCount > 0 ||
+    minPostponeAbsentCount > 0;
 
   return (
     <div className="flex flex-col gap-spacing-600">
@@ -93,15 +109,6 @@ export default function RetakeFilters() {
             ))}
           </FilterSelect>
 
-          <FilterSelect
-            value={minIncompleteCount.toString()}
-            onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
-            <option value="0">미완료 개수</option>
-            <option value="2">2개 이상</option>
-            <option value="3">3개 이상</option>
-            <option value="4">4개 이상</option>
-          </FilterSelect>
-
           <input
             type="date"
             value={selectedDate === "all" ? "" : selectedDate}
@@ -116,6 +123,53 @@ export default function RetakeFilters() {
               초기화
             </button>
           )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-spacing-300">
+          <FilterSelect
+            value={minIncompleteCount.toString()}
+            onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
+            <option value="0">미완료 재시험</option>
+            <option value="2">2개 이상</option>
+            <option value="3">3개 이상</option>
+            <option value="4">4개 이상</option>
+          </FilterSelect>
+
+          <FilterSelect
+            value={minTotalRetakeCount.toString()}
+            onChange={(e) => setMinTotalRetakeCount(Number(e.target.value))}>
+            <option value="0">누적 재시험</option>
+            <option value="2">2회 이상</option>
+            <option value="3">3회 이상</option>
+            <option value="4">4회 이상</option>
+            <option value="5">5회 이상</option>
+          </FilterSelect>
+
+          <FilterSelect
+            value={minPostponeCount.toString()}
+            onChange={(e) => setMinPostponeCount(Number(e.target.value))}>
+            <option value="0">누적 연기</option>
+            <option value="1">1회 이상</option>
+            <option value="2">2회 이상</option>
+            <option value="3">3회 이상</option>
+          </FilterSelect>
+
+          <FilterSelect value={minAbsentCount.toString()} onChange={(e) => setMinAbsentCount(Number(e.target.value))}>
+            <option value="0">누적 결석</option>
+            <option value="1">1회 이상</option>
+            <option value="2">2회 이상</option>
+            <option value="3">3회 이상</option>
+          </FilterSelect>
+
+          <FilterSelect
+            value={minPostponeAbsentCount.toString()}
+            onChange={(e) => setMinPostponeAbsentCount(Number(e.target.value))}>
+            <option value="0">누적 연기+결석</option>
+            <option value="2">2회 이상</option>
+            <option value="3">3회 이상</option>
+            <option value="4">4회 이상</option>
+            <option value="5">5회 이상</option>
+          </FilterSelect>
         </div>
 
         <div className="flex flex-wrap items-center gap-spacing-300">

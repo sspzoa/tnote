@@ -21,3 +21,7 @@ export const searchQueryAtom = atom("");
 export const showCompletedAtom = atom<boolean>(false);
 export const selectedDateAtom = atom<string>("all");
 export const minIncompleteCountAtom = atom<number>(0);
+export const minTotalRetakeCountAtom = atom<number>(0);
+export const minPostponeCountAtom = atom<number>(0);
+export const minAbsentCountAtom = atom<number>(0);
+export const minPostponeAbsentCountAtom = atom<number>(0);

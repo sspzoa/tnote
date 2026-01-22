@@ -23,7 +23,11 @@ import {
 } from "./(atoms)/useModalStore";
 import {
   filterAtom,
+  minAbsentCountAtom,
   minIncompleteCountAtom,
+  minPostponeAbsentCountAtom,
+  minPostponeCountAtom,
+  minTotalRetakeCountAtom,
   openMenuIdAtom,
   searchQueryAtom,
   selectedCourseAtom,
@@ -57,6 +61,10 @@ export default function RetakesPage() {
   const [showCompleted] = useAtom(showCompletedAtom);
   const [selectedDate] = useAtom(selectedDateAtom);
   const [minIncompleteCount] = useAtom(minIncompleteCountAtom);
+  const [minTotalRetakeCount] = useAtom(minTotalRetakeCountAtom);
+  const [minPostponeCount] = useAtom(minPostponeCountAtom);
+  const [minAbsentCount] = useAtom(minAbsentCountAtom);
+  const [minPostponeAbsentCount] = useAtom(minPostponeAbsentCountAtom);
   const [, setSelectedRetake] = useAtom(selectedRetakeAtom);
   const [, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [, setShowPostponeModal] = useAtom(showPostponeModalAtom);
@@ -156,6 +164,38 @@ export default function RetakesPage() {
     {} as Record<string, number>,
   );
 
+  const totalRetakeCountByStudent = fetchedRetakes.reduce(
+    (acc, retake) => {
+      acc[retake.student.id] = (acc[retake.student.id] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const postponeCountByStudent = fetchedRetakes.reduce(
+    (acc, retake) => {
+      acc[retake.student.id] = (acc[retake.student.id] || 0) + retake.postpone_count;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const absentCountByStudent = fetchedRetakes.reduce(
+    (acc, retake) => {
+      acc[retake.student.id] = (acc[retake.student.id] || 0) + retake.absent_count;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const postponeAbsentCountByStudent = fetchedRetakes.reduce(
+    (acc, retake) => {
+      acc[retake.student.id] = (acc[retake.student.id] || 0) + retake.postpone_count + retake.absent_count;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
   const filteredRetakes = fetchedRetakes
     .filter((retake) => showCompleted || retake.status !== "completed")
     .filter((retake) => selectedCourse === "all" || retake.exam.course.id === selectedCourse)
@@ -166,8 +206,25 @@ export default function RetakesPage() {
     .filter(
       (retake) => minIncompleteCount === 0 || (incompleteCountByStudent[retake.student.id] || 0) >= minIncompleteCount,
     )
+    .filter(
+      (retake) =>
+        minTotalRetakeCount === 0 || (totalRetakeCountByStudent[retake.student.id] || 0) >= minTotalRetakeCount,
+    )
+    .filter((retake) => minPostponeCount === 0 || (postponeCountByStudent[retake.student.id] || 0) >= minPostponeCount)
+    .filter((retake) => minAbsentCount === 0 || (absentCountByStudent[retake.student.id] || 0) >= minAbsentCount)
+    .filter(
+      (retake) =>
+        minPostponeAbsentCount === 0 ||
+        (postponeAbsentCountByStudent[retake.student.id] || 0) >= minPostponeAbsentCount,
+    )
     .sort((a, b) => {
-      if (minIncompleteCount > 0) {
+      if (
+        minIncompleteCount > 0 ||
+        minTotalRetakeCount > 0 ||
+        minPostponeCount > 0 ||
+        minAbsentCount > 0 ||
+        minPostponeAbsentCount > 0
+      ) {
         const nameCompare = a.student.name.localeCompare(b.student.name, "ko");
         if (nameCompare !== 0) return nameCompare;
         const dateA = a.current_scheduled_date || "";
