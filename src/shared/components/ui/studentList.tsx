@@ -19,7 +19,7 @@ interface StudentListContainerProps {
 export function StudentListContainer({ children, className = "" }: StudentListContainerProps) {
   return (
     <div
-      className={`h-80 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary ${className}`}>
+      className={`overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary ${className.includes("flex-1") ? "" : "h-80"} ${className}`}>
       {children}
     </div>
   );

@@ -13,6 +13,7 @@ interface MessageComposerProps {
   templates: MessageTemplate[];
   onSaveTemplate: (name: string, content: string) => Promise<unknown>;
   onDeleteTemplate: (id: string) => Promise<unknown>;
+  className?: string;
 }
 
 export default function MessageComposer({
@@ -22,6 +23,7 @@ export default function MessageComposer({
   templates,
   onSaveTemplate,
   onDeleteTemplate,
+  className = "",
 }: MessageComposerProps) {
   const byteLength = getByteLength(messageText);
   const { isLMS, maxBytes } = getMessageType(byteLength);
@@ -33,7 +35,7 @@ export default function MessageComposer({
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col ${className}`}>
       <div className="mb-spacing-300 flex items-center justify-between">
         <label className="font-semibold text-content-standard-primary text-label">메시지 내용</label>
         <div className="flex items-center gap-spacing-300">
@@ -61,7 +63,7 @@ export default function MessageComposer({
         value={messageText}
         onChange={(e) => handleTextChange(e.target.value)}
         placeholder="메시지를 입력하세요..."
-        className="mt-spacing-300 h-64 resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none"
+        className="mt-spacing-300 min-h-32 flex-1 resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none"
       />
 
       <div className="mt-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">

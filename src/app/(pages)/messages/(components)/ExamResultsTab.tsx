@@ -168,8 +168,8 @@ export default function ExamResultsTab() {
       {exportLoading && selectedExamId ? (
         <LoadingComponent />
       ) : (
-        <div className="flex flex-row items-start gap-spacing-600">
-          <div className="flex-1 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+        <div className="flex h-[700px] flex-row items-stretch gap-spacing-600">
+          <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
             {!selectedExamId ? (
               <div className="flex flex-1 flex-col items-center justify-center py-spacing-900">
                 <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
@@ -197,14 +197,14 @@ export default function ExamResultsTab() {
                   onToggle={handleSelectAll}
                 />
 
-                <div className="p-spacing-500">
+                <div className="flex min-h-0 flex-1 flex-col p-spacing-500">
                   <SearchInput
                     placeholder="학생 검색..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="mb-spacing-300"
                   />
-                  <StudentListContainer>
+                  <StudentListContainer className="h-0 flex-1">
                     {filteredStudents.length === 0 ? (
                       <StudentListEmpty
                         message={students.length === 0 ? "점수 데이터가 없습니다" : "검색 결과가 없습니다"}
@@ -238,7 +238,7 @@ export default function ExamResultsTab() {
             )}
           </div>
 
-          <div className="flex-1 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+          <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
             <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
               <h3 className="font-semibold text-body text-content-standard-primary">메시지 템플릿</h3>
               <p className="text-content-standard-tertiary text-footnote">학생별로 변수가 자동 치환됩니다</p>
@@ -246,7 +246,7 @@ export default function ExamResultsTab() {
 
             <RecipientTypeSelector value={recipientType} onChange={setRecipientType} />
 
-            <div className="flex flex-col px-spacing-500 py-spacing-400">
+            <div className="flex min-h-0 flex-1 flex-col px-spacing-500 py-spacing-400">
               <MessageComposer
                 messageText={messageTemplate}
                 onMessageChange={setMessageTemplate}
@@ -254,6 +254,7 @@ export default function ExamResultsTab() {
                 templates={templates}
                 onSaveTemplate={addTemplate}
                 onDeleteTemplate={deleteTemplate}
+                className="min-h-0 flex-1"
               />
 
               <div className="mt-spacing-400 flex items-center justify-between">
