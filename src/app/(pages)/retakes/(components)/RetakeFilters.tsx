@@ -85,121 +85,101 @@ export default function RetakeFilters() {
     minPostponeAbsentCount > 0;
 
   return (
-    <div className="flex flex-col gap-spacing-600">
-      <div className="flex flex-col gap-spacing-300">
-        <div className="flex flex-wrap items-center gap-spacing-300">
-          <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
-            {showCompleted ? "완료된 재시험 숨기기" : "완료된 재시험 보기"}
-          </FilterButton>
-
-          <FilterSelect value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
-            <option value="all">전체 상태</option>
-            <option value="pending">대기중</option>
-            <option value="completed">완료</option>
-            <option value="absent">결석</option>
-          </FilterSelect>
-
-          <FilterSelect
-            value={selectedManagementStatus}
-            onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
-            <option value="all">전체 관리 상태</option>
-            {MANAGEMENT_STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </FilterSelect>
-
-          <input
-            type="date"
-            value={selectedDate === "all" ? "" : selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value || "all")}
-            className="cursor-pointer rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
-          />
-
+    <div className="flex flex-col gap-spacing-400">
+      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
+        <div className="mb-spacing-400 flex items-center justify-between">
+          <span className="font-medium text-content-standard-tertiary text-label">필터</span>
           {isFilterActive && (
             <button
               onClick={handleResetFilters}
-              className="px-spacing-200 font-medium text-content-standard-tertiary text-label transition-all duration-150 hover:text-core-accent">
+              className="font-medium text-content-standard-tertiary text-footnote transition-all duration-150 hover:text-core-accent">
               초기화
             </button>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-spacing-300">
-          <FilterSelect
-            value={minIncompleteCount.toString()}
-            onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
-            <option value="0">미완료 재시험</option>
-            <option value="2">2개 이상</option>
-            <option value="3">3개 이상</option>
-            <option value="4">4개 이상</option>
-          </FilterSelect>
+        <div className="flex flex-col gap-spacing-400">
+          <div className="flex flex-wrap items-center gap-spacing-300">
+            <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
+              {showCompleted ? "완료 숨기기" : "완료 보기"}
+            </FilterButton>
 
-          <FilterSelect
-            value={minTotalRetakeCount.toString()}
-            onChange={(e) => setMinTotalRetakeCount(Number(e.target.value))}>
-            <option value="0">누적 재시험</option>
-            <option value="2">2회 이상</option>
-            <option value="3">3회 이상</option>
-            <option value="4">4회 이상</option>
-            <option value="5">5회 이상</option>
-          </FilterSelect>
+            <FilterSelect value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
+              <option value="all">전체 상태</option>
+              <option value="pending">대기중</option>
+              <option value="completed">완료</option>
+              <option value="absent">결석</option>
+            </FilterSelect>
 
-          <FilterSelect
-            value={minPostponeCount.toString()}
-            onChange={(e) => setMinPostponeCount(Number(e.target.value))}>
-            <option value="0">누적 연기</option>
-            <option value="1">1회 이상</option>
-            <option value="2">2회 이상</option>
-            <option value="3">3회 이상</option>
-          </FilterSelect>
+            <FilterSelect
+              value={selectedManagementStatus}
+              onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
+              <option value="all">전체 관리 상태</option>
+              {MANAGEMENT_STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </FilterSelect>
 
-          <FilterSelect value={minAbsentCount.toString()} onChange={(e) => setMinAbsentCount(Number(e.target.value))}>
-            <option value="0">누적 결석</option>
-            <option value="1">1회 이상</option>
-            <option value="2">2회 이상</option>
-            <option value="3">3회 이상</option>
-          </FilterSelect>
+            <input
+              type="date"
+              value={selectedDate === "all" ? "" : selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value || "all")}
+              className="cursor-pointer rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent"
+            />
+          </div>
 
-          <FilterSelect
-            value={minPostponeAbsentCount.toString()}
-            onChange={(e) => setMinPostponeAbsentCount(Number(e.target.value))}>
-            <option value="0">누적 연기+결석</option>
-            <option value="2">2회 이상</option>
-            <option value="3">3회 이상</option>
-            <option value="4">4회 이상</option>
-            <option value="5">5회 이상</option>
-          </FilterSelect>
-        </div>
+          <div className="flex flex-wrap items-center gap-spacing-300">
+            <FilterSelect
+              value={minIncompleteCount.toString()}
+              onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
+              <option value="0">미완료 재시험</option>
+              <option value="2">2개 이상</option>
+              <option value="3">3개 이상</option>
+              <option value="4">4개 이상</option>
+            </FilterSelect>
 
-        <div className="flex flex-wrap items-center gap-spacing-300">
-          <FilterSelect value={selectedCourse} onChange={(e) => handleCourseChange(e.target.value)}>
-            <option value="all">전체 반</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </FilterSelect>
+            <FilterSelect
+              value={minTotalRetakeCount.toString()}
+              onChange={(e) => setMinTotalRetakeCount(Number(e.target.value))}>
+              <option value="0">누적 재시험</option>
+              <option value="2">2회 이상</option>
+              <option value="3">3회 이상</option>
+              <option value="4">4회 이상</option>
+              <option value="5">5회 이상</option>
+            </FilterSelect>
 
-          <FilterSelect
-            value={selectedExam}
-            onChange={(e) => setSelectedExam(e.target.value)}
-            disabled={selectedCourse === "all"}>
-            <option value="all">전체 시험</option>
-            {exams.map((exam) => (
-              <option key={exam.id} value={exam.id}>
-                {exam.name}
-              </option>
-            ))}
-          </FilterSelect>
-        </div>
+            <FilterSelect
+              value={minPostponeCount.toString()}
+              onChange={(e) => setMinPostponeCount(Number(e.target.value))}>
+              <option value="0">누적 연기</option>
+              <option value="1">1회 이상</option>
+              <option value="2">2회 이상</option>
+              <option value="3">3회 이상</option>
+            </FilterSelect>
 
-        {courses.length > 0 && (
-          <div className="flex flex-wrap gap-spacing-300">
+            <FilterSelect value={minAbsentCount.toString()} onChange={(e) => setMinAbsentCount(Number(e.target.value))}>
+              <option value="0">누적 결석</option>
+              <option value="1">1회 이상</option>
+              <option value="2">2회 이상</option>
+              <option value="3">3회 이상</option>
+            </FilterSelect>
+
+            <FilterSelect
+              value={minPostponeAbsentCount.toString()}
+              onChange={(e) => setMinPostponeAbsentCount(Number(e.target.value))}>
+              <option value="0">누적 연기+결석</option>
+              <option value="2">2회 이상</option>
+              <option value="3">3회 이상</option>
+              <option value="4">4회 이상</option>
+              <option value="5">5회 이상</option>
+            </FilterSelect>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-spacing-300">
             <FilterButton active={selectedCourse === "all"} onClick={() => handleCourseChange("all")}>
-              전체 반
+              전체
             </FilterButton>
             {courses.map((course) => (
               <FilterButton
@@ -210,7 +190,30 @@ export default function RetakeFilters() {
               </FilterButton>
             ))}
           </div>
-        )}
+
+          <div className="flex flex-wrap items-center gap-spacing-300">
+            <FilterSelect value={selectedCourse} onChange={(e) => handleCourseChange(e.target.value)}>
+              <option value="all">전체 반</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.name}
+                </option>
+              ))}
+            </FilterSelect>
+
+            <FilterSelect
+              value={selectedExam}
+              onChange={(e) => setSelectedExam(e.target.value)}
+              disabled={selectedCourse === "all"}>
+              <option value="all">전체 시험</option>
+              {exams.map((exam) => (
+                <option key={exam.id} value={exam.id}>
+                  {exam.name}
+                </option>
+              ))}
+            </FilterSelect>
+          </div>
+        </div>
       </div>
 
       <SearchInput

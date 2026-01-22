@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import { Settings } from "lucide-react";
 import { SearchInput } from "@/shared/components/ui";
+import { FilterButton } from "@/shared/components/ui/filterButton";
 import { TAG_FILTER_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
 import type { Course, StudentTag } from "@/shared/types";
 import { showTagManageModalAtom } from "../(atoms)/useModalStore";
@@ -27,55 +28,48 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
     setSelectedTagIds(newSet);
   };
 
-  return (
-    <div className="flex flex-col gap-spacing-600">
-      <div className="flex flex-wrap gap-spacing-300">
-        <button
-          onClick={() => setSelectedCourse("all")}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
-            selectedCourse === "all"
-              ? "bg-core-accent text-solid-white"
-              : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
-          }`}>
-          전체
-        </button>
-        {courses.map((course) => (
-          <button
-            key={course.id}
-            onClick={() => setSelectedCourse(course.id)}
-            className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
-              selectedCourse === course.id
-                ? "bg-core-accent text-solid-white"
-                : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
-            }`}>
-            {course.name}
-          </button>
-        ))}
-      </div>
+  const tagManageButtonClassName =
+    "flex items-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-secondary text-label transition-all duration-150 hover:border-core-accent/30 hover:bg-components-interactive-hover hover:text-content-standard-primary";
 
-      <div className="flex flex-wrap items-center gap-spacing-300">
-        <button
-          onClick={() => setShowTagManageModal(true)}
-          className="flex items-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-secondary text-label transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
-          <Settings className="size-4" />
-          태그 관리
-        </button>
-        {tags.map((tag) => {
-          const isActive = selectedTagIds.has(tag.id);
-          const colorClasses = TAG_FILTER_COLOR_CLASSES[tag.color];
-          return (
-            <button
-              key={tag.id}
-              onClick={() => toggleTag(tag.id)}
-              className={`rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all ${
-                isActive
-                  ? `${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
-                  : `${colorClasses.bg} ${colorClasses.text} hover:opacity-80`
-              }`}>
-              {tag.name}
+  return (
+    <div className="flex flex-col gap-spacing-400">
+      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
+        <span className="mb-spacing-400 block font-medium text-content-standard-tertiary text-label">필터</span>
+
+        <div className="flex flex-col gap-spacing-400">
+          <div className="flex flex-wrap items-center gap-spacing-300">
+            <FilterButton active={selectedCourse === "all"} onClick={() => setSelectedCourse("all")}>
+              전체
+            </FilterButton>
+            {courses.map((course) => (
+              <FilterButton
+                key={course.id}
+                active={selectedCourse === course.id}
+                onClick={() => setSelectedCourse(course.id)}>
+                {course.name}
+              </FilterButton>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-spacing-300">
+            <button onClick={() => setShowTagManageModal(true)} className={tagManageButtonClassName}>
+              <Settings className="size-4" />
+              태그 관리
             </button>
-          );
-        })}
+            {tags.map((tag) => {
+              const isActive = selectedTagIds.has(tag.id);
+              const colorClasses = TAG_FILTER_COLOR_CLASSES[tag.color];
+              const tagButtonClassName = isActive
+                ? `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
+                : `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.bg} ${colorClasses.text} hover:opacity-80`;
+              return (
+                <button key={tag.id} onClick={() => toggleTag(tag.id)} className={tagButtonClassName}>
+                  {tag.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <SearchInput
