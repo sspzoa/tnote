@@ -198,32 +198,38 @@ export default function StudentList({ students }: StudentListProps) {
                 <td className="px-spacing-500 py-spacing-400">
                   <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
                 </td>
-                <td className="px-spacing-500 py-spacing-400">
-                  <div className="flex flex-wrap items-center gap-spacing-100">
-                    {activeTags.map((assignment) => {
-                      const tag = assignment.tag;
-                      if (!tag) return null;
-                      const colorClasses = TAG_COLOR_CLASSES[tag.color];
-                      return (
-                        <button
-                          key={assignment.id}
-                          onClick={() => openEditTagAssignmentModal(student, assignment)}
-                          className={`group flex items-center gap-spacing-50 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote transition-opacity hover:opacity-70 ${colorClasses.bg} ${colorClasses.text}`}
-                          title="클릭하여 수정">
-                          {tag.name}
-                        </button>
-                      );
-                    })}
-                  </div>
+                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                  {activeTags.length > 0 ? (
+                    <div className="flex flex-wrap items-center gap-spacing-100">
+                      {activeTags.map((assignment) => {
+                        const tag = assignment.tag;
+                        if (!tag) return null;
+                        const colorClasses = TAG_COLOR_CLASSES[tag.color];
+                        return (
+                          <button
+                            key={assignment.id}
+                            onClick={() => openEditTagAssignmentModal(student, assignment)}
+                            className={`group flex items-center gap-spacing-50 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote transition-opacity hover:opacity-70 ${colorClasses.bg} ${colorClasses.text}`}
+                            title="클릭하여 수정">
+                            {tag.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    "-"
+                  )}
                 </td>
                 <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {student.branch || "-"}
                 </td>
-                <td className="px-spacing-500 py-spacing-400">
-                  {student.birth_year && getGrade(student.birth_year) && (
+                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                  {student.birth_year && getGrade(student.birth_year) ? (
                     <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                       {getGrade(student.birth_year)}
                     </span>
+                  ) : (
+                    "-"
                   )}
                 </td>
                 <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
