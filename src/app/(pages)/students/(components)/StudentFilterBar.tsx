@@ -70,45 +70,30 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
         ))}
       </div>
 
-      {tags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-spacing-300">
-          <span className="text-content-standard-tertiary text-label">태그:</span>
-          {tags.map((tag) => {
-            const isActive = selectedTagIds.has(tag.id);
-            const colorClasses = TAG_COLOR_CLASSES[tag.color];
-            return (
-              <button
-                key={tag.id}
-                onClick={() => toggleTag(tag.id)}
-                className={`rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all ${
-                  isActive
-                    ? `${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
-                    : `${colorClasses.bg} ${colorClasses.text} hover:opacity-80`
-                }`}>
-                {tag.name}
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setShowTagManageModal(true)}
-            className="flex items-center gap-spacing-100 rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-content-standard-tertiary text-label transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
-            <Settings className="size-4" />
-            관리
-          </button>
-        </div>
-      )}
-
-      {tags.length === 0 && (
-        <div className="flex items-center gap-spacing-300">
-          <span className="text-content-standard-tertiary text-label">태그:</span>
-          <button
-            onClick={() => setShowTagManageModal(true)}
-            className="flex items-center gap-spacing-100 rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-content-standard-tertiary text-label transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
-            <Settings className="size-4" />
-            태그 추가
-          </button>
-        </div>
-      )}
+      <div className="flex flex-wrap items-center gap-spacing-300">
+        <button
+          onClick={() => setShowTagManageModal(true)}
+          className="flex items-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-secondary text-label transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+          <Settings className="size-4" />
+          태그 관리
+        </button>
+        {tags.map((tag) => {
+          const isActive = selectedTagIds.has(tag.id);
+          const colorClasses = TAG_COLOR_CLASSES[tag.color];
+          return (
+            <button
+              key={tag.id}
+              onClick={() => toggleTag(tag.id)}
+              className={`rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all ${
+                isActive
+                  ? `${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
+                  : `${colorClasses.bg} ${colorClasses.text} hover:opacity-80`
+              }`}>
+              {tag.name}
+            </button>
+          );
+        })}
+      </div>
 
       <SearchInput
         placeholder="학생 검색..."

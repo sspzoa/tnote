@@ -1,5 +1,4 @@
 import { useAtom } from "jotai";
-import { Tag } from "lucide-react";
 import { useCallback } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -212,30 +211,21 @@ export default function StudentList({ students }: StudentListProps) {
                 </td>
                 <td className="px-spacing-500 py-spacing-400">
                   <div className="flex flex-wrap items-center gap-spacing-100">
-                    {activeTags.length > 0 ? (
-                      activeTags.map((assignment) => {
-                        const tag = assignment.tag;
-                        if (!tag) return null;
-                        const colorClasses = TAG_COLOR_CLASSES[tag.color];
-                        return (
-                          <button
-                            key={assignment.id}
-                            onClick={() => handleRemoveTag(student, tag.id, tag.name)}
-                            className={`group flex items-center gap-spacing-50 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote transition-opacity hover:opacity-70 ${colorClasses.bg} ${colorClasses.text}`}
-                            title="클릭하여 제거">
-                            {tag.name}
-                            <span className="hidden text-current opacity-60 group-hover:inline">×</span>
-                          </button>
-                        );
-                      })
-                    ) : (
-                      <button
-                        onClick={() => openAddTagModal(student)}
-                        className="flex items-center gap-spacing-100 text-content-standard-quaternary text-footnote transition-colors hover:text-content-standard-secondary">
-                        <Tag className="size-3" />
-                        추가
-                      </button>
-                    )}
+                    {activeTags.map((assignment) => {
+                      const tag = assignment.tag;
+                      if (!tag) return null;
+                      const colorClasses = TAG_COLOR_CLASSES[tag.color];
+                      return (
+                        <button
+                          key={assignment.id}
+                          onClick={() => handleRemoveTag(student, tag.id, tag.name)}
+                          className={`group flex items-center gap-spacing-50 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote transition-opacity hover:opacity-70 ${colorClasses.bg} ${colorClasses.text}`}
+                          title="클릭하여 제거">
+                          {tag.name}
+                          <span className="hidden text-current opacity-60 group-hover:inline">×</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </td>
                 <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">

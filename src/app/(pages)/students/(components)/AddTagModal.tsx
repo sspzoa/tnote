@@ -3,6 +3,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { Button, FormCheckbox, FormInput, FormSelect, Modal } from "@/shared/components/ui";
+import { getTodayKST } from "@/shared/lib/utils/date";
 import type { TagColor } from "@/shared/types";
 import { showAddTagModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
@@ -23,11 +24,6 @@ const TAG_COLOR_CLASSES: Record<TagColor, { bg: string; text: string }> = {
   white: { bg: "bg-components-fill-standard-secondary", text: "text-content-standard-primary" },
 };
 
-const getTodayString = () => {
-  const today = new Date();
-  return today.toISOString().split("T")[0];
-};
-
 export default function AddTagModal() {
   const [showModal, setShowModal] = useAtom(showAddTagModalAtom);
   const selectedStudent = useAtomValue(selectedStudentAtom);
@@ -35,13 +31,13 @@ export default function AddTagModal() {
   const { mutateAsync: assignTag, isPending: isAssigning } = useAssignTag();
 
   const [selectedTagId, setSelectedTagId] = useState<string>("");
-  const [startDate, setStartDate] = useState<string>(getTodayString());
+  const [startDate, setStartDate] = useState<string>(getTodayKST());
   const [endDate, setEndDate] = useState<string>("");
   const [isIndefinite, setIsIndefinite] = useState<boolean>(true);
 
   const resetForm = () => {
     setSelectedTagId("");
-    setStartDate(getTodayString());
+    setStartDate(getTodayKST());
     setEndDate("");
     setIsIndefinite(true);
   };
