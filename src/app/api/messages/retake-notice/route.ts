@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-import { isSMSServiceAvailable, sendSMS } from "@/shared/lib/services/sms";
+import {
+  checkSMSService,
+  getSenderPhoneNumber,
+  type MessageRecipient,
+  sendMessagesWithHistory,
+} from "@/shared/lib/services/messageSender";
 import { getTodayKorean } from "@/shared/lib/utils/date";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
@@ -15,6 +20,7 @@ interface RetakeWithDetails {
     course: {
       id: string;
       name: string;
+      workspace?: string;
     };
   };
   student: {
@@ -25,14 +31,6 @@ interface RetakeWithDetails {
   };
 }
 
-interface RecipientInfo {
-  phone: string;
-  name: string;
-  studentId: string;
-  targetType: "student" | "parent";
-  text: string;
-}
-
 const formatDate = (dateString: string | null): string => {
   if (!dateString) return "미정";
   const date = new Date(dateString);
@@ -40,24 +38,15 @@ const formatDate = (dateString: string | null): string => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  if (!isSMSServiceAvailable()) {
-    return NextResponse.json({ error: "SMS 서비스가 설정되지 않았습니다." }, { status: 503 });
+  const smsCheck = checkSMSService();
+  if (!smsCheck.available) {
+    return NextResponse.json({ error: smsCheck.error }, { status: 503 });
   }
 
-  const { data: workspace, error: workspaceError } = await supabase
-    .from("Workspaces")
-    .select("sender_phone_number")
-    .eq("id", session.workspace)
-    .single();
-
-  if (workspaceError || !workspace?.sender_phone_number) {
-    return NextResponse.json(
-      { error: "발신번호가 설정되지 않았습니다. 문자 관리에서 발신번호를 먼저 설정해주세요." },
-      { status: 400 },
-    );
+  const senderResult = await getSenderPhoneNumber(supabase, session.workspace);
+  if (!senderResult.phone) {
+    return NextResponse.json({ error: senderResult.error }, { status: 400 });
   }
-
-  const senderPhoneNumber = workspace.sender_phone_number;
 
   const { retakeIds, recipientType, messageTemplate } = await request.json();
 
@@ -106,14 +95,11 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "접근 권한이 없습니다." }, { status: 403 });
   }
 
-  const recipients: RecipientInfo[] = [];
-
   const todayStr = getTodayKorean();
+  const recipients: MessageRecipient[] = [];
 
   for (const retake of validRetakes) {
-    let text = messageTemplate || "";
-
-    text = text
+    const text = (messageTemplate || "")
       .replace(/{이름}/g, retake.student.name)
       .replace(/{수업명}/g, retake.exam.course.name)
       .replace(/{시험명}/g, retake.exam.name)
@@ -153,72 +139,22 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "발송 가능한 전화번호가 없습니다." }, { status: 400 });
   }
 
-  const batchId = crypto.randomUUID();
-  const historyRecords: Array<{
-    workspace: string;
-    batch_id: string;
-    group_id: string | null;
-    message_type: string;
-    recipient_type: string;
-    recipient_phone: string;
-    recipient_name: string;
-    student_id: string;
-    message_content: string;
-    status_code: string | null;
-    status_message: string | null;
-    is_success: boolean;
-    error_message: string | null;
-    sent_by: string;
-  }> = [];
+  const result = await sendMessagesWithHistory({
+    supabase,
+    workspace: session.workspace,
+    userId: session.userId,
+    messageType: "retake",
+    recipients,
+    senderPhoneNumber: senderResult.phone,
+  });
 
-  let successCount = 0;
-  let failCount = 0;
-
-  for (const recipient of recipients) {
-    const result = await sendSMS({
-      to: recipient.phone,
-      text: recipient.text,
-      from: senderPhoneNumber,
-    });
-
-    historyRecords.push({
-      workspace: session.workspace,
-      batch_id: batchId,
-      group_id: result.groupId || null,
-      message_type: "retake",
-      recipient_type: recipient.targetType,
-      recipient_phone: recipient.phone,
-      recipient_name: recipient.name,
-      student_id: recipient.studentId,
-      message_content: recipient.text,
-      status_code: result.statusCode || null,
-      status_message: result.statusMessage || null,
-      is_success: result.success,
-      error_message: result.error || null,
-      sent_by: session.userId,
-    });
-
-    if (result.success) {
-      successCount++;
-    } else {
-      failCount++;
-    }
-  }
-
-  if (historyRecords.length > 0) {
-    const { error: historyError } = await supabase.from("MessageHistory").insert(historyRecords);
-    if (historyError) {
-      console.error("Failed to save message history:", historyError);
-    }
-  }
-
-  if (successCount === 0) {
+  if (result.successCount === 0) {
     return NextResponse.json(
       {
         error: "문자 발송에 실패했습니다.",
-        total: recipients.length,
-        successCount,
-        failCount,
+        total: result.total,
+        successCount: result.successCount,
+        failCount: result.failCount,
       },
       { status: 500 },
     );
@@ -227,9 +163,9 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   return NextResponse.json({
     success: true,
     data: {
-      total: recipients.length,
-      successCount,
-      failCount,
+      total: result.total,
+      successCount: result.successCount,
+      failCount: result.failCount,
     },
   });
 };

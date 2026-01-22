@@ -3,10 +3,6 @@ import { SolapiMessageService } from "solapi";
 const apiKey = process.env.SOLAPI_API_KEY;
 const apiSecret = process.env.SOLAPI_API_SECRET;
 
-if (!apiKey || !apiSecret) {
-  console.warn("SOLAPI 환경변수가 설정되지 않았습니다.");
-}
-
 const messageService = apiKey && apiSecret ? new SolapiMessageService(apiKey, apiSecret) : null;
 
 export interface SendSMSParams {

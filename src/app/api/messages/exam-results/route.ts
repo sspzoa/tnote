@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-import { isSMSServiceAvailable, sendSMS } from "@/shared/lib/services/sms";
+import {
+  checkSMSService,
+  getSenderPhoneNumber,
+  type MessageRecipient,
+  sendMessagesWithHistory,
+} from "@/shared/lib/services/messageSender";
 import { getTodayKorean } from "@/shared/lib/utils/date";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
@@ -33,14 +38,6 @@ interface ExamData {
   };
 }
 
-interface MessageInfo {
-  phone: string;
-  text: string;
-  studentId: string;
-  studentName: string;
-  targetType: "student" | "parent";
-}
-
 const getAssignmentStatusText = (status: string): string => {
   switch (status) {
     case "완료":
@@ -55,24 +52,15 @@ const getAssignmentStatusText = (status: string): string => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  if (!isSMSServiceAvailable()) {
-    return NextResponse.json({ error: "SMS 서비스가 설정되지 않았습니다." }, { status: 503 });
+  const smsCheck = checkSMSService();
+  if (!smsCheck.available) {
+    return NextResponse.json({ error: smsCheck.error }, { status: 503 });
   }
 
-  const { data: workspace, error: workspaceError } = await supabase
-    .from("Workspaces")
-    .select("sender_phone_number")
-    .eq("id", session.workspace)
-    .single();
-
-  if (workspaceError || !workspace?.sender_phone_number) {
-    return NextResponse.json(
-      { error: "발신번호가 설정되지 않았습니다. 문자 관리에서 발신번호를 먼저 설정해주세요." },
-      { status: 400 },
-    );
+  const senderResult = await getSenderPhoneNumber(supabase, session.workspace);
+  if (!senderResult.phone) {
+    return NextResponse.json({ error: senderResult.error }, { status: 400 });
   }
-
-  const senderPhoneNumber = workspace.sender_phone_number;
 
   const { examId, recipientType, studentIds, messageTemplate } = await request.json();
 
@@ -162,17 +150,14 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   }
 
   const totalStudents = sortedScores.length;
-  const messages: MessageInfo[] = [];
+  const todayStr = getTodayKorean();
+  const recipients: MessageRecipient[] = [];
 
   for (const scoreData of typedScores) {
     const rank = rankMap.get(scoreData.student_id) || 0;
     const assignmentStatus = assignmentMap.get(scoreData.student_id) || "-";
 
-    let text = messageTemplate || "";
-
-    const todayStr = getTodayKorean();
-
-    text = text
+    const text = (messageTemplate || "")
       .replace(/{이름}/g, scoreData.student.name)
       .replace(/{수업명}/g, typedExam.course.name)
       .replace(/{시험명}/g, typedExam.name)
@@ -186,102 +171,52 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       .replace(/{오늘날짜}/g, todayStr);
 
     if (recipientType === "student" || recipientType === "both") {
-      messages.push({
+      recipients.push({
         phone: removePhoneHyphens(scoreData.student.phone_number),
-        text,
+        name: scoreData.student.name,
         studentId: scoreData.student.id,
-        studentName: scoreData.student.name,
         targetType: "student",
+        text,
       });
     }
 
     if ((recipientType === "parent" || recipientType === "both") && scoreData.student.parent_phone_number) {
       const parentPhone = removePhoneHyphens(scoreData.student.parent_phone_number);
-      if (!messages.some((m) => m.phone === parentPhone && m.text === text)) {
-        messages.push({
+      if (!recipients.some((m) => m.phone === parentPhone && m.text === text)) {
+        recipients.push({
           phone: parentPhone,
-          text,
+          name: `${scoreData.student.name} 학부모`,
           studentId: scoreData.student.id,
-          studentName: `${scoreData.student.name} 학부모`,
           targetType: "parent",
+          text,
         });
       }
     }
   }
 
-  if (messages.length === 0) {
+  if (recipients.length === 0) {
     return NextResponse.json({ error: "발송 가능한 전화번호가 없습니다." }, { status: 400 });
   }
 
-  const uniqueMessages = messages.filter(
+  const uniqueRecipients = recipients.filter(
     (msg, index, self) => index === self.findIndex((m) => m.phone === msg.phone && m.text === msg.text),
   );
 
-  const batchId = crypto.randomUUID();
-  const historyRecords: Array<{
-    workspace: string;
-    batch_id: string;
-    group_id: string | null;
-    message_type: string;
-    recipient_type: string;
-    recipient_phone: string;
-    recipient_name: string;
-    student_id: string;
-    message_content: string;
-    status_code: string | null;
-    status_message: string | null;
-    is_success: boolean;
-    error_message: string | null;
-    sent_by: string;
-  }> = [];
-
-  let successCount = 0;
-  let failCount = 0;
-
-  for (const msg of uniqueMessages) {
-    const result = await sendSMS({
-      to: msg.phone,
-      text: msg.text,
-      from: senderPhoneNumber,
-    });
-
-    historyRecords.push({
-      workspace: session.workspace,
-      batch_id: batchId,
-      group_id: result.groupId || null,
-      message_type: "exam",
-      recipient_type: msg.targetType,
-      recipient_phone: msg.phone,
-      recipient_name: msg.studentName,
-      student_id: msg.studentId,
-      message_content: msg.text,
-      status_code: result.statusCode || null,
-      status_message: result.statusMessage || null,
-      is_success: result.success,
-      error_message: result.error || null,
-      sent_by: session.userId,
-    });
-
-    if (result.success) {
-      successCount++;
-    } else {
-      failCount++;
-    }
-  }
-
-  if (historyRecords.length > 0) {
-    const { error: historyError } = await supabase.from("MessageHistory").insert(historyRecords);
-    if (historyError) {
-      console.error("Failed to save message history:", historyError);
-    }
-  }
+  const result = await sendMessagesWithHistory({
+    supabase,
+    workspace: session.workspace,
+    userId: session.userId,
+    messageType: "exam",
+    recipients: uniqueRecipients,
+    senderPhoneNumber: senderResult.phone,
+  });
 
   return NextResponse.json({
-    success: failCount === 0,
+    success: result.failCount === 0,
     data: {
-      total: uniqueMessages.length,
-      successCount,
-      failCount,
+      total: result.total,
+      successCount: result.successCount,
+      failCount: result.failCount,
       studentCount: typedScores.length,
     },
   });

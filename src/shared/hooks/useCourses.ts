@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { Course } from "@/shared/types";
 
 interface UseCoursesOptions {
   activeOnly?: boolean;
-  queryKey?: string;
 }
 
 export const useCourses = (options: UseCoursesOptions = {}) => {
-  const { activeOnly = false, queryKey = "courses" } = options;
+  const { activeOnly = false } = options;
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [queryKey],
+    queryKey: activeOnly ? QUERY_KEYS.courses.forStudentsFilter : QUERY_KEYS.courses.all,
     queryFn: async () => {
       const response = await fetchWithAuth("/api/courses");
       const result = await response.json();

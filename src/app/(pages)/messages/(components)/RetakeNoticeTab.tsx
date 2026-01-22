@@ -1,13 +1,9 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { Eye, Send } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
-import { Button } from "@/shared/components/ui/button";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
-import { SearchInput } from "@/shared/components/ui/searchInput";
-import { StudentListContainer, StudentListEmpty } from "@/shared/components/ui/studentList";
 import {
   recipientTypeAtom,
   retakeManagementFilterAtom,
@@ -19,7 +15,7 @@ import { useSelectionList } from "../(hooks)/useSelectionList";
 import { useSendRetakeNotice } from "../(hooks)/useSendMessage";
 import { useRetakes } from "../(hooks)/useStudents";
 import { formatDate, RETAKE_TEMPLATE_VARIABLES } from "../(utils)/messageUtils";
-import { MessageComposer, MessagePreviewModal, RecipientTypeSelector, SelectAllCheckbox } from "./shared";
+import { MessageTabLayout } from "./shared";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "대기중" },
@@ -125,186 +121,125 @@ export default function RetakeNoticeTab() {
     }
   }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection]);
 
-  return (
-    <div className="flex flex-col gap-spacing-600">
-      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
-        <div className="mb-spacing-400">
-          <h3 className="font-semibold text-body text-content-standard-primary">재시험 필터</h3>
-          <p className="text-content-standard-tertiary text-footnote">안내할 재시험 상태를 선택하세요</p>
+  if (isLoading) {
+    return <LoadingComponent />;
+  }
+
+  const filterHeader = (
+    <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
+      <div className="grid grid-cols-2 gap-spacing-400">
+        <div className="flex flex-col gap-spacing-200">
+          <label className="font-semibold text-content-standard-secondary text-label">진행 상태</label>
+          <FilterSelect value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full">
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </FilterSelect>
         </div>
-
-        <div className="grid grid-cols-2 gap-spacing-400">
-          <div className="flex flex-col gap-spacing-200">
-            <label className="font-semibold text-content-standard-secondary text-label">진행 상태</label>
-            <FilterSelect value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full">
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </FilterSelect>
-          </div>
-
-          <div className="flex flex-col gap-spacing-200">
-            <label className="font-semibold text-content-standard-secondary text-label">관리 상태</label>
-            <FilterSelect
-              value={managementFilter}
-              onChange={(e) => setManagementFilter(e.target.value)}
-              className="w-full">
-              {MANAGEMENT_STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </FilterSelect>
-          </div>
+        <div className="flex flex-col gap-spacing-200">
+          <label className="font-semibold text-content-standard-secondary text-label">관리 상태</label>
+          <FilterSelect
+            value={managementFilter}
+            onChange={(e) => setManagementFilter(e.target.value)}
+            className="w-full">
+            {MANAGEMENT_STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </FilterSelect>
         </div>
       </div>
+    </div>
+  );
 
-      {isLoading ? (
-        <LoadingComponent />
-      ) : (
-        <div className="flex h-[700px] flex-row items-stretch gap-spacing-600">
-          <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-            <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-              <h3 className="font-semibold text-body text-content-standard-primary">재시험 목록</h3>
-              <p className="text-content-standard-tertiary text-footnote">
-                {selectedCount > 0 ? (
-                  <span className="text-core-accent">{selectedCount}건 선택됨</span>
-                ) : (
-                  `총 ${retakes.length}건`
-                )}
-              </p>
-            </div>
-
-            <SelectAllCheckbox
-              allSelected={allSelected}
-              someSelected={someSelected}
-              totalCount={filteredRetakes.length}
-              onToggle={handleSelectAll}
-              unit="건"
-            />
-
-            <div className="flex min-h-0 flex-1 flex-col p-spacing-500">
-              <SearchInput
-                placeholder="학생 검색..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-spacing-300"
-              />
-              <StudentListContainer className="h-0 flex-1">
-                {filteredRetakes.length === 0 ? (
-                  <StudentListEmpty
-                    message={retakes.length === 0 ? "해당 상태의 재시험이 없습니다" : "검색 결과가 없습니다"}
-                  />
-                ) : (
-                  filteredRetakes.map((retake) => {
-                    const isSelected = selectedIds.has(retake.id);
-                    return (
-                      <label
-                        key={retake.id}
-                        className="flex cursor-pointer items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 transition-all duration-150 last:border-b-0 hover:bg-core-accent-translucent/50">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => handleToggleRetake(retake.id)}
-                          className="size-4 shrink-0 cursor-pointer accent-core-accent"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-spacing-200">
-                            <span className="truncate font-medium text-body text-content-standard-primary">
-                              {retake.student.name} - {formatDate(retake.current_scheduled_date)}
-                            </span>
-                            {retake.management_status && (
-                              <span
-                                className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
-                                  retake.management_status.includes("완료")
-                                    ? "bg-solid-translucent-blue text-solid-blue"
-                                    : "bg-solid-translucent-red text-solid-red"
-                                }`}>
-                                {retake.management_status}
-                              </span>
-                            )}
-                          </div>
-                          <div className="truncate text-content-standard-tertiary text-footnote">
-                            {retake.exam.course.name} - {retake.exam.exam_number}회 {retake.exam.name}
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })
-                )}
-              </StudentListContainer>
-            </div>
-          </div>
-
-          <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-            <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-              <h3 className="font-semibold text-body text-content-standard-primary">메시지 템플릿</h3>
-              <p className="text-content-standard-tertiary text-footnote">학생별로 변수가 자동 치환됩니다</p>
-            </div>
-
-            <RecipientTypeSelector value={recipientType} onChange={setRecipientType} />
-
-            <div className="flex min-h-0 flex-1 flex-col px-spacing-500 py-spacing-400">
-              <MessageComposer
-                messageText={messageTemplate}
-                onMessageChange={setMessageTemplate}
-                templateVariables={RETAKE_TEMPLATE_VARIABLES}
-                templates={templates}
-                onSaveTemplate={addTemplate}
-                onDeleteTemplate={deleteTemplate}
-                className="min-h-0 flex-1"
-              />
-
-              <div className="mt-spacing-400 flex items-center justify-between">
-                <div className="text-content-standard-tertiary text-footnote">
-                  {selectedCount > 0 ? (
-                    <span>
-                      <span className="font-semibold text-core-accent">{selectedCount}건</span> 발송
+  return (
+    <MessageTabLayout
+      selection={{
+        title: "재시험 목록",
+        subtitle: "재시험을 선택하세요",
+        selectedCount,
+        totalCount: retakes.length,
+        searchQuery,
+        onSearchChange: setSearchQuery,
+        allSelected,
+        someSelected,
+        onSelectAll: handleSelectAll,
+        emptyMessage: "해당 상태의 재시험이 없습니다",
+        noResultsMessage: "검색 결과가 없습니다",
+        filteredCount: filteredRetakes.length,
+        unit: "건",
+        headerContent: filterHeader,
+        renderItems: () =>
+          filteredRetakes.map((retake) => {
+            const isSelected = selectedIds.has(retake.id);
+            return (
+              <label
+                key={retake.id}
+                className="flex cursor-pointer items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 transition-all duration-150 last:border-b-0 hover:bg-core-accent-translucent/50">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => handleToggleRetake(retake.id)}
+                  className="size-4 shrink-0 cursor-pointer accent-core-accent"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-spacing-200">
+                    <span className="truncate font-medium text-body text-content-standard-primary">
+                      {retake.student.name} - {formatDate(retake.current_scheduled_date)}
                     </span>
-                  ) : (
-                    <span>재시험을 선택하세요</span>
-                  )}
+                    {retake.management_status && (
+                      <span
+                        className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
+                          retake.management_status.includes("완료")
+                            ? "bg-solid-translucent-blue text-solid-blue"
+                            : "bg-solid-translucent-red text-solid-red"
+                        }`}>
+                        {retake.management_status}
+                      </span>
+                    )}
+                  </div>
+                  <div className="truncate text-content-standard-tertiary text-footnote">
+                    {retake.exam.course.name} - {retake.exam.exam_number}회 {retake.exam.name}
+                  </div>
                 </div>
-                <div className="flex gap-spacing-200">
-                  <Button variant="secondary" onClick={() => setIsPreviewOpen(true)} disabled={retakes.length === 0}>
-                    <span className="flex items-center gap-spacing-200">
-                      <Eye className="size-4" />
-                      미리보기
-                    </span>
-                  </Button>
-                  <Button
-                    onClick={handleSend}
-                    disabled={selectedCount === 0}
-                    isLoading={isSending}
-                    loadingText="발송 중...">
-                    <span className="flex items-center gap-spacing-200">
-                      <Send className="size-4" />
-                      재시험 안내 발송
-                    </span>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <MessagePreviewModal
-        isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
-        recipientName={previewRetake?.student.name}
-        previewMessage={previewMessage}
-        variables={[
+              </label>
+            );
+          }),
+      }}
+      message={{
+        recipientType,
+        onRecipientTypeChange: setRecipientType,
+        messageText: messageTemplate,
+        onMessageChange: setMessageTemplate,
+        templateVariables: RETAKE_TEMPLATE_VARIABLES,
+        templates,
+        onSaveTemplate: addTemplate,
+        onDeleteTemplate: deleteTemplate,
+      }}
+      send={{
+        buttonText: "재시험 안내 발송",
+        onSend: handleSend,
+        isSending,
+        canSend: selectedCount > 0,
+      }}
+      preview={{
+        isOpen: isPreviewOpen,
+        onOpen: () => setIsPreviewOpen(true),
+        onClose: () => setIsPreviewOpen(false),
+        recipientName: previewRetake?.student.name,
+        message: previewMessage,
+        variables: [
           { label: "이름", value: previewRetake?.student.name },
           { label: "코스", value: previewRetake?.exam.course.name },
           { label: "시험", value: previewRetake?.exam.name },
           { label: "회차", value: previewRetake ? `${previewRetake.exam.exam_number}회` : undefined },
           { label: "예정일", value: previewRetake ? formatDate(previewRetake.current_scheduled_date) : undefined },
           { label: "상태", value: previewRetake ? formatStatusLabel(previewRetake.status) : undefined },
-        ]}
-      />
-    </div>
+        ],
+      }}
+    />
   );
 }

@@ -1,4 +1,3 @@
-// Tag types
 export type TagColor =
   | "red"
   | "orange"
@@ -31,7 +30,6 @@ export interface StudentTagAssignment {
   tag?: StudentTag;
 }
 
-// Student types
 export interface Student {
   id: string;
   phone_number: string;
@@ -46,7 +44,6 @@ export interface Student {
   tags?: StudentTagAssignment[];
 }
 
-// Course types
 export interface Course {
   id: string;
   name: string;
@@ -57,7 +54,6 @@ export interface Course {
   days_of_week?: number[] | null;
 }
 
-// Clinic types
 export interface Clinic {
   id: string;
   name: string;
@@ -75,7 +71,6 @@ export interface AttendanceRecord {
   student: Student;
 }
 
-// Retake types
 export type ManagementStatus =
   | "재시 안내 예정"
   | "재시 안내 완료"
@@ -94,7 +89,14 @@ export interface Exam {
   exam_number: number;
   max_score?: number;
   cutline?: number;
-  course: Course;
+  course: Pick<Course, "id" | "name">;
+}
+
+export interface RetakeStudent {
+  id: string;
+  phone_number: string;
+  name: string;
+  school: string;
 }
 
 export interface Retake {
@@ -107,34 +109,23 @@ export interface Retake {
   postpone_count: number;
   absent_count: number;
   note: string | null;
-  exam: {
-    id: string;
-    name: string;
-    exam_number: number;
-    course: {
-      id: string;
-      name: string;
-    };
-  };
-  student: {
-    id: string;
-    phone_number: string;
-    name: string;
-    school: string;
-  };
+  exam: Pick<Exam, "id" | "name" | "exam_number"> & { course: Pick<Course, "id" | "name"> };
+  student: RetakeStudent;
 }
+
+export type RetakeActionType =
+  | "assign"
+  | "postpone"
+  | "absent"
+  | "complete"
+  | "status_change"
+  | "management_status_change"
+  | "note_update"
+  | "date_edit";
 
 export interface RetakeHistory {
   id: string;
-  action_type:
-    | "assign"
-    | "postpone"
-    | "absent"
-    | "complete"
-    | "status_change"
-    | "management_status_change"
-    | "note_update"
-    | "date_edit";
+  action_type: RetakeActionType;
   previous_date: string | null;
   new_date: string | null;
   previous_status: string | null;
@@ -149,7 +140,6 @@ export interface RetakeHistory {
   } | null;
 }
 
-// Consultation types
 export interface ConsultationLog {
   id: string;
   student_id: string;
@@ -165,19 +155,13 @@ export interface ConsultationWithDetails {
   title: string;
   content: string;
   created_at: string;
-  student: {
-    id: string;
-    name: string;
-    phone_number: string;
-    school: string | null;
-  };
+  student: Pick<Student, "id" | "name" | "phone_number" | "school">;
   creator?: {
     id: string;
     name: string;
   } | null;
 }
 
-// Admin types
 export interface Admin {
   id: string;
   phone_number: string;
@@ -186,7 +170,6 @@ export interface Admin {
   created_at: string;
 }
 
-// Calendar types
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -199,7 +182,6 @@ export interface CalendarEvent {
   };
 }
 
-// Message types
 export type RecipientType = "student" | "parent" | "both";
 
 export interface SendMessageRequest {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormSelect } from "@/shared/components/ui/formSelect";
@@ -13,9 +13,9 @@ import {
   StudentListItem,
   StudentListLoading,
 } from "@/shared/components/ui/studentList";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
+import { useExamScoresForAssign } from "../(hooks)/useExamScoresForAssign";
 import { useExamsForAssign } from "../(hooks)/useExamsForAssign";
 import { useRetakeAssign } from "../(hooks)/useRetakeAssign";
 import { useStudentsForAssign } from "../(hooks)/useStudentsForAssign";
@@ -24,69 +24,42 @@ interface RetakeAssignModalProps {
   onSuccess?: () => void;
 }
 
-interface ExamScore {
-  student_id: string;
-  score: number;
-}
-
 export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps) {
   const [isOpen, setIsOpen] = useAtom(showAssignModalAtom);
-  const [selectedCourseId, setSelectedCourseId] = useState<string>("");
-  const [selectedExamId, setSelectedExamId] = useState<string>("");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [selectedExamId, setSelectedExamId] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
-  const [scheduledDate, setScheduledDate] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [examScores, setExamScores] = useState<ExamScore[]>([]);
-  const [loadingScores, setLoadingScores] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { courses, isLoading: coursesLoading } = useCoursesForAssign();
   const { exams, isLoading: examsLoading } = useExamsForAssign(selectedCourseId || null);
   const { students, isLoading: studentsLoading } = useStudentsForAssign(selectedCourseId || null);
+  const { examScores, isLoading: scoresLoading } = useExamScoresForAssign(selectedExamId || null);
   const { assignRetake, isAssigning } = useRetakeAssign();
 
-  // 선택된 시험 정보
-  const selectedExam = exams.find((e) => e.id === selectedExamId);
+  const selectedExam = useMemo(() => exams.find((e) => e.id === selectedExamId), [exams, selectedExamId]);
 
-  // 시험 선택 시 점수 불러오기
-  useEffect(() => {
-    const fetchScores = async () => {
-      if (!selectedExamId) {
-        setExamScores([]);
-        return;
-      }
-
-      setLoadingScores(true);
-      try {
-        const response = await fetchWithAuth(`/api/exams/${selectedExamId}/scores`);
-        const result = await response.json();
-        if (response.ok && result.data) {
-          setExamScores(result.data.scores || []);
-        }
-      } catch {
-        setExamScores([]);
-      } finally {
-        setLoadingScores(false);
-      }
-    };
-
-    fetchScores();
-  }, [selectedExamId]);
-
-  // 학생별 점수 조회
   const getStudentScore = (studentId: string): number | null => {
     const score = examScores.find((s) => s.student_id === studentId);
     return score ? score.score : null;
   };
 
-  // 커트라인 미달 학생인지 확인
   const isBelowCutline = (studentId: string): boolean => {
     const score = getStudentScore(studentId);
     if (score === null || !selectedExam) return false;
     return score < (selectedExam.cutline || 4);
   };
 
-  // 커트라인 미달 학생 목록
-  const studentsBelowCutline = students.filter((s) => isBelowCutline(s.id));
+  const studentsBelowCutline = useMemo(
+    () => students.filter((s) => isBelowCutline(s.id)),
+    [students, examScores, selectedExam],
+  );
+
+  const filteredStudents = useMemo(
+    () => students.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [students, searchQuery],
+  );
 
   const handleClose = () => {
     setIsOpen(false);
@@ -95,14 +68,12 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     setSelectedStudentIds([]);
     setScheduledDate("");
     setSearchQuery("");
-    setExamScores([]);
   };
 
   const handleCourseChange = (courseId: string) => {
     setSelectedCourseId(courseId);
     setSelectedExamId("");
     setSelectedStudentIds([]);
-    setExamScores([]);
   };
 
   const handleStudentToggle = (studentId: string) => {
@@ -112,7 +83,6 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
   };
 
   const handleSelectAll = () => {
-    const filteredStudents = students.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
     if (selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0) {
       setSelectedStudentIds([]);
     } else {
@@ -120,7 +90,6 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     }
   };
 
-  // 재시험자(커트라인 미달) 전체 선택
   const handleSelectBelowCutline = () => {
     const filteredBelowCutline = studentsBelowCutline.filter((s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -129,10 +98,8 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       filteredBelowCutline.length > 0 && filteredBelowCutline.every((s) => selectedStudentIds.includes(s.id));
 
     if (allSelected) {
-      // 재시험자만 해제
       setSelectedStudentIds((prev) => prev.filter((id) => !filteredBelowCutline.some((s) => s.id === id)));
     } else {
-      // 재시험자 전체 선택 (기존 선택 유지하면서 추가)
       const newIds = filteredBelowCutline.map((s) => s.id);
       setSelectedStudentIds((prev) => [...new Set([...prev, ...newIds])]);
     }
@@ -158,8 +125,6 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     }
   };
 
-  const filteredStudents = students.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
   const courseOptions = [
     { value: "", label: "과목을 선택하세요" },
     ...courses.map((course) => ({ value: course.id, label: course.name })),
@@ -169,6 +134,14 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     { value: "", label: "시험을 선택하세요" },
     ...exams.map((exam) => ({ value: exam.id, label: `${exam.name} ${exam.exam_number}회차` })),
   ];
+
+  const isDataLoading = studentsLoading || scoresLoading;
+  const filteredBelowCutlineForButton = studentsBelowCutline.filter((s) =>
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+  const allBelowCutlineSelected =
+    filteredBelowCutlineForButton.length > 0 &&
+    filteredBelowCutlineForButton.every((s) => selectedStudentIds.includes(s.id));
 
   return (
     <Modal
@@ -232,12 +205,8 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
                   <button
                     onClick={handleSelectBelowCutline}
                     className="text-body text-core-status-negative hover:underline"
-                    disabled={studentsLoading || loadingScores}>
-                    {studentsBelowCutline.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .length > 0 &&
-                    studentsBelowCutline
-                      .filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .every((s) => selectedStudentIds.includes(s.id))
+                    disabled={isDataLoading}>
+                    {allBelowCutlineSelected
                       ? "재시험자 해제"
                       : `재시험자 전체 선택 (${studentsBelowCutline.length}명)`}
                   </button>
@@ -245,7 +214,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
                 <button
                   onClick={handleSelectAll}
                   className="text-body text-core-accent hover:underline"
-                  disabled={studentsLoading || filteredStudents.length === 0}>
+                  disabled={isDataLoading || filteredStudents.length === 0}>
                   {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                     ? "전체 해제"
                     : "전체 선택"}
@@ -261,7 +230,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             />
 
             <StudentListContainer>
-              {studentsLoading || loadingScores ? (
+              {isDataLoading ? (
                 <StudentListLoading />
               ) : filteredStudents.length === 0 ? (
                 <StudentListEmpty message={students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."} />
