@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, Refres
 import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/useMessageStore";
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
@@ -235,10 +236,7 @@ export default function MessagesPage() {
 
             <div className="flex-1 overflow-y-auto">
               {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-spacing-900">
-                  <div className="mb-spacing-300 size-8 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
-                  <span className="text-content-standard-tertiary text-label">로딩중...</span>
-                </div>
+                <LoadingComponent className="py-spacing-900" size="md" />
               ) : history.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-spacing-900">
                   <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">

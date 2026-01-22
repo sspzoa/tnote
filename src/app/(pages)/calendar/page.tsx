@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import type { CalendarEvent } from "@/shared/types";
 import CalendarGrid from "./(components)/CalendarGrid";
 import CalendarToolbar from "./(components)/CalendarToolbar";
@@ -58,9 +59,7 @@ export default function CalendarPage() {
         />
 
         {isLoading ? (
-          <div className="flex min-h-[600px] items-center justify-center">
-            <p className="text-body text-content-standard-tertiary">로딩 중...</p>
-          </div>
+          <LoadingComponent className="min-h-[600px]" />
         ) : (
           <CalendarGrid
             currentDate={currentDate}

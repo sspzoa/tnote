@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import type { ConsultationLog } from "@/shared/types";
@@ -60,7 +61,7 @@ export default function ConsultationListModal() {
         </>
       }>
       {isLoading ? (
-        <div className="py-spacing-900 text-center text-content-standard-tertiary">로딩중...</div>
+        <LoadingComponent className="py-spacing-900" size="md" />
       ) : consultations.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="mb-spacing-200 text-body text-content-standard-tertiary">상담일지가 없습니다.</p>

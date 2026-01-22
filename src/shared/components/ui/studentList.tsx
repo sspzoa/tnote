@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 
 export interface StudentListStudent {
@@ -96,6 +97,6 @@ interface StudentListLoadingProps {
   message?: string;
 }
 
-export function StudentListLoading({ message = "로딩중..." }: StudentListLoadingProps) {
-  return <div className="py-spacing-600 text-center text-content-standard-tertiary">{message}</div>;
+export function StudentListLoading(_props: StudentListLoadingProps) {
+  return <LoadingComponent className="py-spacing-600" size="md" />;
 }
