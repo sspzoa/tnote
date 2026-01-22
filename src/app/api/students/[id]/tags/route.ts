@@ -97,6 +97,58 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   return NextResponse.json({ success: true, data });
 };
 
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
+  const studentId = params?.id;
+  const { tagId, startDate, endDate } = await request.json();
+
+  if (!tagId) {
+    return NextResponse.json({ error: "태그 ID는 필수입니다." }, { status: 400 });
+  }
+
+  if (!startDate) {
+    return NextResponse.json({ error: "시작 날짜는 필수입니다." }, { status: 400 });
+  }
+
+  const { data: student, error: studentError } = await supabase
+    .from("Users")
+    .select("id")
+    .eq("id", studentId)
+    .eq("workspace", session.workspace)
+    .eq("role", "student")
+    .single();
+
+  if (studentError || !student) {
+    return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
+  }
+
+  const { data, error } = await supabase
+    .from("StudentTagAssignments")
+    .update({
+      start_date: startDate,
+      end_date: endDate || null,
+    })
+    .eq("student_id", studentId)
+    .eq("tag_id", tagId)
+    .select(`
+      id,
+      student_id,
+      tag_id,
+      start_date,
+      end_date,
+      created_at,
+      tag:StudentTags(id, name, color)
+    `)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      return NextResponse.json({ error: "해당 태그 할당을 찾을 수 없습니다." }, { status: 404 });
+    }
+    throw error;
+  }
+  return NextResponse.json({ success: true, data });
+};
+
 const handleDelete = async ({ request, supabase, session, params }: ApiContext) => {
   const studentId = params?.id;
   const { tagId } = await request.json();
@@ -140,5 +192,10 @@ export const POST = withLogging(handlePost, {
 export const DELETE = withLogging(handleDelete, {
   resource: "student-tags",
   action: "delete",
+  allowedRoles: ["owner", "admin"],
+});
+export const PATCH = withLogging(handlePatch, {
+  resource: "student-tags",
+  action: "update",
   allowedRoles: ["owner", "admin"],
 });

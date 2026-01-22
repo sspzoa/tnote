@@ -7,6 +7,7 @@ export const QUERY_KEYS = {
   },
   tags: {
     all: ["tags"] as const,
+    detail: (id: string) => ["tags", "detail", id] as const,
   },
   students: {
     all: ["students"] as const,

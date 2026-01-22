@@ -25,6 +25,7 @@ import { useExams } from "../(hooks)/useExams";
 const MANAGEMENT_STATUS_OPTIONS: ManagementStatus[] = [
   "재시 안내 예정",
   "재시 안내 완료",
+  "재시 날짜 확답 완료",
   "클리닉 1회 불참 연락 필요",
   "클리닉 1회 불참 연락 완료",
   "클리닉 2회 불참 연락 필요",

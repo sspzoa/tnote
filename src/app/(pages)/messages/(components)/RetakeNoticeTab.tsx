@@ -30,6 +30,7 @@ const MANAGEMENT_STATUS_OPTIONS = [
   { value: "all", label: "전체" },
   { value: "재시 안내 예정", label: "재시 안내 예정" },
   { value: "재시 안내 완료", label: "재시 안내 완료" },
+  { value: "재시 날짜 확답 완료", label: "재시 날짜 확답 완료" },
   { value: "클리닉 1회 불참 연락 필요", label: "클리닉 1회 불참 연락 필요" },
   { value: "클리닉 1회 불참 연락 완료", label: "클리닉 1회 불참 연락 완료" },
   { value: "클리닉 2회 불참 연락 필요", label: "클리닉 2회 불참 연락 필요" },
@@ -251,7 +252,12 @@ export default function RetakeNoticeTab() {
                               {formatDate(retake.current_scheduled_date)}
                             </span>
                             {retake.management_status && (
-                              <span className="rounded-radius-200 bg-solid-translucent-yellow px-spacing-200 py-spacing-50 font-semibold text-footnote text-solid-yellow">
+                              <span
+                                className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
+                                  retake.management_status.includes("완료")
+                                    ? "bg-solid-translucent-green text-solid-green"
+                                    : "bg-solid-translucent-yellow text-solid-yellow"
+                                }`}>
                                 {retake.management_status}
                               </span>
                             )}

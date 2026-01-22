@@ -10,6 +10,7 @@ import { useRetakeManagementStatus } from "../(hooks)/useRetakeManagementStatus"
 const MANAGEMENT_STATUS_OPTIONS: { value: ManagementStatus; label: ManagementStatus }[] = [
   { value: "재시 안내 예정", label: "재시 안내 예정" },
   { value: "재시 안내 완료", label: "재시 안내 완료" },
+  { value: "재시 날짜 확답 완료", label: "재시 날짜 확답 완료" },
   { value: "클리닉 1회 불참 연락 필요", label: "클리닉 1회 불참 연락 필요" },
   { value: "클리닉 1회 불참 연락 완료", label: "클리닉 1회 불참 연락 완료" },
   { value: "클리닉 2회 불참 연락 필요", label: "클리닉 2회 불참 연락 필요" },

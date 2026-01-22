@@ -3,20 +3,21 @@ import { useCallback } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import type { TagColor } from "@/shared/types";
+import type { StudentTagAssignment, TagColor } from "@/shared/types";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import {
+  editTagAssignmentDataAtom,
   openMenuIdAtom,
   showAddTagModalAtom,
   showConsultationModalAtom,
   showEditModalAtom,
+  showEditTagAssignmentModalAtom,
   showInfoModalAtom,
 } from "../(atoms)/useModalStore";
 import type { Student } from "../(atoms)/useStudentsStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useStudentDelete } from "../(hooks)/useStudentDelete";
 import { useStudentPasswordReset } from "../(hooks)/useStudentPasswordReset";
-import { useRemoveTag } from "../(hooks)/useStudentTags";
 
 interface StudentListProps {
   students: Student[];
@@ -58,9 +59,10 @@ export default function StudentList({ students }: StudentListProps) {
   const [, setShowInfoModal] = useAtom(showInfoModalAtom);
   const [, setShowAddTagModal] = useAtom(showAddTagModalAtom);
   const [, setEditForm] = useAtom(editFormAtom);
+  const [, setShowEditTagAssignmentModal] = useAtom(showEditTagAssignmentModalAtom);
+  const [, setEditTagAssignmentData] = useAtom(editTagAssignmentDataAtom);
   const { deleteStudent } = useStudentDelete();
   const { resetPassword } = useStudentPasswordReset();
-  const { mutateAsync: removeTag } = useRemoveTag();
 
   const handleEditClick = useCallback(
     (student: Student) => {
@@ -142,16 +144,16 @@ export default function StudentList({ students }: StudentListProps) {
     [setSelectedStudent, setShowAddTagModal],
   );
 
-  const handleRemoveTag = useCallback(
-    async (student: Student, tagId: string, tagName: string) => {
-      if (!confirm(`"${tagName}" 태그를 제거하시겠습니까?`)) return;
-      try {
-        await removeTag({ studentId: student.id, tagId });
-      } catch {
-        alert("태그 제거에 실패했습니다.");
-      }
+  const openEditTagAssignmentModal = useCallback(
+    (student: Student, assignment: StudentTagAssignment) => {
+      setEditTagAssignmentData({
+        studentId: student.id,
+        studentName: student.name,
+        assignment,
+      });
+      setShowEditTagAssignmentModal(true);
     },
-    [removeTag],
+    [setEditTagAssignmentData, setShowEditTagAssignmentModal],
   );
 
   const getMenuItems = useCallback(
@@ -218,11 +220,10 @@ export default function StudentList({ students }: StudentListProps) {
                       return (
                         <button
                           key={assignment.id}
-                          onClick={() => handleRemoveTag(student, tag.id, tag.name)}
+                          onClick={() => openEditTagAssignmentModal(student, assignment)}
                           className={`group flex items-center gap-spacing-50 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote transition-opacity hover:opacity-70 ${colorClasses.bg} ${colorClasses.text}`}
-                          title="클릭하여 제거">
+                          title="클릭하여 수정">
                           {tag.name}
-                          <span className="hidden text-current opacity-60 group-hover:inline">×</span>
                         </button>
                       );
                     })}

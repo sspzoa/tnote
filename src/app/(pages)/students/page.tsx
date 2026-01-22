@@ -16,6 +16,7 @@ import { searchQueryAtom, selectedTagIdsAtom } from "./(atoms)/useStudentsStore"
 import AddTagModal from "./(components)/AddTagModal";
 import ConsultationFormModal from "./(components)/ConsultationFormModal";
 import ConsultationListModal from "./(components)/ConsultationListModal";
+import EditTagAssignmentModal from "./(components)/EditTagAssignmentModal";
 import StudentCreateModal from "./(components)/StudentCreateModal";
 import StudentEditModal from "./(components)/StudentEditModal";
 import StudentFilterBar from "./(components)/StudentFilterBar";
@@ -131,6 +132,7 @@ export default function StudentsPage() {
       <ConsultationFormModal />
       <TagManageModal />
       <AddTagModal />
+      <EditTagAssignmentModal />
 
       {showConsultationPanel && (
         <>

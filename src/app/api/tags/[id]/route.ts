@@ -16,6 +16,38 @@ const VALID_COLORS: TagColor[] = [
   "white",
 ];
 
+const handleGet = async ({ supabase, session, params }: ApiContext) => {
+  const id = params?.id;
+
+  const { data: tag, error: tagError } = await supabase
+    .from("StudentTags")
+    .select("id, name, color")
+    .eq("id", id)
+    .eq("workspace", session.workspace)
+    .single();
+
+  if (tagError || !tag) {
+    return NextResponse.json({ error: "태그를 찾을 수 없습니다." }, { status: 404 });
+  }
+
+  const { data: assignments, error: assignmentsError } = await supabase
+    .from("StudentTagAssignments")
+    .select(`
+      id,
+      student_id,
+      tag_id,
+      start_date,
+      end_date,
+      created_at,
+      student:Users!inner(id, name, phone_number, school)
+    `)
+    .eq("tag_id", id);
+
+  if (assignmentsError) throw assignmentsError;
+
+  return NextResponse.json({ data: { tag, assignments: assignments || [] } });
+};
+
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { name, color } = await request.json();
@@ -89,6 +121,7 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   return NextResponse.json({ success: true });
 };
 
+export const GET = withLogging(handleGet, { resource: "tags", action: "read", allowedRoles: ["owner", "admin"] });
 export const PATCH = withLogging(handlePatch, { resource: "tags", action: "update", allowedRoles: ["owner", "admin"] });
 export const DELETE = withLogging(handleDelete, {
   resource: "tags",
