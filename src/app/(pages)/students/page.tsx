@@ -12,7 +12,8 @@ import { EmptyState } from "@/shared/components/ui/emptyState";
 import { Modal } from "@/shared/components/ui/modal";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
-import { searchQueryAtom, showFavoritesOnlyAtom } from "./(atoms)/useStudentsStore";
+import { searchQueryAtom, selectedTagIdsAtom } from "./(atoms)/useStudentsStore";
+import AddTagModal from "./(components)/AddTagModal";
 import ConsultationFormModal from "./(components)/ConsultationFormModal";
 import ConsultationListModal from "./(components)/ConsultationListModal";
 import StudentCreateModal from "./(components)/StudentCreateModal";
@@ -20,25 +21,48 @@ import StudentEditModal from "./(components)/StudentEditModal";
 import StudentFilterBar from "./(components)/StudentFilterBar";
 import StudentInfoModal from "./(components)/StudentInfoModal";
 import StudentList from "./(components)/StudentList";
+import TagManageModal from "./(components)/TagManageModal";
 import { useAllConsultations } from "./(hooks)/useAllConsultations";
 import { useCourses } from "./(hooks)/useCourses";
 import { useStudents } from "./(hooks)/useStudents";
+import { useTags } from "./(hooks)/useTags";
+
+const isTagActive = (startDate: string, endDate: string | null): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+
+  if (today < start) return false;
+  if (endDate === null) return true;
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+  return today <= end;
+};
 
 export default function StudentsPage() {
   const { students, isLoading: studentsLoading, error: studentsError } = useStudents();
   const { courses, isLoading: coursesLoading } = useCourses();
   const { consultations, isLoading: consultationsLoading } = useAllConsultations();
+  const { tags, isLoading: tagsLoading } = useTags();
   const searchQuery = useAtomValue(searchQueryAtom);
-  const showFavoritesOnly = useAtomValue(showFavoritesOnlyAtom);
+  const selectedTagIds = useAtomValue(selectedTagIdsAtom);
   const [, setShowCreateModal] = useAtom(showCreateModalAtom);
   const [selectedConsultation, setSelectedConsultation] = useState<ConsultationWithDetails | null>(null);
   const [showConsultationPanel, setShowConsultationPanel] = useState(false);
 
   const filteredStudents = students
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .filter((student) => !showFavoritesOnly || student.is_favorite);
+    .filter((student) => {
+      if (selectedTagIds.size === 0) return true;
+      const activeTags = (student.tags || []).filter((assignment) =>
+        isTagActive(assignment.start_date, assignment.end_date),
+      );
+      return activeTags.some((assignment) => selectedTagIds.has(assignment.tag_id));
+    });
 
-  const isLoading = studentsLoading || coursesLoading;
+  const isLoading = studentsLoading || coursesLoading || tagsLoading;
 
   if (studentsError) {
     return <ErrorComponent errorMessage="학생 목록을 불러오는데 실패했습니다." />;
@@ -70,7 +94,7 @@ export default function StudentsPage() {
       />
 
       <div className="flex flex-col gap-spacing-600">
-        <StudentFilterBar courses={courses} />
+        <StudentFilterBar courses={courses} tags={tags} />
 
         {isLoading ? (
           <LoadingComponent />
@@ -105,6 +129,8 @@ export default function StudentsPage() {
       <StudentInfoModal />
       <ConsultationListModal />
       <ConsultationFormModal />
+      <TagManageModal />
+      <AddTagModal />
 
       {showConsultationPanel && (
         <>

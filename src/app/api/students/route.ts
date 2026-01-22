@@ -32,7 +32,6 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
           school,
           branch,
           birth_year,
-          is_favorite,
           workspace
         )
       `)
@@ -71,7 +70,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, is_favorite, created_at")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, created_at")
     .eq("role", "student")
     .eq("workspace", session.workspace)
     .order("name", { ascending: true });
@@ -80,24 +79,48 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 
   const studentIds = data.map((student) => student.id);
 
-  const { data: consultationCounts, error: countError } = await supabase
-    .from("ConsultationLogs")
-    .select("student_id")
-    .eq("workspace", session.workspace)
-    .in("student_id", studentIds);
+  const [consultationResult, tagsResult] = await Promise.all([
+    supabase
+      .from("ConsultationLogs")
+      .select("student_id")
+      .eq("workspace", session.workspace)
+      .in("student_id", studentIds),
+    supabase
+      .from("StudentTagAssignments")
+      .select(`
+        student_id,
+        id,
+        tag_id,
+        start_date,
+        end_date,
+        created_at,
+        tag:StudentTags!inner(id, name, color, workspace)
+      `)
+      .in("student_id", studentIds)
+      .eq("tag.workspace", session.workspace),
+  ]);
 
-  if (countError) throw countError;
+  if (consultationResult.error) throw consultationResult.error;
+  if (tagsResult.error) throw tagsResult.error;
 
   const countMap = new Map<string, number>();
-  for (const log of consultationCounts) {
+  for (const log of consultationResult.data) {
     countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
   }
 
-  const studentsWithCount = data.map((student) => ({
+  const tagsMap = new Map<string, typeof tagsResult.data>();
+  for (const assignment of tagsResult.data) {
+    const existing = tagsMap.get(assignment.student_id) || [];
+    existing.push(assignment);
+    tagsMap.set(assignment.student_id, existing);
+  }
+
+  const studentsWithData = data.map((student) => ({
     ...student,
     consultation_count: countMap.get(student.id) || 0,
+    tags: tagsMap.get(student.id) || [],
   }));
-  return NextResponse.json({ data: studentsWithCount });
+  return NextResponse.json({ data: studentsWithData });
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {

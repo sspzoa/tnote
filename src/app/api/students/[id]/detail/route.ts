@@ -90,7 +90,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: student, error: studentError } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, birth_year, is_favorite, created_at")
+    .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
     .eq("id", studentId)
     .eq("workspace", session.workspace)
     .single();
@@ -284,7 +284,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         parentPhoneNumber: student.parent_phone_number,
         school: student.school,
         birthYear: student.birth_year,
-        isFavorite: student.is_favorite,
         createdAt: student.created_at,
       },
       courses,

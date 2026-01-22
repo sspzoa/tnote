@@ -1,3 +1,36 @@
+// Tag types
+export type TagColor =
+  | "red"
+  | "orange"
+  | "yellow"
+  | "green"
+  | "blue"
+  | "indigo"
+  | "purple"
+  | "pink"
+  | "brown"
+  | "black"
+  | "white";
+
+export interface StudentTag {
+  id: string;
+  workspace: string;
+  name: string;
+  color: TagColor;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface StudentTagAssignment {
+  id: string;
+  student_id: string;
+  tag_id: string;
+  start_date: string;
+  end_date: string | null;
+  created_at?: string;
+  tag?: StudentTag;
+}
+
 // Student types
 export interface Student {
   id: string;
@@ -7,10 +40,10 @@ export interface Student {
   school?: string | null;
   branch?: string | null;
   birth_year?: number | null;
-  is_favorite?: boolean;
   enrolled_at?: string;
   created_at?: string;
   consultation_count?: number;
+  tags?: StudentTagAssignment[];
 }
 
 // Course types

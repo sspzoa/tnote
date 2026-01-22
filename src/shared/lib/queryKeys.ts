@@ -5,6 +5,9 @@ export const QUERY_KEYS = {
   home: {
     stats: ["home", "stats"] as const,
   },
+  tags: {
+    all: ["tags"] as const,
+  },
   students: {
     all: ["students"] as const,
     byCourse: (courseId: string) => ["students", "byCourse", courseId] as const,
