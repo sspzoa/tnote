@@ -7,13 +7,9 @@ import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { SearchInput } from "@/shared/components/ui/searchInput";
 import { StudentListContainer, StudentListEmpty, StudentListItem } from "@/shared/components/ui/studentList";
-import {
-  messageTextAtom,
-  recipientTypeAtom,
-  searchQueryAtom,
-  selectedStudentIdsAtom,
-} from "../(atoms)/useMessageStore";
+import { messageTextAtom, recipientTypeAtom } from "../(atoms)/useMessageStore";
 import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
+import { useSelectionList } from "../(hooks)/useSelectionList";
 import { useSendMessage } from "../(hooks)/useSendMessage";
 import { useStudents } from "../(hooks)/useStudents";
 import { GENERAL_TEMPLATE_VARIABLES, getTodayFormatted } from "../(utils)/messageUtils";
@@ -24,26 +20,25 @@ export default function GeneralTab() {
   const { sendMessage, isSending } = useSendMessage();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("general");
 
-  const [selectedIds, setSelectedIds] = useAtom(selectedStudentIdsAtom);
-  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
+  const {
+    selectedIds,
+    searchQuery,
+    setSearchQuery,
+    filteredItems: filteredStudents,
+    allSelected,
+    someSelected,
+    handleToggle: handleToggleStudent,
+    handleSelectAll,
+    resetSelection,
+    selectedCount,
+  } = useSelectionList({
+    items: students,
+    getSearchableText: (student) => student.name,
+  });
+
   const [recipientType, setRecipientType] = useAtom(recipientTypeAtom);
   const [messageText, setMessageText] = useAtom(messageTextAtom);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-
-  const filteredStudents = useMemo(() => {
-    if (!searchQuery.trim()) return students;
-    const query = searchQuery.toLowerCase();
-    return students.filter((student) => student.name.toLowerCase().includes(query));
-  }, [students, searchQuery]);
-
-  const allSelected = useMemo(() => {
-    if (filteredStudents.length === 0) return false;
-    return filteredStudents.every((s) => selectedIds.has(s.id));
-  }, [filteredStudents, selectedIds]);
-
-  const someSelected = useMemo(() => {
-    return filteredStudents.some((s) => selectedIds.has(s.id)) && !allSelected;
-  }, [filteredStudents, selectedIds, allSelected]);
 
   const previewStudent = useMemo(() => {
     if (students.length === 0) return null;
@@ -56,39 +51,8 @@ export default function GeneralTab() {
     return messageText.replace(/{이름}/g, previewStudent.name).replace(/{오늘날짜}/g, getTodayFormatted());
   }, [messageText, previewStudent]);
 
-  const handleToggleStudent = useCallback(
-    (studentId: string) => {
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        if (next.has(studentId)) {
-          next.delete(studentId);
-        } else {
-          next.add(studentId);
-        }
-        return next;
-      });
-    },
-    [setSelectedIds],
-  );
-
-  const handleSelectAll = useCallback(() => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (allSelected) {
-        for (const student of filteredStudents) {
-          next.delete(student.id);
-        }
-      } else {
-        for (const student of filteredStudents) {
-          next.add(student.id);
-        }
-      }
-      return next;
-    });
-  }, [setSelectedIds, filteredStudents, allSelected]);
-
   const handleSend = useCallback(async () => {
-    if (selectedIds.size === 0) {
+    if (selectedCount === 0) {
       alert("수신자를 선택하세요.");
       return;
     }
@@ -109,12 +73,12 @@ export default function GeneralTab() {
           `${result.data.successCount}건 발송 완료${result.data.failCount > 0 ? `, ${result.data.failCount}건 실패` : ""}`,
         );
         setMessageText("");
-        setSelectedIds(new Set<string>());
+        resetSelection();
       }
     } catch (err) {
       alert(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
     }
-  }, [selectedIds, messageText, recipientType, sendMessage, setMessageText, setSelectedIds]);
+  }, [selectedIds, selectedCount, messageText, recipientType, sendMessage, setMessageText, resetSelection]);
 
   if (isLoading) {
     return <LoadingComponent />;
@@ -126,8 +90,8 @@ export default function GeneralTab() {
         <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
           <h3 className="font-semibold text-body text-content-standard-primary">수신자 선택</h3>
           <p className="text-content-standard-tertiary text-footnote">
-            {selectedIds.size > 0 ? (
-              <span className="text-core-accent">{selectedIds.size}명 선택됨</span>
+            {selectedCount > 0 ? (
+              <span className="text-core-accent">{selectedCount}명 선택됨</span>
             ) : (
               `총 ${students.length}명`
             )}
@@ -185,9 +149,9 @@ export default function GeneralTab() {
 
           <div className="mt-spacing-400 flex items-center justify-between">
             <div className="text-content-standard-tertiary text-footnote">
-              {selectedIds.size > 0 ? (
+              {selectedCount > 0 ? (
                 <span>
-                  <span className="font-semibold text-core-accent">{selectedIds.size}명</span>에게 발송
+                  <span className="font-semibold text-core-accent">{selectedCount}명</span>에게 발송
                 </span>
               ) : (
                 <span>수신자를 선택하세요</span>
@@ -202,7 +166,7 @@ export default function GeneralTab() {
               </Button>
               <Button
                 onClick={handleSend}
-                disabled={selectedIds.size === 0 || !messageText.trim()}
+                disabled={selectedCount === 0 || !messageText.trim()}
                 isLoading={isSending}
                 loadingText="발송 중...">
                 <span className="flex items-center gap-spacing-200">

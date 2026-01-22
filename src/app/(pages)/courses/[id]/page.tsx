@@ -1,15 +1,26 @@
 "use client";
 
+import { useAtomValue } from "jotai";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
+import {
+  assignmentExamAtom,
+  scoreExamAtom,
+  selectedExamAtom,
+  showAssignmentModalAtom,
+  showCreateModalAtom,
+  showEditModalAtom,
+  showScoreModalAtom,
+} from "./(atoms)/useExamStore";
 import { AssignmentModal } from "./(components)/AssignmentModal";
 import { ExamFormModal } from "./(components)/ExamFormModal";
 import { ExamTable } from "./(components)/ExamTable";
 import { ScoreInputModal } from "./(components)/ScoreInputModal";
 import { useCourseDetail } from "./(hooks)/useCourseDetail";
+import { useCoursePageHandlers } from "./(hooks)/useCoursePageHandlers";
 import { useCourseStudents } from "./(hooks)/useCourseStudents";
 import { useExamAssignments, useExamAssignmentsSave } from "./(hooks)/useExamAssignments";
 import { useExamCreate } from "./(hooks)/useExamCreate";
@@ -31,13 +42,24 @@ export default function CourseDetailPage() {
   const { saveScores, isPending: isSavingScores } = useExamScoresSave(courseId);
   const { saveAssignments, isPending: isSavingAssignments } = useExamAssignmentsSave();
 
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
-  const [showScoreModal, setShowScoreModal] = useState(false);
-  const [scoreExam, setScoreExam] = useState<Exam | null>(null);
-  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
-  const [assignmentExam, setAssignmentExam] = useState<Exam | null>(null);
+  const showCreateModal = useAtomValue(showCreateModalAtom);
+  const showEditModal = useAtomValue(showEditModalAtom);
+  const selectedExam = useAtomValue(selectedExamAtom);
+  const showScoreModal = useAtomValue(showScoreModalAtom);
+  const scoreExam = useAtomValue(scoreExamAtom);
+  const showAssignmentModal = useAtomValue(showAssignmentModalAtom);
+  const assignmentExam = useAtomValue(assignmentExamAtom);
+
+  const {
+    openCreateModal,
+    closeCreateModal,
+    openEditModal,
+    closeEditModal,
+    openScoreModal,
+    closeScoreModal,
+    openAssignmentModal,
+    closeAssignmentModal,
+  } = useCoursePageHandlers();
 
   const { students: scoreStudents, isLoading: loadingScoreStudents } = useCourseStudents(courseId, showScoreModal);
   const { scores: existingScores, isLoading: loadingExistingScores } = useExamScores(
@@ -64,7 +86,6 @@ export default function CourseDetailPage() {
     try {
       await createExam({ courseId, ...data });
       alert("시험이 생성되었습니다.");
-      setShowCreateModal(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
     }
@@ -76,7 +97,6 @@ export default function CourseDetailPage() {
     try {
       await updateExam({ examId: selectedExam.id, ...data });
       alert("시험이 수정되었습니다.");
-      setShowEditModal(false);
     } catch (error) {
       alert(error instanceof Error ? error.message : "시험 수정에 실패했습니다.");
     }
@@ -97,25 +117,6 @@ export default function CourseDetailPage() {
     }
   };
 
-  const openCreateModal = () => {
-    setShowCreateModal(true);
-  };
-
-  const openEditModal = (exam: Exam) => {
-    setSelectedExam(exam);
-    setShowEditModal(true);
-  };
-
-  const openScoreModal = (exam: Exam) => {
-    setScoreExam(exam);
-    setShowScoreModal(true);
-  };
-
-  const closeScoreModal = () => {
-    setShowScoreModal(false);
-    setScoreExam(null);
-  };
-
   const handleSaveScores = async (scores: Array<{ studentId: string; score: number }>, toDelete: string[]) => {
     if (!scoreExam) return;
 
@@ -126,16 +127,6 @@ export default function CourseDetailPage() {
     } catch (error) {
       alert(error instanceof Error ? error.message : "점수 저장에 실패했습니다.");
     }
-  };
-
-  const openAssignmentModal = (exam: Exam) => {
-    setAssignmentExam(exam);
-    setShowAssignmentModal(true);
-  };
-
-  const closeAssignmentModal = () => {
-    setShowAssignmentModal(false);
-    setAssignmentExam(null);
   };
 
   const handleSaveAssignments = async (assignments: Array<{ studentId: string; status: string }>) => {
@@ -212,7 +203,7 @@ export default function CourseDetailPage() {
 
         <ExamFormModal
           isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
+          onClose={closeCreateModal}
           mode="create"
           courseName={course.name}
           initialData={showCreateModal ? getCreateInitialData() : undefined}
@@ -222,7 +213,7 @@ export default function CourseDetailPage() {
 
         <ExamFormModal
           isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
+          onClose={closeEditModal}
           mode="edit"
           initialData={getEditInitialData()}
           onSubmit={handleEdit}

@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, MessageSquare, UserCog, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { sidebarOpenAtom } from "./(atoms)/useSidebarStore";
 import { PasswordChangeModal } from "./PasswordChangeModal";
 
@@ -81,9 +81,25 @@ export default function Sidebar() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isOpen, setIsOpen] = useAtom(sidebarOpenAtom);
 
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      const response = await fetch("/api/auth/me");
+      const result = await response.json();
+      if (result.user) {
+        setUserInfo({
+          name: result.user.name,
+          role: result.user.role,
+          workspaceName: result.user.workspaceName || "",
+        });
+      }
+    } catch {
+      // noop
+    }
+  }, []);
+
   useEffect(() => {
     fetchUserInfo();
-  }, []);
+  }, [fetchUserInfo]);
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -101,22 +117,6 @@ export default function Sidebar() {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
-
-  const fetchUserInfo = async () => {
-    try {
-      const response = await fetch("/api/auth/me");
-      const result = await response.json();
-      if (result.user) {
-        setUserInfo({
-          name: result.user.name,
-          role: result.user.role,
-          workspaceName: result.user.workspaceName || "",
-        });
-      }
-    } catch {
-      // noop
-    }
-  };
 
   const handleLogout = async () => {
     if (!confirm("로그아웃 하시겠습니까?")) return;

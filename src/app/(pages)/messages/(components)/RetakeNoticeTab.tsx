@@ -13,9 +13,9 @@ import {
   retakeManagementFilterAtom,
   retakeMessageTemplateAtom,
   retakeStatusFilterAtom,
-  selectedRetakeIdsAtom,
 } from "../(atoms)/useMessageStore";
 import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
+import { useSelectionList } from "../(hooks)/useSelectionList";
 import { useSendRetakeNotice } from "../(hooks)/useSendMessage";
 import { useRetakes } from "../(hooks)/useStudents";
 import { formatDate, RETAKE_TEMPLATE_VARIABLES } from "../(utils)/messageUtils";
@@ -60,31 +60,29 @@ export default function RetakeNoticeTab() {
   const { sendRetakeNotice, isSending } = useSendRetakeNotice();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("retake");
 
-  const [selectedIds, setSelectedIds] = useAtom(selectedRetakeIdsAtom);
   const [recipientType, setRecipientType] = useAtom(recipientTypeAtom);
   const [messageTemplate, setMessageTemplate] = useAtom(retakeMessageTemplateAtom);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  const {
+    selectedIds,
+    searchQuery,
+    setSearchQuery,
+    filteredItems: filteredRetakes,
+    allSelected,
+    someSelected,
+    handleToggle: handleToggleRetake,
+    handleSelectAll,
+    resetSelection,
+    selectedCount,
+  } = useSelectionList({
+    items: retakes,
+    getSearchableText: (retake) => retake.student.name,
+  });
 
   useEffect(() => {
-    setSelectedIds(new Set<string>());
-    setSearchQuery("");
-  }, [statusFilter, managementFilter, setSelectedIds]);
-
-  const filteredRetakes = useMemo(() => {
-    if (!searchQuery.trim()) return retakes;
-    const query = searchQuery.toLowerCase();
-    return retakes.filter((retake) => retake.student.name.toLowerCase().includes(query));
-  }, [retakes, searchQuery]);
-
-  const allSelected = useMemo(() => {
-    if (filteredRetakes.length === 0) return false;
-    return filteredRetakes.every((r) => selectedIds.has(r.id));
-  }, [filteredRetakes, selectedIds]);
-
-  const someSelected = useMemo(() => {
-    return filteredRetakes.some((r) => selectedIds.has(r.id)) && !allSelected;
-  }, [filteredRetakes, selectedIds, allSelected]);
+    resetSelection();
+  }, [statusFilter, managementFilter, resetSelection]);
 
   const previewRetake = useMemo(() => {
     if (retakes.length === 0) return null;
@@ -103,39 +101,8 @@ export default function RetakeNoticeTab() {
       .replace(/{상태}/g, formatStatusLabel(previewRetake.status));
   }, [messageTemplate, previewRetake]);
 
-  const handleToggleRetake = useCallback(
-    (retakeId: string) => {
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        if (next.has(retakeId)) {
-          next.delete(retakeId);
-        } else {
-          next.add(retakeId);
-        }
-        return next;
-      });
-    },
-    [setSelectedIds],
-  );
-
-  const handleSelectAll = useCallback(() => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (allSelected) {
-        for (const retake of filteredRetakes) {
-          next.delete(retake.id);
-        }
-      } else {
-        for (const retake of filteredRetakes) {
-          next.add(retake.id);
-        }
-      }
-      return next;
-    });
-  }, [setSelectedIds, filteredRetakes, allSelected]);
-
   const handleSend = useCallback(async () => {
-    if (selectedIds.size === 0) {
+    if (selectedCount === 0) {
       alert("수신자를 선택하세요.");
       return;
     }
@@ -151,12 +118,12 @@ export default function RetakeNoticeTab() {
         alert(
           `${result.data.successCount}건 발송 완료${result.data.failCount > 0 ? `, ${result.data.failCount}건 실패` : ""}`,
         );
-        setSelectedIds(new Set<string>());
+        resetSelection();
       }
     } catch (err) {
       alert(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
     }
-  }, [selectedIds, recipientType, messageTemplate, sendRetakeNotice, setSelectedIds]);
+  }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection]);
 
   return (
     <div className="flex flex-col gap-spacing-600">
@@ -202,8 +169,8 @@ export default function RetakeNoticeTab() {
             <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
               <h3 className="font-semibold text-body text-content-standard-primary">재시험 목록</h3>
               <p className="text-content-standard-tertiary text-footnote">
-                {selectedIds.size > 0 ? (
-                  <span className="text-core-accent">{selectedIds.size}건 선택됨</span>
+                {selectedCount > 0 ? (
+                  <span className="text-core-accent">{selectedCount}건 선택됨</span>
                 ) : (
                   `총 ${retakes.length}건`
                 )}
@@ -294,9 +261,9 @@ export default function RetakeNoticeTab() {
 
               <div className="mt-spacing-400 flex items-center justify-between">
                 <div className="text-content-standard-tertiary text-footnote">
-                  {selectedIds.size > 0 ? (
+                  {selectedCount > 0 ? (
                     <span>
-                      <span className="font-semibold text-core-accent">{selectedIds.size}건</span> 발송
+                      <span className="font-semibold text-core-accent">{selectedCount}건</span> 발송
                     </span>
                   ) : (
                     <span>재시험을 선택하세요</span>
@@ -311,7 +278,7 @@ export default function RetakeNoticeTab() {
                   </Button>
                   <Button
                     onClick={handleSend}
-                    disabled={selectedIds.size === 0}
+                    disabled={selectedCount === 0}
                     isLoading={isSending}
                     loadingText="발송 중...">
                     <span className="flex items-center gap-spacing-200">

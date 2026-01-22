@@ -10,7 +10,6 @@ interface CalendarEvent {
   metadata?: Record<string, unknown>;
 }
 
-// Supabase query result types (relations return single object when using !inner)
 interface CourseData {
   id: string;
   name: string;
@@ -32,6 +31,34 @@ interface AttendanceRecord {
   student_id: string;
   clinic_id?: string;
 }
+
+const generateCourseSessions = (course: {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  days_of_week: number[];
+}): CalendarEvent[] => {
+  const events: CalendarEvent[] = [];
+  const start = new Date(course.start_date);
+  const end = new Date(course.end_date);
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const dayOfWeek = d.getDay();
+    if (course.days_of_week.includes(dayOfWeek)) {
+      events.push({
+        id: `course-${course.id}-${d.toISOString().split("T")[0]}`,
+        type: "course",
+        title: course.name,
+        date: d.toISOString().split("T")[0],
+        allDay: true,
+        metadata: { courseId: course.id },
+      });
+    }
+  }
+
+  return events;
+};
 
 const generateClinicSessions = (
   clinic: {
@@ -74,8 +101,6 @@ const generateClinicSessions = (
         status = "attended";
       } else if (dateObj < today) {
         status = "absent";
-      } else {
-        status = "scheduled";
       }
 
       const statusLabel = status === "attended" ? "출석" : status === "absent" ? "결석" : "예정";
@@ -119,32 +144,127 @@ const generateClinicSessions = (
   return events;
 };
 
-const generateCourseSessions = (course: {
+interface RetakeData {
   id: string;
-  name: string;
-  start_date: string;
-  end_date: string;
-  days_of_week: number[];
-}): CalendarEvent[] => {
-  const events: CalendarEvent[] = [];
-  const start = new Date(course.start_date);
-  const end = new Date(course.end_date);
+  current_scheduled_date: string | null;
+  status: string;
+  exam: {
+    name: string;
+    course: { name: string };
+  };
+  student?: { name: string };
+}
 
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const dayOfWeek = d.getDay();
-    if (course.days_of_week.includes(dayOfWeek)) {
-      events.push({
-        id: `course-${course.id}-${d.toISOString().split("T")[0]}`,
-        type: "course",
-        title: course.name,
-        date: d.toISOString().split("T")[0],
-        allDay: true,
-        metadata: { courseId: course.id },
-      });
-    }
+const createRetakeEvent = (retake: RetakeData, includeStudentName: boolean): CalendarEvent => {
+  const studentName = includeStudentName && retake.student ? `${retake.student.name} - ` : "";
+  return {
+    id: `retake-${retake.id}`,
+    type: "retake",
+    title: `재시험: ${studentName}${retake.exam.course.name} ${retake.exam.name}`,
+    date: retake.current_scheduled_date as string,
+    allDay: true,
+    metadata: {
+      retakeId: retake.id,
+      status: retake.status,
+      ...(retake.student && { studentName: retake.student.name }),
+      examName: retake.exam.name,
+      courseName: retake.exam.course.name,
+    },
+  };
+};
+
+const fetchCourses = async (
+  supabase: ApiContext["supabase"],
+  workspace: string,
+  studentId?: string,
+): Promise<CourseData[]> => {
+  if (studentId) {
+    const { data: enrollments, error } = await supabase
+      .from("CourseEnrollments")
+      .select(`course:Courses!inner(id, name, start_date, end_date, days_of_week)`)
+      .eq("student_id", studentId);
+
+    if (error) throw error;
+    return (enrollments || []).map((e) => e.course as unknown as CourseData);
   }
 
-  return events;
+  const { data: courses, error } = await supabase
+    .from("Courses")
+    .select("id, name, start_date, end_date, days_of_week")
+    .eq("workspace", workspace)
+    .not("start_date", "is", null)
+    .not("end_date", "is", null);
+
+  if (error) throw error;
+  return (courses as CourseData[]) || [];
+};
+
+const fetchRetakes = async (
+  supabase: ApiContext["supabase"],
+  workspace: string,
+  studentId?: string,
+): Promise<RetakeData[]> => {
+  if (studentId) {
+    const { data, error } = await supabase
+      .from("RetakeAssignments")
+      .select(
+        `id, current_scheduled_date, status, exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name))`,
+      )
+      .eq("student_id", studentId);
+
+    if (error) throw error;
+    return (data || []).map((r) => ({
+      id: r.id,
+      current_scheduled_date: r.current_scheduled_date,
+      status: r.status,
+      exam: r.exam as unknown as { name: string; course: { name: string } },
+    }));
+  }
+
+  const { data, error } = await supabase
+    .from("RetakeAssignments")
+    .select(`
+      id, current_scheduled_date, status,
+      student:Users!RetakeAssignments_student_id_fkey!inner(name, workspace),
+      exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name))
+    `)
+    .eq("student.workspace", workspace);
+
+  if (error) throw error;
+  return (data || []).map((r) => ({
+    id: r.id,
+    current_scheduled_date: r.current_scheduled_date,
+    status: r.status,
+    exam: r.exam as unknown as { name: string; course: { name: string } },
+    student: r.student as unknown as { name: string },
+  }));
+};
+
+const fetchClinicsWithAttendance = async (
+  supabase: ApiContext["supabase"],
+  workspace: string,
+): Promise<{ clinics: ClinicData[]; attendance: AttendanceRecord[] }> => {
+  const { data: clinics, error: clinicsError } = await supabase
+    .from("Clinics")
+    .select("id, name, start_date, end_date, operating_days")
+    .eq("workspace", workspace)
+    .not("start_date", "is", null)
+    .not("end_date", "is", null);
+
+  if (clinicsError) throw clinicsError;
+
+  const clinicIds = (clinics as ClinicData[] | null)?.map((c) => c.id) || [];
+  const { data: attendance, error: attendanceError } = await supabase
+    .from("ClinicAttendance")
+    .select("attendance_date, student_id, clinic_id")
+    .in("clinic_id", clinicIds.length > 0 ? clinicIds : [""]);
+
+  if (attendanceError) throw attendanceError;
+
+  return {
+    clinics: (clinics as ClinicData[]) || [],
+    attendance: (attendance as AttendanceRecord[]) || [],
+  };
 };
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
@@ -153,210 +273,54 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const endDate = searchParams.get("end");
 
   const events: CalendarEvent[] = [];
+  const isStudent = session.role === "student";
+  const studentId = isStudent ? session.userId : undefined;
 
-  if (session.role === "student") {
-    const { data: enrollments, error: enrollError } = await supabase
-      .from("CourseEnrollments")
-      .select(`
-        course:Courses!inner(
-          id,
-          name,
-          start_date,
-          end_date,
-          days_of_week
-        )
-      `)
-      .eq("student_id", session.userId);
+  const courses = await fetchCourses(supabase, session.workspace, studentId);
+  for (const course of courses) {
+    if (course.start_date && course.end_date && course.days_of_week) {
+      events.push(
+        ...generateCourseSessions({
+          id: course.id,
+          name: course.name,
+          start_date: course.start_date,
+          end_date: course.end_date,
+          days_of_week: course.days_of_week,
+        }),
+      );
+    }
+  }
 
-    if (enrollError) throw enrollError;
+  const retakes = await fetchRetakes(supabase, session.workspace, studentId);
+  for (const retake of retakes) {
+    events.push(createRetakeEvent(retake, !isStudent));
+  }
 
-    enrollments?.forEach((enrollment) => {
-      const course = enrollment.course as unknown as CourseData;
-      if (course.start_date && course.end_date && course.days_of_week) {
-        events.push(
-          ...generateCourseSessions({
-            id: course.id,
-            name: course.name,
-            start_date: course.start_date,
-            end_date: course.end_date,
-            days_of_week: course.days_of_week,
-          }),
-        );
-      }
-    });
-
-    const { data: retakes, error: retakeError } = await supabase
-      .from("RetakeAssignments")
-      .select(`
-        id,
-        current_scheduled_date,
-        status,
-        exam:Exams!inner(
-          id,
-          name,
-          exam_number,
-          course:Courses!inner(id, name)
-        )
-      `)
-      .eq("student_id", session.userId);
-
-    if (retakeError) throw retakeError;
-
-    retakes?.forEach((retake) => {
-      const exam = retake.exam as unknown as { name: string; course: { id: string; name: string } };
-      events.push({
-        id: `retake-${retake.id}`,
-        type: "retake",
-        title: `재시험: ${exam.course.name} ${exam.name}`,
-        date: retake.current_scheduled_date as string,
-        allDay: true,
-        metadata: {
-          retakeId: retake.id,
-          status: retake.status,
-          examName: exam.name,
-          courseName: exam.course.name,
-        },
-      });
-    });
-
-    const { data: clinics, error: clinicsError } = await supabase
-      .from("Clinics")
-      .select("id, name, start_date, end_date, operating_days")
-      .eq("workspace", session.workspace)
-      .not("start_date", "is", null)
-      .not("end_date", "is", null);
-
-    if (clinicsError) throw clinicsError;
-
-    const clinicIds = (clinics as ClinicData[] | null)?.map((c) => c.id) || [];
-    const { data: allAttendance, error: attendanceError } = await supabase
-      .from("ClinicAttendance")
-      .select("attendance_date, student_id, clinic_id")
-      .in("clinic_id", clinicIds.length > 0 ? clinicIds : [""]);
-
-    if (attendanceError) throw attendanceError;
-
-    (clinics as ClinicData[] | null)?.forEach((clinic) => {
-      if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-        const clinicAttendance =
-          (allAttendance as AttendanceRecord[] | null)?.filter((a) => a.clinic_id === clinic.id) || [];
-        events.push(
-          ...generateClinicSessions(
-            {
-              id: clinic.id,
-              name: clinic.name,
-              start_date: clinic.start_date,
-              end_date: clinic.end_date,
-              operating_days: clinic.operating_days,
-            },
-            clinicAttendance,
-            session.userId,
-          ),
-        );
-      }
-    });
-  } else {
-    const { data: courses, error: coursesError } = await supabase
-      .from("Courses")
-      .select("id, name, start_date, end_date, days_of_week")
-      .eq("workspace", session.workspace)
-      .not("start_date", "is", null)
-      .not("end_date", "is", null);
-
-    if (coursesError) throw coursesError;
-
-    (courses as CourseData[] | null)?.forEach((course) => {
-      if (course.start_date && course.end_date && course.days_of_week) {
-        events.push(
-          ...generateCourseSessions({
-            id: course.id,
-            name: course.name,
-            start_date: course.start_date,
-            end_date: course.end_date,
-            days_of_week: course.days_of_week,
-          }),
-        );
-      }
-    });
-
-    const { data: retakes, error: retakeError } = await supabase
-      .from("RetakeAssignments")
-      .select(`
-        id,
-        current_scheduled_date,
-        status,
-        student:Users!RetakeAssignments_student_id_fkey!inner(name, workspace),
-        exam:Exams!inner(
-          id,
-          name,
-          exam_number,
-          course:Courses!inner(id, name)
-        )
-      `)
-      .eq("student.workspace", session.workspace);
-
-    if (retakeError) throw retakeError;
-
-    retakes?.forEach((retake) => {
-      const student = retake.student as unknown as { name: string };
-      const exam = retake.exam as unknown as { name: string; course: { name: string } };
-      events.push({
-        id: `retake-${retake.id}`,
-        type: "retake",
-        title: `재시험: ${student.name} - ${exam.course.name} ${exam.name}`,
-        date: retake.current_scheduled_date as string,
-        allDay: true,
-        metadata: {
-          retakeId: retake.id,
-          status: retake.status,
-          studentName: student.name,
-          examName: exam.name,
-          courseName: exam.course.name,
-        },
-      });
-    });
-
-    const { data: clinics, error: clinicsError } = await supabase
-      .from("Clinics")
-      .select("id, name, start_date, end_date, operating_days")
-      .eq("workspace", session.workspace)
-      .not("start_date", "is", null)
-      .not("end_date", "is", null);
-
-    if (clinicsError) throw clinicsError;
-
-    const clinicIds = (clinics as ClinicData[] | null)?.map((c) => c.id) || [];
-    const { data: allAttendance, error: attendanceError } = await supabase
-      .from("ClinicAttendance")
-      .select("attendance_date, clinic_id, student_id")
-      .in("clinic_id", clinicIds.length > 0 ? clinicIds : [""]);
-
-    if (attendanceError) throw attendanceError;
-
-    (clinics as ClinicData[] | null)?.forEach((clinic) => {
-      if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-        const clinicAttendance =
-          (allAttendance as AttendanceRecord[] | null)?.filter((a) => a.clinic_id === clinic.id) || [];
-        events.push(
-          ...generateClinicSessions(
-            {
-              id: clinic.id,
-              name: clinic.name,
-              start_date: clinic.start_date,
-              end_date: clinic.end_date,
-              operating_days: clinic.operating_days,
-            },
-            clinicAttendance,
-          ),
-        );
-      }
-    });
+  const { clinics, attendance } = await fetchClinicsWithAttendance(supabase, session.workspace);
+  for (const clinic of clinics) {
+    if (clinic.start_date && clinic.end_date && clinic.operating_days) {
+      const clinicAttendance = attendance.filter((a) => a.clinic_id === clinic.id);
+      events.push(
+        ...generateClinicSessions(
+          {
+            id: clinic.id,
+            name: clinic.name,
+            start_date: clinic.start_date,
+            end_date: clinic.end_date,
+            operating_days: clinic.operating_days,
+          },
+          clinicAttendance,
+          studentId,
+        ),
+      );
+    }
   }
 
   let filteredEvents = events;
   if (startDate && endDate) {
     filteredEvents = events.filter((e) => e.date >= startDate && e.date <= endDate);
   }
+
   return NextResponse.json({ data: filteredEvents });
 };
 
