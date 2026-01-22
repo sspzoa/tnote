@@ -50,21 +50,13 @@ export default function RetakeList({
 
   const getManagementStatusBadge = (status: string) => {
     const isCompleted = status.includes("완료");
-    const isInProgress = status.includes("진행 중");
-    const isNeeded = status.includes("필요") || status.includes("예정");
 
-    let bgColor = "bg-components-fill-standard-secondary";
-    let textColor = "text-content-standard-secondary";
+    let bgColor = "bg-solid-translucent-red";
+    let textColor = "text-solid-red";
 
     if (isCompleted) {
-      bgColor = "bg-solid-translucent-green";
-      textColor = "text-solid-green";
-    } else if (isInProgress) {
       bgColor = "bg-solid-translucent-blue";
       textColor = "text-solid-blue";
-    } else if (isNeeded) {
-      bgColor = "bg-solid-translucent-yellow";
-      textColor = "text-solid-yellow";
     }
 
     return (
@@ -116,10 +108,10 @@ export default function RetakeList({
                 </button>
               </td>
               <td className="px-spacing-500 py-spacing-400">
-                <div className="text-body text-content-standard-primary">
-                  {retake.exam.course.name} - {retake.exam.name}
+                <div className="text-body text-content-standard-primary">{retake.exam.name}</div>
+                <div className="text-content-standard-secondary text-footnote">
+                  {retake.exam.course.name} {retake.exam.exam_number}회차
                 </div>
-                <div className="text-content-standard-secondary text-footnote">{retake.exam.exam_number}회차</div>
               </td>
               <td className="px-spacing-500 py-spacing-400">
                 <div className="text-body text-content-standard-primary">

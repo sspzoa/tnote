@@ -213,17 +213,14 @@ export default function RetakeNoticeTab() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-spacing-200">
                             <span className="truncate font-medium text-body text-content-standard-primary">
-                              {retake.student.name}
-                            </span>
-                            <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 font-semibold text-footnote text-solid-blue">
-                              {formatDate(retake.current_scheduled_date)}
+                              {retake.student.name} - {formatDate(retake.current_scheduled_date)}
                             </span>
                             {retake.management_status && (
                               <span
                                 className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
                                   retake.management_status.includes("완료")
-                                    ? "bg-solid-translucent-green text-solid-green"
-                                    : "bg-solid-translucent-yellow text-solid-yellow"
+                                    ? "bg-solid-translucent-blue text-solid-blue"
+                                    : "bg-solid-translucent-red text-solid-red"
                                 }`}>
                                 {retake.management_status}
                               </span>
