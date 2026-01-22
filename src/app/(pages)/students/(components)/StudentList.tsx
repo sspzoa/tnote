@@ -3,7 +3,8 @@ import { useCallback } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import type { StudentTagAssignment, TagColor } from "@/shared/types";
+import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
+import type { StudentTagAssignment } from "@/shared/types";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import {
   editTagAssignmentDataAtom,
@@ -22,20 +23,6 @@ import { useStudentPasswordReset } from "../(hooks)/useStudentPasswordReset";
 interface StudentListProps {
   students: Student[];
 }
-
-const TAG_COLOR_CLASSES: Record<TagColor, { bg: string; text: string }> = {
-  red: { bg: "bg-solid-translucent-red", text: "text-solid-red" },
-  orange: { bg: "bg-solid-translucent-orange", text: "text-solid-orange" },
-  yellow: { bg: "bg-solid-translucent-yellow", text: "text-solid-yellow" },
-  green: { bg: "bg-solid-translucent-green", text: "text-solid-green" },
-  blue: { bg: "bg-solid-translucent-blue", text: "text-solid-blue" },
-  indigo: { bg: "bg-solid-translucent-indigo", text: "text-solid-indigo" },
-  purple: { bg: "bg-solid-translucent-purple", text: "text-solid-purple" },
-  pink: { bg: "bg-solid-translucent-pink", text: "text-solid-pink" },
-  brown: { bg: "bg-solid-translucent-brown", text: "text-solid-brown" },
-  black: { bg: "bg-solid-translucent-black", text: "text-solid-black" },
-  white: { bg: "bg-components-fill-standard-secondary", text: "text-content-standard-primary" },
-};
 
 const isTagActive = (startDate: string, endDate: string | null): boolean => {
   const today = new Date();

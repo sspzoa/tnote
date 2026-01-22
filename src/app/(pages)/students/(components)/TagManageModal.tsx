@@ -3,51 +3,10 @@
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { TAG_COLOR_STYLES, TAG_COLORS, TAG_SOLID_COLORS } from "@/shared/lib/utils/tagColors";
 import type { StudentTag, TagColor } from "@/shared/types";
 import { showTagManageModalAtom } from "../(atoms)/useModalStore";
 import { useCreateTag, useDeleteTag, useTags, useUpdateTag } from "../(hooks)/useTags";
-
-const TAG_COLORS: TagColor[] = [
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "blue",
-  "indigo",
-  "purple",
-  "pink",
-  "brown",
-  "black",
-  "white",
-];
-
-const colorStyles: Record<TagColor, { bg: string; text: string; ring: string }> = {
-  red: { bg: "bg-solid-translucent-red", text: "text-solid-red", ring: "ring-solid-red" },
-  orange: { bg: "bg-solid-translucent-orange", text: "text-solid-orange", ring: "ring-solid-orange" },
-  yellow: { bg: "bg-solid-translucent-yellow", text: "text-solid-yellow", ring: "ring-solid-yellow" },
-  green: { bg: "bg-solid-translucent-green", text: "text-solid-green", ring: "ring-solid-green" },
-  blue: { bg: "bg-solid-translucent-blue", text: "text-solid-blue", ring: "ring-solid-blue" },
-  indigo: { bg: "bg-solid-translucent-indigo", text: "text-solid-indigo", ring: "ring-solid-indigo" },
-  purple: { bg: "bg-solid-translucent-purple", text: "text-solid-purple", ring: "ring-solid-purple" },
-  pink: { bg: "bg-solid-translucent-pink", text: "text-solid-pink", ring: "ring-solid-pink" },
-  brown: { bg: "bg-solid-translucent-brown", text: "text-solid-brown", ring: "ring-solid-brown" },
-  black: { bg: "bg-solid-translucent-black", text: "text-solid-black", ring: "ring-solid-black" },
-  white: { bg: "bg-solid-translucent-white", text: "text-solid-white", ring: "ring-solid-white" },
-};
-
-const solidColorStyles: Record<TagColor, string> = {
-  red: "bg-solid-red",
-  orange: "bg-solid-orange",
-  yellow: "bg-solid-yellow",
-  green: "bg-solid-green",
-  blue: "bg-solid-blue",
-  indigo: "bg-solid-indigo",
-  purple: "bg-solid-purple",
-  pink: "bg-solid-pink",
-  brown: "bg-solid-brown",
-  black: "bg-solid-black",
-  white: "bg-solid-white border border-line-outline",
-};
 
 interface TagFormState {
   name: string;
@@ -165,7 +124,7 @@ export default function TagManageModal() {
                   key={color}
                   type="button"
                   onClick={() => setForm({ ...form, color })}
-                  className={`size-8 rounded-radius-full transition-all ${solidColorStyles[color]} ${
+                  className={`size-8 rounded-radius-full transition-all ${TAG_SOLID_COLORS[color]} ${
                     form.color === color ? "ring-2 ring-offset-2 ring-offset-components-fill-standard-primary" : ""
                   } hover:scale-110`}
                   title={color}
@@ -227,7 +186,7 @@ export default function TagManageModal() {
                   }`}>
                   <div className="flex items-center gap-spacing-300">
                     <span
-                      className={`inline-flex items-center rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-label ${colorStyles[tag.color].bg} ${colorStyles[tag.color].text}`}>
+                      className={`inline-flex items-center rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-label ${TAG_COLOR_STYLES[tag.color].bg} ${TAG_COLOR_STYLES[tag.color].text}`}>
                       {tag.name}
                     </span>
                   </div>

@@ -4,25 +4,11 @@ import { useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { Button, FormCheckbox, FormInput, FormSelect, Modal } from "@/shared/components/ui";
 import { getTodayKST } from "@/shared/lib/utils/date";
-import type { TagColor } from "@/shared/types";
+import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
 import { showAddTagModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useAssignTag } from "../(hooks)/useStudentTags";
 import { useTags } from "../(hooks)/useTags";
-
-const TAG_COLOR_CLASSES: Record<TagColor, { bg: string; text: string }> = {
-  red: { bg: "bg-solid-translucent-red", text: "text-solid-red" },
-  orange: { bg: "bg-solid-translucent-orange", text: "text-solid-orange" },
-  yellow: { bg: "bg-solid-translucent-yellow", text: "text-solid-yellow" },
-  green: { bg: "bg-solid-translucent-green", text: "text-solid-green" },
-  blue: { bg: "bg-solid-translucent-blue", text: "text-solid-blue" },
-  indigo: { bg: "bg-solid-translucent-indigo", text: "text-solid-indigo" },
-  purple: { bg: "bg-solid-translucent-purple", text: "text-solid-purple" },
-  pink: { bg: "bg-solid-translucent-pink", text: "text-solid-pink" },
-  brown: { bg: "bg-solid-translucent-brown", text: "text-solid-brown" },
-  black: { bg: "bg-solid-translucent-black", text: "text-solid-black" },
-  white: { bg: "bg-components-fill-standard-secondary", text: "text-content-standard-primary" },
-};
 
 export default function AddTagModal() {
   const [showModal, setShowModal] = useAtom(showAddTagModalAtom);
