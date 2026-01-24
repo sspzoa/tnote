@@ -91,15 +91,39 @@ export default function StudentCreateModal() {
           placeholder="러셀부천"
         />
 
-        <FormInput
-          label="출생년도"
-          type="number"
-          min="1900"
-          max="2100"
-          value={form.birthYear}
-          onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
-          placeholder="2010"
-        />
+        <div className="flex items-end gap-spacing-200">
+          <div className="flex-1">
+            <FormInput
+              label="출생년도"
+              type="number"
+              min="1900"
+              max="2100"
+              value={form.birthYear}
+              onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
+              placeholder="2010"
+            />
+          </div>
+          <div className="flex gap-spacing-100">
+            {(["고1", "고2", "고3"] as const).map((grade) => {
+              const gradeNumber = Number.parseInt(grade[1]) + 9;
+              const birthYear = new Date().getFullYear() - (gradeNumber + 7) + 1;
+              const isActive = form.birthYear === birthYear.toString();
+              return (
+                <button
+                  key={grade}
+                  type="button"
+                  onClick={() => setForm({ ...form, birthYear: birthYear.toString() })}
+                  className={`rounded-radius-300 border px-spacing-300 py-spacing-300 font-medium text-body transition-colors ${
+                    isActive
+                      ? "border-core-accent bg-core-accent text-solid-white"
+                      : "border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
+                  }`}>
+                  {grade}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </Modal>
   );
