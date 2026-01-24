@@ -30,6 +30,7 @@ export default function LoginPage() {
     confirmPassword: "",
     workspaceName: "",
   });
+  const [agreements, setAgreements] = useState({ terms: false, privacy: false });
   const [registering, setRegistering] = useState(false);
 
   useEffect(() => {
@@ -85,6 +86,11 @@ export default function LoginPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!agreements.terms || !agreements.privacy) {
+      alert("이용약관과 개인정보처리방침에 동의해주세요.");
+      return;
+    }
+
     if (registerForm.password !== registerForm.confirmPassword) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
@@ -108,6 +114,8 @@ export default function LoginPage() {
           phoneNumber: removePhoneHyphens(registerForm.phoneNumber),
           password: registerForm.password,
           workspaceName: registerForm.workspaceName,
+          agreedToTerms: agreements.terms,
+          agreedToPrivacy: agreements.privacy,
         }),
       });
 
@@ -121,6 +129,7 @@ export default function LoginPage() {
       alert(data.message || "회원가입이 완료되었습니다.");
       setShowRegisterModal(false);
       setRegisterForm({ name: "", phoneNumber: "", password: "", confirmPassword: "", workspaceName: "" });
+      setAgreements({ terms: false, privacy: false });
     } catch {
       alert("회원가입에 실패했습니다.");
     } finally {
@@ -190,7 +199,7 @@ export default function LoginPage() {
               로그인
             </Button>
 
-            {/* {tab === "teacher" && (
+            {tab === "teacher" && (
               <div className="text-center text-body text-content-standard-secondary">
                 계정이 없으신가요?{" "}
                 <button
@@ -200,7 +209,7 @@ export default function LoginPage() {
                   회원가입
                 </button>
               </div>
-            )} */}
+            )}
           </form>
         </div>
       </div>
@@ -270,6 +279,61 @@ export default function LoginPage() {
             onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
             placeholder="비밀번호를 다시 입력하세요"
           />
+
+          <div className="border-line-divider border-t pt-spacing-400">
+            <p className="mb-spacing-300 font-semibold text-content-standard-primary text-label">
+              약관 동의 <span className="text-core-status-negative">*</span>
+            </p>
+            <div className="space-y-spacing-300">
+              <label className="group flex cursor-pointer items-center gap-spacing-200">
+                <input
+                  type="checkbox"
+                  checked={agreements.terms && agreements.privacy}
+                  onChange={(e) => setAgreements({ terms: e.target.checked, privacy: e.target.checked })}
+                  className="size-4 cursor-pointer rounded-radius-100 border border-line-outline bg-components-fill-standard-secondary text-core-accent transition-all duration-150 checked:border-core-accent checked:bg-core-accent focus:ring-2 focus:ring-core-accent-translucent group-hover:border-core-accent/50"
+                />
+                <span className="font-medium text-body text-content-standard-primary">전체 동의</span>
+              </label>
+              <div className="space-y-spacing-200 pl-spacing-100">
+                <label className="group flex cursor-pointer items-center gap-spacing-200">
+                  <input
+                    type="checkbox"
+                    checked={agreements.terms}
+                    onChange={(e) => setAgreements({ ...agreements, terms: e.target.checked })}
+                    className="size-4 cursor-pointer rounded-radius-100 border border-line-outline bg-components-fill-standard-secondary text-core-accent transition-all duration-150 checked:border-core-accent checked:bg-core-accent focus:ring-2 focus:ring-core-accent-translucent group-hover:border-core-accent/50"
+                  />
+                  <span className="text-body text-content-standard-secondary">
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline transition-colors hover:text-core-accent">
+                      이용약관
+                    </a>
+                    에 동의합니다 (필수)
+                  </span>
+                </label>
+                <label className="group flex cursor-pointer items-center gap-spacing-200">
+                  <input
+                    type="checkbox"
+                    checked={agreements.privacy}
+                    onChange={(e) => setAgreements({ ...agreements, privacy: e.target.checked })}
+                    className="size-4 cursor-pointer rounded-radius-100 border border-line-outline bg-components-fill-standard-secondary text-core-accent transition-all duration-150 checked:border-core-accent checked:bg-core-accent focus:ring-2 focus:ring-core-accent-translucent group-hover:border-core-accent/50"
+                  />
+                  <span className="text-body text-content-standard-secondary">
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline transition-colors hover:text-core-accent">
+                      개인정보처리방침
+                    </a>
+                    에 동의합니다 (필수)
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
         </form>
       </Modal>
     </div>

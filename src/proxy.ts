@@ -14,20 +14,23 @@ interface TokenPayload {
   exp: number;
 }
 
-interface PublicApi {
+interface PublicRoute {
   path: string;
   methods: string[];
 }
 
-const PUBLIC_APIS: PublicApi[] = [
+const PUBLIC_APIS: PublicRoute[] = [
   { path: "/api/auth/login", methods: ["POST"] },
   { path: "/api/auth/register", methods: ["POST"] },
   { path: "/api/auth/refresh", methods: ["POST"] },
   { path: "/api/workspaces", methods: ["GET"] },
 ];
 
-const STUDENT_ALLOWED_PATHS = ["/", "/my-retakes", "/calendar"];
-const ADMIN_PATHS = ["/students", "/courses", "/exams", "/retakes", "/admins", "/clinics"];
+const PUBLIC_PAGES = ["/login", "/terms", "/privacy"];
+
+const STUDENT_ALLOWED_PAGES = ["/", "/calendar"];
+
+const ADMIN_ONLY_PAGES = ["/students", "/courses", "/retakes", "/clinics", "/messages", "/admins"];
 
 const ACCESS_TOKEN_COOKIE = "access_token";
 const REFRESH_TOKEN_COOKIE = "refresh_token";
@@ -84,6 +87,14 @@ const isPublicApi = (pathname: string, method: string): boolean => {
   return PUBLIC_APIS.some((api) => pathname.startsWith(api.path) && api.methods.includes(method));
 };
 
+const isPublicPage = (pathname: string): boolean => {
+  return PUBLIC_PAGES.some((page) => pathname === page);
+};
+
+const matchesPath = (pathname: string, paths: string[]): boolean => {
+  return paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+};
+
 const handleApiRoute = (request: NextRequest, pathname: string, payload: TokenPayload | null): NextResponse => {
   if (isPublicApi(pathname, request.method)) {
     return NextResponse.next();
@@ -100,17 +111,12 @@ const handlePageRoute = (request: NextRequest, payload: TokenPayload): NextRespo
   const { pathname } = request.nextUrl;
   const { role } = payload;
 
-  if (role === "student") {
-    const isAllowedPath = STUDENT_ALLOWED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
-    if (!isAllowedPath) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (role === "student" && !matchesPath(pathname, STUDENT_ALLOWED_PAGES)) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (ADMIN_PATHS.some((path) => pathname.startsWith(`/${path.replace("/", "")}`))) {
-    if (role === "student") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (matchesPath(pathname, ADMIN_ONLY_PAGES) && role === "student") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return null;
@@ -118,30 +124,30 @@ const handlePageRoute = (request: NextRequest, payload: TokenPayload): NextRespo
 
 export const proxy = async (request: NextRequest): Promise<NextResponse> => {
   const { pathname } = request.nextUrl;
-  const { payload, needsRefresh } = await getSessionFromTokens(request);
 
-  // 로그인 페이지 처리
-  if (pathname === "/login") {
-    return payload ? NextResponse.redirect(new URL("/", request.url)) : NextResponse.next();
+  if (isPublicPage(pathname)) {
+    const { payload } = await getSessionFromTokens(request);
+    if (pathname === "/login" && payload) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
   }
 
-  // API 라우트 처리
+  const { payload, needsRefresh } = await getSessionFromTokens(request);
+
   if (pathname.startsWith("/api/")) {
     return handleApiRoute(request, pathname, payload);
   }
 
-  // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
   if (!payload) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // 페이지 접근 권한 확인
   const redirectResponse = handlePageRoute(request, payload);
   if (redirectResponse) {
     return redirectResponse;
   }
 
-  // 토큰 갱신이 필요한 경우 헤더에 표시 (클라이언트에서 처리)
   const response = NextResponse.next();
   if (needsRefresh) {
     response.headers.set("X-Token-Refresh-Required", "true");

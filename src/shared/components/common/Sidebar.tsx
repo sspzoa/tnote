@@ -6,6 +6,7 @@ import {
   BookOpen,
   Calendar,
   ClipboardList,
+  ExternalLink,
   Hospital,
   LogOut,
   MessageSquare,
@@ -134,6 +135,28 @@ function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             <Button variant="secondary" onClick={() => setShowPasswordModal(true)} className="w-full">
               비밀번호 변경
             </Button>
+          </div>
+
+          <div className="border-line-divider border-t pt-spacing-500">
+            <p className="mb-spacing-300 font-medium text-body text-content-standard-primary">법적 고지</p>
+            <div className="flex flex-col gap-spacing-200">
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 font-semibold text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 hover:bg-components-interactive-hover active:scale-[0.98]">
+                이용약관
+                <ExternalLink className="size-3" />
+              </a>
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 font-semibold text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 hover:bg-components-interactive-hover active:scale-[0.98]">
+                개인정보처리방침
+                <ExternalLink className="size-3" />
+              </a>
+            </div>
           </div>
         </div>
       </Modal>

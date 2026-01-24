@@ -7,12 +7,18 @@ export async function POST(request: Request) {
   const logger = createLogger(request, null, "create", "auth");
 
   try {
-    const { name, phoneNumber, password, workspaceName } = await request.json();
+    const { name, phoneNumber, password, workspaceName, agreedToTerms, agreedToPrivacy } = await request.json();
 
     if (!name || !phoneNumber || !password || !workspaceName) {
       await logger.log("warn", 400);
       await logger.flush();
       return NextResponse.json({ error: "모든 필수 정보를 입력해주세요." }, { status: 400 });
+    }
+
+    if (!agreedToTerms || !agreedToPrivacy) {
+      await logger.log("warn", 400);
+      await logger.flush();
+      return NextResponse.json({ error: "이용약관과 개인정보처리방침에 동의해주세요." }, { status: 400 });
     }
 
     if (password.length < 8) {
