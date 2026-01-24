@@ -15,6 +15,7 @@ export const QUERY_KEYS = {
     detail: (id: string) => ["students", "detail", id] as const,
     forMessages: ["students-for-messages"] as const,
     forAssign: (courseId: string) => ["students-for-assign", courseId] as const,
+    enrolledInCourse: (courseId: string) => ["enrolled-students", courseId] as const,
   },
   courses: {
     all: ["courses"] as const,
@@ -46,6 +47,7 @@ export const QUERY_KEYS = {
     forAssign: (courseId: string) => ["exams-for-assign", courseId] as const,
     detail: (examId: string) => ["exams", "detail", examId] as const,
     scores: (examId: string) => ["exams", "scores", examId] as const,
+    scoresForAssign: (examId: string) => ["exam-scores-for-assign", examId] as const,
     assignments: (examId: string) => ["exams", "assignments", examId] as const,
     export: (examId: string) => ["exam-export", examId] as const,
   },
@@ -57,6 +59,7 @@ export const QUERY_KEYS = {
     all: ["admins"] as const,
   },
   calendar: {
+    all: ["calendarEvents"] as const,
     events: (startDate: string, endDate: string) => ["calendarEvents", startDate, endDate] as const,
   },
   messages: {

@@ -48,7 +48,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .single();
 
   if (error) throw error;
-  return NextResponse.json({ success: true, data });
+  return NextResponse.json({ success: true, data }, { status: 201 });
 };
 
 export const GET = withLogging(handleGet, { resource: "courses", action: "read", allowedRoles: ["owner", "admin"] });

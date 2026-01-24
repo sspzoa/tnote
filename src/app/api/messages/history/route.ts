@@ -1,44 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-
-interface MessageHistoryRecord {
-  id: string;
-  batch_id: string | null;
-  group_id: string | null;
-  message_type: string;
-  recipient_type: string;
-  recipient_phone: string;
-  recipient_name: string;
-  student_id: string;
-  message_content: string;
-  status_code: string | null;
-  status_message: string | null;
-  is_success: boolean;
-  error_message: string | null;
-  sent_by: string;
-  sent_at: string | null;
-  created_at: string;
-  sender: { id: string; name: string } | null;
-}
-
-interface GroupedBatch {
-  batch_id: string;
-  message_type: string;
-  message_content: string;
-  created_at: string;
-  sender: { id: string; name: string } | null;
-  total_count: number;
-  success_count: number;
-  fail_count: number;
-  recipients: Array<{
-    id: string;
-    recipient_name: string;
-    recipient_phone: string;
-    recipient_type: string;
-    is_success: boolean;
-    error_message: string | null;
-  }>;
-}
+import type { MessageHistoryGroupedBatch, MessageHistoryQueryResult } from "@/shared/types/api";
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
@@ -79,9 +41,9 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 
   if (error) throw error;
 
-  const records = (data || []) as unknown as MessageHistoryRecord[];
+  const records = (data || []) as unknown as MessageHistoryQueryResult[];
 
-  const batchMap = new Map<string, GroupedBatch>();
+  const batchMap = new Map<string, MessageHistoryGroupedBatch>();
 
   for (const record of records) {
     const batchKey = record.batch_id || record.id;

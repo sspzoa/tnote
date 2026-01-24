@@ -7,41 +7,18 @@ import {
   generateCourseSessions,
 } from "@/shared/lib/utils/calendar";
 
-interface CourseData {
-  id: string;
-  name: string;
-  start_date: string | null;
-  end_date: string | null;
-  days_of_week: number[] | null;
-}
-
-interface ClinicData {
-  id: string;
-  name: string;
-  start_date: string | null;
-  end_date: string | null;
-  operating_days: number[];
-}
-
-interface AttendanceRecord {
-  attendance_date: string;
-  student_id: string;
-  clinic_id?: string;
-}
-
-interface RetakeData {
-  id: string;
-  current_scheduled_date: string | null;
-  status: string;
-  exam: { name: string; course: { name: string } };
-  student?: { name: string };
-}
+import type {
+  CalendarAttendanceRecord,
+  CalendarClinicData,
+  CalendarCourseData,
+  CalendarRetakeData,
+} from "@/shared/types/api";
 
 const fetchCourses = async (
   supabase: ApiContext["supabase"],
   workspace: string,
   studentId?: string,
-): Promise<CourseData[]> => {
+): Promise<CalendarCourseData[]> => {
   if (studentId) {
     const { data: enrollments, error } = await supabase
       .from("CourseEnrollments")
@@ -49,7 +26,7 @@ const fetchCourses = async (
       .eq("student_id", studentId);
 
     if (error) throw error;
-    return (enrollments || []).map((e) => e.course as unknown as CourseData);
+    return (enrollments || []).map((e) => e.course as unknown as CalendarCourseData);
   }
 
   const { data: courses, error } = await supabase
@@ -60,14 +37,14 @@ const fetchCourses = async (
     .not("end_date", "is", null);
 
   if (error) throw error;
-  return (courses as CourseData[]) || [];
+  return (courses as CalendarCourseData[]) || [];
 };
 
 const fetchRetakes = async (
   supabase: ApiContext["supabase"],
   workspace: string,
   studentId?: string,
-): Promise<RetakeData[]> => {
+): Promise<CalendarRetakeData[]> => {
   if (studentId) {
     const { data, error } = await supabase
       .from("RetakeAssignments")
@@ -107,7 +84,7 @@ const fetchRetakes = async (
 const fetchClinicsWithAttendance = async (
   supabase: ApiContext["supabase"],
   workspace: string,
-): Promise<{ clinics: ClinicData[]; attendance: AttendanceRecord[] }> => {
+): Promise<{ clinics: CalendarClinicData[]; attendance: CalendarAttendanceRecord[] }> => {
   const { data: clinics, error: clinicsError } = await supabase
     .from("Clinics")
     .select("id, name, start_date, end_date, operating_days")
@@ -117,7 +94,7 @@ const fetchClinicsWithAttendance = async (
 
   if (clinicsError) throw clinicsError;
 
-  const clinicIds = (clinics as ClinicData[] | null)?.map((c) => c.id) || [];
+  const clinicIds = (clinics as CalendarClinicData[] | null)?.map((c) => c.id) || [];
   const { data: attendance, error: attendanceError } = await supabase
     .from("ClinicAttendance")
     .select("attendance_date, student_id, clinic_id")
@@ -126,8 +103,8 @@ const fetchClinicsWithAttendance = async (
   if (attendanceError) throw attendanceError;
 
   return {
-    clinics: (clinics as ClinicData[]) || [],
-    attendance: (attendance as AttendanceRecord[]) || [],
+    clinics: (clinics as CalendarClinicData[]) || [],
+    attendance: (attendance as CalendarAttendanceRecord[]) || [],
   };
 };
 

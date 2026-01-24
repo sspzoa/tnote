@@ -29,7 +29,7 @@ export const useConsultationUpdate = () => {
       return { result, studentId };
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["consultations", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.consultations.byStudent(data.studentId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.consultations.all });
     },
   });

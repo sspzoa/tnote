@@ -29,8 +29,8 @@ export const useCourseCreate = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
-      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
     },
   });

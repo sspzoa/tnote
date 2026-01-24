@@ -55,7 +55,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     }
     throw adminError;
   }
-  return NextResponse.json({ success: true, data: newAdmin });
+  return NextResponse.json({ success: true, data: newAdmin }, { status: 201 });
 };
 
 export const GET = withLogging(handleGet, { resource: "admins", action: "read", allowedRoles: ["owner", "admin"] });

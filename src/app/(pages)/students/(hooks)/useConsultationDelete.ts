@@ -25,7 +25,7 @@ export const useConsultationDelete = () => {
       return result;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["consultations", variables.studentId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.consultations.byStudent(variables.studentId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.consultations.all });
     },
   });

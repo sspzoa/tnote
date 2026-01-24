@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface SaveAttendanceData {
   clinicId: string;
@@ -27,8 +28,8 @@ export const useAttendanceSave = () => {
       return result.data;
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["attendance", variables.clinicId, variables.date] });
-      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.clinics.attendance(variables.clinicId, variables.date) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
     },
   });
 

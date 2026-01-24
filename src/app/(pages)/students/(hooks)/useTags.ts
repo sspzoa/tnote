@@ -71,7 +71,7 @@ export const useUpdateTag = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tags.all });
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
     },
   });
 };
@@ -90,7 +90,7 @@ export const useDeleteTag = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.tags.all });
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
     },
   });
 };

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface ExamScore {
   student_id: string;
@@ -8,7 +9,7 @@ interface ExamScore {
 
 export const useExamScoresForAssign = (examId: string | null) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["exam-scores-for-assign", examId],
+    queryKey: QUERY_KEYS.exams.scoresForAssign(examId || ""),
     queryFn: async () => {
       if (!examId) return [];
       const response = await fetchWithAuth(`/api/exams/${examId}/scores`);

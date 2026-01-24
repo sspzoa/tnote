@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import {
+  buildRecipientList,
   checkSMSService,
   getSenderPhoneNumber,
-  type MessageRecipient,
   sendMessagesWithHistory,
+  validateRecipientType,
 } from "@/shared/lib/services/messageSender";
 import { getTodayKorean } from "@/shared/lib/utils/date";
-import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const smsCheck = checkSMSService();
@@ -22,7 +22,12 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
 
   const { recipientType, recipientIds, text } = await request.json();
 
-  if (!recipientType || !recipientIds || !Array.isArray(recipientIds) || recipientIds.length === 0) {
+  if (
+    !validateRecipientType(recipientType) ||
+    !recipientIds ||
+    !Array.isArray(recipientIds) ||
+    recipientIds.length === 0
+  ) {
     return NextResponse.json({ error: "수신자 정보가 필요합니다." }, { status: 400 });
   }
 
@@ -49,38 +54,10 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
 
   const todayStr = getTodayKorean();
   const messageTemplate = text.trim();
-  const recipients: MessageRecipient[] = [];
 
-  for (const student of students) {
-    const messageText = messageTemplate.replace(/{이름}/g, student.name).replace(/{오늘날짜}/g, todayStr);
-
-    if (recipientType === "student" || recipientType === "both") {
-      const phone = removePhoneHyphens(student.phone_number);
-      if (phone) {
-        recipients.push({
-          phone,
-          name: student.name,
-          studentId: student.id,
-          targetType: "student",
-          text: messageText,
-        });
-      }
-    }
-    if (recipientType === "parent" || recipientType === "both") {
-      if (student.parent_phone_number) {
-        const phone = removePhoneHyphens(student.parent_phone_number);
-        if (phone && !recipients.some((r) => r.phone === phone && r.text === messageText)) {
-          recipients.push({
-            phone,
-            name: `${student.name} 학부모`,
-            studentId: student.id,
-            targetType: "parent",
-            text: messageText,
-          });
-        }
-      }
-    }
-  }
+  const recipients = buildRecipientList(students, recipientType, (student) =>
+    messageTemplate.replace(/{이름}/g, student.name).replace(/{오늘날짜}/g, todayStr),
+  );
 
   if (recipients.length === 0) {
     return NextResponse.json({ error: "발송 가능한 전화번호가 없습니다." }, { status: 400 });

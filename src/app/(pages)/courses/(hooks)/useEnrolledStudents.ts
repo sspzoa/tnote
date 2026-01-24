@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { Student } from "../(atoms)/useCoursesStore";
 
 export const useEnrolledStudents = (courseId: string | null) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["enrolled-students", courseId],
+    queryKey: QUERY_KEYS.students.enrolledInCourse(courseId || ""),
     queryFn: async () => {
       if (!courseId) return [];
 

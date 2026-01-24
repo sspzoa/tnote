@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-
-interface ExamWithCourse {
-  id: string;
-  course: {
-    workspace: string;
-  };
-}
+import type { ExamWorkspaceOnly } from "@/shared/types/api";
 
 const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const examId = params?.id;
@@ -17,7 +11,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     .eq("id", examId)
     .single();
 
-  const typedExam = exam as unknown as ExamWithCourse | null;
+  const typedExam = exam as unknown as ExamWorkspaceOnly | null;
   if (!typedExam || typedExam.course.workspace !== session.workspace) {
     return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
   }
@@ -56,7 +50,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     .eq("id", examId)
     .single();
 
-  const typedExam = exam as unknown as ExamWithCourse | null;
+  const typedExam = exam as unknown as ExamWorkspaceOnly | null;
   if (!typedExam || typedExam.course.workspace !== session.workspace) {
     return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
   }

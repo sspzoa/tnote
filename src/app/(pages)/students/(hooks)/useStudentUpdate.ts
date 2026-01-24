@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface UpdateStudentData {
   id: string;
@@ -31,7 +32,7 @@ export const useStudentUpdate = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
     },
   });
 

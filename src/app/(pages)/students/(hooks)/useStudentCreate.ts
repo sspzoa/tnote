@@ -31,7 +31,7 @@ export const useStudentCreate = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
     },
   });

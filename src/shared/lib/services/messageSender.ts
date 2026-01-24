@@ -1,4 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { removePhoneHyphens } from "@/shared/lib/utils/phone";
+import type { RecipientType } from "@/shared/types";
 import { isSMSServiceAvailable, sendSMS } from "./sms";
 
 export interface MessageRecipient {
@@ -64,6 +66,57 @@ export const checkSMSService = (): { available: boolean; error: string | null } 
     return { available: false, error: "SMS 서비스가 설정되지 않았습니다." };
   }
   return { available: true, error: null };
+};
+
+export interface StudentWithPhone {
+  id: string;
+  name: string;
+  phone_number: string;
+  parent_phone_number: string | null;
+}
+
+export const validateRecipientType = (recipientType: string | undefined): recipientType is RecipientType => {
+  return !!recipientType && ["student", "parent", "both"].includes(recipientType);
+};
+
+export const buildRecipientList = (
+  students: StudentWithPhone[],
+  recipientType: RecipientType,
+  getMessageText: (student: StudentWithPhone) => string,
+): MessageRecipient[] => {
+  const recipients: MessageRecipient[] = [];
+
+  for (const student of students) {
+    const text = getMessageText(student);
+
+    if (recipientType === "student" || recipientType === "both") {
+      const phone = removePhoneHyphens(student.phone_number);
+      if (phone) {
+        recipients.push({
+          phone,
+          name: student.name,
+          studentId: student.id,
+          targetType: "student",
+          text,
+        });
+      }
+    }
+
+    if ((recipientType === "parent" || recipientType === "both") && student.parent_phone_number) {
+      const parentPhone = removePhoneHyphens(student.parent_phone_number);
+      if (parentPhone && !recipients.some((r) => r.phone === parentPhone && r.text === text)) {
+        recipients.push({
+          phone: parentPhone,
+          name: `${student.name} 학부모`,
+          studentId: student.id,
+          targetType: "parent",
+          text,
+        });
+      }
+    }
+  }
+
+  return recipients;
 };
 
 export const sendMessagesWithHistory = async ({

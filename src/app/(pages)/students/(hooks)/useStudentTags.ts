@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { StudentTagAssignment } from "@/shared/types";
 
 export const useAssignTag = () => {
@@ -27,7 +28,7 @@ export const useAssignTag = () => {
       return result.data as StudentTagAssignment;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
     },
   });
 };
@@ -47,7 +48,7 @@ export const useRemoveTag = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
     },
   });
 };
@@ -77,7 +78,7 @@ export const useUpdateTagAssignment = () => {
       return result.data as StudentTagAssignment;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
     },
   });
 };

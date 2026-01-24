@@ -63,7 +63,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     await supabase.from("RetakeHistory").insert(historyRecords);
   }
 
-  return NextResponse.json({ success: true, data });
+  return NextResponse.json({ success: true, data }, { status: 201 });
 };
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {

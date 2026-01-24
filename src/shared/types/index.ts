@@ -34,10 +34,10 @@ export interface Student {
   id: string;
   phone_number: string;
   name: string;
-  parent_phone_number?: string | null;
-  school?: string | null;
-  branch?: string | null;
-  birth_year?: number | null;
+  parent_phone_number: string | null;
+  school: string | null;
+  branch: string | null;
+  birth_year: number | null;
   enrolled_at?: string;
   created_at?: string;
   consultation_count?: number;
@@ -49,9 +49,9 @@ export interface Course {
   name: string;
   created_at?: string;
   student_count?: number;
-  start_date?: string | null;
-  end_date?: string | null;
-  days_of_week?: number[] | null;
+  start_date: string | null;
+  end_date: string | null;
+  days_of_week: number[] | null;
 }
 
 export interface Clinic {

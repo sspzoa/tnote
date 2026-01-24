@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { AttendanceRecord } from "../(atoms)/useClinicsStore";
 
 export const useAttendance = (clinicId: string | null, date: string | null) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["attendance", clinicId, date],
+    queryKey: QUERY_KEYS.clinics.attendance(clinicId || "", date || ""),
     queryFn: async () => {
       if (!clinicId || !date) return [];
 

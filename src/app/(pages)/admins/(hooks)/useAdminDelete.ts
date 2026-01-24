@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export const useAdminDelete = () => {
   const queryClient = useQueryClient();
@@ -19,7 +20,7 @@ export const useAdminDelete = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.admins.all });
     },
   });
 

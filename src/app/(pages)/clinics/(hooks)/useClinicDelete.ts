@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export const useClinicDelete = () => {
   const queryClient = useQueryClient();
@@ -18,8 +19,8 @@ export const useClinicDelete = () => {
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clinics"] });
-      queryClient.invalidateQueries({ queryKey: ["calendarEvents"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.clinics.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
     },
   });
 

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface UnenrollData {
   courseId: string;
@@ -26,8 +27,8 @@ export const useCourseUnenroll = () => {
       return { result, courseId };
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["enrolled-students", data.courseId] });
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.enrolledInCourse(data.courseId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses.all });
     },
   });
 

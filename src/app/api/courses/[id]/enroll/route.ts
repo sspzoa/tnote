@@ -47,7 +47,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     }
     throw error;
   }
-  return NextResponse.json({ success: true, data });
+  return NextResponse.json({ success: true, data }, { status: 201 });
 };
 
 const handleDelete = async ({ request, supabase, session, params }: ApiContext) => {

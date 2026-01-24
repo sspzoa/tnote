@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { ConsultationLog } from "../(atoms)/useConsultationStore";
 
 export const useConsultations = (studentId: string | null) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["consultations", studentId],
+    queryKey: QUERY_KEYS.consultations.byStudent(studentId || ""),
     queryFn: async () => {
       if (!studentId) return [];
 

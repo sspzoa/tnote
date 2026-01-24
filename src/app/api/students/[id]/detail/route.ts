@@ -1,86 +1,12 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-
-interface ExamData {
-  id: string;
-  name: string;
-  exam_number: number;
-  max_score: number | null;
-  cutline: number | null;
-  course: {
-    id: string;
-    name: string;
-    workspace: string;
-  };
-}
-
-interface ExamScoreData {
-  id: string;
-  score: number;
-  created_at: string;
-  exam: ExamData;
-}
-
-interface ClinicData {
-  id: string;
-  name: string;
-  workspace: string;
-}
-
-interface ClinicAttendanceData {
-  id: string;
-  attendance_date: string;
-  note: string | null;
-  clinic: ClinicData;
-}
-
-interface CourseData {
-  id: string;
-  name: string;
-  start_date: string | null;
-  end_date: string | null;
-  days_of_week: number[] | null;
-}
-
-interface EnrollmentData {
-  enrolled_at: string;
-  course: CourseData;
-}
-
-interface AssignmentData {
-  id: string;
-  status: string;
-  note: string | null;
-  exam: {
-    id: string;
-    name: string;
-    exam_number: number;
-    course: {
-      id: string;
-      name: string;
-      workspace: string;
-    };
-  };
-}
-
-interface RetakeData {
-  id: string;
-  status: string;
-  management_status: string;
-  current_scheduled_date: string | null;
-  postpone_count: number;
-  absent_count: number;
-  exam: {
-    id: string;
-    name: string;
-    exam_number: number;
-    course: {
-      id: string;
-      name: string;
-      workspace: string;
-    };
-  };
-}
+import type {
+  StudentDetailAssignment,
+  StudentDetailClinicAttendance,
+  StudentDetailEnrollment,
+  StudentDetailExamScore,
+  StudentDetailRetake,
+} from "@/shared/types/api";
 
 const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const studentId = params?.id;
@@ -110,7 +36,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (enrollmentError) throw enrollmentError;
 
-  const courses = ((enrollments as unknown as EnrollmentData[]) || []).map((e) => ({
+  const courses = ((enrollments as unknown as StudentDetailEnrollment[]) || []).map((e) => ({
     ...e.course,
     enrolled_at: e.enrolled_at,
   }));
@@ -138,7 +64,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   if (scoresError) throw scoresError;
 
   const scoresWithRank = await Promise.all(
-    ((examScores as unknown as ExamScoreData[]) || []).map(async (scoreData) => {
+    ((examScores as unknown as StudentDetailExamScore[]) || []).map(async (scoreData) => {
       const examId = scoreData.exam.id;
       const studentScore = scoreData.score;
 
@@ -188,7 +114,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (attendanceError) throw attendanceError;
 
-  const clinicHistory = ((clinicAttendance as unknown as ClinicAttendanceData[]) || []).map((record) => ({
+  const clinicHistory = ((clinicAttendance as unknown as StudentDetailClinicAttendance[]) || []).map((record) => ({
     id: record.id,
     attendanceDate: record.attendance_date,
     note: record.note,
@@ -219,7 +145,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (assignmentsError) throw assignmentsError;
 
-  const assignmentHistory = ((assignments as unknown as AssignmentData[]) || []).map((record) => ({
+  const assignmentHistory = ((assignments as unknown as StudentDetailAssignment[]) || []).map((record) => ({
     id: record.id,
     status: record.status,
     note: record.note,
@@ -257,7 +183,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (retakesError) throw retakesError;
 
-  const retakeHistory = ((retakes as unknown as RetakeData[]) || []).map((record) => ({
+  const retakeHistory = ((retakes as unknown as StudentDetailRetake[]) || []).map((record) => ({
     id: record.id,
     status: record.status,
     managementStatus: record.management_status,

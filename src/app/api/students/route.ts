@@ -56,7 +56,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     }
 
     const students = data.map((enrollment) => {
-      const student = enrollment.student as unknown as { name: string; [key: string]: unknown };
+      const student = enrollment.student as unknown as { id: string; name: string; [key: string]: unknown };
       return {
         ...student,
         enrolled_at: enrollment.enrolled_at,
@@ -174,7 +174,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     }
     throw error;
   }
-  return NextResponse.json({ success: true, data });
+  return NextResponse.json({ success: true, data }, { status: 201 });
 };
 
 export const GET = withLogging(handleGet, { resource: "students", action: "read", allowedRoles: ["owner", "admin"] });
