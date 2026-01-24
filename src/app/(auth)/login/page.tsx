@@ -207,7 +207,7 @@ export default function LoginPage() {
               로그인
             </Button>
 
-            {tab === "teacher" && (
+            {/* {tab === "teacher" && (
               <div className="text-center text-body text-content-standard-secondary">
                 계정이 없으신가요?{" "}
                 <button
@@ -217,7 +217,7 @@ export default function LoginPage() {
                   회원가입
                 </button>
               </div>
-            )}
+            )} */}
           </form>
         </div>
       </div>
