@@ -1,9 +1,10 @@
 "use client";
 
-import { BookOpen, ClipboardList, Users } from "lucide-react";
+import { BookOpen, ClipboardList, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { useUser } from "@/shared/hooks/useUser";
+import { getGreetingByTime } from "@/shared/lib/utils/date";
 import { useHomeStats } from "./(hooks)/useHomeStats";
 
 export default function Home() {
@@ -59,7 +60,10 @@ export default function Home() {
         <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-display">
           안녕하세요, {user?.name}님
         </h1>
-        <p className="text-body text-content-standard-secondary">티노트에 오신 것을 환영합니다</p>
+        <div className="mt-spacing-300 inline-flex items-center gap-spacing-200 rounded-full bg-core-accent-translucent py-spacing-300 pr-spacing-500 pl-spacing-400">
+          <Sparkles className="size-4 text-core-accent" />
+          <p className="text-body text-content-standard-secondary">{getGreetingByTime()}</p>
+        </div>
 
         {!isStudent && stats && (
           <div className="mt-spacing-800 grid grid-cols-3 gap-spacing-400">
