@@ -26,24 +26,30 @@ export default function Home() {
       icon: BookOpen,
       value: stats?.courseCount || 0,
       label: "수업",
-      bgColor: "bg-core-accent-translucent",
-      iconColor: "text-core-accent",
+      bgColor: "bg-solid-translucent-blue",
+      iconColor: "text-solid-blue",
+      hoverBorder: "hover:border-solid-blue",
+      gradientFrom: "group-hover:from-solid-translucent-blue/30",
     },
     {
       href: "/students",
       icon: Users,
       value: stats?.studentCount || 0,
       label: "학생",
-      bgColor: "bg-core-accent-translucent",
-      iconColor: "text-core-accent",
+      bgColor: "bg-solid-translucent-green",
+      iconColor: "text-solid-green",
+      hoverBorder: "hover:border-solid-green",
+      gradientFrom: "group-hover:from-solid-translucent-green/30",
     },
     {
       href: "/retakes",
       icon: ClipboardList,
       value: stats?.pendingRetakeCount || 0,
       label: "남은 재시험",
-      bgColor: "bg-core-accent-translucent",
-      iconColor: "text-core-accent",
+      bgColor: "bg-solid-translucent-yellow",
+      iconColor: "text-solid-yellow",
+      hoverBorder: "hover:border-solid-yellow",
+      gradientFrom: "group-hover:from-solid-translucent-yellow/30",
     },
   ];
 
@@ -61,8 +67,10 @@ export default function Home() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group relative flex flex-col items-center gap-spacing-300 overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all duration-200 hover:border-core-accent">
-                <div className="absolute inset-0 bg-gradient-to-b from-core-accent-translucent/0 to-core-accent-translucent/0 transition-all duration-200 group-hover:from-core-accent-translucent/30 group-hover:to-transparent" />
+                className={`group relative flex flex-col items-center gap-spacing-300 overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all duration-200 ${item.hoverBorder}`}>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-b from-transparent to-transparent transition-all duration-200 ${item.gradientFrom} group-hover:to-transparent`}
+                />
                 <div
                   className={`relative flex size-16 items-center justify-center rounded-full ${item.bgColor} transition-all duration-200 group-hover:scale-110`}>
                   <item.icon className={`size-8 ${item.iconColor}`} />
