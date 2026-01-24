@@ -2,10 +2,25 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { BookOpen, Calendar, ClipboardList, Hospital, LogOut, MessageSquare, UserCog, Users } from "lucide-react";
+import {
+  BookOpen,
+  Calendar,
+  ClipboardList,
+  Hospital,
+  LogOut,
+  MessageSquare,
+  Monitor,
+  Moon,
+  Settings,
+  Sun,
+  UserCog,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { Button, Modal, SegmentedControl } from "@/shared/components/ui";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { sidebarOpenAtom } from "./(atoms)/useSidebarStore";
 import { PasswordChangeModal } from "./PasswordChangeModal";
 
@@ -20,8 +35,8 @@ const menuItems = [
     href: "/calendar",
     icon: Calendar,
     label: "캘린더",
-    bgColor: "bg-solid-translucent-blue",
-    iconColor: "text-solid-blue",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
 ];
 
@@ -30,36 +45,36 @@ const adminMenuItems = [
     href: "/messages",
     icon: MessageSquare,
     label: "문자 관리",
-    bgColor: "bg-solid-translucent-indigo",
-    iconColor: "text-solid-indigo",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
   {
     href: "/retakes",
     icon: ClipboardList,
     label: "재시험 관리",
-    bgColor: "bg-solid-translucent-red",
-    iconColor: "text-solid-red",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
   {
     href: "/students",
     icon: Users,
     label: "학생 관리",
-    bgColor: "bg-solid-translucent-green",
-    iconColor: "text-solid-green",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
   {
     href: "/courses",
     icon: BookOpen,
     label: "수업 관리",
-    bgColor: "bg-solid-translucent-purple",
-    iconColor: "text-solid-purple",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
   {
     href: "/clinics",
     icon: Hospital,
     label: "클리닉 관리",
-    bgColor: "bg-solid-translucent-orange",
-    iconColor: "text-solid-orange",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
 ];
 
@@ -68,17 +83,58 @@ const ownerMenuItems = [
     href: "/admins",
     icon: UserCog,
     label: "관리자 관리",
-    bgColor: "bg-solid-translucent-brown",
-    iconColor: "text-solid-brown",
+    bgColor: "bg-core-accent-translucent",
+    iconColor: "text-core-accent",
   },
 ];
+
+const themeOptions = [
+  { value: "system" as const, icon: Monitor, label: "시스템" },
+  { value: "light" as const, icon: Sun, label: "라이트" },
+  { value: "dark" as const, icon: Moon, label: "다크" },
+];
+
+function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { theme, setTheme } = useTheme();
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  return (
+    <>
+      <Modal
+        isOpen={isOpen}
+        title="설정"
+        onClose={onClose}
+        footer={
+          <Button variant="secondary" onClick={onClose} className="flex-1">
+            닫기
+          </Button>
+        }>
+        <div className="space-y-spacing-500">
+          <div>
+            <p className="mb-spacing-300 font-medium text-body text-content-standard-primary">테마</p>
+            <SegmentedControl items={themeOptions} value={theme} onChange={setTheme} />
+          </div>
+
+          <div className="border-line-divider border-t pt-spacing-500">
+            <p className="mb-spacing-300 font-medium text-body text-content-standard-primary">계정</p>
+            <Button variant="secondary" onClick={() => setShowPasswordModal(true)} className="w-full">
+              비밀번호 변경
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <PasswordChangeModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
+    </>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isOpen, setIsOpen] = useAtom(sidebarOpenAtom);
 
   const fetchUserInfo = useCallback(async () => {
@@ -141,8 +197,8 @@ export default function Sidebar() {
       href: "/calendar",
       icon: Calendar,
       label: "캘린더",
-      bgColor: "bg-solid-translucent-blue",
-      iconColor: "text-solid-blue",
+      bgColor: "bg-core-accent-translucent",
+      iconColor: "text-core-accent",
     },
   ];
   const allMenuItems = isAdmin
@@ -197,7 +253,6 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* 사용자 정보 */}
       {userInfo && (
         <div className="border-line-divider border-t p-spacing-400">
           <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
@@ -214,17 +269,22 @@ export default function Sidebar() {
             </div>
           </div>
           <div className="flex gap-spacing-200">
-            <button
-              onClick={() => setShowPasswordModal(true)}
-              className="flex-1 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-footnote transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent">
-              비밀번호 변경
-            </button>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowSettingsModal(true)}
+              className="flex flex-1 items-center justify-center gap-spacing-100">
+              <Settings className="size-3" />
+              설정
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleLogout}
-              className="flex items-center justify-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-content-standard-primary text-footnote transition-all duration-150 hover:border-core-status-negative/30 hover:bg-solid-translucent-red hover:text-core-status-negative">
+              className="flex items-center justify-center gap-spacing-100">
               <LogOut className="size-3" />
               로그아웃
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -263,17 +323,20 @@ export default function Sidebar() {
 
             {userInfo && (
               <div className="flex w-full max-w-xs flex-col gap-spacing-300">
-                <button
-                  onClick={() => setShowPasswordModal(true)}
-                  className="w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent">
-                  비밀번호 변경
-                </button>
-                <button
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowSettingsModal(true)}
+                  className="flex w-full items-center justify-center gap-spacing-200">
+                  <Settings className="size-4" />
+                  설정
+                </Button>
+                <Button
+                  variant="secondary"
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-500 py-spacing-300 font-semibold text-body text-content-standard-primary transition-all duration-150 hover:border-core-status-negative/30 hover:bg-solid-translucent-red hover:text-core-status-negative">
+                  className="flex w-full items-center justify-center gap-spacing-200">
                   <LogOut className="size-4" />
                   로그아웃
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -284,7 +347,7 @@ export default function Sidebar() {
         {sidebarContent}
       </aside>
 
-      <PasswordChangeModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
+      <SettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
     </>
   );
 }

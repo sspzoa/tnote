@@ -194,10 +194,10 @@ export default function ExamResultsTab() {
                   <span
                     className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
                       student.assignmentStatus === "완료"
-                        ? "bg-solid-translucent-green text-solid-green"
+                        ? "bg-solid-translucent-green text-core-status-positive"
                         : student.assignmentStatus === "미흡"
-                          ? "bg-solid-translucent-yellow text-solid-yellow"
-                          : "bg-solid-translucent-red text-solid-red"
+                          ? "bg-solid-translucent-yellow text-core-status-warning"
+                          : "bg-solid-translucent-red text-core-status-negative"
                     }`}>
                     {student.assignmentStatus || "-"}
                   </span>

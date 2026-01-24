@@ -54,9 +54,9 @@ export default function RetakeList({
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      pending: "bg-solid-translucent-yellow text-solid-yellow",
-      completed: "bg-solid-translucent-green text-solid-green",
-      absent: "bg-solid-translucent-red text-solid-red",
+      pending: "bg-solid-translucent-yellow text-core-status-warning",
+      completed: "bg-solid-translucent-green text-core-status-positive",
+      absent: "bg-solid-translucent-red text-core-status-negative",
     };
     const labels = {
       pending: "대기중",
@@ -75,11 +75,11 @@ export default function RetakeList({
     const isCompleted = status.includes("완료");
 
     let bgColor = "bg-solid-translucent-red";
-    let textColor = "text-solid-red";
+    let textColor = "text-core-status-negative";
 
     if (isCompleted) {
-      bgColor = "bg-solid-translucent-blue";
-      textColor = "text-solid-blue";
+      bgColor = "bg-solid-translucent-green";
+      textColor = "text-core-status-positive";
     }
 
     return (

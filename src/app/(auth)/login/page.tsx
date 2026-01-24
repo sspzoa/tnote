@@ -6,6 +6,7 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormSelect } from "@/shared/components/ui/formSelect";
 import { Modal } from "@/shared/components/ui/modal";
+import { SegmentedControl } from "@/shared/components/ui/segmentedControl";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 interface Workspace {
@@ -140,36 +141,18 @@ export default function LoginPage() {
           <p className="mt-spacing-200 text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
         </div>
         <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          <div className="relative mb-spacing-600 flex gap-spacing-100 rounded-radius-400 bg-components-fill-standard-secondary p-spacing-100">
-            <div
-              className={`absolute top-spacing-100 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-radius-300 bg-core-accent transition-all duration-200 ${
-                tab === "student" ? "left-[calc(50%+2px)]" : "left-spacing-100"
-              }`}
-            />
-            <button
-              onClick={() => {
-                setTab("teacher");
-                setWorkspaceId("");
-              }}
-              className={`relative z-10 flex-1 rounded-radius-300 py-spacing-400 font-semibold text-body transition-colors duration-200 ${
-                tab === "teacher"
-                  ? "text-solid-white"
-                  : "text-content-standard-secondary hover:text-content-standard-primary"
-              }`}>
-              선생님 로그인
-            </button>
-            <button
-              onClick={() => {
-                setTab("student");
-              }}
-              className={`relative z-10 flex-1 rounded-radius-300 py-spacing-400 font-semibold text-body transition-colors duration-200 ${
-                tab === "student"
-                  ? "text-solid-white"
-                  : "text-content-standard-secondary hover:text-content-standard-primary"
-              }`}>
-              학생 로그인
-            </button>
-          </div>
+          <SegmentedControl
+            items={[
+              { value: "teacher", label: "선생님 로그인" },
+              { value: "student", label: "학생 로그인" },
+            ]}
+            value={tab}
+            onChange={(v) => {
+              setTab(v);
+              if (v === "teacher") setWorkspaceId("");
+            }}
+            className="mb-spacing-600"
+          />
 
           <form onSubmit={handleLogin} className="space-y-spacing-500">
             {tab === "student" && (

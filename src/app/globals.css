@@ -78,55 +78,53 @@
   --syntax-keyword: rgb(255, 50, 90, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --solid-translucent-red: rgba(255, 64, 53, 0.2);
-    --solid-translucent-orange: rgba(255, 154, 5, 0.2);
-    --solid-translucent-yellow: rgba(245, 201, 5, 0.2);
-    --solid-translucent-green: rgba(50, 204, 88, 0.2);
-    --solid-translucent-blue: rgba(5, 127, 255, 0.2);
-    --solid-translucent-indigo: rgba(91, 89, 222, 0.2);
-    --solid-translucent-purple: rgba(183, 86, 232, 0.2);
-    --solid-translucent-pink: rgba(255, 50, 90, 0.2);
-    --solid-translucent-brown: rgba(167, 137, 99, 0.2);
-    --solid-translucent-black: rgba(0, 0, 0, 0.2);
-    --solid-translucent-white: rgba(255, 255, 255, 0.2);
+.dark {
+  --solid-translucent-red: rgba(255, 64, 53, 0.2);
+  --solid-translucent-orange: rgba(255, 154, 5, 0.2);
+  --solid-translucent-yellow: rgba(245, 201, 5, 0.2);
+  --solid-translucent-green: rgba(50, 204, 88, 0.2);
+  --solid-translucent-blue: rgba(5, 127, 255, 0.2);
+  --solid-translucent-indigo: rgba(91, 89, 222, 0.2);
+  --solid-translucent-purple: rgba(183, 86, 232, 0.2);
+  --solid-translucent-pink: rgba(255, 50, 90, 0.2);
+  --solid-translucent-brown: rgba(167, 137, 99, 0.2);
+  --solid-translucent-black: rgba(0, 0, 0, 0.2);
+  --solid-translucent-white: rgba(255, 255, 255, 0.2);
 
-    --background-standard-primary: var(--solid-black);
-    --background-standard-secondary: rgba(14, 14, 15, 1);
+  --background-standard-primary: var(--solid-black);
+  --background-standard-secondary: rgba(14, 14, 15, 1);
 
-    --background-inverted-primary: var(--solid-white);
-    --background-inverted-secondary: rgba(237, 238, 242, 1);
+  --background-inverted-primary: var(--solid-white);
+  --background-inverted-secondary: rgba(237, 238, 242, 1);
 
-    --content-standard-primary: rgba(244, 244, 245, 1);
-    --content-standard-secondary: rgba(244, 244, 245, 0.7);
-    --content-standard-tertiary: rgba(244, 244, 245, 0.5);
-    --content-standard-quaternary: rgba(244, 244, 245, 0.3);
+  --content-standard-primary: rgba(244, 244, 245, 1);
+  --content-standard-secondary: rgba(244, 244, 245, 0.7);
+  --content-standard-tertiary: rgba(244, 244, 245, 0.5);
+  --content-standard-quaternary: rgba(244, 244, 245, 0.3);
 
-    --content-inverted-primary: rgba(32, 33, 40, 1);
-    --content-inverted-secondary: rgba(32, 33, 40, 0.6);
-    --content-inverted-tertiary: rgba(32, 33, 40, 0.4);
-    --content-inverted-quaternary: rgba(32, 33, 40, 0.2);
+  --content-inverted-primary: rgba(32, 33, 40, 1);
+  --content-inverted-secondary: rgba(32, 33, 40, 0.6);
+  --content-inverted-tertiary: rgba(32, 33, 40, 0.4);
+  --content-inverted-quaternary: rgba(32, 33, 40, 0.2);
 
-    --line-divider: rgba(121, 123, 138, 0.32);
-    --line-outline: rgba(121, 123, 138, 0.24);
+  --line-divider: rgba(121, 123, 138, 0.32);
+  --line-outline: rgba(121, 123, 138, 0.24);
 
-    --components-fill-standard-primary: rgba(19, 19, 20, 1);
-    --components-fill-standard-secondary: rgba(22, 22, 23, 1);
-    --components-fill-standard-tertiary: rgba(27, 27, 29, 1);
+  --components-fill-standard-primary: rgba(19, 19, 20, 1);
+  --components-fill-standard-secondary: rgba(22, 22, 23, 1);
+  --components-fill-standard-tertiary: rgba(27, 27, 29, 1);
 
-    --components-fill-inverted-primary: rgba(254, 254, 255, 1);
-    --components-fill-inverted-secondary: rgba(250, 250, 250, 1);
-    --components-fill-inverted-tertiary: rgba(254, 254, 255, 1);
+  --components-fill-inverted-primary: rgba(254, 254, 255, 1);
+  --components-fill-inverted-secondary: rgba(250, 250, 250, 1);
+  --components-fill-inverted-tertiary: rgba(254, 254, 255, 1);
 
-    --components-interactive-hover: rgba(244, 244, 245, 0.08);
-    --components-interactive-focused: rgba(244, 244, 245, 0.12);
-    --components-interactive-pressed: rgba(244, 244, 245, 0.16);
+  --components-interactive-hover: rgba(244, 244, 245, 0.08);
+  --components-interactive-focused: rgba(244, 244, 245, 0.12);
+  --components-interactive-pressed: rgba(244, 244, 245, 0.16);
 
-    --components-translucent-primary: rgb(121, 124, 138, 0.2);
-    --components-translucent-secondary: rgba(121, 124, 138, 0.18);
-    --components-translucent-tertiary: rgba(121, 124, 138, 0.16);
-  }
+  --components-translucent-primary: rgb(121, 124, 138, 0.2);
+  --components-translucent-secondary: rgba(121, 124, 138, 0.18);
+  --components-translucent-tertiary: rgba(121, 124, 138, 0.16);
 }
 
 body {

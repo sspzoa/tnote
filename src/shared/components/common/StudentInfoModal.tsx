@@ -188,7 +188,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                           {score.rank}/{score.totalStudents}등
                         </span>
                         {isPassed && (
-                          <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 text-footnote text-solid-green">
+                          <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 text-core-status-positive text-footnote">
                             통과
                           </span>
                         )}
@@ -232,9 +232,9 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                       <span
                         className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
                           assignment.status === "완료"
-                            ? "bg-solid-translucent-green text-solid-green"
+                            ? "bg-solid-translucent-green text-core-status-positive"
                             : assignment.status === "미흡"
-                              ? "bg-solid-translucent-orange text-solid-orange"
+                              ? "bg-solid-translucent-yellow text-core-status-warning"
                               : "bg-solid-translucent-red text-core-status-negative"
                         }`}>
                         {assignment.status}
@@ -310,10 +310,10 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                     <span
                       className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
                         retake.status === "completed"
-                          ? "bg-solid-translucent-green text-solid-green"
+                          ? "bg-solid-translucent-green text-core-status-positive"
                           : retake.status === "absent"
                             ? "bg-solid-translucent-red text-core-status-negative"
-                            : "bg-solid-translucent-blue text-solid-blue"
+                            : "bg-solid-translucent-yellow text-core-status-warning"
                       }`}>
                       {RETAKE_STATUS_LABELS[retake.status]}
                     </span>

@@ -15,7 +15,7 @@ export function FilterButton({ active, onClick, children, variant = "default" }:
         onClick={onClick}
         className={`${baseStyles} ${
           active
-            ? "border-core-status-positive/30 bg-solid-translucent-green text-solid-green"
+            ? "border-core-status-positive/30 bg-solid-translucent-green text-core-status-positive"
             : "border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:border-core-accent/30 hover:bg-components-interactive-hover"
         }`}>
         {children}

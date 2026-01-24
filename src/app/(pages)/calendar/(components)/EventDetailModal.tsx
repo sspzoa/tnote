@@ -55,24 +55,24 @@ const getRetakeStatusLabel = (status: string) => {
 const getClinicStatusStyle = (status: string) => {
   switch (status) {
     case "attended":
-      return "bg-solid-translucent-green text-solid-green";
+      return "bg-solid-translucent-green text-core-status-positive";
     case "absent":
-      return "bg-solid-translucent-red text-solid-red";
+      return "bg-solid-translucent-red text-core-status-negative";
     default:
-      return "bg-solid-translucent-purple text-solid-purple";
+      return "bg-solid-translucent-yellow text-core-status-warning";
   }
 };
 
 const getRetakeStatusStyle = (status: string) => {
   switch (status) {
     case "completed":
-      return "bg-solid-translucent-green text-solid-green";
+      return "bg-solid-translucent-green text-core-status-positive";
     case "absent":
-      return "bg-solid-translucent-red text-solid-red";
+      return "bg-solid-translucent-red text-core-status-negative";
     case "postponed":
-      return "bg-solid-translucent-yellow text-solid-yellow";
+      return "bg-solid-translucent-yellow text-core-status-warning";
     default:
-      return "bg-solid-translucent-blue text-solid-blue";
+      return "bg-solid-translucent-yellow text-core-status-warning";
   }
 };
 

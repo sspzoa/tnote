@@ -17,9 +17,9 @@ export const toastsAtom = atomWithStorage<ToastMessage[]>("toasts", []);
 
 const toastStyles: Record<ToastType, { bg: string; icon: typeof CheckCircle; iconColor: string }> = {
   success: {
-    bg: "bg-solid-translucent-green border-solid-green",
+    bg: "bg-solid-translucent-green border-core-status-positive",
     icon: CheckCircle,
-    iconColor: "text-solid-green",
+    iconColor: "text-core-status-positive",
   },
   error: {
     bg: "bg-solid-translucent-red border-core-status-negative",

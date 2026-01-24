@@ -190,8 +190,8 @@ export default function RetakeNoticeTab() {
                       <span
                         className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
                           retake.management_status.includes("완료")
-                            ? "bg-solid-translucent-blue text-solid-blue"
-                            : "bg-solid-translucent-red text-solid-red"
+                            ? "bg-solid-translucent-green text-core-status-positive"
+                            : "bg-solid-translucent-red text-core-status-negative"
                         }`}>
                         {retake.management_status}
                       </span>

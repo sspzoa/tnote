@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { SegmentedControl } from "@/shared/components/ui/segmentedControl";
 import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/useMessageStore";
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
@@ -70,7 +71,7 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
               {getMessageTypeLabel(batch.message_type)}
             </span>
             {batch.fail_count > 0 && (
-              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-150 py-spacing-50 font-semibold text-caption text-solid-red">
+              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-150 py-spacing-50 font-semibold text-caption text-core-status-negative">
                 {batch.fail_count}건 실패
               </span>
             )}
@@ -120,9 +121,9 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
                   </span>
                 </div>
                 {recipient.is_success ? (
-                  <span className="text-solid-green">성공</span>
+                  <span className="text-core-status-positive">성공</span>
                 ) : (
-                  <span className="text-solid-red" title={recipient.error_message || undefined}>
+                  <span className="text-core-status-negative" title={recipient.error_message || undefined}>
                     실패
                   </span>
                 )}
@@ -189,25 +190,7 @@ export default function MessagesPage() {
       />
 
       <div className="flex flex-col gap-spacing-600">
-        <div className="flex gap-spacing-200 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-200">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.value;
-            return (
-              <button
-                key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
-                className={`flex flex-1 items-center justify-center gap-spacing-200 rounded-radius-300 px-spacing-500 py-spacing-300 font-semibold text-body transition-all ${
-                  isActive
-                    ? "bg-core-accent text-solid-white"
-                    : "text-content-standard-secondary hover:bg-components-interactive-hover hover:text-content-standard-primary"
-                }`}>
-                <Icon className="size-5" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+        <SegmentedControl items={TABS} value={activeTab} onChange={setActiveTab} />
 
         {activeTab === "general" && <GeneralTab />}
         {activeTab === "exam-results" && <ExamResultsTab />}

@@ -33,12 +33,12 @@ interface AssignmentModalProps {
 
 const statusStyles: Record<AssignmentStatus, { active: string; inactive: string }> = {
   완료: {
-    active: "bg-solid-translucent-green text-solid-green",
+    active: "bg-solid-translucent-green text-core-status-positive",
     inactive:
       "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-interactive-hover",
   },
   미흡: {
-    active: "bg-solid-translucent-orange text-solid-orange",
+    active: "bg-solid-translucent-yellow text-core-status-warning",
     inactive:
       "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-interactive-hover",
   },
@@ -132,8 +132,12 @@ export function AssignmentModal({
                 입력됨: {inputCount}명 / {students.length}명
               </span>
               <div className="flex items-center gap-spacing-400">
-                {statusCounts["완료"] > 0 && <span className="text-solid-green">완료: {statusCounts["완료"]}명</span>}
-                {statusCounts["미흡"] > 0 && <span className="text-solid-orange">미흡: {statusCounts["미흡"]}명</span>}
+                {statusCounts["완료"] > 0 && (
+                  <span className="text-core-status-positive">완료: {statusCounts["완료"]}명</span>
+                )}
+                {statusCounts["미흡"] > 0 && (
+                  <span className="text-core-status-warning">미흡: {statusCounts["미흡"]}명</span>
+                )}
                 {statusCounts["미제출"] > 0 && (
                   <span className="text-core-status-negative">미제출: {statusCounts["미제출"]}명</span>
                 )}
