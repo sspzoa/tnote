@@ -1,6 +1,9 @@
 import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
+import { useMemo } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
@@ -9,6 +12,8 @@ import { useCourseDelete } from "../(hooks)/useCourseDelete";
 interface CourseListProps {
   courses: Course[];
 }
+
+type CourseSortKey = "name" | "studentCount";
 
 export default function CourseList({ courses }: CourseListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
@@ -20,6 +25,20 @@ export default function CourseList({ courses }: CourseListProps) {
   const setEndDate = useSetAtom(courseEndDateAtom);
   const setDaysOfWeek = useSetAtom(courseDaysOfWeekAtom);
   const { deleteCourse } = useCourseDelete();
+
+  const comparators = useMemo(
+    () => ({
+      name: (a: Course, b: Course) => a.name.localeCompare(b.name, "ko"),
+      studentCount: (a: Course, b: Course) => (a.student_count || 0) - (b.student_count || 0),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<Course, CourseSortKey>({
+    data: courses,
+    comparators,
+    defaultSort: { key: "name", direction: "asc" },
+  });
 
   const openEditModal = (course: Course) => {
     setSelectedCourse(course);
@@ -58,20 +77,28 @@ export default function CourseList({ courses }: CourseListProps) {
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              수업명
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              학생 수
-            </th>
+            <SortableHeader
+              label="수업명"
+              sortKey="name"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="학생 수"
+              sortKey="studentCount"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               관리
             </th>
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
           </tr>
         </thead>
         <tbody>
-          {courses.map((course) => (
+          {sortedData.map((course) => (
             <tr
               key={course.id}
               className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">

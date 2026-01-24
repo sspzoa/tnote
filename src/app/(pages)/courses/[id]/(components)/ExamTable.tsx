@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
 import type { Exam } from "../(hooks)/useExams";
 
 interface ExamTableProps {
@@ -13,8 +15,30 @@ interface ExamTableProps {
   onDelete: (exam: Exam) => void;
 }
 
+type ExamSortKey = "name" | "examNumber" | "maxScore" | "cutline" | "highest" | "average" | "median" | "retakers";
+
 export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete }: ExamTableProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  const comparators = useMemo(
+    () => ({
+      name: (a: Exam, b: Exam) => a.name.localeCompare(b.name, "ko"),
+      examNumber: (a: Exam, b: Exam) => a.exam_number - b.exam_number,
+      maxScore: (a: Exam, b: Exam) => (a.max_score || 8) - (b.max_score || 8),
+      cutline: (a: Exam, b: Exam) => (a.cutline || 4) - (b.cutline || 4),
+      highest: (a: Exam, b: Exam) => (a.highest_score ?? -1) - (b.highest_score ?? -1),
+      average: (a: Exam, b: Exam) => (a.average_score ?? -1) - (b.average_score ?? -1),
+      median: (a: Exam, b: Exam) => (a.median_score ?? -1) - (b.median_score ?? -1),
+      retakers: (a: Exam, b: Exam) => (a.below_cutline_count ?? -1) - (b.below_cutline_count ?? -1),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<Exam, ExamSortKey>({
+    data: exams,
+    comparators,
+    defaultSort: { key: "examNumber", direction: "asc" },
+  });
 
   const getMenuItems = (exam: Exam): DropdownMenuItem[] => [
     { label: "수정", onClick: () => onEdit(exam), dividerAfter: true },
@@ -26,30 +50,62 @@ export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete 
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              시험명
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              회차
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              만점
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              커트라인
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              최고점
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              평균
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              중앙값
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              재시험자
-            </th>
+            <SortableHeader
+              label="시험명"
+              sortKey="name"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="회차"
+              sortKey="examNumber"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="만점"
+              sortKey="maxScore"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="커트라인"
+              sortKey="cutline"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="최고점"
+              sortKey="highest"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="평균"
+              sortKey="average"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="중앙값"
+              sortKey="median"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="재시험자"
+              sortKey="retakers"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               관리
             </th>
@@ -57,7 +113,7 @@ export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete 
           </tr>
         </thead>
         <tbody className="divide-y divide-line-divider">
-          {exams.map((exam) => (
+          {sortedData.map((exam) => (
             <tr key={exam.id} className="transition-colors hover:bg-core-accent-translucent/50">
               <td className="px-spacing-500 py-spacing-400">
                 <div className="font-medium text-body text-content-standard-primary">{exam.name}</div>

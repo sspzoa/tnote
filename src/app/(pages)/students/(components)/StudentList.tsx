@@ -1,6 +1,8 @@
 import { useAtom } from "jotai";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
@@ -38,6 +40,8 @@ const isTagActive = (startDate: string, endDate: string | null): boolean => {
   return today <= end;
 };
 
+type StudentSortKey = "name" | "branch" | "grade" | "phone" | "parentPhone" | "school";
+
 export default function StudentList({ students }: StudentListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [, setSelectedStudent] = useAtom(selectedStudentAtom);
@@ -50,6 +54,24 @@ export default function StudentList({ students }: StudentListProps) {
   const [, setEditTagAssignmentData] = useAtom(editTagAssignmentDataAtom);
   const { deleteStudent } = useStudentDelete();
   const { resetPassword } = useStudentPasswordReset();
+
+  const comparators = useMemo(
+    () => ({
+      name: (a: Student, b: Student) => a.name.localeCompare(b.name, "ko"),
+      branch: (a: Student, b: Student) => (a.branch || "").localeCompare(b.branch || "", "ko"),
+      grade: (a: Student, b: Student) => (a.birth_year || 0) - (b.birth_year || 0),
+      phone: (a: Student, b: Student) => a.phone_number.localeCompare(b.phone_number),
+      parentPhone: (a: Student, b: Student) => (a.parent_phone_number || "").localeCompare(b.parent_phone_number || ""),
+      school: (a: Student, b: Student) => (a.school || "").localeCompare(b.school || "", "ko"),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<Student, StudentSortKey>({
+    data: students,
+    comparators,
+    defaultSort: { key: "name", direction: "asc" },
+  });
 
   const handleEditClick = useCallback(
     (student: Student) => {
@@ -160,33 +182,56 @@ export default function StudentList({ students }: StudentListProps) {
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              이름
-            </th>
+            <SortableHeader
+              label="이름"
+              sortKey="name"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
             <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               태그
             </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              지점
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              학년
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              전화번호
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              학부모 번호
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              학교
-            </th>
-
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+            <SortableHeader
+              label="지점"
+              sortKey="branch"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="학년"
+              sortKey="grade"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="전화번호"
+              sortKey="phone"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="학부모 번호"
+              sortKey="parentPhone"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="학교"
+              sortKey="school"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
           </tr>
         </thead>
         <tbody>
-          {students.map((student) => {
+          {sortedData.map((student) => {
             const activeTags = (student.tags || []).filter((assignment) =>
               isTagActive(assignment.start_date, assignment.end_date),
             );

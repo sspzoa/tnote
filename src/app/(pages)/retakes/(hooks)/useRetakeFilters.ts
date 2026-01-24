@@ -121,25 +121,7 @@ export const useRetakeFilters = () => {
           (retake) =>
             minPostponeAbsentCount === 0 ||
             (postponeAbsentCountByStudent[retake.student.id] || 0) >= minPostponeAbsentCount,
-        )
-        .sort((a, b) => {
-          if (
-            minIncompleteCount > 0 ||
-            minTotalRetakeCount > 0 ||
-            minPostponeCount > 0 ||
-            minAbsentCount > 0 ||
-            minPostponeAbsentCount > 0
-          ) {
-            const nameCompare = a.student.name.localeCompare(b.student.name, "ko");
-            if (nameCompare !== 0) return nameCompare;
-            const dateA = a.current_scheduled_date || "";
-            const dateB = b.current_scheduled_date || "";
-            return dateA.localeCompare(dateB);
-          }
-          const dateA = a.current_scheduled_date || "";
-          const dateB = b.current_scheduled_date || "";
-          return dateA.localeCompare(dateB);
-        }),
+        ),
     [
       fetchedRetakes,
       showCompleted,

@@ -1,5 +1,8 @@
 import { useAtom } from "jotai";
+import { useMemo } from "react";
 import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
@@ -10,10 +13,28 @@ interface AdminListProps {
   isOwner: boolean;
 }
 
+type AdminSortKey = "name" | "phone" | "role" | "createdAt";
+
 export default function AdminList({ admins, isOwner }: AdminListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const { deleteAdmin } = useAdminDelete();
   const { resetPassword } = useAdminResetPassword();
+
+  const comparators = useMemo(
+    () => ({
+      name: (a: Admin, b: Admin) => a.name.localeCompare(b.name, "ko"),
+      phone: (a: Admin, b: Admin) => a.phone_number.localeCompare(b.phone_number),
+      role: (a: Admin, b: Admin) => a.role.localeCompare(b.role),
+      createdAt: (a: Admin, b: Admin) => a.created_at.localeCompare(b.created_at),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<Admin, AdminSortKey>({
+    data: admins,
+    comparators,
+    defaultSort: { key: "name", direction: "asc" },
+  });
 
   const handleDelete = async (admin: Admin) => {
     if (admin.role === "owner") {
@@ -56,25 +77,41 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              이름
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              전화번호
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              역할
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              가입일
-            </th>
+            <SortableHeader
+              label="이름"
+              sortKey="name"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="전화번호"
+              sortKey="phone"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="역할"
+              sortKey="role"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="가입일"
+              sortKey="createdAt"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
             {isOwner && (
               <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
             )}
           </tr>
         </thead>
         <tbody>
-          {admins.map((admin) => (
+          {sortedData.map((admin) => (
             <tr
               key={admin.id}
               className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">

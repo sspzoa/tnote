@@ -1,6 +1,9 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { useMemo } from "react";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { openMenuIdAtom, type Retake } from "../(atoms)/useRetakesStore";
 
@@ -16,6 +19,8 @@ interface RetakeListProps {
   onEditDate: (retake: Retake) => void;
 }
 
+type RetakeSortKey = "student" | "exam" | "scheduledDate" | "status" | "managementStatus";
+
 export default function RetakeList({
   retakes,
   onViewStudent,
@@ -28,6 +33,24 @@ export default function RetakeList({
   onEditDate,
 }: RetakeListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
+
+  const comparators = useMemo(
+    () => ({
+      student: (a: Retake, b: Retake) => a.student.name.localeCompare(b.student.name, "ko"),
+      exam: (a: Retake, b: Retake) => a.exam.name.localeCompare(b.exam.name, "ko"),
+      scheduledDate: (a: Retake, b: Retake) =>
+        (a.current_scheduled_date || "").localeCompare(b.current_scheduled_date || ""),
+      status: (a: Retake, b: Retake) => a.status.localeCompare(b.status),
+      managementStatus: (a: Retake, b: Retake) => a.management_status.localeCompare(b.management_status),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<Retake, RetakeSortKey>({
+    data: retakes,
+    comparators,
+    defaultSort: { key: "scheduledDate", direction: "asc" },
+  });
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -72,26 +95,46 @@ export default function RetakeList({
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              학생
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              시험
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              예정일
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              상태
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              관리 상태
-            </th>
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary"></th>
+            <SortableHeader
+              label="학생"
+              sortKey="student"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="시험"
+              sortKey="exam"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="예정일"
+              sortKey="scheduledDate"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="상태"
+              sortKey="status"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <SortableHeader
+              label="관리 상태"
+              sortKey="managementStatus"
+              currentSortKey={sortState.key}
+              currentDirection={sortState.direction}
+              onSort={toggleSort}
+            />
+            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
           </tr>
         </thead>
         <tbody>
-          {retakes.map((retake) => (
+          {sortedData.map((retake) => (
             <tr
               key={retake.id}
               className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
