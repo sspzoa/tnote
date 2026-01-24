@@ -1,17 +1,44 @@
 "use client";
 
+import { createTypeStream } from "hangul-typing-animation";
 import { BookOpen, ClipboardList, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { useUser } from "@/shared/hooks/useUser";
 import { getGreetingByTime } from "@/shared/lib/utils/date";
 import { useHomeStats } from "./(hooks)/useHomeStats";
+
+const useHangulTyping = (text: string) => {
+  const [displayText, setDisplayText] = useState("");
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (!text || hasRun.current) return;
+    hasRun.current = true;
+
+    const typeStream = createTypeStream({
+      perChar: 30,
+      perHangul: 60,
+      perSpace: 20,
+      perDot: 200,
+    });
+
+    typeStream(text, (typing) => {
+      setDisplayText(typing);
+    });
+  }, [text]);
+
+  return displayText;
+};
 
 export default function Home() {
   const { user, isLoading: userLoading, isStudent } = useUser();
   const { stats, isLoading: statsLoading } = useHomeStats(!isStudent && !!user);
 
   const isLoading = userLoading || (!isStudent && statsLoading);
+  const greeting = getGreetingByTime();
+  const typedGreeting = useHangulTyping(isLoading ? "" : greeting);
 
   if (isLoading) {
     return (
@@ -62,7 +89,7 @@ export default function Home() {
         </h1>
         <div className="mt-spacing-300 inline-flex items-center gap-spacing-200 rounded-full bg-core-accent-translucent py-spacing-300 pr-spacing-500 pl-spacing-400">
           <Sparkles className="size-4 text-core-accent" />
-          <p className="text-body text-content-standard-secondary">{getGreetingByTime()}</p>
+          <p className="text-body text-content-standard-secondary">{typedGreeting || "\u00A0"}</p>
         </div>
 
         {!isStudent && stats && (
