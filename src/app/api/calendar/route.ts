@@ -85,27 +85,26 @@ const fetchClinicsWithAttendance = async (
   supabase: ApiContext["supabase"],
   workspace: string,
 ): Promise<{ clinics: CalendarClinicData[]; attendance: CalendarAttendanceRecord[] }> => {
-  const { data: clinics, error: clinicsError } = await supabase
-    .from("Clinics")
-    .select("id, name, start_date, end_date, operating_days")
-    .eq("workspace", workspace)
-    .not("start_date", "is", null)
-    .not("end_date", "is", null);
+  const [clinicsResult, attendanceResult] = await Promise.all([
+    supabase
+      .from("Clinics")
+      .select("id, name, start_date, end_date, operating_days")
+      .eq("workspace", workspace)
+      .not("start_date", "is", null)
+      .not("end_date", "is", null),
+    supabase.from("ClinicAttendance").select("attendance_date, student_id, clinic_id"),
+  ]);
 
-  if (clinicsError) throw clinicsError;
+  if (clinicsResult.error) throw clinicsResult.error;
+  if (attendanceResult.error) throw attendanceResult.error;
 
-  const clinicIds = (clinics as CalendarClinicData[] | null)?.map((c) => c.id) || [];
-  const { data: attendance, error: attendanceError } = await supabase
-    .from("ClinicAttendance")
-    .select("attendance_date, student_id, clinic_id")
-    .in("clinic_id", clinicIds.length > 0 ? clinicIds : [""]);
+  const clinics = (clinicsResult.data as CalendarClinicData[]) || [];
+  const clinicIds = new Set(clinics.map((c) => c.id));
+  const attendance = ((attendanceResult.data as CalendarAttendanceRecord[]) || []).filter(
+    (a) => a.clinic_id && clinicIds.has(a.clinic_id),
+  );
 
-  if (attendanceError) throw attendanceError;
-
-  return {
-    clinics: (clinics as CalendarClinicData[]) || [],
-    attendance: (attendance as CalendarAttendanceRecord[]) || [],
-  };
+  return { clinics, attendance };
 };
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
@@ -117,7 +116,12 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const isStudent = session.role === "student";
   const studentId = isStudent ? session.userId : undefined;
 
-  const courses = await fetchCourses(supabase, session.workspace, studentId);
+  const [courses, retakes, { clinics, attendance }] = await Promise.all([
+    fetchCourses(supabase, session.workspace, studentId),
+    fetchRetakes(supabase, session.workspace, studentId),
+    fetchClinicsWithAttendance(supabase, session.workspace),
+  ]);
+
   for (const course of courses) {
     if (course.start_date && course.end_date && course.days_of_week) {
       events.push(
@@ -132,14 +136,12 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     }
   }
 
-  const retakes = await fetchRetakes(supabase, session.workspace, studentId);
   for (const retake of retakes) {
     if (retake.current_scheduled_date) {
       events.push(createRetakeEvent(retake, !isStudent));
     }
   }
 
-  const { clinics, attendance } = await fetchClinicsWithAttendance(supabase, session.workspace);
   for (const clinic of clinics) {
     if (clinic.start_date && clinic.end_date && clinic.operating_days) {
       const clinicAttendance = attendance.filter((a) => a.clinic_id === clinic.id);

@@ -19,43 +19,40 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       return NextResponse.json({ error: "코스를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const { data, error } = await supabase
-      .from("CourseEnrollments")
-      .select(`
-        student_id,
-        enrolled_at,
-        student:Users!CourseEnrollments_student_id_fkey!inner(
-          id,
-          phone_number,
-          name,
-          parent_phone_number,
-          school,
-          branch,
-          birth_year,
-          workspace
-        )
-      `)
-      .eq("course_id", courseId)
-      .eq("student.workspace", session.workspace);
+    const [enrollmentResult, consultationResult] = await Promise.all([
+      supabase
+        .from("CourseEnrollments")
+        .select(`
+          student_id,
+          enrolled_at,
+          student:Users!CourseEnrollments_student_id_fkey!inner(
+            id,
+            phone_number,
+            name,
+            parent_phone_number,
+            school,
+            branch,
+            birth_year,
+            workspace
+          )
+        `)
+        .eq("course_id", courseId)
+        .eq("student.workspace", session.workspace),
+      supabase.from("ConsultationLogs").select("student_id").eq("workspace", session.workspace),
+    ]);
 
-    if (error) throw error;
+    if (enrollmentResult.error) throw enrollmentResult.error;
+    if (consultationResult.error) throw consultationResult.error;
 
-    const studentIds = data.map((enrollment) => enrollment.student_id);
-
-    const { data: consultationCounts, error: countError } = await supabase
-      .from("ConsultationLogs")
-      .select("student_id")
-      .eq("workspace", session.workspace)
-      .in("student_id", studentIds);
-
-    if (countError) throw countError;
-
+    const enrolledStudentIds = new Set(enrollmentResult.data.map((e) => e.student_id));
     const countMap = new Map<string, number>();
-    for (const log of consultationCounts) {
-      countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
+    for (const log of consultationResult.data) {
+      if (enrolledStudentIds.has(log.student_id)) {
+        countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
+      }
     }
 
-    const students = data.map((enrollment) => {
+    const students = enrollmentResult.data.map((enrollment) => {
       const student = enrollment.student as unknown as { id: string; name: string; [key: string]: unknown };
       return {
         ...student,

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { getSession, type Session } from "@/shared/lib/supabase/auth";
 import { createClient } from "@/shared/lib/supabase/server";
 import { createLogger, type LogAction } from "@/shared/lib/utils/logger";
@@ -52,14 +52,18 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
 
     try {
       if (requireAuth && !session) {
-        await logger.log("warn", 401);
-        await logger.flush();
+        after(async () => {
+          await logger.log("warn", 401);
+          await logger.flush();
+        });
         return createErrorResponse("Unauthorized", 401, "로그인이 필요합니다.");
       }
 
       if (session && allowedRoles && !allowedRoles.includes(session.role)) {
-        await logger.log("warn", 403);
-        await logger.flush();
+        after(async () => {
+          await logger.log("warn", 403);
+          await logger.flush();
+        });
         return createErrorResponse("Forbidden", 403, "접근 권한이 없습니다.");
       }
 
@@ -76,8 +80,10 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
       const level = status >= 500 ? "error" : status >= 400 ? "warn" : "info";
       const resourceId = getResourceIdFromParams(resolvedParams);
 
-      await logger.log(level, status, undefined, resourceId);
-      await logger.flush();
+      after(async () => {
+        await logger.log(level, status, undefined, resourceId);
+        await logger.flush();
+      });
       return response;
     } catch (error: unknown) {
       let err: Error;
@@ -93,8 +99,10 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
 
       const resourceId = getResourceIdFromParams(resolvedParams);
 
-      await logger.log("error", 500, err, resourceId);
-      await logger.flush();
+      after(async () => {
+        await logger.log("error", 500, err, resourceId);
+        await logger.flush();
+      });
 
       return createErrorResponse(err, 500, `${resource} 처리 중 오류가 발생했습니다.`);
     }
@@ -119,8 +127,10 @@ export const withPublicLogging = (
       const status = response.status;
       const level = status >= 500 ? "error" : status >= 400 ? "warn" : "info";
 
-      await logger.log(level, status);
-      await logger.flush();
+      after(async () => {
+        await logger.log(level, status);
+        await logger.flush();
+      });
       return response;
     } catch (error: unknown) {
       let err: Error;
@@ -134,8 +144,10 @@ export const withPublicLogging = (
         err = new Error(String(error));
       }
 
-      await logger.log("error", 500, err);
-      await logger.flush();
+      after(async () => {
+        await logger.log("error", 500, err);
+        await logger.flush();
+      });
 
       return NextResponse.json({ error: `${resource} 처리 중 오류가 발생했습니다.` }, { status: 500 });
     }

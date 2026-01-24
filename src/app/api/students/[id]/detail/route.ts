@@ -25,19 +25,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
   }
 
-  const { data: tagAssignments, error: tagError } = await supabase
-    .from("StudentTagAssignments")
-    .select(`
-      id,
-      start_date,
-      end_date,
-      tag:StudentTags!inner(id, name, color, workspace)
-    `)
-    .eq("student_id", studentId)
-    .eq("tag.workspace", session.workspace);
-
-  if (tagError) throw tagError;
-
   interface TagAssignmentRow {
     id: string;
     start_date: string;
@@ -45,7 +32,105 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     tag: { id: string; name: string; color: string; workspace: string };
   }
 
-  const tags = ((tagAssignments as unknown as TagAssignmentRow[]) || []).map((assignment) => ({
+  const [tagResult, enrollmentResult, examScoreResult, clinicResult, assignmentResult, retakeResult] =
+    await Promise.all([
+      supabase
+        .from("StudentTagAssignments")
+        .select(`
+          id,
+          start_date,
+          end_date,
+          tag:StudentTags!inner(id, name, color, workspace)
+        `)
+        .eq("student_id", studentId)
+        .eq("tag.workspace", session.workspace),
+      supabase
+        .from("CourseEnrollments")
+        .select(`
+          enrolled_at,
+          course:Courses!inner(id, name, start_date, end_date, days_of_week)
+        `)
+        .eq("student_id", studentId)
+        .eq("course.workspace", session.workspace),
+      supabase
+        .from("ExamScores")
+        .select(`
+          id,
+          score,
+          created_at,
+          exam:Exams!inner(
+            id,
+            name,
+            exam_number,
+            max_score,
+            cutline,
+            course:Courses!inner(id, name, workspace)
+          )
+        `)
+        .eq("student_id", studentId)
+        .eq("exam.course.workspace", session.workspace)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      supabase
+        .from("ClinicAttendance")
+        .select(`
+          id,
+          attendance_date,
+          note,
+          clinic:Clinics!inner(id, name, workspace)
+        `)
+        .eq("student_id", studentId)
+        .eq("clinic.workspace", session.workspace)
+        .order("attendance_date", { ascending: false })
+        .limit(10),
+      supabase
+        .from("CourseAssignments")
+        .select(`
+          id,
+          status,
+          note,
+          updated_at,
+          exam:Exams!inner(
+            id,
+            name,
+            exam_number,
+            course:Courses!inner(id, name, workspace)
+          )
+        `)
+        .eq("student_id", studentId)
+        .eq("exam.course.workspace", session.workspace)
+        .order("updated_at", { ascending: false })
+        .limit(10),
+      supabase
+        .from("RetakeAssignments")
+        .select(`
+          id,
+          status,
+          management_status,
+          current_scheduled_date,
+          postpone_count,
+          absent_count,
+          exam:Exams!inner(
+            id,
+            name,
+            exam_number,
+            course:Courses!inner(id, name, workspace)
+          )
+        `)
+        .eq("student_id", studentId)
+        .eq("exam.course.workspace", session.workspace)
+        .order("current_scheduled_date", { ascending: true, nullsFirst: false })
+        .limit(10),
+    ]);
+
+  if (tagResult.error) throw tagResult.error;
+  if (enrollmentResult.error) throw enrollmentResult.error;
+  if (examScoreResult.error) throw examScoreResult.error;
+  if (clinicResult.error) throw clinicResult.error;
+  if (assignmentResult.error) throw assignmentResult.error;
+  if (retakeResult.error) throw retakeResult.error;
+
+  const tags = ((tagResult.data as unknown as TagAssignmentRow[]) || []).map((assignment) => ({
     id: assignment.id,
     start_date: assignment.start_date,
     end_date: assignment.end_date,
@@ -56,96 +141,61 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     },
   }));
 
-  const { data: enrollments, error: enrollmentError } = await supabase
-    .from("CourseEnrollments")
-    .select(`
-      enrolled_at,
-      course:Courses!inner(id, name, start_date, end_date, days_of_week)
-    `)
-    .eq("student_id", studentId)
-    .eq("course.workspace", session.workspace);
-
-  if (enrollmentError) throw enrollmentError;
-
-  const courses = ((enrollments as unknown as StudentDetailEnrollment[]) || []).map((e) => ({
+  const courses = ((enrollmentResult.data as unknown as StudentDetailEnrollment[]) || []).map((e) => ({
     ...e.course,
     enrolled_at: e.enrolled_at,
   }));
 
-  const { data: examScores, error: scoresError } = await supabase
-    .from("ExamScores")
-    .select(`
-      id,
-      score,
-      created_at,
-      exam:Exams!inner(
-        id,
-        name,
-        exam_number,
-        max_score,
-        cutline,
-        course:Courses!inner(id, name, workspace)
-      )
-    `)
-    .eq("student_id", studentId)
-    .eq("exam.course.workspace", session.workspace)
-    .order("created_at", { ascending: false })
-    .limit(5);
+  const examScores = (examScoreResult.data as unknown as StudentDetailExamScore[]) || [];
+  const examIds = [...new Set(examScores.map((s) => s.exam.id))];
 
-  if (scoresError) throw scoresError;
+  const rankMap = new Map<string, { rank: number; total: number }>();
+  if (examIds.length > 0) {
+    const { data: allScoresForExams, error: rankError } = await supabase
+      .from("ExamScores")
+      .select("exam_id, score")
+      .in("exam_id", examIds);
 
-  const scoresWithRank = await Promise.all(
-    ((examScores as unknown as StudentDetailExamScore[]) || []).map(async (scoreData) => {
-      const examId = scoreData.exam.id;
-      const studentScore = scoreData.score;
+    if (rankError) throw rankError;
 
-      const { data: allScores, error: rankError } = await supabase
-        .from("ExamScores")
-        .select("score")
-        .eq("exam_id", examId);
+    const scoresByExam = new Map<string, number[]>();
+    for (const row of allScoresForExams || []) {
+      const scores = scoresByExam.get(row.exam_id) || [];
+      scores.push(row.score);
+      scoresByExam.set(row.exam_id, scores);
+    }
 
-      if (rankError) throw rankError;
+    for (const scoreData of examScores) {
+      const scores = scoresByExam.get(scoreData.exam.id) || [];
+      const total = scores.length;
+      const rank = scores.filter((s) => s > scoreData.score).length + 1;
+      rankMap.set(scoreData.id, { rank, total });
+    }
+  }
 
-      const totalStudents = allScores?.length || 0;
-      const rank = (allScores?.filter((s) => s.score > studentScore).length || 0) + 1;
-
-      return {
-        id: scoreData.id,
-        score: scoreData.score,
-        maxScore: scoreData.exam.max_score,
-        cutline: scoreData.exam.cutline,
-        rank,
-        totalStudents,
-        createdAt: scoreData.created_at,
-        exam: {
-          id: scoreData.exam.id,
-          name: scoreData.exam.name,
-          examNumber: scoreData.exam.exam_number,
-          course: {
-            id: scoreData.exam.course.id,
-            name: scoreData.exam.course.name,
-          },
+  const scoresWithRank = examScores.map((scoreData) => {
+    const rankInfo = rankMap.get(scoreData.id) || { rank: 1, total: 1 };
+    return {
+      id: scoreData.id,
+      score: scoreData.score,
+      maxScore: scoreData.exam.max_score,
+      cutline: scoreData.exam.cutline,
+      rank: rankInfo.rank,
+      totalStudents: rankInfo.total,
+      createdAt: scoreData.created_at,
+      exam: {
+        id: scoreData.exam.id,
+        name: scoreData.exam.name,
+        examNumber: scoreData.exam.exam_number,
+        course: {
+          id: scoreData.exam.course.id,
+          name: scoreData.exam.course.name,
         },
-      };
-    }),
-  );
+      },
+    };
+  });
 
-  const { data: clinicAttendance, error: attendanceError } = await supabase
-    .from("ClinicAttendance")
-    .select(`
-      id,
-      attendance_date,
-      note,
-      clinic:Clinics!inner(id, name, workspace)
-    `)
-    .eq("student_id", studentId)
-    .eq("clinic.workspace", session.workspace)
-    .order("attendance_date", { ascending: false })
-    .limit(10);
-
-  if (attendanceError) throw attendanceError;
-
-  const clinicHistory = ((clinicAttendance as unknown as StudentDetailClinicAttendance[]) || []).map((record) => ({
+  const clinicHistory = ((clinicResult.data as unknown as StudentDetailClinicAttendance[]) || []).map((record) => ({
     id: record.id,
     attendanceDate: record.attendance_date,
     note: record.note,
@@ -155,28 +205,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     },
   }));
 
-  const { data: assignments, error: assignmentsError } = await supabase
-    .from("CourseAssignments")
-    .select(`
-      id,
-      status,
-      note,
-      updated_at,
-      exam:Exams!inner(
-        id,
-        name,
-        exam_number,
-        course:Courses!inner(id, name, workspace)
-      )
-    `)
-    .eq("student_id", studentId)
-    .eq("exam.course.workspace", session.workspace)
-    .order("updated_at", { ascending: false })
-    .limit(10);
-
-  if (assignmentsError) throw assignmentsError;
-
-  const assignmentHistory = ((assignments as unknown as StudentDetailAssignment[]) || []).map((record) => ({
+  const assignmentHistory = ((assignmentResult.data as unknown as StudentDetailAssignment[]) || []).map((record) => ({
     id: record.id,
     status: record.status,
     note: record.note,
@@ -191,30 +220,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     },
   }));
 
-  const { data: retakes, error: retakesError } = await supabase
-    .from("RetakeAssignments")
-    .select(`
-      id,
-      status,
-      management_status,
-      current_scheduled_date,
-      postpone_count,
-      absent_count,
-      exam:Exams!inner(
-        id,
-        name,
-        exam_number,
-        course:Courses!inner(id, name, workspace)
-      )
-    `)
-    .eq("student_id", studentId)
-    .eq("exam.course.workspace", session.workspace)
-    .order("current_scheduled_date", { ascending: true, nullsFirst: false })
-    .limit(10);
-
-  if (retakesError) throw retakesError;
-
-  const retakeHistory = ((retakes as unknown as StudentDetailRetake[]) || []).map((record) => ({
+  const retakeHistory = ((retakeResult.data as unknown as StudentDetailRetake[]) || []).map((record) => ({
     id: record.id,
     status: record.status,
     managementStatus: record.management_status,
