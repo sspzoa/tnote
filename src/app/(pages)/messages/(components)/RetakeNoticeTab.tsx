@@ -2,7 +2,6 @@
 
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import {
   recipientTypeAtom,
@@ -52,7 +51,7 @@ const formatStatusLabel = (status: string) => {
 export default function RetakeNoticeTab() {
   const [statusFilter, setStatusFilter] = useAtom(retakeStatusFilterAtom);
   const [managementFilter, setManagementFilter] = useAtom(retakeManagementFilterAtom);
-  const { retakes, isLoading } = useRetakes(statusFilter, managementFilter);
+  const { retakes, isFetching } = useRetakes(statusFilter, managementFilter);
   const { sendRetakeNotice, isSending } = useSendRetakeNotice();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("retake");
 
@@ -121,10 +120,6 @@ export default function RetakeNoticeTab() {
     }
   }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection]);
 
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
   const filterHeader = (
     <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
       <div className="grid grid-cols-2 gap-spacing-400">
@@ -157,6 +152,7 @@ export default function RetakeNoticeTab() {
 
   return (
     <MessageTabLayout
+      isLoading={isFetching}
       selection={{
         title: "재시험 목록",
         subtitle: "재시험을 선택하세요",

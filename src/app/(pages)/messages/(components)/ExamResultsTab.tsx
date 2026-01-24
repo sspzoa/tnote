@@ -3,7 +3,6 @@
 import { useAtom } from "jotai";
 import { FileText } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { StudentListItem } from "@/shared/components/ui/studentList";
 import {
@@ -24,7 +23,7 @@ export default function ExamResultsTab() {
   const [selectedCourseId, setSelectedCourseId] = useAtom(selectedCourseIdAtom);
   const [selectedExamId, setSelectedExamId] = useAtom(selectedExamIdAtom);
   const { exams, isLoading: examsLoading } = useExams(selectedCourseId);
-  const { exportData, isLoading: exportLoading } = useExamExport(selectedExamId);
+  const { exportData, isFetching: exportFetching } = useExamExport(selectedExamId);
   const { sendExamResults, isSending } = useSendExamResults();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("exam");
 
@@ -120,10 +119,6 @@ export default function ExamResultsTab() {
     }
   }, [selectedExamId, selectedIds, selectedCount, recipientType, messageTemplate, sendExamResults, resetSelection]);
 
-  if (exportLoading && selectedExamId) {
-    return <LoadingComponent />;
-  }
-
   const examSelector = (
     <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
       <div className="mb-spacing-400">
@@ -171,6 +166,7 @@ export default function ExamResultsTab() {
     <div className="flex flex-col gap-spacing-600">
       {examSelector}
       <MessageTabLayout
+        isLoading={exportFetching}
         selection={{
           title: "학생 선택",
           subtitle: "학생을 선택하세요",

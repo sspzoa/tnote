@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import type { Student } from "@/shared/types";
@@ -107,7 +107,7 @@ export interface ExamExportData {
 }
 
 export const useExamExport = (examId: string) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isFetching, error } = useQuery({
     queryKey: QUERY_KEYS.exams.export(examId),
     queryFn: async () => {
       const response = await fetchWithAuth(`/api/exams/${examId}/export`);
@@ -120,11 +120,12 @@ export const useExamExport = (examId: string) => {
       return result.data as ExamExportData;
     },
     enabled: !!examId,
+    placeholderData: keepPreviousData,
   });
 
   return {
     exportData: data,
-    isLoading,
+    isFetching,
     error,
   };
 };
@@ -155,7 +156,7 @@ export interface RetakeAssignment {
 }
 
 export const useRetakes = (status: string, managementStatus?: string) => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isFetching, error } = useQuery({
     queryKey: QUERY_KEYS.retakes.forMessages(status, managementStatus || "all"),
     queryFn: async () => {
       let url = `/api/retakes?status=${status}`;
@@ -171,11 +172,12 @@ export const useRetakes = (status: string, managementStatus?: string) => {
 
       return result.data as RetakeAssignment[];
     },
+    placeholderData: keepPreviousData,
   });
 
   return {
     retakes: data || [],
-    isLoading,
+    isFetching,
     error,
   };
 };

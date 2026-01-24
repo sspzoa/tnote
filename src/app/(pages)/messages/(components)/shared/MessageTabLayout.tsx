@@ -71,9 +71,10 @@ interface MessageTabLayoutProps {
   message: MessagePanelProps;
   send: SendActionProps;
   preview: PreviewProps;
+  isLoading?: boolean;
 }
 
-export default function MessageTabLayout({ selection, message, send, preview }: MessageTabLayoutProps) {
+export default function MessageTabLayout({ selection, message, send, preview, isLoading }: MessageTabLayoutProps) {
   return (
     <>
       <div className="flex h-[700px] flex-row items-stretch gap-spacing-600">
@@ -113,7 +114,12 @@ export default function MessageTabLayout({ selection, message, send, preview }: 
                 unit={selection.unit || "명"}
               />
 
-              <div className="flex min-h-0 flex-1 flex-col p-spacing-500">
+              <div className="relative flex min-h-0 flex-1 flex-col p-spacing-500">
+                {isLoading && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-components-fill-standard-primary/60">
+                    <div className="size-6 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
+                  </div>
+                )}
                 <SearchInput
                   placeholder="학생 검색..."
                   value={selection.searchQuery}
