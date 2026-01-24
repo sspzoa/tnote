@@ -25,6 +25,37 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
   }
 
+  const { data: tagAssignments, error: tagError } = await supabase
+    .from("StudentTagAssignments")
+    .select(`
+      id,
+      start_date,
+      end_date,
+      tag:StudentTags!inner(id, name, color, workspace)
+    `)
+    .eq("student_id", studentId)
+    .eq("tag.workspace", session.workspace);
+
+  if (tagError) throw tagError;
+
+  interface TagAssignmentRow {
+    id: string;
+    start_date: string;
+    end_date: string | null;
+    tag: { id: string; name: string; color: string; workspace: string };
+  }
+
+  const tags = ((tagAssignments as unknown as TagAssignmentRow[]) || []).map((assignment) => ({
+    id: assignment.id,
+    start_date: assignment.start_date,
+    end_date: assignment.end_date,
+    tag: {
+      id: assignment.tag.id,
+      name: assignment.tag.name,
+      color: assignment.tag.color,
+    },
+  }));
+
   const { data: enrollments, error: enrollmentError } = await supabase
     .from("CourseEnrollments")
     .select(`
@@ -211,6 +242,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         school: student.school,
         birthYear: student.birth_year,
         createdAt: student.created_at,
+        tags,
       },
       courses,
       examScores: scoresWithRank,

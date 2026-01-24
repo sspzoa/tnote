@@ -73,6 +73,19 @@ interface RetakeHistoryInfo {
   };
 }
 
+interface TagInfo {
+  id: string;
+  name: string;
+  color: string;
+}
+
+interface TagAssignmentInfo {
+  id: string;
+  start_date: string;
+  end_date: string | null;
+  tag: TagInfo;
+}
+
 interface StudentInfo {
   id: string;
   phoneNumber: string;
@@ -82,6 +95,7 @@ interface StudentInfo {
   birthYear: number | null;
   isFavorite: boolean;
   createdAt: string;
+  tags: TagAssignmentInfo[];
 }
 
 export interface StudentDetail {

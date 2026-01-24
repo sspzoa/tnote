@@ -6,6 +6,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
+import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
+import type { TagColor } from "@/shared/types";
 
 const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -18,6 +20,20 @@ const RETAKE_STATUS_LABELS: Record<string, string> = {
 const formatDaysOfWeek = (days: number[] | null): string => {
   if (!days || days.length === 0) return "-";
   return days.map((d) => DAY_NAMES[d]).join(", ");
+};
+
+const isTagActive = (startDate: string, endDate: string | null): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+
+  if (today < start) return false;
+  if (endDate === null) return true;
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+  return today <= end;
 };
 
 interface StudentInfoModalProps {
@@ -86,6 +102,29 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                   {new Date(studentDetail.student.createdAt).toLocaleDateString("ko-KR")}
                 </span>
               </div>
+              {(() => {
+                const activeTags = (studentDetail.student.tags || []).filter((assignment) =>
+                  isTagActive(assignment.start_date, assignment.end_date),
+                );
+                if (activeTags.length === 0) return null;
+                return (
+                  <div className="col-span-2 flex flex-col gap-spacing-50">
+                    <span className="text-content-standard-tertiary text-footnote">태그</span>
+                    <div className="flex flex-wrap items-center gap-spacing-100">
+                      {activeTags.map((assignment) => {
+                        const colorClasses = TAG_COLOR_CLASSES[assignment.tag.color as TagColor];
+                        return (
+                          <span
+                            key={assignment.id}
+                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${colorClasses.bg} ${colorClasses.text}`}>
+                            {assignment.tag.name}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </section>
 
