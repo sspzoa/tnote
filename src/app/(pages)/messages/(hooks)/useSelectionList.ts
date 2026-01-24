@@ -33,9 +33,10 @@ export const useSelectionList = <T extends SelectableItem>({
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return items;
-    const query = searchQuery.toLowerCase();
-    return items.filter((item) => getSearchableText(item).toLowerCase().includes(query));
+    const filtered = searchQuery.trim()
+      ? items.filter((item) => getSearchableText(item).toLowerCase().includes(searchQuery.toLowerCase()))
+      : [...items];
+    return filtered.sort((a, b) => (a.name || "").localeCompare(b.name || "", "ko"));
   }, [items, searchQuery, getSearchableText]);
 
   const allSelected = useMemo(() => {

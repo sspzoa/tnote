@@ -101,7 +101,9 @@ export function AssignmentModal({
 
   if (!exam) return null;
 
-  const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredStudents = students
+    .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
   const getStatusCounts = () => {
     const counts = { 완료: 0, 미흡: 0, 미제출: 0 };

@@ -25,9 +25,38 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (error) throw error;
 
-  const students = data
-    .map((enrollment) => enrollment.student as unknown as { name: string; [key: string]: unknown })
-    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
+  const studentIds = data.map((enrollment) => enrollment.student_id);
+
+  const { data: tagsData, error: tagsError } = await supabase
+    .from("StudentTagAssignments")
+    .select(`
+      student_id,
+      id,
+      tag_id,
+      start_date,
+      end_date,
+      created_at,
+      tag:StudentTags!inner(id, name, color, workspace)
+    `)
+    .in("student_id", studentIds)
+    .eq("tag.workspace", session.workspace);
+
+  if (tagsError) throw tagsError;
+
+  const tagsMap = new Map<string, typeof tagsData>();
+  for (const assignment of tagsData) {
+    const existing = tagsMap.get(assignment.student_id) || [];
+    existing.push(assignment);
+    tagsMap.set(assignment.student_id, existing);
+  }
+
+  const students = data.map((enrollment) => {
+    const student = enrollment.student as unknown as { id: string; name: string; [key: string]: unknown };
+    return {
+      ...student,
+      tags: tagsMap.get(student.id) || [],
+    };
+  });
   return NextResponse.json({ data: students });
 };
 

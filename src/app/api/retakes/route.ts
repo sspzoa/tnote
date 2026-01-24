@@ -84,8 +84,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
       student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace, parent_phone_number)
     `)
-    .eq("student.workspace", session.workspace)
-    .order("current_scheduled_date", { ascending: true, nullsFirst: false });
+    .eq("student.workspace", session.workspace);
 
   if (courseId) {
     query = query.eq("exam.course_id", courseId);

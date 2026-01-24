@@ -57,7 +57,10 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
   );
 
   const filteredStudents = useMemo(
-    () => students.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    () =>
+      students
+        .filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name, "ko")),
     [students, searchQuery],
   );
 

@@ -3,12 +3,15 @@
 import type { ReactNode } from "react";
 import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
+import type { StudentTagAssignment } from "@/shared/types";
 
 export interface StudentListStudent {
   id: string;
   name: string;
   phone_number: string;
   school?: string | null;
+  tags?: StudentTagAssignment[];
 }
 
 interface StudentListContainerProps {
@@ -19,7 +22,7 @@ interface StudentListContainerProps {
 export function StudentListContainer({ children, className = "" }: StudentListContainerProps) {
   return (
     <div
-      className={`overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary ${className.includes("flex-1") ? "" : "h-80"} ${className}`}>
+      className={`overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary ${className.includes("flex-1") ? "min-h-0" : "h-80"} ${className}`}>
       {children}
     </div>
   );
@@ -44,6 +47,18 @@ export function StudentListItem({
   rightContent,
   extraInfo,
 }: StudentListItemProps) {
+  const activeTags = (student.tags || []).filter((assignment) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(assignment.start_date);
+    start.setHours(0, 0, 0, 0);
+    if (today < start) return false;
+    if (assignment.end_date === null) return true;
+    const end = new Date(assignment.end_date);
+    end.setHours(0, 0, 0, 0);
+    return today <= end;
+  });
+
   const content = (
     <>
       {onToggle !== undefined && (
@@ -57,6 +72,19 @@ export function StudentListItem({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-spacing-200">
           <span className="truncate font-medium text-body text-content-standard-primary">{student.name}</span>
+          {activeTags.length > 0 &&
+            activeTags.map((assignment) => {
+              const tag = assignment.tag;
+              if (!tag) return null;
+              const colorClasses = TAG_COLOR_CLASSES[tag.color];
+              return (
+                <span
+                  key={assignment.id}
+                  className={`rounded-radius-200 px-spacing-150 py-spacing-50 font-medium text-caption ${colorClasses.bg} ${colorClasses.text}`}>
+                  {tag.name}
+                </span>
+              );
+            })}
           {badge}
         </div>
         <div className="truncate text-content-standard-tertiary text-footnote">

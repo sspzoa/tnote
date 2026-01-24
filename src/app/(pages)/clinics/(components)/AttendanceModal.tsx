@@ -37,7 +37,9 @@ export default function AttendanceModal() {
   }, [attendance, isOpen]);
 
   const filteredStudents = useMemo(() => {
-    return students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return students
+      .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => a.name.localeCompare(b.name, "ko"));
   }, [students, searchQuery]);
 
   const handleClose = () => {

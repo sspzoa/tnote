@@ -7,8 +7,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
     .from("Users")
     .select("id, phone_number, name, role, created_at")
     .in("role", ["owner", "admin"])
-    .eq("workspace", session.workspace)
-    .order("created_at", { ascending: true });
+    .eq("workspace", session.workspace);
 
   if (error) throw error;
   return NextResponse.json({ data });

@@ -34,13 +34,13 @@ export default function EnrollmentModal() {
     (student) => !enrolledStudents.find((enrolled) => enrolled.id === student.id),
   );
 
-  const filteredEnrolledStudents = enrolledStudents.filter((student) =>
-    student.name.toLowerCase().includes(enrolledSearchQuery.toLowerCase()),
-  );
+  const filteredEnrolledStudents = enrolledStudents
+    .filter((student) => student.name.toLowerCase().includes(enrolledSearchQuery.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
-  const filteredUnenrolledStudents = unenrolledStudents.filter((student) =>
-    student.name.toLowerCase().includes(unenrolledSearchQuery.toLowerCase()),
-  );
+  const filteredUnenrolledStudents = unenrolledStudents
+    .filter((student) => student.name.toLowerCase().includes(unenrolledSearchQuery.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
   const handleEnroll = async (studentId: string) => {
     setLoadingStudentId(studentId);
@@ -80,14 +80,13 @@ export default function EnrollmentModal() {
           <StudentListLoading />
         </StudentListContainer>
       ) : (
-        <>
-          {/* 등록된 학생 */}
-          <div className="mb-spacing-600">
+        <div className="flex h-96 gap-spacing-500">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
               등록된 학생 ({enrolledStudents.length}명)
             </h3>
             {enrolledStudents.length === 0 ? (
-              <StudentListContainer>
+              <StudentListContainer className="flex-1">
                 <StudentListEmpty message="등록된 학생이 없습니다." />
               </StudentListContainer>
             ) : (
@@ -98,7 +97,7 @@ export default function EnrollmentModal() {
                   onChange={(e) => setEnrolledSearchQuery(e.target.value)}
                   className="mb-spacing-300"
                 />
-                <StudentListContainer>
+                <StudentListContainer className="flex-1">
                   {filteredEnrolledStudents.length === 0 ? (
                     <StudentListEmpty message="검색 결과가 없습니다." />
                   ) : (
@@ -122,13 +121,12 @@ export default function EnrollmentModal() {
             )}
           </div>
 
-          {/* 미등록 학생 */}
-          <div>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
               학생 추가 ({unenrolledStudents.length}명)
             </h3>
             {unenrolledStudents.length === 0 ? (
-              <StudentListContainer>
+              <StudentListContainer className="flex-1">
                 <StudentListEmpty message="모든 학생이 등록되었습니다." />
               </StudentListContainer>
             ) : (
@@ -139,7 +137,7 @@ export default function EnrollmentModal() {
                   onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
                   className="mb-spacing-300"
                 />
-                <StudentListContainer>
+                <StudentListContainer className="flex-1">
                   {filteredUnenrolledStudents.length === 0 ? (
                     <StudentListEmpty message="검색 결과가 없습니다." />
                   ) : (
@@ -162,7 +160,7 @@ export default function EnrollmentModal() {
               </>
             )}
           </div>
-        </>
+        </div>
       )}
     </Modal>
   );

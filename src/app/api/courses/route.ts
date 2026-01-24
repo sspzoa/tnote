@@ -8,8 +8,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
       *,
       enrollments:CourseEnrollments(count)
     `)
-    .eq("workspace", session.workspace)
-    .order("created_at", { ascending: false });
+    .eq("workspace", session.workspace);
 
   if (error) throw error;
 

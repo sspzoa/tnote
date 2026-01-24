@@ -8,6 +8,7 @@ export interface AssignStudent {
   phone_number: string;
   name: string;
   school: string;
+  tags?: import("@/shared/types").StudentTagAssignment[];
 }
 
 export const retakesAtom = atom<Retake[]>([]);

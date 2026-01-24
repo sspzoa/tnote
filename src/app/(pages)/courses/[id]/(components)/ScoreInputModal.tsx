@@ -98,7 +98,9 @@ export function ScoreInputModal({
 
   if (!exam) return null;
 
-  const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredStudents = students
+    .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
   const inputCount = Object.values(scoreInputs).filter((v) => v !== "" && !Number.isNaN(Number.parseInt(v))).length;
   const cutlineValue = exam.cutline || 4;
   const belowCutlineCount = Object.entries(scoreInputs).filter(([, value]) => {

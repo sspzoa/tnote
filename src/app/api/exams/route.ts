@@ -66,8 +66,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
         scores:ExamScores(score)
       `,
       )
-      .eq("course.workspace", session.workspace)
-      .order("exam_number", { ascending: true });
+      .eq("course.workspace", session.workspace);
 
     if (courseId) {
       query = query.eq("course_id", courseId);
@@ -94,8 +93,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       course:Courses!inner(id, name, workspace)
     `,
     )
-    .eq("course.workspace", session.workspace)
-    .order("exam_number", { ascending: true });
+    .eq("course.workspace", session.workspace);
 
   if (courseId) {
     query = query.eq("course_id", courseId);

@@ -55,16 +55,14 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       countMap.set(log.student_id, (countMap.get(log.student_id) || 0) + 1);
     }
 
-    const students = data
-      .map((enrollment) => {
-        const student = enrollment.student as unknown as { name: string; [key: string]: unknown };
-        return {
-          ...student,
-          enrolled_at: enrollment.enrolled_at,
-          consultation_count: countMap.get(enrollment.student_id) || 0,
-        };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    const students = data.map((enrollment) => {
+      const student = enrollment.student as unknown as { name: string; [key: string]: unknown };
+      return {
+        ...student,
+        enrolled_at: enrollment.enrolled_at,
+        consultation_count: countMap.get(enrollment.student_id) || 0,
+      };
+    });
     return NextResponse.json({ data: students });
   }
 
@@ -72,8 +70,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     .from("Users")
     .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, created_at")
     .eq("role", "student")
-    .eq("workspace", session.workspace)
-    .order("name", { ascending: true });
+    .eq("workspace", session.workspace);
 
   if (error) throw error;
 

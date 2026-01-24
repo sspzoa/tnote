@@ -5,8 +5,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
     .from("Clinics")
     .select("id, name, operating_days, start_date, end_date, created_at")
-    .eq("workspace", session.workspace)
-    .order("created_at", { ascending: false });
+    .eq("workspace", session.workspace);
 
   if (error) {
     throw error;
