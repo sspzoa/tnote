@@ -4,7 +4,7 @@ import { createTypeStream } from "hangul-typing-animation";
 import { BookOpen, ClipboardList, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Skeleton } from "@/shared/components/ui";
+import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 import { useUser } from "@/shared/hooks/useUser";
 import { getGreetingByTime } from "@/shared/lib/utils/date";
 import { useHomeStats } from "./(hooks)/useHomeStats";
@@ -41,25 +41,7 @@ export default function Home() {
   const typedGreeting = useHangulTyping(isLoading ? "" : greeting);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-spacing-600">
-        <div className="w-full max-w-2xl text-center">
-          <Skeleton className="mx-auto mb-spacing-200 h-16 w-64" />
-          <Skeleton className="mx-auto mt-spacing-300 h-12 w-48 rounded-full" />
-          <div className="mt-spacing-800 grid grid-cols-3 gap-spacing-400">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center gap-spacing-300 rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
-                <Skeleton className="size-16 rounded-full" />
-                <Skeleton className="h-16 w-12" />
-                <Skeleton className="h-6 w-16" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <SkeletonSpinner className="min-h-screen" />;
   }
 
   const statItems = [
