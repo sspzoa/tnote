@@ -1,7 +1,7 @@
 "use client";
 
 import { History, X } from "lucide-react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 
 interface HistoryItem {
   id: string;
@@ -81,7 +81,7 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
 
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <LoadingComponent className="py-spacing-900" size="md" />
+            <SkeletonSpinner className="py-spacing-900" size="md" />
           ) : history.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-spacing-900">
               <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">

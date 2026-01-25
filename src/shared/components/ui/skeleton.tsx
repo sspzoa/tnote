@@ -22,6 +22,27 @@ export function SkeletonAvatar({ className = "" }: SkeletonProps) {
   return <Skeleton className={`size-10 rounded-full ${className}`} />;
 }
 
+interface SkeletonSpinnerProps {
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+const spinnerSizeClasses = {
+  sm: "size-5",
+  md: "size-6",
+  lg: "size-8",
+};
+
+export function SkeletonSpinner({ className = "min-h-[50vh]", size = "lg" }: SkeletonSpinnerProps) {
+  return (
+    <div className={`flex items-center justify-center ${className}`} role="status" aria-live="polite">
+      <div
+        className={`${spinnerSizeClasses[size]} animate-spin rounded-full border-2 border-core-accent border-t-transparent`}
+      />
+    </div>
+  );
+}
+
 export type SkeletonColumnDef =
   | string // 단순 width class (예: "w-16")
   | { width: string; rounded?: boolean } // width + rounded badge 스타일

@@ -2,10 +2,10 @@
 
 import { Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 import { useSenderPhone } from "../(hooks)/useSenderPhone";
 
 const formatPhoneForDisplay = (phone: string | null): string => {
@@ -94,7 +94,7 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
         </div>
       }>
       {isLoading ? (
-        <LoadingComponent className="py-spacing-600" size="md" />
+        <SkeletonSpinner className="py-spacing-600" size="md" />
       ) : (
         <div className="space-y-spacing-400">
           <FormInput

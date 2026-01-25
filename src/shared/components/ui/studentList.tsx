@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
+import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
 import type { StudentTagAssignment } from "@/shared/types";
@@ -126,7 +126,7 @@ interface StudentListLoadingProps {
 }
 
 export function StudentListLoading(_props: StudentListLoadingProps) {
-  return <LoadingComponent className="py-spacing-600" size="md" />;
+  return <SkeletonSpinner className="py-spacing-600" size="md" />;
 }
 
 interface StudentListSkeletonProps {
