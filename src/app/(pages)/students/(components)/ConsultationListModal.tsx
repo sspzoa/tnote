@@ -1,7 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
-import { ConsultationListSkeleton } from "@/shared/components/ui/skeleton";
 import type { ConsultationLog } from "@/shared/types";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import {
@@ -11,6 +10,7 @@ import {
 } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useConsultations } from "../(hooks)/useConsultations";
+import { ConsultationListSkeleton } from "./ConsultationListSkeleton";
 
 interface ConsultationWithCreator extends ConsultationLog {
   creator?: {

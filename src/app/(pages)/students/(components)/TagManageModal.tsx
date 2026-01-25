@@ -3,11 +3,11 @@
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
-import { TagListSkeleton } from "@/shared/components/ui/skeleton";
 import { TAG_COLOR_STYLES, TAG_COLORS, TAG_SOLID_COLORS } from "@/shared/lib/utils/tagColors";
 import type { StudentTag, TagColor } from "@/shared/types";
 import { showTagManageModalAtom } from "../(atoms)/useModalStore";
 import { useCreateTag, useDeleteTag, useTags, useUpdateTag } from "../(hooks)/useTags";
+import { TagListSkeleton } from "./TagListSkeleton";
 
 interface TagFormState {
   name: string;

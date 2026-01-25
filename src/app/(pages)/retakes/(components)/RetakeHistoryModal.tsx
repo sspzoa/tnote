@@ -5,12 +5,12 @@ import { Undo2 } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
-import { HistoryListSkeleton } from "@/shared/components/ui/skeleton";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
 import type { History } from "../(atoms)/useRetakesStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
 import { useRetakeHistory } from "../(hooks)/useRetakeHistory";
 import { useRetakeUndo } from "../(hooks)/useRetakeUndo";
+import { HistoryListSkeleton } from "./HistoryListSkeleton";
 
 interface RetakeHistoryModalProps {
   onSuccess?: () => void;

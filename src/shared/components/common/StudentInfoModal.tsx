@@ -3,11 +3,11 @@
 import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
-import { StudentInfoSkeleton } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
 import type { TagColor } from "@/shared/types";
+import { StudentInfoSkeleton } from "./StudentInfoSkeleton";
 
 const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
 

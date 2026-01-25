@@ -6,7 +6,7 @@ import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useUser } from "@/shared/hooks/useUser";
 import { showInviteModalAtom, showWorkspaceDeleteModalAtom } from "./(atoms)/useModalStore";
 import AdminInviteModal from "./(components)/AdminInviteModal";
@@ -25,48 +25,7 @@ export default function AdminsPage() {
   }
 
   const adminTableSkeleton = (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full">
-        <thead className="bg-components-fill-standard-secondary">
-          <tr>
-            <th className="px-spacing-500 py-spacing-400 text-left">
-              <Skeleton className="h-6 w-10" />
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left">
-              <Skeleton className="h-6 w-16" />
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left">
-              <Skeleton className="h-6 w-10" />
-            </th>
-            <th className="px-spacing-500 py-spacing-400 text-left">
-              <Skeleton className="h-6 w-12" />
-            </th>
-            <th className="w-24 px-spacing-500 py-spacing-400" />
-          </tr>
-        </thead>
-        <tbody>
-          {[...Array(5)].map((_, i) => (
-            <tr key={i} className="border-line-divider border-t">
-              <td className="px-spacing-500 py-spacing-400">
-                <Skeleton className="h-6 w-16" />
-              </td>
-              <td className="px-spacing-500 py-spacing-400">
-                <Skeleton className="h-6 w-24" />
-              </td>
-              <td className="px-spacing-500 py-spacing-400">
-                <Skeleton className="h-7 w-12 rounded-radius-200" />
-              </td>
-              <td className="px-spacing-500 py-spacing-400">
-                <Skeleton className="h-6 w-20" />
-              </td>
-              <td className="px-spacing-500 py-spacing-400">
-                <Skeleton className="ml-auto h-9 w-11 rounded-radius-200" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <SkeletonTable rows={5} columns={["w-16", "w-24", { width: "w-12", rounded: true }, "w-20", "action"]} />
   );
 
   const isDataLoading = isLoading || userLoading;

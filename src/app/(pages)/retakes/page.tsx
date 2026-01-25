@@ -7,7 +7,7 @@ import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import ManagementStatusModal from "./(components)/ManagementStatusModal";
 import RetakeAbsentModal from "./(components)/RetakeAbsentModal";
 import RetakeAssignModal from "./(components)/RetakeAssignModal";
@@ -84,63 +84,17 @@ export default function RetakesPage() {
         <RetakeFilters />
 
         {isLoading ? (
-          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-            <table className="w-full">
-              <thead className="bg-components-fill-standard-secondary">
-                <tr>
-                  <th className="px-spacing-500 py-spacing-400 text-left">
-                    <Skeleton className="h-6 w-10" />
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left">
-                    <Skeleton className="h-6 w-10" />
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left">
-                    <Skeleton className="h-6 w-12" />
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left">
-                    <Skeleton className="h-6 w-10" />
-                  </th>
-                  <th className="px-spacing-500 py-spacing-400 text-left">
-                    <Skeleton className="h-6 w-16" />
-                  </th>
-                  <th className="w-24 px-spacing-500 py-spacing-400" />
-                </tr>
-              </thead>
-              <tbody>
-                {[...Array(8)].map((_, i) => (
-                  <tr key={i} className="border-line-divider border-t">
-                    <td className="px-spacing-500 py-spacing-400">
-                      <div className="space-y-spacing-100">
-                        <Skeleton className="h-6 w-16" />
-                        <Skeleton className="h-5 w-24" />
-                      </div>
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <div className="space-y-spacing-100">
-                        <Skeleton className="h-6 w-20" />
-                        <Skeleton className="h-5 w-24" />
-                      </div>
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <div className="space-y-spacing-100">
-                        <Skeleton className="h-6 w-20" />
-                        <Skeleton className="h-5 w-16" />
-                      </div>
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <Skeleton className="h-7 w-12 rounded-radius-200" />
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <Skeleton className="h-7 w-24 rounded-radius-200" />
-                    </td>
-                    <td className="px-spacing-500 py-spacing-400">
-                      <Skeleton className="ml-auto h-9 w-11 rounded-radius-200" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <SkeletonTable
+            rows={8}
+            columns={[
+              { width: "w-16", stacked: ["w-16", "w-24"] },
+              { width: "w-20", stacked: ["w-20", "w-24"] },
+              { width: "w-20", stacked: ["w-20", "w-16"] },
+              { width: "w-12", rounded: true },
+              { width: "w-24", rounded: true },
+              "action",
+            ]}
+          />
         ) : fetchedRetakes.length === 0 ? (
           <EmptyState message="재시험이 없습니다." />
         ) : filteredRetakes.length === 0 ? (

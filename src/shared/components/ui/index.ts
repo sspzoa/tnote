@@ -6,16 +6,6 @@ export { FormTextarea } from "./formTextarea";
 export { Modal } from "./modal";
 export { SearchInput } from "./searchInput";
 export { SegmentedControl } from "./segmentedControl";
-export {
-  Skeleton,
-  SkeletonAvatar,
-  SkeletonButton,
-  SkeletonCard,
-  SkeletonFilterBar,
-  SkeletonGrid,
-  SkeletonHeader,
-  SkeletonList,
-  SkeletonTable,
-  SkeletonText,
-} from "./skeleton";
+export type { SkeletonColumnDef } from "./skeleton";
+export { Skeleton, SkeletonAvatar, SkeletonButton, SkeletonCard, SkeletonTable, SkeletonText } from "./skeleton";
 export { StatusBadge } from "./statusBadge";
