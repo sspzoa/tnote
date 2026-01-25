@@ -201,3 +201,11 @@ export interface SendMessageResponse {
   };
   error?: string;
 }
+
+export interface ConsultationTemplate {
+  id: string;
+  name: string;
+  content: string;
+  created_at: string;
+  created_by: string;
+}

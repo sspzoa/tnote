@@ -54,6 +54,7 @@ export const QUERY_KEYS = {
   consultations: {
     all: ["consultations"] as const,
     byStudent: (studentId: string) => ["consultations", "byStudent", studentId] as const,
+    templates: ["consultation-templates"] as const,
   },
   admins: {
     all: ["admins"] as const,
