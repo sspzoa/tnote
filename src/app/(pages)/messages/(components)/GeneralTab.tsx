@@ -2,7 +2,6 @@
 
 import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { StudentListItem } from "@/shared/components/ui/studentList";
 import { messageTextAtom, recipientTypeAtom } from "../(atoms)/useMessageStore";
 import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
@@ -10,7 +9,7 @@ import { useSelectionList } from "../(hooks)/useSelectionList";
 import { useSendMessage } from "../(hooks)/useSendMessage";
 import { useStudents } from "../(hooks)/useStudents";
 import { GENERAL_TEMPLATE_VARIABLES, getTodayFormatted } from "../(utils)/messageUtils";
-import { MessageTabLayout } from "./shared";
+import { MessageTabLayout, MessageTabSkeleton } from "./shared";
 
 export default function GeneralTab() {
   const { students, isLoading } = useStudents();
@@ -78,7 +77,7 @@ export default function GeneralTab() {
   }, [selectedIds, selectedCount, messageText, recipientType, sendMessage, setMessageText, resetSelection]);
 
   if (isLoading) {
-    return <LoadingComponent />;
+    return <MessageTabSkeleton />;
   }
 
   return (

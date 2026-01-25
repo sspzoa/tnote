@@ -8,7 +8,7 @@ import {
   StudentListContainer,
   StudentListEmpty,
   StudentListItem,
-  StudentListLoading,
+  StudentListSkeleton,
   type StudentListStudent,
 } from "@/shared/components/ui/studentList";
 import type { Exam } from "../(hooks)/useExams";
@@ -115,36 +115,40 @@ export function ScoreInputModal({
       title="점수 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
-        !isLoading && students.length > 0 ? (
-          <div className="w-full">
-            <div className="mb-spacing-300 flex items-center justify-between text-body">
-              <span className="text-content-standard-secondary">
-                입력된 점수: {inputCount}명 / {students.length}명
-              </span>
-              {belowCutlineCount > 0 && (
-                <span className="text-core-status-negative">커트라인 미달: {belowCutlineCount}명</span>
-              )}
-            </div>
-            <div className="flex gap-spacing-300">
-              <Button variant="secondary" onClick={handleClose} className="flex-1">
-                취소
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleSave}
-                isLoading={isSaving}
-                loadingText="저장 중..."
-                className="flex-1">
-                저장
-              </Button>
-            </div>
+        <div className="w-full">
+          <div className="mb-spacing-300 flex items-center justify-between text-body">
+            <span className="text-content-standard-secondary">
+              입력된 점수: {inputCount}명 / {students.length}명
+            </span>
+            {belowCutlineCount > 0 && (
+              <span className="text-core-status-negative">커트라인 미달: {belowCutlineCount}명</span>
+            )}
           </div>
-        ) : undefined
+          <div className="flex gap-spacing-300">
+            <Button variant="secondary" onClick={handleClose} className="flex-1">
+              취소
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSave}
+              disabled={isLoading || students.length === 0}
+              isLoading={isSaving}
+              loadingText="저장 중..."
+              className="flex-1">
+              저장
+            </Button>
+          </div>
+        </div>
       }>
       {isLoading ? (
-        <StudentListContainer>
-          <StudentListLoading />
-        </StudentListContainer>
+        <>
+          <div className="mb-spacing-400">
+            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+          </div>
+          <StudentListContainer>
+            <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
+          </StudentListContainer>
+        </>
       ) : students.length === 0 ? (
         <StudentListContainer>
           <StudentListEmpty message="수강생이 없습니다." />

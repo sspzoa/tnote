@@ -5,8 +5,8 @@ import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, Refres
 import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { SegmentedControl } from "@/shared/components/ui/segmentedControl";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/useMessageStore";
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
@@ -219,7 +219,21 @@ export default function MessagesPage() {
 
             <div className="flex-1 overflow-y-auto">
               {isLoading ? (
-                <LoadingComponent className="py-spacing-900" size="md" />
+                <div className="space-y-spacing-300 p-spacing-600">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="space-y-spacing-200 border-line-divider border-b pb-spacing-300">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-spacing-200">
+                          <Skeleton className="h-6 w-24" />
+                          <Skeleton className="h-4 w-12 rounded-radius-200" />
+                        </div>
+                        <Skeleton className="h-6 w-20 rounded-radius-200" />
+                      </div>
+                      <Skeleton className="h-6 w-full" />
+                      <Skeleton className="h-5 w-32" />
+                    </div>
+                  ))}
+                </div>
               ) : history.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-spacing-900">
                   <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">

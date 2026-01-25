@@ -1,9 +1,9 @@
 "use client";
 
 import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { StudentInfoSkeleton } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
@@ -56,7 +56,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
         </Button>
       }>
       {isLoading ? (
-        <LoadingComponent className="py-spacing-900" size="md" />
+        <StudentInfoSkeleton />
       ) : !studentDetail ? (
         <div className="py-spacing-900 text-center text-content-standard-tertiary">학생 정보를 불러올 수 없습니다.</div>
       ) : (

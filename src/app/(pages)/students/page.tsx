@@ -6,10 +6,10 @@ import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { Modal } from "@/shared/components/ui/modal";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import { searchQueryAtom, selectedTagIdsAtom } from "./(atoms)/useStudentsStore";
@@ -98,7 +98,69 @@ export default function StudentsPage() {
         <StudentFilterBar courses={courses} tags={tags} />
 
         {isLoading ? (
-          <LoadingComponent />
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+            <table className="w-full">
+              <thead className="bg-components-fill-standard-secondary">
+                <tr>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-12" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-16" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-20" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="w-24 px-spacing-500 py-spacing-400" />
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(8)].map((_, i) => (
+                  <tr key={i} className="border-line-divider border-t">
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-16" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <div className="flex gap-spacing-100">
+                        <Skeleton className="h-6 w-12 rounded-radius-200" />
+                        <Skeleton className="h-6 w-10 rounded-radius-200" />
+                      </div>
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-14" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-7 w-10 rounded-radius-200" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-24" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-24" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-16" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="ml-auto h-9 w-11 rounded-radius-200" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : filteredStudents.length === 0 ? (
           <EmptyState
             message={students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
@@ -156,7 +218,18 @@ export default function StudentsPage() {
 
             <div className="flex-1 overflow-y-auto">
               {consultationsLoading ? (
-                <LoadingComponent className="py-spacing-900" size="md" />
+                <div className="space-y-spacing-300 p-spacing-600">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="space-y-spacing-200">
+                      <div className="flex items-center justify-between">
+                        <Skeleton className="h-6 w-20" />
+                        <Skeleton className="h-6 w-16 rounded-radius-200" />
+                      </div>
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-5 w-24" />
+                    </div>
+                  ))}
+                </div>
               ) : consultations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-spacing-900">
                   <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">

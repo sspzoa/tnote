@@ -4,8 +4,8 @@ import { useAtomValue } from "jotai";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import {
   assignmentExamAtom,
   scoreExamAtom,
@@ -165,7 +165,95 @@ export default function CourseDetailPage() {
   const loadingAssignments = loadingAssignmentStudents || loadingExistingAssignments;
 
   if (courseLoading || examsLoading || !course) {
-    return <LoadingComponent />;
+    return (
+      <div className="min-h-screen p-spacing-600 md:p-spacing-800">
+        <div className="mx-auto max-w-7xl">
+          <Skeleton className="mb-spacing-400 h-6 w-40" />
+          <div className="mb-spacing-700 flex items-end justify-between">
+            <div className="space-y-spacing-200">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-6 w-24" />
+            </div>
+            <Skeleton className="h-12 w-28 rounded-radius-300" />
+          </div>
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+            <table className="w-full">
+              <thead className="bg-components-fill-standard-secondary">
+                <tr>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-14" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-16" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-12" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-12" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-16" />
+                  </th>
+                  <th className="px-spacing-500 py-spacing-400 text-left">
+                    <Skeleton className="h-6 w-10" />
+                  </th>
+                  <th className="w-24 px-spacing-500 py-spacing-400" />
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(5)].map((_, i) => (
+                  <tr key={i} className="border-line-divider border-t">
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-20" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-7 w-14 rounded-radius-200" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-8" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-8" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-8" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-10" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-8" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="h-6 w-16" />
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <div className="flex gap-spacing-200">
+                        <Skeleton className="h-[38px] w-16 rounded-radius-300" />
+                        <Skeleton className="h-[38px] w-12 rounded-radius-300" />
+                      </div>
+                    </td>
+                    <td className="px-spacing-500 py-spacing-400">
+                      <Skeleton className="ml-auto h-9 w-11 rounded-radius-200" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

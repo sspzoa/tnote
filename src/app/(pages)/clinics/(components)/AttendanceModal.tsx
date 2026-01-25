@@ -10,7 +10,7 @@ import {
   StudentListContainer,
   StudentListEmpty,
   StudentListItem,
-  StudentListLoading,
+  StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
 import { attendanceSearchQueryAtom, selectedDateAtom, selectedStudentIdsAtom } from "../(atoms)/useFormStore";
@@ -103,9 +103,12 @@ export default function AttendanceModal() {
             참석 학생 선택 ({students.length}명)
           </h3>
           {loadingAttendance ? (
-            <StudentListContainer>
-              <StudentListLoading />
-            </StudentListContainer>
+            <>
+              <div className="mb-spacing-300 h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+              <StudentListContainer>
+                <StudentListSkeleton count={6} showCheckbox />
+              </StudentListContainer>
+            </>
           ) : students.length === 0 ? (
             <StudentListContainer>
               <StudentListEmpty />

@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { ConsultationListSkeleton } from "@/shared/components/ui/skeleton";
 import type { ConsultationLog } from "@/shared/types";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import {
@@ -61,7 +61,7 @@ export default function ConsultationListModal() {
         </>
       }>
       {isLoading ? (
-        <LoadingComponent className="py-spacing-900" size="md" />
+        <ConsultationListSkeleton count={4} />
       ) : consultations.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="mb-spacing-200 text-body text-content-standard-tertiary">상담일지가 없습니다.</p>

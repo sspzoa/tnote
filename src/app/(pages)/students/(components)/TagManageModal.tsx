@@ -2,8 +2,8 @@
 
 import { useAtom } from "jotai";
 import { useState } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { TagListSkeleton } from "@/shared/components/ui/skeleton";
 import { TAG_COLOR_STYLES, TAG_COLORS, TAG_SOLID_COLORS } from "@/shared/lib/utils/tagColors";
 import type { StudentTag, TagColor } from "@/shared/types";
 import { showTagManageModalAtom } from "../(atoms)/useModalStore";
@@ -168,7 +168,7 @@ export default function TagManageModal() {
           <h3 className="font-semibold text-body text-content-standard-primary">등록된 태그</h3>
 
           {isLoading ? (
-            <LoadingComponent className="py-spacing-600" size="md" />
+            <TagListSkeleton count={4} />
           ) : tags.length === 0 ? (
             <div className="rounded-radius-400 border border-line-divider bg-components-fill-standard-secondary/30 py-spacing-600 text-center text-content-standard-tertiary text-label">
               등록된 태그가 없습니다.

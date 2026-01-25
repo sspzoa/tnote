@@ -128,3 +128,36 @@ interface StudentListLoadingProps {
 export function StudentListLoading(_props: StudentListLoadingProps) {
   return <LoadingComponent className="py-spacing-600" size="md" />;
 }
+
+interface StudentListSkeletonProps {
+  count?: number;
+  showCheckbox?: boolean;
+  showRightContent?: boolean;
+}
+
+export function StudentListSkeleton({
+  count = 5,
+  showCheckbox = true,
+  showRightContent = false,
+}: StudentListSkeletonProps) {
+  return (
+    <>
+      {[...Array(count)].map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0">
+          {showCheckbox && (
+            <div className="size-4 shrink-0 animate-pulse rounded-radius-100 bg-components-fill-standard-tertiary" />
+          )}
+          <div className="min-w-0 flex-1 space-y-spacing-100">
+            <div className="h-6 w-20 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
+            <div className="h-5 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
+          </div>
+          {showRightContent && (
+            <div className="h-8 w-16 shrink-0 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
+          )}
+        </div>
+      ))}
+    </>
+  );
+}

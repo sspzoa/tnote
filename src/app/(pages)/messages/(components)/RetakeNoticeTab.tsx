@@ -229,7 +229,7 @@ export default function RetakeNoticeTab() {
         message: previewMessage,
         variables: [
           { label: "이름", value: previewRetake?.student.name },
-          { label: "코스", value: previewRetake?.exam.course.name },
+          { label: "수업", value: previewRetake?.exam.course.name },
           { label: "시험", value: previewRetake?.exam.name },
           { label: "회차", value: previewRetake ? `${previewRetake.exam.exam_number}회` : undefined },
           { label: "예정일", value: previewRetake ? formatDate(previewRetake.current_scheduled_date) : undefined },

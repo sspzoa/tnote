@@ -7,7 +7,7 @@ import {
   StudentListContainer,
   StudentListEmpty,
   StudentListItem,
-  StudentListLoading,
+  StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { enrolledSearchQueryAtom, selectedCourseAtom, unenrolledSearchQueryAtom } from "../(atoms)/useCoursesStore";
 import { showEnrollModalAtom } from "../(atoms)/useModalStore";
@@ -76,9 +76,22 @@ export default function EnrollmentModal() {
         </Button>
       }>
       {isLoadingEnrolled ? (
-        <StudentListContainer>
-          <StudentListLoading />
-        </StudentListContainer>
+        <div className="flex h-96 gap-spacing-500">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div className="mb-spacing-300 h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+            <div className="mb-spacing-300 h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+            <StudentListContainer className="flex-1">
+              <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
+            </StudentListContainer>
+          </div>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div className="mb-spacing-300 h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+            <div className="mb-spacing-300 h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+            <StudentListContainer className="flex-1">
+              <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
+            </StudentListContainer>
+          </div>
+        </div>
       ) : (
         <div className="flex h-96 gap-spacing-500">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">

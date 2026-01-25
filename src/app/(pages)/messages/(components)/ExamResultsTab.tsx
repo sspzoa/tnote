@@ -230,7 +230,7 @@ export default function ExamResultsTab() {
           message: previewMessage,
           variables: [
             { label: "이름", value: previewStudent?.name },
-            { label: "코스", value: selectedCourse?.name },
+            { label: "수업", value: selectedCourse?.name },
             { label: "시험", value: selectedExam?.name },
             { label: "과제", value: previewStudent?.assignmentStatus },
             { label: "점수", value: previewStudent?.score },

@@ -8,7 +8,7 @@ import {
   StudentListContainer,
   StudentListEmpty,
   StudentListItem,
-  StudentListLoading,
+  StudentListSkeleton,
   type StudentListStudent,
 } from "@/shared/components/ui/studentList";
 import type { Exam } from "../(hooks)/useExams";
@@ -125,44 +125,48 @@ export function AssignmentModal({
       title="과제 관리"
       subtitle={`${exam.name} (${exam.exam_number}회차)`}
       footer={
-        !isLoading && students.length > 0 ? (
-          <div className="w-full">
-            <div className="mb-spacing-300 flex items-center justify-between text-body">
-              <span className="text-content-standard-secondary">
-                입력됨: {inputCount}명 / {students.length}명
-              </span>
-              <div className="flex items-center gap-spacing-400">
-                {statusCounts["완료"] > 0 && (
-                  <span className="text-core-status-positive">완료: {statusCounts["완료"]}명</span>
-                )}
-                {statusCounts["미흡"] > 0 && (
-                  <span className="text-core-status-warning">미흡: {statusCounts["미흡"]}명</span>
-                )}
-                {statusCounts["미제출"] > 0 && (
-                  <span className="text-core-status-negative">미제출: {statusCounts["미제출"]}명</span>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-spacing-300">
-              <Button variant="secondary" onClick={handleClose} className="flex-1">
-                취소
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleSave}
-                isLoading={isSaving}
-                loadingText="저장 중..."
-                className="flex-1">
-                저장
-              </Button>
+        <div className="w-full">
+          <div className="mb-spacing-300 flex items-center justify-between text-body">
+            <span className="text-content-standard-secondary">
+              입력됨: {inputCount}명 / {students.length}명
+            </span>
+            <div className="flex items-center gap-spacing-400">
+              {statusCounts["완료"] > 0 && (
+                <span className="text-core-status-positive">완료: {statusCounts["완료"]}명</span>
+              )}
+              {statusCounts["미흡"] > 0 && (
+                <span className="text-core-status-warning">미흡: {statusCounts["미흡"]}명</span>
+              )}
+              {statusCounts["미제출"] > 0 && (
+                <span className="text-core-status-negative">미제출: {statusCounts["미제출"]}명</span>
+              )}
             </div>
           </div>
-        ) : undefined
+          <div className="flex gap-spacing-300">
+            <Button variant="secondary" onClick={handleClose} className="flex-1">
+              취소
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSave}
+              disabled={isLoading || students.length === 0}
+              isLoading={isSaving}
+              loadingText="저장 중..."
+              className="flex-1">
+              저장
+            </Button>
+          </div>
+        </div>
       }>
       {isLoading ? (
-        <StudentListContainer>
-          <StudentListLoading />
-        </StudentListContainer>
+        <>
+          <div className="mb-spacing-400">
+            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+          </div>
+          <StudentListContainer>
+            <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
+          </StudentListContainer>
+        </>
       ) : students.length === 0 ? (
         <StudentListContainer>
           <StudentListEmpty message="수강생이 없습니다." />

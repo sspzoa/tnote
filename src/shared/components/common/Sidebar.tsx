@@ -171,6 +171,7 @@ export default function Sidebar() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isOpen, setIsOpen] = useAtom(sidebarOpenAtom);
 
@@ -187,6 +188,8 @@ export default function Sidebar() {
       }
     } catch {
       // noop
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -266,67 +269,90 @@ export default function Sidebar() {
       {/* 메뉴 목록 */}
       <nav className="flex-1 overflow-y-auto p-spacing-400">
         <div className="space-y-spacing-100">
-          {allMenuItems.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`group relative flex items-center gap-spacing-300 rounded-radius-300 px-spacing-400 py-spacing-300 transition-all duration-150 ${
-                  active ? "bg-core-accent-translucent" : "hover:bg-core-accent-translucent/50"
-                }`}>
-                {active && (
-                  <div className="-translate-y-1/2 absolute top-1/2 left-0 h-6 w-1 rounded-r-full bg-core-accent" />
-                )}
-                <div
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-radius-300 transition-all duration-150 ${active ? "bg-core-accent" : `${item.bgColor} group-hover:scale-105`}`}>
-                  <item.icon className={`size-5 ${active ? "text-solid-white" : item.iconColor}`} />
+          {isLoading
+            ? [...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center gap-spacing-300 px-spacing-400 py-spacing-300">
+                  <div className="size-9 shrink-0 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+                  <div className="h-6 w-20 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
                 </div>
-                <span
-                  className={`font-medium text-body transition-colors duration-150 ${active ? "text-core-accent" : "text-content-standard-primary group-hover:text-core-accent"}`}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+              ))
+            : allMenuItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`group relative flex items-center gap-spacing-300 rounded-radius-300 px-spacing-400 py-spacing-300 transition-all duration-150 ${
+                      active ? "bg-core-accent-translucent" : "hover:bg-core-accent-translucent/50"
+                    }`}>
+                    {active && (
+                      <div className="-translate-y-1/2 absolute top-1/2 left-0 h-6 w-1 rounded-r-full bg-core-accent" />
+                    )}
+                    <div
+                      className={`flex size-9 shrink-0 items-center justify-center rounded-radius-300 transition-all duration-150 ${active ? "bg-core-accent" : `${item.bgColor} group-hover:scale-105`}`}>
+                      <item.icon className={`size-5 ${active ? "text-solid-white" : item.iconColor}`} />
+                    </div>
+                    <span
+                      className={`font-medium text-body transition-colors duration-150 ${active ? "text-core-accent" : "text-content-standard-primary group-hover:text-core-accent"}`}>
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
         </div>
       </nav>
 
-      {userInfo && (
-        <div className="border-line-divider border-t p-spacing-400">
-          <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
-            <div className="flex size-9 items-center justify-center rounded-full bg-components-fill-standard-secondary">
-              <span className="font-semibold text-content-standard-secondary text-label">
-                {userInfo.name?.charAt(0) || "U"}
-              </span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-medium text-body text-content-standard-primary">{userInfo.name}</div>
-              <div className="text-content-standard-tertiary text-footnote">
-                {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
+      <div className="border-line-divider border-t p-spacing-400">
+        {isLoading ? (
+          <>
+            <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
+              <div className="size-9 animate-pulse rounded-full bg-components-fill-standard-secondary" />
+              <div className="min-w-0 flex-1 space-y-spacing-100">
+                <div className="h-6 w-16 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+                <div className="h-5 w-10 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
               </div>
             </div>
-          </div>
-          <div className="flex gap-spacing-200">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setShowSettingsModal(true)}
-              className="flex flex-1 items-center justify-center gap-spacing-100">
-              <Settings className="size-3" />
-              설정
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleLogout}
-              className="flex items-center justify-center gap-spacing-100">
-              <LogOut className="size-3" />
-              로그아웃
-            </Button>
-          </div>
-        </div>
-      )}
+            <div className="flex gap-spacing-200">
+              <div className="h-[38px] flex-1 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+              <div className="h-[38px] w-20 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+            </div>
+          </>
+        ) : userInfo ? (
+          <>
+            <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
+              <div className="flex size-9 items-center justify-center rounded-full bg-components-fill-standard-secondary">
+                <span className="font-semibold text-content-standard-secondary text-label">
+                  {userInfo.name?.charAt(0) || "U"}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-medium text-body text-content-standard-primary">{userInfo.name}</div>
+                <div className="text-content-standard-tertiary text-footnote">
+                  {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-spacing-200">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowSettingsModal(true)}
+                className="flex flex-1 items-center justify-center gap-spacing-100">
+                <Settings className="size-3" />
+                설정
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-spacing-100">
+                <LogOut className="size-3" />
+                로그아웃
+              </Button>
+            </div>
+          </>
+        ) : null}
+      </div>
     </>
   );
 
@@ -336,19 +362,30 @@ export default function Sidebar() {
         <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
           <div className="flex items-center gap-spacing-300">
             <h1 className="font-bold text-content-standard-primary text-heading">Tnote</h1>
-            {userInfo?.workspaceName && (
-              <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
-                {userInfo.workspaceName}
-              </span>
+            {isLoading ? (
+              <div className="h-7 w-12 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+            ) : (
+              userInfo?.workspaceName && (
+                <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
+                  {userInfo.workspaceName}
+                </span>
+              )
             )}
           </div>
-          {userInfo && (
-            <div className="flex items-center gap-spacing-200 text-body text-content-standard-primary">
-              <span className="text-content-standard-tertiary">
-                {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
-              </span>
-              <span className="font-medium">{userInfo.name}</span>
+          {isLoading ? (
+            <div className="flex items-center gap-spacing-200">
+              <div className="h-6 w-10 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+              <div className="h-6 w-12 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
             </div>
+          ) : (
+            userInfo && (
+              <div className="flex items-center gap-spacing-200 text-body text-content-standard-primary">
+                <span className="text-content-standard-tertiary">
+                  {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
+                </span>
+                <span className="font-medium">{userInfo.name}</span>
+              </div>
+            )
           )}
         </div>
 
@@ -360,7 +397,7 @@ export default function Sidebar() {
               PC에서 이용해 주세요.
             </p>
 
-            {userInfo && (
+            {!isLoading && userInfo && (
               <div className="flex w-full max-w-xs flex-col gap-spacing-300">
                 <Button
                   variant="secondary"

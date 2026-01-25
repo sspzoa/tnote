@@ -3,9 +3,9 @@
 import { useAtom } from "jotai";
 import { Undo2 } from "lucide-react";
 import { useEffect } from "react";
-import LoadingComponent from "@/shared/components/common/LoadingComponent";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { HistoryListSkeleton } from "@/shared/components/ui/skeleton";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
 import type { History } from "../(atoms)/useRetakesStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -99,7 +99,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
         </Button>
       }>
       {isLoading ? (
-        <LoadingComponent className="py-spacing-900" size="md" />
+        <HistoryListSkeleton count={4} />
       ) : history.length === 0 ? (
         <div className="py-spacing-900 text-center">
           <p className="text-body text-content-standard-tertiary">이력이 없습니다.</p>

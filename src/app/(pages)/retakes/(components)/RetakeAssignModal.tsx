@@ -11,7 +11,7 @@ import {
   StudentListContainer,
   StudentListEmpty,
   StudentListItem,
-  StudentListLoading,
+  StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
@@ -129,7 +129,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
   };
 
   const courseOptions = [
-    { value: "", label: "과목을 선택하세요" },
+    { value: "", label: "수업을 선택하세요" },
     ...courses.map((course) => ({ value: course.id, label: course.name })),
   ];
 
@@ -166,7 +166,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       }>
       <div className="space-y-spacing-500">
         <FormSelect
-          label="과목 선택"
+          label="수업 선택"
           required
           value={selectedCourseId}
           onChange={(e) => handleCourseChange(e.target.value)}
@@ -174,16 +174,14 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           options={courseOptions}
         />
 
-        {selectedCourseId && (
-          <FormSelect
-            label="시험 선택"
-            required
-            value={selectedExamId}
-            onChange={(e) => setSelectedExamId(e.target.value)}
-            disabled={examsLoading}
-            options={examOptions}
-          />
-        )}
+        <FormSelect
+          label="시험 선택"
+          required
+          value={selectedExamId}
+          onChange={(e) => setSelectedExamId(e.target.value)}
+          disabled={!selectedCourseId || examsLoading}
+          options={examOptions}
+        />
 
         <FormInput
           label="예정일 (선택)"
@@ -192,92 +190,89 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           onChange={(e) => setScheduledDate(e.target.value)}
         />
 
-        {selectedCourseId && (
-          <div>
-            <div className="mb-spacing-200 flex items-center justify-between">
-              <label className="font-semibold text-body text-content-standard-primary">
-                학생 선택 <span className="text-core-status-negative">*</span>
-                {selectedExam && examScores.length > 0 && (
-                  <span className="ml-spacing-200 font-normal text-content-standard-tertiary text-footnote">
-                    (커트라인: {selectedExam.cutline || 4}점)
-                  </span>
-                )}
-              </label>
-              <div className="flex gap-spacing-300">
-                {selectedExamId && examScores.length > 0 && studentsBelowCutline.length > 0 && (
-                  <button
-                    onClick={handleSelectBelowCutline}
-                    className="text-body text-core-status-negative hover:underline"
-                    disabled={isDataLoading}>
-                    {allBelowCutlineSelected
-                      ? "재시험자 해제"
-                      : `재시험자 전체 선택 (${studentsBelowCutline.length}명)`}
-                  </button>
-                )}
-                <button
-                  onClick={handleSelectAll}
-                  className="text-body text-core-accent hover:underline"
-                  disabled={isDataLoading || filteredStudents.length === 0}>
-                  {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
-                    ? "전체 해제"
-                    : "전체 선택"}
-                </button>
-              </div>
-            </div>
-
-            <SearchInput
-              placeholder="학생 검색..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mb-spacing-300"
-            />
-
-            <StudentListContainer>
-              {isDataLoading ? (
-                <StudentListLoading />
-              ) : filteredStudents.length === 0 ? (
-                <StudentListEmpty message={students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."} />
-              ) : (
-                filteredStudents.map((student) => {
-                  const score = getStudentScore(student.id);
-                  const belowCutline = isBelowCutline(student.id);
-
-                  return (
-                    <StudentListItem
-                      key={student.id}
-                      student={student}
-                      selected={selectedStudentIds.includes(student.id)}
-                      onToggle={() => handleStudentToggle(student.id)}
-                      highlighted={belowCutline}
-                      badge={
-                        belowCutline && (
-                          <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
-                            재시험 대상
-                          </span>
-                        )
-                      }
-                      extraInfo={
-                        score !== null &&
-                        selectedExam && (
-                          <span className={belowCutline ? "text-core-status-negative" : ""}>
-                            {" "}
-                            · {score}/{selectedExam.max_score || 8}점
-                          </span>
-                        )
-                      }
-                    />
-                  );
-                })
+        <div>
+          <div className="mb-spacing-200 flex items-center justify-between">
+            <label className="font-semibold text-body text-content-standard-primary">
+              학생 선택 <span className="text-core-status-negative">*</span>
+              {selectedExam && examScores.length > 0 && (
+                <span className="ml-spacing-200 font-normal text-content-standard-tertiary text-footnote">
+                  (커트라인: {selectedExam.cutline || 4}점)
+                </span>
               )}
-            </StudentListContainer>
-
-            {selectedStudentIds.length > 0 && (
-              <div className="mt-spacing-200 text-body text-content-standard-secondary">
-                선택된 학생: {selectedStudentIds.length}명
-              </div>
-            )}
+            </label>
+            <div className="flex gap-spacing-300">
+              {selectedExamId && examScores.length > 0 && studentsBelowCutline.length > 0 && (
+                <button
+                  onClick={handleSelectBelowCutline}
+                  className="text-body text-core-status-negative hover:underline"
+                  disabled={isDataLoading}>
+                  {allBelowCutlineSelected ? "재시험자 해제" : `재시험자 전체 선택 (${studentsBelowCutline.length}명)`}
+                </button>
+              )}
+              <button
+                onClick={handleSelectAll}
+                className="text-body text-core-accent hover:underline"
+                disabled={!selectedCourseId || isDataLoading || filteredStudents.length === 0}>
+                {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
+                  ? "전체 해제"
+                  : "전체 선택"}
+              </button>
+            </div>
           </div>
-        )}
+
+          <SearchInput
+            placeholder="학생 검색..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mb-spacing-300"
+            disabled={!selectedCourseId}
+          />
+
+          <StudentListContainer>
+            {!selectedCourseId ? (
+              <StudentListEmpty message="수업을 먼저 선택하세요." />
+            ) : isDataLoading ? (
+              <StudentListSkeleton count={6} showCheckbox showRightContent />
+            ) : filteredStudents.length === 0 ? (
+              <StudentListEmpty message={students.length === 0 ? "수강생이 없습니다." : "검색 결과가 없습니다."} />
+            ) : (
+              filteredStudents.map((student) => {
+                const score = getStudentScore(student.id);
+                const belowCutline = isBelowCutline(student.id);
+
+                return (
+                  <StudentListItem
+                    key={student.id}
+                    student={student}
+                    selected={selectedStudentIds.includes(student.id)}
+                    onToggle={() => handleStudentToggle(student.id)}
+                    highlighted={belowCutline}
+                    badge={
+                      belowCutline && (
+                        <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
+                          재시험 대상
+                        </span>
+                      )
+                    }
+                    extraInfo={
+                      score !== null &&
+                      selectedExam && (
+                        <span className={belowCutline ? "text-core-status-negative" : ""}>
+                          {" "}
+                          · {score}/{selectedExam.max_score || 8}점
+                        </span>
+                      )
+                    }
+                  />
+                );
+              })
+            )}
+          </StudentListContainer>
+
+          <div className="mt-spacing-200 text-body text-content-standard-secondary">
+            선택된 학생: {selectedStudentIds.length}명
+          </div>
+        </div>
       </div>
     </Modal>
   );
