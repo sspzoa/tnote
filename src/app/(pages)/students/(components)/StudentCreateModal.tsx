@@ -43,7 +43,14 @@ export default function StudentCreateModal() {
             variant="primary"
             className="flex-1"
             onClick={handleCreate}
-            disabled={!form.name || !form.phoneNumber}
+            disabled={
+              !form.name ||
+              !form.phoneNumber ||
+              !form.parentPhoneNumber ||
+              !form.school ||
+              !form.branch ||
+              !form.birthYear
+            }
             isLoading={isCreating}
             loadingText="추가 중...">
             추가
@@ -74,6 +81,7 @@ export default function StudentCreateModal() {
           value={form.parentPhoneNumber}
           onChange={(e) => setForm({ ...form, parentPhoneNumber: e.target.value })}
           placeholder="01012345678"
+          required
         />
 
         <FormInput
@@ -81,6 +89,7 @@ export default function StudentCreateModal() {
           type="text"
           value={form.school}
           onChange={(e) => setForm({ ...form, school: e.target.value })}
+          required
         />
 
         <FormInput
@@ -89,6 +98,7 @@ export default function StudentCreateModal() {
           value={form.branch}
           onChange={(e) => setForm({ ...form, branch: e.target.value })}
           placeholder="러셀부천"
+          required
         />
 
         <div className="flex items-end gap-spacing-200">
@@ -101,6 +111,7 @@ export default function StudentCreateModal() {
               value={form.birthYear}
               onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
               placeholder="2010"
+              required
             />
           </div>
           <div className="flex gap-spacing-100">

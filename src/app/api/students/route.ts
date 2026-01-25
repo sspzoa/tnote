@@ -120,8 +120,8 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear } = await request.json();
 
-  if (!name || !phoneNumber) {
-    return NextResponse.json({ error: "이름과 전화번호는 필수입니다." }, { status: 400 });
+  if (!name || !phoneNumber || !parentPhoneNumber || !school || !branch || !birthYear) {
+    return NextResponse.json({ error: "모든 필드는 필수입니다." }, { status: 400 });
   }
 
   if (typeof name !== "string" || name.trim().length === 0 || name.length > 50) {
@@ -133,18 +133,14 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "올바른 전화번호 형식이 아닙니다." }, { status: 400 });
   }
 
-  if (parentPhoneNumber) {
-    const cleanedParentPhone = removePhoneHyphens(parentPhoneNumber);
-    if (!isValidPhoneNumber(cleanedParentPhone)) {
-      return NextResponse.json({ error: "올바른 학부모 전화번호 형식이 아닙니다." }, { status: 400 });
-    }
+  const cleanedParentPhone = removePhoneHyphens(parentPhoneNumber);
+  if (!isValidPhoneNumber(cleanedParentPhone)) {
+    return NextResponse.json({ error: "올바른 학부모 전화번호 형식이 아닙니다." }, { status: 400 });
   }
 
-  if (birthYear) {
-    const year = Number.parseInt(birthYear);
-    if (Number.isNaN(year) || !isValidBirthYear(year)) {
-      return NextResponse.json({ error: "올바른 출생연도가 아닙니다." }, { status: 400 });
-    }
+  const year = Number.parseInt(birthYear);
+  if (Number.isNaN(year) || !isValidBirthYear(year)) {
+    return NextResponse.json({ error: "올바른 출생연도가 아닙니다." }, { status: 400 });
   }
 
   const hashedPassword = await bcrypt.hash(cleanedPhoneNumber, 10);
@@ -154,10 +150,10 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .insert({
       name: name.trim(),
       phone_number: cleanedPhoneNumber,
-      parent_phone_number: parentPhoneNumber ? removePhoneHyphens(parentPhoneNumber) : null,
-      school: school?.trim() || null,
-      branch: branch?.trim() || null,
-      birth_year: birthYear ? Number.parseInt(birthYear) : null,
+      parent_phone_number: cleanedParentPhone,
+      school: school.trim(),
+      branch: branch.trim(),
+      birth_year: year,
       password: hashedPassword,
       role: "student",
       workspace: session.workspace,
