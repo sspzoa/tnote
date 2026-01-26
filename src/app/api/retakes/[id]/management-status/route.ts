@@ -4,6 +4,7 @@ import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 const VALID_MANAGEMENT_STATUSES = [
   "재시 안내 예정",
   "재시 안내 완료",
+  "재시 날짜 확답 완료",
   "클리닉 1회 불참 연락 필요",
   "클리닉 1회 불참 연락 완료",
   "클리닉 2회 불참 연락 필요",
