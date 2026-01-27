@@ -20,7 +20,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Button, Modal, SegmentedControl } from "@/shared/components/ui";
+import { Button, Modal, SegmentedControl, Skeleton } from "@/shared/components/ui";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { sidebarOpenAtom } from "./(atoms)/useSidebarStore";
 import { PasswordChangeModal } from "./PasswordChangeModal";
@@ -272,8 +272,8 @@ export default function Sidebar() {
           {isLoading
             ? [...Array(6)].map((_, i) => (
                 <div key={i} className="flex items-center gap-spacing-300 px-spacing-400 py-spacing-300">
-                  <div className="size-9 shrink-0 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
-                  <div className="h-6 w-20 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+                  <Skeleton className="size-9 shrink-0 rounded-radius-300" />
+                  <Skeleton className="h-6 w-20" />
                 </div>
               ))
             : allMenuItems.map((item) => {
@@ -306,15 +306,15 @@ export default function Sidebar() {
         {isLoading ? (
           <>
             <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
-              <div className="size-9 animate-pulse rounded-full bg-components-fill-standard-secondary" />
+              <Skeleton className="size-9 rounded-full" />
               <div className="min-w-0 flex-1 space-y-spacing-100">
-                <div className="h-6 w-16 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
-                <div className="h-5 w-10 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+                <Skeleton className="h-6 w-16" />
+                <Skeleton className="h-5 w-10" />
               </div>
             </div>
             <div className="flex gap-spacing-200">
-              <div className="h-[38px] flex-1 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
-              <div className="h-[38px] w-20 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+              <Skeleton className="h-[38px] flex-1 rounded-radius-300" />
+              <Skeleton className="h-[38px] w-20 rounded-radius-300" />
             </div>
           </>
         ) : userInfo ? (
@@ -363,7 +363,7 @@ export default function Sidebar() {
           <div className="flex items-center gap-spacing-300">
             <h1 className="font-bold text-content-standard-primary text-heading">Tnote</h1>
             {isLoading ? (
-              <div className="h-7 w-12 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+              <Skeleton className="h-7 w-12" />
             ) : (
               userInfo?.workspaceName && (
                 <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
@@ -374,8 +374,8 @@ export default function Sidebar() {
           </div>
           {isLoading ? (
             <div className="flex items-center gap-spacing-200">
-              <div className="h-6 w-10 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
-              <div className="h-6 w-12 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+              <Skeleton className="h-6 w-10" />
+              <Skeleton className="h-6 w-12" />
             </div>
           ) : (
             userInfo && (

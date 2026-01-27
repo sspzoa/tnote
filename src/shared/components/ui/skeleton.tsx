@@ -3,7 +3,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className = "" }: SkeletonProps) {
-  return <div className={`animate-pulse rounded-radius-200 bg-components-fill-standard-secondary ${className}`} />;
+  return <div className={`animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary ${className}`} />;
 }
 
 export function SkeletonText({ className = "" }: SkeletonProps) {
