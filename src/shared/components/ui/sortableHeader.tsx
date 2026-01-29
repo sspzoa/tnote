@@ -41,7 +41,7 @@ export const SortableHeader = <K extends string = string>({
 
   return (
     <th
-      className={`cursor-pointer select-none px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover ${className}`}
+      className={`cursor-pointer select-none whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover ${className}`}
       onClick={() => onSort(sortKey)}>
       <span className="inline-flex items-center">
         {label}

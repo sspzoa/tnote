@@ -73,7 +73,7 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
   ];
 
   return (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
@@ -106,7 +106,7 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
               onSort={toggleSort}
             />
             {isOwner && (
-              <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+              <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
             )}
           </tr>
         </thead>
@@ -115,13 +115,13 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
             <tr
               key={admin.id}
               className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary">
                 {admin.name}
               </td>
-              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {formatPhoneNumber(admin.phone_number)}
               </td>
-              <td className="px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span
                   className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${
                     admin.role === "owner"
@@ -131,11 +131,11 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
                   {admin.role === "owner" ? "소유자" : "관리자"}
                 </span>
               </td>
-              <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {new Date(admin.created_at).toLocaleDateString("ko-KR")}
               </td>
               {isOwner && (
-                <td className="relative px-spacing-500 py-spacing-400">
+                <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
                   {admin.role !== "owner" && (
                     <>
                       <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)} />

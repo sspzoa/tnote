@@ -178,7 +178,7 @@ export default function StudentList({ students }: StudentListProps) {
   );
 
   return (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
@@ -189,7 +189,7 @@ export default function StudentList({ students }: StudentListProps) {
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               태그
             </th>
             <SortableHeader
@@ -227,7 +227,7 @@ export default function StudentList({ students }: StudentListProps) {
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
           </tr>
         </thead>
         <tbody>
@@ -240,12 +240,12 @@ export default function StudentList({ students }: StudentListProps) {
               <tr
                 key={student.id}
                 className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                <td className="px-spacing-500 py-spacing-400">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                   <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
                 </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {activeTags.length > 0 ? (
-                    <div className="flex flex-wrap items-center gap-spacing-100">
+                    <div className="flex items-center gap-spacing-100">
                       {activeTags.map((assignment) => {
                         const tag = assignment.tag;
                         if (!tag) return null;
@@ -265,10 +265,10 @@ export default function StudentList({ students }: StudentListProps) {
                     "-"
                   )}
                 </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {student.branch || "-"}
                 </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {student.birth_year && getGrade(student.birth_year) ? (
                     <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                       {getGrade(student.birth_year)}
@@ -277,17 +277,17 @@ export default function StudentList({ students }: StudentListProps) {
                     "-"
                   )}
                 </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {formatPhoneNumber(student.phone_number)}
                 </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
                 </td>
-                <td className="px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {student.school || "-"}
                 </td>
 
-                <td className="relative px-spacing-500 py-spacing-400">
+                <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
                   <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />
                   <DropdownMenu
                     isOpen={openMenuId === student.id}

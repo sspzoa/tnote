@@ -91,7 +91,7 @@ export default function RetakeList({
   };
 
   return (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full rounded-radius-400">
         <thead className="bg-components-fill-standard-secondary">
           <tr>
@@ -130,7 +130,7 @@ export default function RetakeList({
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="w-24 px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
           </tr>
         </thead>
         <tbody>
@@ -138,7 +138,7 @@ export default function RetakeList({
             <tr
               key={retake.id}
               className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <button
                   onClick={() => onViewStudent(retake.student.id)}
                   className="text-left transition-colors hover:text-core-accent">
@@ -150,13 +150,13 @@ export default function RetakeList({
                   </div>
                 </button>
               </td>
-              <td className="px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <div className="text-body text-content-standard-primary">{retake.exam.name}</div>
                 <div className="text-content-standard-secondary text-footnote">
                   {retake.exam.course.name} {retake.exam.exam_number}회차
                 </div>
               </td>
-              <td className="px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <div className="text-body text-content-standard-primary">{retake.current_scheduled_date || "-"}</div>
                 {(retake.postpone_count > 0 || retake.absent_count > 0) && (
                   <div className="mt-spacing-100 flex gap-spacing-200">
@@ -171,15 +171,15 @@ export default function RetakeList({
                   </div>
                 )}
               </td>
-              <td className="px-spacing-500 py-spacing-400">{getStatusBadge(retake.status)}</td>
-              <td className="px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">{getStatusBadge(retake.status)}</td>
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <button
                   onClick={() => onManagementStatusChange(retake)}
                   className="transition-opacity hover:opacity-70">
                   {getManagementStatusBadge(retake.management_status)}
                 </button>
               </td>
-              <td className="relative px-spacing-500 py-spacing-400">
+              <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
                 <button
                   onClick={() => setOpenMenuId(openMenuId === retake.id ? null : retake.id)}
                   className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
