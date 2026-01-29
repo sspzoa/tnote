@@ -24,6 +24,7 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <head>
         <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: 테마 FOUC 방지용 하드코딩 스크립트 - XSS 위험 없음
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("tnote-theme")||"system";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme:dark)").matches);if(d)document.documentElement.classList.add("dark")}catch(e){}})()`,
           }}
