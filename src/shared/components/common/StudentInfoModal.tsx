@@ -171,21 +171,16 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                     <div
                       key={score.id}
                       className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                      <div className="flex flex-col gap-spacing-50">
-                        <span className="font-medium text-body text-content-standard-primary">
-                          {score.exam.course.name} - {score.exam.name}
-                        </span>
-                        <span className="text-content-standard-tertiary text-footnote">
-                          {new Date(score.createdAt).toLocaleDateString("ko-KR")}
-                        </span>
-                      </div>
+                      <span className="font-medium text-body text-content-standard-primary">
+                        {score.exam.course.name} - {score.exam.name}
+                      </span>
                       <div className="flex items-center gap-spacing-200">
                         <span className="font-medium text-body text-content-standard-primary">
                           {score.score}
-                          {score.maxScore !== null && `/${score.maxScore}`}점
+                          {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
                         </span>
                         <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
-                          {score.rank}/{score.totalStudents}등
+                          {score.exam.examNumber}회차
                         </span>
                         {isPassed && (
                           <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 text-core-status-positive text-footnote">
