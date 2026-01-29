@@ -84,13 +84,29 @@ export const useExams = (courseId: string) => {
   };
 };
 
+export interface ExamExportTag {
+  id: string;
+  tag_id: string;
+  start_date: string;
+  end_date: string | null;
+  tag: {
+    id: string;
+    name: string;
+    color: string;
+    workspace: string;
+  };
+}
+
 export interface ExamExportRow {
   studentId: string;
   name: string;
+  phoneNumber: string;
   parentPhone: string;
+  school: string;
   assignmentStatus: string;
   score: number | null;
   rank: number | null;
+  tags: ExamExportTag[];
 }
 
 export interface ExamExportData {

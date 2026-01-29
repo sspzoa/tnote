@@ -52,9 +52,11 @@ export const EXAM_TEMPLATE_VARIABLES: TemplateVariable[] = [
   { key: "{이름}", description: "학생 이름" },
   { key: "{수업명}", description: "수업명" },
   { key: "{시험명}", description: "시험명" },
+  { key: "{회차}", description: "시험 회차" },
   { key: "{과제검사}", description: "과제검사 결과" },
   { key: "{점수}", description: "점수" },
   { key: "{만점}", description: "만점" },
+  { key: "{커트라인}", description: "커트라인" },
   { key: "{석차}", description: "석차" },
   { key: "{전체인원}", description: "전체 인원" },
 ];

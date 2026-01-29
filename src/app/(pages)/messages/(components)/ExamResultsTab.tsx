@@ -5,6 +5,7 @@ import { FileText } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { StudentListItem } from "@/shared/components/ui/studentList";
+import type { TagColor } from "@/shared/types";
 import {
   examMessageTemplateAtom,
   recipientTypeAtom,
@@ -33,13 +34,27 @@ export default function ExamResultsTab() {
 
   const students = useMemo(() => {
     if (!exportData?.rows) return [];
+    const cutline = exportData.exam?.cutline ?? null;
     return exportData.rows.map((row) => ({
       id: row.studentId,
       name: row.name,
-      phone_number: row.parentPhone || "",
+      phone_number: row.phoneNumber || "",
+      school: row.school || "",
       assignmentStatus: row.assignmentStatus,
       score: row.score,
       rank: row.rank,
+      isFailed: cutline !== null && row.score !== null && row.score < cutline,
+      tags: row.tags.map((t) => ({
+        id: t.id,
+        student_id: row.studentId,
+        tag_id: t.tag_id,
+        start_date: t.start_date,
+        end_date: t.end_date,
+        tag: {
+          ...t.tag,
+          color: t.tag.color as TagColor,
+        },
+      })),
     }));
   }, [exportData]);
 
@@ -78,9 +93,11 @@ export default function ExamResultsTab() {
       .replace(/{이름}/g, previewStudent.name)
       .replace(/{수업명}/g, selectedCourse.name)
       .replace(/{시험명}/g, selectedExam.name)
+      .replace(/{회차}/g, selectedExam.exam_number?.toString() || "-")
       .replace(/{과제검사}/g, previewStudent.assignmentStatus || "-")
       .replace(/{점수}/g, previewStudent.score?.toString() || "-")
       .replace(/{만점}/g, exportData?.exam?.maxScore?.toString() || "100")
+      .replace(/{커트라인}/g, exportData?.exam?.cutline?.toString() || "-")
       .replace(/{석차}/g, previewStudent.rank?.toString() || "-")
       .replace(/{전체인원}/g, students.length.toString());
   }, [messageTemplate, previewStudent, selectedExam, selectedCourse, exportData, students.length]);
@@ -190,19 +207,29 @@ export default function ExamResultsTab() {
                 student={student}
                 selected={selectedIds.has(student.id)}
                 onToggle={() => handleToggleStudent(student.id)}
-                badge={
-                  <span
-                    className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
-                      student.assignmentStatus === "완료"
-                        ? "bg-solid-translucent-green text-core-status-positive"
-                        : student.assignmentStatus === "미흡"
-                          ? "bg-solid-translucent-yellow text-core-status-warning"
-                          : "bg-solid-translucent-red text-core-status-negative"
-                    }`}>
-                    {student.assignmentStatus || "-"}
-                  </span>
+                rightContent={
+                  <div className="flex items-center gap-spacing-200">
+                    <span
+                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
+                        student.isFailed
+                          ? "bg-solid-translucent-red text-core-status-negative"
+                          : "bg-solid-translucent-green text-core-status-positive"
+                      }`}>
+                      {student.score ?? "-"}/{exportData?.exam?.maxScore ?? "-"}점 · {student.rank ?? "-"}/
+                      {students.length}등
+                    </span>
+                    <span
+                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
+                        student.assignmentStatus === "완료"
+                          ? "bg-solid-translucent-green text-core-status-positive"
+                          : student.assignmentStatus === "미흡"
+                            ? "bg-solid-translucent-yellow text-core-status-warning"
+                            : "bg-solid-translucent-red text-core-status-negative"
+                      }`}>
+                      {student.assignmentStatus}
+                    </span>
+                  </div>
                 }
-                extraInfo={` · ${student.score !== null ? `${student.score}점` : "-"} / ${student.rank !== null ? `${student.rank}등` : "-"}`}
               />
             )),
         }}
@@ -232,9 +259,11 @@ export default function ExamResultsTab() {
             { label: "이름", value: previewStudent?.name },
             { label: "수업", value: selectedCourse?.name },
             { label: "시험", value: selectedExam?.name },
+            { label: "회차", value: selectedExam?.exam_number },
             { label: "과제", value: previewStudent?.assignmentStatus },
             { label: "점수", value: previewStudent?.score },
             { label: "만점", value: exportData?.exam?.maxScore || 100 },
+            { label: "커트라인", value: exportData?.exam?.cutline },
             { label: "석차", value: previewStudent?.rank },
             { label: "전체", value: `${students.length}명` },
           ],
