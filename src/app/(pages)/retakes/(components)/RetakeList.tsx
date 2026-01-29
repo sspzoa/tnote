@@ -1,7 +1,13 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
+import {
+  DropdownMenu,
+  type DropdownMenuItem,
+  type MenuPosition,
+  MoreOptionsButton,
+} from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -33,6 +39,34 @@ export default function RetakeList({
   onEditDate,
 }: RetakeListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
+
+  const getMenuItems = useCallback(
+    (retake: Retake): DropdownMenuItem[] => {
+      const items: DropdownMenuItem[] = [];
+
+      if (retake.status !== "completed") {
+        items.push({ label: "연기", onClick: () => onPostpone(retake) });
+        if (retake.status === "pending") {
+          items.push({ label: "결석", onClick: () => onAbsent(retake) });
+        }
+        items.push({ label: "완료", onClick: () => onComplete(retake), dividerAfter: true });
+      }
+
+      items.push({ label: "이력 보기", onClick: () => onViewHistory(retake) });
+
+      if (retake.status !== "completed") {
+        items.push({ label: "수정", onClick: () => onEditDate(retake), dividerAfter: true });
+      } else {
+        items[items.length - 1].dividerAfter = true;
+      }
+
+      items.push({ label: "삭제", onClick: () => onDelete(retake), variant: "danger" });
+
+      return items;
+    },
+    [onPostpone, onAbsent, onComplete, onViewHistory, onEditDate, onDelete],
+  );
 
   const comparators = useMemo(
     () => ({
@@ -179,84 +213,34 @@ export default function RetakeList({
                   {getManagementStatusBadge(retake.management_status)}
                 </button>
               </td>
-              <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
-                <button
-                  onClick={() => setOpenMenuId(openMenuId === retake.id ? null : retake.id)}
-                  className="rounded-radius-200 px-spacing-300 py-spacing-200 transition-colors hover:bg-components-fill-standard-secondary">
-                  <svg className="h-5 w-5 text-content-standard-tertiary" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-                {openMenuId === retake.id && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                    <div className="absolute top-full right-0 z-20 mt-spacing-100 min-w-[140px] rounded-radius-300 border border-line-outline bg-components-fill-standard-primary py-spacing-200">
-                      {retake.status !== "completed" && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setOpenMenuId(null);
-                              onPostpone(retake);
-                            }}
-                            className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                            연기
-                          </button>
-                          {retake.status === "pending" && (
-                            <button
-                              onClick={() => {
-                                setOpenMenuId(null);
-                                onAbsent(retake);
-                              }}
-                              className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                              결석
-                            </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              setOpenMenuId(null);
-                              onComplete(retake);
-                            }}
-                            className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                            완료
-                          </button>
-                          <div className="my-spacing-100 border-line-divider border-t" />
-                        </>
-                      )}
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onViewHistory(retake);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                        이력 보기
-                      </button>
-                      {retake.status !== "completed" && (
-                        <button
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            onEditDate(retake);
-                          }}
-                          className="w-full px-spacing-400 py-spacing-200 text-left text-body text-content-standard-primary transition-colors hover:bg-components-interactive-hover">
-                          수정
-                        </button>
-                      )}
-                      <div className="my-spacing-100 border-line-divider border-t" />
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onDelete(retake);
-                        }}
-                        className="w-full px-spacing-400 py-spacing-200 text-left text-body text-core-status-negative transition-colors hover:bg-solid-translucent-red">
-                        삭제
-                      </button>
-                    </div>
-                  </>
-                )}
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                <MoreOptionsButton
+                  onClick={(pos) => {
+                    if (openMenuId === retake.id) {
+                      setOpenMenuId(null);
+                      setMenuPosition(null);
+                    } else {
+                      setOpenMenuId(retake.id);
+                      setMenuPosition(pos);
+                    }
+                  }}
+                />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {openMenuId && (
+        <DropdownMenu
+          isOpen={true}
+          onClose={() => {
+            setOpenMenuId(null);
+            setMenuPosition(null);
+          }}
+          items={getMenuItems(sortedData.find((r) => r.id === openMenuId)!)}
+          position={menuPosition}
+        />
+      )}
     </div>
   );
 }

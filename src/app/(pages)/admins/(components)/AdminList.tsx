@@ -1,6 +1,11 @@
 import { useAtom } from "jotai";
-import { useMemo } from "react";
-import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { useMemo, useState } from "react";
+import {
+  DropdownMenu,
+  type DropdownMenuItem,
+  type MenuPosition,
+  MoreOptionsButton,
+} from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -17,6 +22,7 @@ type AdminSortKey = "name" | "phone" | "role" | "createdAt";
 
 export default function AdminList({ admins, isOwner }: AdminListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const { deleteAdmin } = useAdminDelete();
   const { resetPassword } = useAdminResetPassword();
 
@@ -135,16 +141,19 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
                 {new Date(admin.created_at).toLocaleDateString("ko-KR")}
               </td>
               {isOwner && (
-                <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                   {admin.role !== "owner" && (
-                    <>
-                      <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === admin.id ? null : admin.id)} />
-                      <DropdownMenu
-                        isOpen={openMenuId === admin.id}
-                        onClose={() => setOpenMenuId(null)}
-                        items={getMenuItems(admin)}
-                      />
-                    </>
+                    <MoreOptionsButton
+                      onClick={(pos) => {
+                        if (openMenuId === admin.id) {
+                          setOpenMenuId(null);
+                          setMenuPosition(null);
+                        } else {
+                          setOpenMenuId(admin.id);
+                          setMenuPosition(pos);
+                        }
+                      }}
+                    />
                   )}
                 </td>
               )}
@@ -152,6 +161,17 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
           ))}
         </tbody>
       </table>
+      {openMenuId && (
+        <DropdownMenu
+          isOpen={true}
+          onClose={() => {
+            setOpenMenuId(null);
+            setMenuPosition(null);
+          }}
+          items={getMenuItems(sortedData.find((a) => a.id === openMenuId)!)}
+          position={menuPosition}
+        />
+      )}
     </div>
   );
 }

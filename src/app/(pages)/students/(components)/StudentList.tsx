@@ -1,6 +1,11 @@
 import { useAtom } from "jotai";
-import { useCallback, useMemo } from "react";
-import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { useCallback, useMemo, useState } from "react";
+import {
+  DropdownMenu,
+  type DropdownMenuItem,
+  type MenuPosition,
+  MoreOptionsButton,
+} from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -44,6 +49,7 @@ type StudentSortKey = "name" | "branch" | "grade" | "phone" | "parentPhone" | "s
 
 export default function StudentList({ students }: StudentListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const [, setSelectedStudent] = useAtom(selectedStudentAtom);
   const [, setShowEditModal] = useAtom(showEditModalAtom);
   const [, setShowConsultationModal] = useAtom(showConsultationModalAtom);
@@ -287,12 +293,17 @@ export default function StudentList({ students }: StudentListProps) {
                   {student.school || "-"}
                 </td>
 
-                <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
-                  <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === student.id ? null : student.id)} />
-                  <DropdownMenu
-                    isOpen={openMenuId === student.id}
-                    onClose={() => setOpenMenuId(null)}
-                    items={getMenuItems(student)}
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                  <MoreOptionsButton
+                    onClick={(pos) => {
+                      if (openMenuId === student.id) {
+                        setOpenMenuId(null);
+                        setMenuPosition(null);
+                      } else {
+                        setOpenMenuId(student.id);
+                        setMenuPosition(pos);
+                      }
+                    }}
                   />
                 </td>
               </tr>
@@ -300,6 +311,17 @@ export default function StudentList({ students }: StudentListProps) {
           })}
         </tbody>
       </table>
+      {openMenuId && (
+        <DropdownMenu
+          isOpen={true}
+          onClose={() => {
+            setOpenMenuId(null);
+            setMenuPosition(null);
+          }}
+          items={getMenuItems(sortedData.find((s) => s.id === openMenuId)!)}
+          position={menuPosition}
+        />
+      )}
     </div>
   );
 }

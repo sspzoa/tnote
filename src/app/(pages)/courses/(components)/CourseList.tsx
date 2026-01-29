@@ -1,7 +1,12 @@
 import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
-import { useMemo } from "react";
-import { DropdownMenu, type DropdownMenuItem, MoreOptionsButton } from "@/shared/components/ui/dropdownMenu";
+import { useMemo, useState } from "react";
+import {
+  DropdownMenu,
+  type DropdownMenuItem,
+  type MenuPosition,
+  MoreOptionsButton,
+} from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
@@ -17,6 +22,7 @@ type CourseSortKey = "name" | "studentCount";
 
 export default function CourseList({ courses }: CourseListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const setSelectedCourse = useSetAtom(selectedCourseAtom);
   const setShowEditModal = useSetAtom(showEditModalAtom);
   const setShowEnrollModal = useSetAtom(showEnrollModalAtom);
@@ -128,18 +134,34 @@ export default function CourseList({ courses }: CourseListProps) {
                   </button>
                 </div>
               </td>
-              <td className="relative whitespace-nowrap px-spacing-500 py-spacing-400">
-                <MoreOptionsButton onClick={() => setOpenMenuId(openMenuId === course.id ? null : course.id)} />
-                <DropdownMenu
-                  isOpen={openMenuId === course.id}
-                  onClose={() => setOpenMenuId(null)}
-                  items={getMenuItems(course)}
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                <MoreOptionsButton
+                  onClick={(pos) => {
+                    if (openMenuId === course.id) {
+                      setOpenMenuId(null);
+                      setMenuPosition(null);
+                    } else {
+                      setOpenMenuId(course.id);
+                      setMenuPosition(pos);
+                    }
+                  }}
                 />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {openMenuId && (
+        <DropdownMenu
+          isOpen={true}
+          onClose={() => {
+            setOpenMenuId(null);
+            setMenuPosition(null);
+          }}
+          items={getMenuItems(sortedData.find((c) => c.id === openMenuId)!)}
+          position={menuPosition}
+        />
+      )}
     </div>
   );
 }
