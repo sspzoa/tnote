@@ -174,9 +174,13 @@ export default function MessagesPage() {
               className="flex items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
               <Phone className="size-4" />
               <span className="hidden sm:inline">발신번호:</span>
-              <span className={senderPhoneNumber ? "text-core-accent" : "text-core-status-negative"}>
-                {isSenderPhoneLoading ? "..." : formatPhoneNumberDisplay(senderPhoneNumber)}
-              </span>
+              {isSenderPhoneLoading ? (
+                <Skeleton className="h-5 w-28" />
+              ) : (
+                <span className={senderPhoneNumber ? "text-core-accent" : "text-core-status-negative"}>
+                  {formatPhoneNumberDisplay(senderPhoneNumber)}
+                </span>
+              )}
               <Settings className="size-3 text-content-standard-tertiary" />
             </button>
             <button
