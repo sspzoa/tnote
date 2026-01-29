@@ -231,7 +231,6 @@ export default function Sidebar() {
   };
 
   const isAdmin = userInfo?.role === "admin" || userInfo?.role === "owner";
-  const isOwner = userInfo?.role === "owner";
   const studentMenuItems = [
     {
       href: "/calendar",
@@ -243,9 +242,7 @@ export default function Sidebar() {
       activeIndicator: "bg-solid-red",
     },
   ];
-  const allMenuItems = isAdmin
-    ? [...menuItems, ...adminMenuItems, ...(isOwner ? ownerMenuItems : [])]
-    : studentMenuItems;
+  const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems, ...ownerMenuItems] : studentMenuItems;
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
