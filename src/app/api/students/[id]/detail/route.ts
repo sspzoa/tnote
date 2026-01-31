@@ -32,29 +32,37 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     tag: { id: string; name: string; color: string; workspace: string };
   }
 
-  const [tagResult, enrollmentResult, examScoreResult, clinicResult, assignmentResult, retakeResult] =
-    await Promise.all([
-      supabase
-        .from("StudentTagAssignments")
-        .select(`
+  const [
+    tagResult,
+    enrollmentResult,
+    examScoreResult,
+    clinicResult,
+    assignmentResult,
+    retakeResult,
+    consultationResult,
+    messageResult,
+  ] = await Promise.all([
+    supabase
+      .from("StudentTagAssignments")
+      .select(`
           id,
           start_date,
           end_date,
           tag:StudentTags!inner(id, name, color, workspace)
         `)
-        .eq("student_id", studentId)
-        .eq("tag.workspace", session.workspace),
-      supabase
-        .from("CourseEnrollments")
-        .select(`
+      .eq("student_id", studentId)
+      .eq("tag.workspace", session.workspace),
+    supabase
+      .from("CourseEnrollments")
+      .select(`
           enrolled_at,
           course:Courses!inner(id, name, start_date, end_date, days_of_week)
         `)
-        .eq("student_id", studentId)
-        .eq("course.workspace", session.workspace),
-      supabase
-        .from("ExamScores")
-        .select(`
+      .eq("student_id", studentId)
+      .eq("course.workspace", session.workspace),
+    supabase
+      .from("ExamScores")
+      .select(`
           id,
           score,
           created_at,
@@ -67,23 +75,22 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
             course:Courses!inner(id, name, workspace)
           )
         `)
-        .eq("student_id", studentId)
-        .eq("exam.course.workspace", session.workspace),
-      supabase
-        .from("ClinicAttendance")
-        .select(`
+      .eq("student_id", studentId)
+      .eq("exam.course.workspace", session.workspace),
+    supabase
+      .from("ClinicAttendance")
+      .select(`
           id,
           attendance_date,
           note,
           clinic:Clinics!inner(id, name, workspace)
         `)
-        .eq("student_id", studentId)
-        .eq("clinic.workspace", session.workspace)
-        .order("attendance_date", { ascending: false })
-        .limit(10),
-      supabase
-        .from("CourseAssignments")
-        .select(`
+      .eq("student_id", studentId)
+      .eq("clinic.workspace", session.workspace)
+      .order("attendance_date", { ascending: false }),
+    supabase
+      .from("CourseAssignments")
+      .select(`
           id,
           status,
           note,
@@ -95,11 +102,11 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
             course:Courses!inner(id, name, workspace)
           )
         `)
-        .eq("student_id", studentId)
-        .eq("exam.course.workspace", session.workspace),
-      supabase
-        .from("RetakeAssignments")
-        .select(`
+      .eq("student_id", studentId)
+      .eq("exam.course.workspace", session.workspace),
+    supabase
+      .from("RetakeAssignments")
+      .select(`
           id,
           status,
           management_status,
@@ -113,9 +120,36 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
             course:Courses!inner(id, name, workspace)
           )
         `)
-        .eq("student_id", studentId)
-        .eq("exam.course.workspace", session.workspace),
-    ]);
+      .eq("student_id", studentId)
+      .eq("exam.course.workspace", session.workspace),
+    supabase
+      .from("ConsultationLogs")
+      .select(`
+          id,
+          title,
+          content,
+          created_at,
+          creator:Users!ConsultationLogs_created_by_fkey(id, name)
+        `)
+      .eq("student_id", studentId)
+      .eq("workspace", session.workspace)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("MessageHistory")
+      .select(`
+          id,
+          message_type,
+          recipient_type,
+          recipient_phone,
+          message_content,
+          is_success,
+          sent_at,
+          sender:Users!MessageHistory_sent_by_fkey(id, name)
+        `)
+      .eq("student_id", studentId)
+      .eq("workspace", session.workspace)
+      .order("sent_at", { ascending: false }),
+  ]);
 
   if (tagResult.error) throw tagResult.error;
   if (enrollmentResult.error) throw enrollmentResult.error;
@@ -123,6 +157,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   if (clinicResult.error) throw clinicResult.error;
   if (assignmentResult.error) throw assignmentResult.error;
   if (retakeResult.error) throw retakeResult.error;
+  if (consultationResult.error) throw consultationResult.error;
+  if (messageResult.error) throw messageResult.error;
 
   const tags = ((tagResult.data as unknown as TagAssignmentRow[]) || []).map((assignment) => ({
     id: assignment.id,
@@ -189,8 +225,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         },
       };
     })
-    .sort((a, b) => b.exam.examNumber - a.exam.examNumber)
-    .slice(0, 10);
+    .sort((a, b) => b.exam.examNumber - a.exam.examNumber);
 
   const clinicHistory = ((clinicResult.data as unknown as StudentDetailClinicAttendance[]) || []).map((record) => ({
     id: record.id,
@@ -217,8 +252,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         },
       },
     }))
-    .sort((a, b) => b.exam.examNumber - a.exam.examNumber)
-    .slice(0, 10);
+    .sort((a, b) => b.exam.examNumber - a.exam.examNumber);
 
   const retakeHistory = ((retakeResult.data as unknown as StudentDetailRetake[]) || [])
     .map((record) => ({
@@ -243,8 +277,45 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       if (!a.scheduledDate) return 1;
       if (!b.scheduledDate) return -1;
       return new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime();
-    })
-    .slice(0, 10);
+    });
+
+  interface ConsultationRow {
+    id: string;
+    title: string;
+    content: string;
+    created_at: string;
+    creator: { id: string; name: string } | null;
+  }
+
+  const consultationHistory = ((consultationResult.data as unknown as ConsultationRow[]) || []).map((record) => ({
+    id: record.id,
+    title: record.title,
+    content: record.content,
+    createdAt: record.created_at,
+    creator: record.creator,
+  }));
+
+  interface MessageRow {
+    id: string;
+    message_type: string;
+    recipient_type: string;
+    recipient_phone: string;
+    message_content: string;
+    is_success: boolean;
+    sent_at: string;
+    sender: { id: string; name: string } | null;
+  }
+
+  const messageHistory = ((messageResult.data as unknown as MessageRow[]) || []).map((record) => ({
+    id: record.id,
+    messageType: record.message_type,
+    recipientType: record.recipient_type,
+    recipientPhone: record.recipient_phone,
+    messageContent: record.message_content,
+    isSuccess: record.is_success,
+    sentAt: record.sent_at,
+    sender: record.sender,
+  }));
 
   return NextResponse.json({
     data: {
@@ -263,6 +334,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       clinicHistory,
       assignmentHistory,
       retakeHistory,
+      consultationHistory,
+      messageHistory,
     },
   });
 };

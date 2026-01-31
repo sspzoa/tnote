@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
@@ -51,9 +52,16 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
       title={studentDetail?.student.name || "학생 정보"}
       subtitle="학생 상세 정보"
       footer={
-        <Button variant="secondary" onClick={onClose} className="flex-1">
-          닫기
-        </Button>
+        <div className="flex w-full gap-spacing-300">
+          <Button variant="secondary" onClick={onClose} className="flex-1">
+            닫기
+          </Button>
+          {studentDetail && (
+            <Link href={`/students/${studentDetail.student.id}`} className="flex-1" onClick={onClose}>
+              <Button className="w-full">상세 페이지</Button>
+            </Link>
+          )}
+        </div>
       }>
       {isLoading ? (
         <StudentInfoSkeleton />

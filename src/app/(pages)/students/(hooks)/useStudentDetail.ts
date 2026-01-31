@@ -73,6 +73,25 @@ interface RetakeHistoryInfo {
   };
 }
 
+interface ConsultationHistoryInfo {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  creator: { id: string; name: string } | null;
+}
+
+interface MessageHistoryInfo {
+  id: string;
+  messageType: string;
+  recipientType: string;
+  recipientPhone: string;
+  messageContent: string;
+  isSuccess: boolean;
+  sentAt: string;
+  sender: { id: string; name: string } | null;
+}
+
 interface TagInfo {
   id: string;
   name: string;
@@ -93,7 +112,6 @@ interface StudentInfo {
   parentPhoneNumber: string | null;
   school: string | null;
   birthYear: number | null;
-  isFavorite: boolean;
   createdAt: string;
   tags: TagAssignmentInfo[];
 }
@@ -105,6 +123,8 @@ export interface StudentDetail {
   clinicHistory: ClinicHistoryInfo[];
   assignmentHistory: AssignmentHistoryInfo[];
   retakeHistory: RetakeHistoryInfo[];
+  consultationHistory: ConsultationHistoryInfo[];
+  messageHistory: MessageHistoryInfo[];
 }
 
 export const useStudentDetail = (studentId: string | null) => {
