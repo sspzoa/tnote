@@ -135,18 +135,20 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 수강 중인 수업이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
                 {studentDetail.courses.map((course) => (
                   <div
                     key={course.id}
-                    className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex flex-col gap-spacing-50">
-                      <span className="font-medium text-body text-content-standard-primary">{course.name}</span>
+                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                      <span className="truncate font-medium text-body text-content-standard-primary">
+                        {course.name}
+                      </span>
                       <span className="text-content-standard-tertiary text-footnote">
                         등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
                       </span>
                     </div>
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                    <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
                       {formatDaysOfWeek(course.days_of_week)}
                     </span>
                   </div>
@@ -162,7 +164,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 시험 성적이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
                 {studentDetail.examScores.map((score) => {
                   const isPassed = score.cutline !== null && score.score >= score.cutline;
                   const isFailed = score.cutline !== null && score.score < score.cutline;
@@ -170,11 +172,11 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                   return (
                     <div
                       key={score.id}
-                      className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                      <span className="font-medium text-body text-content-standard-primary">
+                      className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                      <span className="min-w-0 flex-1 truncate font-medium text-body text-content-standard-primary">
                         {score.exam.course.name} - {score.exam.name}
                       </span>
-                      <div className="flex items-center gap-spacing-200">
+                      <div className="flex shrink-0 items-center gap-spacing-200">
                         <span className="font-medium text-body text-content-standard-primary">
                           {score.score}
                           {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
@@ -207,20 +209,20 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 과제 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
                 {studentDetail.assignmentHistory.map((assignment) => (
                   <div
                     key={assignment.id}
-                    className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex flex-col gap-spacing-50">
-                      <span className="font-medium text-body text-content-standard-primary">
+                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                      <span className="truncate font-medium text-body text-content-standard-primary">
                         {assignment.exam.course.name} - {assignment.exam.name}
                       </span>
                       {assignment.note && (
-                        <span className="text-content-standard-tertiary text-footnote">{assignment.note}</span>
+                        <span className="truncate text-content-standard-tertiary text-footnote">{assignment.note}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-spacing-200">
+                    <div className="flex shrink-0 items-center gap-spacing-200">
                       <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
                         {assignment.exam.examNumber}회차
                       </span>
@@ -248,18 +250,20 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 클리닉 출석 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
                 {studentDetail.clinicHistory.map((history) => (
                   <div
                     key={history.id}
-                    className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex flex-col gap-spacing-50">
-                      <span className="font-medium text-body text-content-standard-primary">{history.clinic.name}</span>
+                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                      <span className="truncate font-medium text-body text-content-standard-primary">
+                        {history.clinic.name}
+                      </span>
                       {history.note && (
-                        <span className="text-content-standard-tertiary text-footnote">{history.note}</span>
+                        <span className="truncate text-content-standard-tertiary text-footnote">{history.note}</span>
                       )}
                     </div>
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                    <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
                       {new Date(history.attendanceDate).toLocaleDateString("ko-KR")}
                     </span>
                   </div>
@@ -275,13 +279,13 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 재시험 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider overflow-hidden rounded-radius-400 border border-line-outline">
+              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
                 {studentDetail.retakeHistory.map((retake) => (
                   <div
                     key={retake.id}
-                    className="flex items-center justify-between bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex flex-col gap-spacing-50">
-                      <span className="font-medium text-body text-content-standard-primary">
+                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                      <span className="truncate font-medium text-body text-content-standard-primary">
                         {retake.exam.course.name} - {retake.exam.name}
                       </span>
                       <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
@@ -303,7 +307,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                       </div>
                     </div>
                     <span
-                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
+                      className={`shrink-0 rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
                         retake.status === "completed"
                           ? "bg-solid-translucent-green text-core-status-positive"
                           : retake.status === "absent"

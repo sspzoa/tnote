@@ -72,6 +72,8 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       query = query.eq("course_id", courseId);
     }
 
+    query = query.order("exam_number", { ascending: true });
+
     const { data, error } = await query;
 
     if (error) throw error;
@@ -98,6 +100,8 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   if (courseId) {
     query = query.eq("course_id", courseId);
   }
+
+  query = query.order("exam_number", { ascending: true });
 
   const { data, error } = await query;
 

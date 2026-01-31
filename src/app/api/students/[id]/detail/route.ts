@@ -68,9 +68,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
           )
         `)
         .eq("student_id", studentId)
-        .eq("exam.course.workspace", session.workspace)
-        .order("created_at", { ascending: false })
-        .limit(5),
+        .eq("exam.course.workspace", session.workspace),
       supabase
         .from("ClinicAttendance")
         .select(`
@@ -98,9 +96,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
           )
         `)
         .eq("student_id", studentId)
-        .eq("exam.course.workspace", session.workspace)
-        .order("updated_at", { ascending: false })
-        .limit(10),
+        .eq("exam.course.workspace", session.workspace),
       supabase
         .from("RetakeAssignments")
         .select(`
@@ -118,9 +114,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
           )
         `)
         .eq("student_id", studentId)
-        .eq("exam.course.workspace", session.workspace)
-        .order("current_scheduled_date", { ascending: true, nullsFirst: false })
-        .limit(10),
+        .eq("exam.course.workspace", session.workspace),
     ]);
 
   if (tagResult.error) throw tagResult.error;
@@ -173,27 +167,30 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     }
   }
 
-  const scoresWithRank = examScores.map((scoreData) => {
-    const rankInfo = rankMap.get(scoreData.id) || { rank: 1, total: 1 };
-    return {
-      id: scoreData.id,
-      score: scoreData.score,
-      maxScore: scoreData.exam.max_score,
-      cutline: scoreData.exam.cutline,
-      rank: rankInfo.rank,
-      totalStudents: rankInfo.total,
-      createdAt: scoreData.created_at,
-      exam: {
-        id: scoreData.exam.id,
-        name: scoreData.exam.name,
-        examNumber: scoreData.exam.exam_number,
-        course: {
-          id: scoreData.exam.course.id,
-          name: scoreData.exam.course.name,
+  const scoresWithRank = examScores
+    .map((scoreData) => {
+      const rankInfo = rankMap.get(scoreData.id) || { rank: 1, total: 1 };
+      return {
+        id: scoreData.id,
+        score: scoreData.score,
+        maxScore: scoreData.exam.max_score,
+        cutline: scoreData.exam.cutline,
+        rank: rankInfo.rank,
+        totalStudents: rankInfo.total,
+        createdAt: scoreData.created_at,
+        exam: {
+          id: scoreData.exam.id,
+          name: scoreData.exam.name,
+          examNumber: scoreData.exam.exam_number,
+          course: {
+            id: scoreData.exam.course.id,
+            name: scoreData.exam.course.name,
+          },
         },
-      },
-    };
-  });
+      };
+    })
+    .sort((a, b) => b.exam.examNumber - a.exam.examNumber)
+    .slice(0, 10);
 
   const clinicHistory = ((clinicResult.data as unknown as StudentDetailClinicAttendance[]) || []).map((record) => ({
     id: record.id,
@@ -205,38 +202,49 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     },
   }));
 
-  const assignmentHistory = ((assignmentResult.data as unknown as StudentDetailAssignment[]) || []).map((record) => ({
-    id: record.id,
-    status: record.status,
-    note: record.note,
-    exam: {
-      id: record.exam.id,
-      name: record.exam.name,
-      examNumber: record.exam.exam_number,
-      course: {
-        id: record.exam.course.id,
-        name: record.exam.course.name,
+  const assignmentHistory = ((assignmentResult.data as unknown as StudentDetailAssignment[]) || [])
+    .map((record) => ({
+      id: record.id,
+      status: record.status,
+      note: record.note,
+      exam: {
+        id: record.exam.id,
+        name: record.exam.name,
+        examNumber: record.exam.exam_number,
+        course: {
+          id: record.exam.course.id,
+          name: record.exam.course.name,
+        },
       },
-    },
-  }));
+    }))
+    .sort((a, b) => b.exam.examNumber - a.exam.examNumber)
+    .slice(0, 10);
 
-  const retakeHistory = ((retakeResult.data as unknown as StudentDetailRetake[]) || []).map((record) => ({
-    id: record.id,
-    status: record.status,
-    managementStatus: record.management_status,
-    scheduledDate: record.current_scheduled_date,
-    postponeCount: record.postpone_count,
-    absentCount: record.absent_count,
-    exam: {
-      id: record.exam.id,
-      name: record.exam.name,
-      examNumber: record.exam.exam_number,
-      course: {
-        id: record.exam.course.id,
-        name: record.exam.course.name,
+  const retakeHistory = ((retakeResult.data as unknown as StudentDetailRetake[]) || [])
+    .map((record) => ({
+      id: record.id,
+      status: record.status,
+      managementStatus: record.management_status,
+      scheduledDate: record.current_scheduled_date,
+      postponeCount: record.postpone_count,
+      absentCount: record.absent_count,
+      exam: {
+        id: record.exam.id,
+        name: record.exam.name,
+        examNumber: record.exam.exam_number,
+        course: {
+          id: record.exam.course.id,
+          name: record.exam.course.name,
+        },
       },
-    },
-  }));
+    }))
+    .sort((a, b) => {
+      if (!a.scheduledDate && !b.scheduledDate) return 0;
+      if (!a.scheduledDate) return 1;
+      if (!b.scheduledDate) return -1;
+      return new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime();
+    })
+    .slice(0, 10);
 
   return NextResponse.json({
     data: {
