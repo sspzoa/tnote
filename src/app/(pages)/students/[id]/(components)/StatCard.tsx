@@ -9,7 +9,7 @@ interface StatCardProps {
 }
 
 export const StatCard = ({ icon: Icon, label, value, subValue, colorClass }: StatCardProps) => (
-  <div className="group relative overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all hover:border-line-outline-strong hover:shadow-sm">
+  <div className="group relative overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all hover:border-line-outline-strong">
     <div className={`-right-4 -top-4 absolute h-24 w-24 rounded-full opacity-10 ${colorClass.split(" ")[0]}`} />
 
     <div className="relative flex flex-col gap-spacing-300">
