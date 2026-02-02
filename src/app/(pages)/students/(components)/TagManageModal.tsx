@@ -12,11 +12,13 @@ import { TagListSkeleton } from "./TagListSkeleton";
 interface TagFormState {
   name: string;
   color: TagColor;
+  hiddenByDefault: boolean;
 }
 
 const initialFormState: TagFormState = {
   name: "",
   color: "blue",
+  hiddenByDefault: false,
 };
 
 export default function TagManageModal() {
@@ -35,7 +37,7 @@ export default function TagManageModal() {
     if (!form.name.trim()) return;
 
     try {
-      await createTag({ name: form.name.trim(), color: form.color });
+      await createTag({ name: form.name.trim(), color: form.color, hiddenByDefault: form.hiddenByDefault });
       alert("태그가 추가되었습니다.");
       setForm(initialFormState);
     } catch (error) {
@@ -45,7 +47,7 @@ export default function TagManageModal() {
 
   const handleStartEdit = (tag: StudentTag) => {
     setEditingTag(tag);
-    setForm({ name: tag.name, color: tag.color });
+    setForm({ name: tag.name, color: tag.color, hiddenByDefault: tag.hidden_by_default });
   };
 
   const handleCancelEdit = () => {
@@ -57,7 +59,12 @@ export default function TagManageModal() {
     if (!editingTag || !form.name.trim()) return;
 
     try {
-      await updateTag({ id: editingTag.id, name: form.name.trim(), color: form.color });
+      await updateTag({
+        id: editingTag.id,
+        name: form.name.trim(),
+        color: form.color,
+        hiddenByDefault: form.hiddenByDefault,
+      });
       alert("태그가 수정되었습니다.");
       setEditingTag(null);
       setForm(initialFormState);
@@ -134,6 +141,19 @@ export default function TagManageModal() {
             </div>
           </div>
 
+          <label className="flex cursor-pointer items-center gap-spacing-300">
+            <input
+              type="checkbox"
+              checked={form.hiddenByDefault}
+              onChange={(e) => setForm({ ...form, hiddenByDefault: e.target.checked })}
+              className="size-5 cursor-pointer rounded-radius-200 border-line-outline accent-core-accent"
+            />
+            <span className="font-medium text-body text-content-standard-primary">기본으로 숨김</span>
+            <span className="text-content-standard-tertiary text-footnote">
+              (이 태그가 있는 학생은 기본적으로 목록에서 숨겨집니다)
+            </span>
+          </label>
+
           <div className="flex gap-spacing-300">
             {editingTag ? (
               <>
@@ -188,6 +208,9 @@ export default function TagManageModal() {
                       className={`inline-flex items-center rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-label ${TAG_COLOR_STYLES[tag.color].bg} ${TAG_COLOR_STYLES[tag.color].text}`}>
                       {tag.name}
                     </span>
+                    {tag.hidden_by_default && (
+                      <span className="text-content-standard-tertiary text-footnote">(기본 숨김)</span>
+                    )}
                   </div>
                   <div className="flex gap-spacing-200">
                     <Button

@@ -53,6 +53,7 @@ export default function ExamResultsTab() {
         tag: {
           ...t.tag,
           color: t.tag.color as TagColor,
+          hidden_by_default: t.tag.hidden_by_default ?? false,
         },
       })),
     }));

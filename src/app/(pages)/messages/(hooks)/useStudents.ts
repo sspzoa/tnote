@@ -107,6 +107,7 @@ export interface ExamExportTag {
     name: string;
     color: string;
     workspace: string;
+    hidden_by_default: boolean;
   };
 }
 

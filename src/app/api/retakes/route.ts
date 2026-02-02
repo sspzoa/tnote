@@ -82,7 +82,10 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     .select(`
       *,
       exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name, workspace)),
-      student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace, parent_phone_number)
+      student:Users!RetakeAssignments_student_id_fkey!inner(
+        id, phone_number, name, school, workspace, parent_phone_number,
+        tags:StudentTagAssignments(id, tag_id, start_date, end_date, tag:StudentTags(id, name, color))
+      )
     `)
     .eq("student.workspace", session.workspace);
 

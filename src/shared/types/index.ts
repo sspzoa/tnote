@@ -16,6 +16,7 @@ export interface StudentTag {
   workspace: string;
   name: string;
   color: TagColor;
+  hidden_by_default: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -97,6 +98,7 @@ export interface RetakeStudent {
   phone_number: string;
   name: string;
   school: string;
+  tags?: StudentTagAssignment[];
 }
 
 export interface Retake {

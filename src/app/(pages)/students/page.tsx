@@ -53,13 +53,24 @@ export default function StudentsPage() {
   const [selectedConsultation, setSelectedConsultation] = useState<ConsultationWithDetails | null>(null);
   const [showConsultationPanel, setShowConsultationPanel] = useState(false);
 
+  const hiddenTagIds = new Set(tags.filter((tag) => tag.hidden_by_default).map((tag) => tag.id));
+
   const filteredStudents = students
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .filter((student) => {
-      if (selectedTagIds.size === 0) return true;
       const activeTags = (student.tags || []).filter((assignment) =>
         isTagActive(assignment.start_date, assignment.end_date),
       );
+
+      const hasHiddenTag = activeTags.some((assignment) => hiddenTagIds.has(assignment.tag_id));
+      if (hasHiddenTag) {
+        const selectedHiddenTag = activeTags.find(
+          (assignment) => hiddenTagIds.has(assignment.tag_id) && selectedTagIds.has(assignment.tag_id),
+        );
+        if (!selectedHiddenTag) return false;
+      }
+
+      if (selectedTagIds.size === 0) return true;
       return activeTags.some((assignment) => selectedTagIds.has(assignment.tag_id));
     });
 

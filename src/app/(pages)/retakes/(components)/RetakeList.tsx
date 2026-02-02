@@ -10,8 +10,23 @@ import {
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
-import { formatPhoneNumber } from "@/shared/lib/utils/phone";
+import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
+import type { TagColor } from "@/shared/types";
 import { openMenuIdAtom, type Retake } from "../(atoms)/useRetakesStore";
+
+const isTagActive = (startDate: string, endDate: string | null): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+
+  if (today < start) return false;
+  if (endDate === null) return true;
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+  return today <= end;
+};
 
 interface RetakeListProps {
   retakes: Retake[];
@@ -175,13 +190,30 @@ export default function RetakeList({
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <button
                   onClick={() => onViewStudent(retake.student.id)}
-                  className="text-left transition-colors hover:text-core-accent">
-                  <div className="font-medium text-body text-content-standard-primary hover:text-core-accent">
+                  className="flex items-center gap-spacing-200 text-left transition-colors hover:text-core-accent">
+                  <span className="font-medium text-body text-content-standard-primary hover:text-core-accent">
                     {retake.student.name}
-                  </div>
-                  <div className="text-content-standard-tertiary text-footnote">
-                    {formatPhoneNumber(retake.student.phone_number)}
-                  </div>
+                  </span>
+                  {(() => {
+                    const activeTags = (retake.student.tags || []).filter((assignment) =>
+                      isTagActive(assignment.start_date, assignment.end_date),
+                    );
+                    if (activeTags.length === 0) return null;
+                    return (
+                      <div className="flex flex-wrap gap-spacing-100">
+                        {activeTags.map((assignment) => {
+                          const colorClasses = TAG_COLOR_CLASSES[assignment.tag?.color as TagColor];
+                          return (
+                            <span
+                              key={assignment.id}
+                              className={`rounded-radius-200 px-spacing-150 py-spacing-50 text-caption ${colorClasses?.bg || "bg-solid-translucent-gray"} ${colorClasses?.text || "text-content-standard-secondary"}`}>
+                              {assignment.tag?.name}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

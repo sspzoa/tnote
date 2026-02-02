@@ -28,7 +28,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const { name, color } = await request.json();
+  const { name, color, hiddenByDefault } = await request.json();
 
   if (!name || typeof name !== "string" || name.trim().length === 0) {
     return NextResponse.json({ error: "태그 이름은 필수입니다." }, { status: 400 });
@@ -48,6 +48,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       workspace: session.workspace,
       name: name.trim(),
       color,
+      hidden_by_default: hiddenByDefault ?? false,
     })
     .select()
     .single();

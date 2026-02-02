@@ -29,6 +29,7 @@ interface TagAssignment {
     name: string;
     color: string;
     workspace: string;
+    hidden_by_default: boolean;
   };
 }
 
@@ -84,7 +85,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       tag_id,
       start_date,
       end_date,
-      tag:StudentTags!inner(id, name, color, workspace)
+      tag:StudentTags!inner(id, name, color, workspace, hidden_by_default)
     `)
     .in("student_id", studentIds)
     .eq("tag.workspace", session.workspace);

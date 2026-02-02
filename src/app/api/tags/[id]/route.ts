@@ -50,7 +50,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
-  const { name, color } = await request.json();
+  const { name, color, hiddenByDefault } = await request.json();
 
   const { data: existingTag, error: fetchError } = await supabase
     .from("StudentTags")
@@ -63,7 +63,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     return NextResponse.json({ error: "태그를 찾을 수 없습니다." }, { status: 404 });
   }
 
-  const updates: { name?: string; color?: TagColor; updated_at: string } = {
+  const updates: { name?: string; color?: TagColor; hidden_by_default?: boolean; updated_at: string } = {
     updated_at: new Date().toISOString(),
   };
 
@@ -82,6 +82,10 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
       return NextResponse.json({ error: "유효한 색상을 선택해주세요." }, { status: 400 });
     }
     updates.color = color;
+  }
+
+  if (hiddenByDefault !== undefined) {
+    updates.hidden_by_default = hiddenByDefault;
   }
 
   const { data, error } = await supabase

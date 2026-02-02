@@ -39,11 +39,19 @@ export const useCreateTag = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ name, color }: { name: string; color: TagColor }) => {
+    mutationFn: async ({
+      name,
+      color,
+      hiddenByDefault,
+    }: {
+      name: string;
+      color: TagColor;
+      hiddenByDefault?: boolean;
+    }) => {
       const response = await fetchWithAuth("/api/tags", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, color }),
+        body: JSON.stringify({ name, color, hiddenByDefault }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
@@ -59,11 +67,21 @@ export const useUpdateTag = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, name, color }: { id: string; name?: string; color?: TagColor }) => {
+    mutationFn: async ({
+      id,
+      name,
+      color,
+      hiddenByDefault,
+    }: {
+      id: string;
+      name?: string;
+      color?: TagColor;
+      hiddenByDefault?: boolean;
+    }) => {
       const response = await fetchWithAuth(`/api/tags/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, color }),
+        body: JSON.stringify({ name, color, hiddenByDefault }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);

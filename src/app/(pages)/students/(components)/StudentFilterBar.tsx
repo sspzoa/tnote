@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Settings } from "lucide-react";
+import { useMemo } from "react";
 import { SearchInput } from "@/shared/components/ui";
 import { FilterButton } from "@/shared/components/ui/filterButton";
 import { TAG_FILTER_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
@@ -18,6 +19,12 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
   const [selectedTagIds, setSelectedTagIds] = useAtom(selectedTagIdsAtom);
   const [, setShowTagManageModal] = useAtom(showTagManageModalAtom);
 
+  const { hiddenTags, visibleTags } = useMemo(() => {
+    const hidden = tags.filter((tag) => tag.hidden_by_default);
+    const visible = tags.filter((tag) => !tag.hidden_by_default);
+    return { hiddenTags: hidden, visibleTags: visible };
+  }, [tags]);
+
   const toggleTag = (tagId: string) => {
     const newSet = new Set(selectedTagIds);
     if (newSet.has(tagId)) {
@@ -26,6 +33,14 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
       newSet.add(tagId);
     }
     setSelectedTagIds(newSet);
+  };
+
+  const getTagButtonClassName = (tag: StudentTag) => {
+    const isActive = selectedTagIds.has(tag.id);
+    const colorClasses = TAG_FILTER_COLOR_CLASSES[tag.color];
+    return isActive
+      ? `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
+      : `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.bg} ${colorClasses.text} hover:opacity-80`;
   };
 
   const tagManageButtonClassName =
@@ -56,18 +71,16 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
               <Settings className="size-4" />
               태그 관리
             </button>
-            {tags.map((tag) => {
-              const isActive = selectedTagIds.has(tag.id);
-              const colorClasses = TAG_FILTER_COLOR_CLASSES[tag.color];
-              const tagButtonClassName = isActive
-                ? `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
-                : `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.bg} ${colorClasses.text} hover:opacity-80`;
-              return (
-                <button key={tag.id} onClick={() => toggleTag(tag.id)} className={tagButtonClassName}>
-                  {tag.name}
-                </button>
-              );
-            })}
+            {hiddenTags.map((tag) => (
+              <button key={tag.id} onClick={() => toggleTag(tag.id)} className={getTagButtonClassName(tag)}>
+                {tag.name}
+              </button>
+            ))}
+            {visibleTags.map((tag) => (
+              <button key={tag.id} onClick={() => toggleTag(tag.id)} className={getTagButtonClassName(tag)}>
+                {tag.name}
+              </button>
+            ))}
           </div>
         </div>
       </div>
