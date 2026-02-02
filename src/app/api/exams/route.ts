@@ -17,6 +17,7 @@ interface ExamWithScores {
     id: string;
     name: string;
     workspace: string;
+    end_date: string | null;
   };
   scores: ScoreData[];
 }
@@ -62,7 +63,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       .select(
         `
         *,
-        course:Courses!inner(id, name, workspace),
+        course:Courses!inner(id, name, workspace, end_date),
         scores:ExamScores(score)
       `,
       )
@@ -92,7 +93,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     .select(
       `
       *,
-      course:Courses!inner(id, name, workspace)
+      course:Courses!inner(id, name, workspace, end_date)
     `,
     )
     .eq("course.workspace", session.workspace);

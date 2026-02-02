@@ -20,6 +20,12 @@ interface CourseListProps {
 
 type CourseSortKey = "name" | "studentCount";
 
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+};
+
 export default function CourseList({ courses }: CourseListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
@@ -98,6 +104,9 @@ export default function CourseList({ courses }: CourseListProps) {
               onSort={toggleSort}
             />
             <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              기간
+            </th>
+            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               관리
             </th>
             <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
@@ -118,6 +127,11 @@ export default function CourseList({ courses }: CourseListProps) {
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
                   {course.student_count || 0}명
+                </span>
+              </td>
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                <span className="text-body text-content-standard-secondary">
+                  {formatDate(course.start_date)} ~ {formatDate(course.end_date)}
                 </span>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

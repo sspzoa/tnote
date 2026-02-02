@@ -1,12 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
-import type { Exam } from "../(atoms)/useRetakesStore";
 
 interface CourseBasic {
   id: string;
   name: string;
+  end_date?: string | null;
 }
+
+interface ExamWithCourse {
+  id: string;
+  course: CourseBasic;
+}
+
+const filterActiveCourses = (courses: CourseBasic[]): CourseBasic[] => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return courses.filter((course) => {
+    if (!course.end_date) return true;
+    const endDate = new Date(course.end_date);
+    endDate.setHours(0, 0, 0, 0);
+    return endDate >= today;
+  });
+};
 
 export const useCoursesForAssign = () => {
   const { data, isLoading, error } = useQuery({
@@ -19,14 +36,14 @@ export const useCoursesForAssign = () => {
         throw new Error(result.error || "강좌 목록을 불러오는데 실패했습니다.");
       }
 
-      const uniqueCourses = result.data.reduce((acc: CourseBasic[], exam: Exam) => {
+      const uniqueCourses = result.data.reduce((acc: CourseBasic[], exam: ExamWithCourse) => {
         if (!acc.find((c) => c.id === exam.course.id)) {
           acc.push(exam.course);
         }
         return acc;
       }, []);
 
-      return uniqueCourses;
+      return filterActiveCourses(uniqueCourses);
     },
   });
 

@@ -127,6 +127,18 @@ export interface StudentDetail {
   messageHistory: MessageHistoryInfo[];
 }
 
+const filterActiveCourses = (courses: CourseInfo[]): CourseInfo[] => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return courses.filter((course) => {
+    if (!course.end_date) return true;
+    const endDate = new Date(course.end_date);
+    endDate.setHours(0, 0, 0, 0);
+    return endDate >= today;
+  });
+};
+
 export const useStudentDetail = (studentId: string | null) => {
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.students.detail(studentId || ""),
@@ -135,7 +147,12 @@ export const useStudentDetail = (studentId: string | null) => {
       const res = await fetchWithAuth(`/api/students/${studentId}/detail`);
       const result = await res.json();
       if (!res.ok) throw new Error(result.error);
-      return result.data as StudentDetail;
+
+      const detail = result.data as StudentDetail;
+      return {
+        ...detail,
+        courses: filterActiveCourses(detail.courses),
+      };
     },
     enabled: !!studentId,
   });

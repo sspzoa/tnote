@@ -21,6 +21,12 @@ interface ClinicListProps {
 
 const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+};
+
 type ClinicSortKey = "name" | "operatingDays";
 
 export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: ClinicListProps) {
@@ -66,6 +72,9 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
               onSort={toggleSort}
             />
             <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              기간
+            </th>
+            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               관리
             </th>
             <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
@@ -89,6 +98,11 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
                     </span>
                   ))}
                 </div>
+              </td>
+              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                <span className="text-body text-content-standard-secondary">
+                  {formatDate(clinic.start_date)} ~ {formatDate(clinic.end_date)}
+                </span>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <button

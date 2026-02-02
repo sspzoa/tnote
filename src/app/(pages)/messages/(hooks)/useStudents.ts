@@ -28,6 +28,7 @@ export const useStudents = () => {
 interface Course {
   id: string;
   name: string;
+  end_date?: string | null;
 }
 
 interface Exam {
@@ -38,6 +39,18 @@ interface Exam {
   cutline: number;
   course: Course;
 }
+
+const filterActiveCourses = (courses: Course[]): Course[] => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return courses.filter((course) => {
+    if (!course.end_date) return true;
+    const endDate = new Date(course.end_date);
+    endDate.setHours(0, 0, 0, 0);
+    return endDate >= today;
+  });
+};
 
 export const useCourses = () => {
   const { data, isLoading, error } = useQuery({
@@ -50,7 +63,7 @@ export const useCourses = () => {
         throw new Error(result.error || "코스 목록을 불러오는데 실패했습니다.");
       }
 
-      return result.data as Course[];
+      return filterActiveCourses(result.data as Course[]);
     },
   });
 
