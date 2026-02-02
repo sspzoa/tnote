@@ -200,7 +200,7 @@ export default function RetakeList({
                     );
                     if (activeTags.length === 0) return null;
                     return (
-                      <div className="flex flex-wrap gap-spacing-100">
+                      <div className="flex flex-nowrap gap-spacing-100">
                         {activeTags.map((assignment) => {
                           const colorClasses = TAG_COLOR_CLASSES[assignment.tag?.color as TagColor];
                           return (
