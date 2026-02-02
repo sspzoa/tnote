@@ -145,11 +145,11 @@ export default function LoginPage() {
   return (
     <div className="flex h-dvh items-center justify-center p-spacing-400 md:p-spacing-600">
       <div className="w-full max-w-md">
-        <div className="mb-spacing-600 text-center">
-          <h1 className="font-bold text-content-standard-primary text-title">Tnote</h1>
-          <p className="mt-spacing-200 text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
-        </div>
         <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+          <div className="mb-spacing-600 text-center">
+            <h1 className="font-bold text-content-standard-primary text-title">Tnote</h1>
+            <p className="mt-spacing-200 text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
+          </div>
           <SegmentedControl
             items={[
               { value: "teacher", label: "선생님 로그인" },
