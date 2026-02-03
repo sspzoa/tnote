@@ -22,14 +22,33 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "일부 상태 ID가 유효하지 않습니다." }, { status: 400 });
   }
 
-  const updates = validIds.map((id: string, index: number) =>
+  const now = new Date().toISOString();
+
+  // Step 1: 임시 순서(음수)로 먼저 업데이트 - unique constraint 충돌 방지
+  const tempUpdates = validIds.map((id: string, index: number) =>
     supabase
       .from("ManagementStatuses")
-      .update({ display_order: index + 1, updated_at: new Date().toISOString() })
-      .eq("id", id),
+      .update({ display_order: -(index + 1), updated_at: now })
+      .eq("id", id)
+      .eq("workspace", session.workspace),
   );
 
-  await Promise.all(updates);
+  const tempResults = await Promise.all(tempUpdates);
+  const tempError = tempResults.find((r) => r.error)?.error;
+  if (tempError) throw tempError;
+
+  // Step 2: 최종 순서로 업데이트
+  const finalUpdates = validIds.map((id: string, index: number) =>
+    supabase
+      .from("ManagementStatuses")
+      .update({ display_order: index + 1 })
+      .eq("id", id)
+      .eq("workspace", session.workspace),
+  );
+
+  const finalResults = await Promise.all(finalUpdates);
+  const finalError = finalResults.find((r) => r.error)?.error;
+  if (finalError) throw finalError;
 
   return NextResponse.json({ success: true });
 };

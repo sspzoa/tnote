@@ -1,6 +1,7 @@
 "use client";
 
 import { Info } from "lucide-react";
+import { Textarea } from "@/shared/components/ui";
 import type { MessageTemplate } from "../../(hooks)/useMessageTemplates";
 import type { TemplateVariable } from "../../(utils)/messageUtils";
 import { getByteLength, getMessageType } from "../../(utils)/messageUtils";
@@ -59,11 +60,11 @@ export default function MessageComposer({
         onDelete={onDeleteTemplate}
       />
 
-      <textarea
+      <Textarea
         value={messageText}
         onChange={(e) => handleTextChange(e.target.value)}
         placeholder="메시지를 입력하세요..."
-        className="mt-spacing-300 min-h-32 flex-1 resize-none rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none"
+        className="mt-spacing-300 min-h-32 flex-1 resize-none"
       />
 
       <div className="mt-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">

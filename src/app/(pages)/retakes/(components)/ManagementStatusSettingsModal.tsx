@@ -2,7 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
-import { Button, Modal, StatusBadge } from "@/shared/components/ui";
+import { Button, IconButton, Input, Modal, Select, StatusBadge } from "@/shared/components/ui";
 import {
   useManagementStatusCreate,
   useManagementStatusDelete,
@@ -146,25 +146,21 @@ export default function ManagementStatusSettingsModal() {
           <div className="flex flex-col gap-spacing-200">
             <span className="font-semibold text-content-standard-secondary text-label">새 상태 추가</span>
             <div className="flex items-center gap-spacing-300">
-              <input
+              <Input
                 type="text"
                 placeholder="상태 이름"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 disabled={isBusy}
-                className="flex-1 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-body text-content-standard-primary outline-none placeholder:text-content-standard-quaternary focus:border-core-accent"
+                className="flex-1"
               />
-              <select
+              <Select
                 value={newColor}
                 onChange={(e) => setNewColor(e.target.value as StatusColor)}
                 disabled={isBusy}
-                className="w-36 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-body text-content-standard-primary outline-none focus:border-core-accent">
-                {COLOR_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                options={COLOR_OPTIONS}
+                className="w-36"
+              />
               <Button
                 variant="primary"
                 onClick={handleCreate}
@@ -183,44 +179,44 @@ export default function ManagementStatusSettingsModal() {
                   key={status.id}
                   className="flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0">
                   <div className="flex gap-spacing-100">
-                    <button
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
                       type="button"
                       onClick={() => handleMoveUp(index)}
                       disabled={index === 0 || isBusy}
-                      className="rounded-radius-200 p-spacing-100 text-content-standard-tertiary transition-colors hover:bg-components-fill-standard-secondary disabled:opacity-30">
+                      aria-label="위로 이동">
                       ↑
-                    </button>
-                    <button
+                    </IconButton>
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
                       type="button"
                       onClick={() => handleMoveDown(index)}
                       disabled={index === localStatuses.length - 1 || isBusy}
-                      className="rounded-radius-200 p-spacing-100 text-content-standard-tertiary transition-colors hover:bg-components-fill-standard-secondary disabled:opacity-30">
+                      aria-label="아래로 이동">
                       ↓
-                    </button>
+                    </IconButton>
                   </div>
 
                   <span className="w-6 text-center text-content-standard-quaternary text-caption">{index + 1}</span>
 
                   {editingId === status.id ? (
                     <>
-                      <input
+                      <Input
                         type="text"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         disabled={isBusy}
-                        className="flex-1 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-body text-content-standard-primary outline-none focus:border-core-accent"
+                        className="flex-1"
                       />
-                      <select
+                      <Select
                         value={editColor}
                         onChange={(e) => setEditColor(e.target.value as StatusColor)}
                         disabled={isBusy}
-                        className="w-32 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-200 text-body text-content-standard-primary outline-none focus:border-core-accent">
-                        {COLOR_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
+                        options={COLOR_OPTIONS}
+                        className="w-32"
+                      />
                       <Button
                         variant="primary"
                         size="sm"

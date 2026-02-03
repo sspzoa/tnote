@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/shared/components/ui/button";
-import { Modal } from "@/shared/components/ui/modal";
-import { SearchInput } from "@/shared/components/ui/searchInput";
+import { Button, Modal, SearchInput, Select } from "@/shared/components/ui";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -235,15 +233,17 @@ export function ScoreInputModal({
                           <span className="text-footnote text-content-standard-tertiary">/ {exam.max_score || 8}</span>
                         </div>
                         <div className="h-6 w-px bg-line-divider" />
-                        <select
+                        <Select
                           value={currentAssignment}
                           onChange={(e) => handleAssignmentChange(student.id, e.target.value)}
-                          className="w-20 rounded-radius-300 border border-line-outline bg-components-fill-standard-primary px-spacing-200 py-spacing-200 text-center text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
-                          <option value="">-</option>
-                          <option value="완료">완료</option>
-                          <option value="미흡">미흡</option>
-                          <option value="미제출">미제출</option>
-                        </select>
+                          placeholder="-"
+                          options={[
+                            { value: "완료", label: "완료" },
+                            { value: "미흡", label: "미흡" },
+                            { value: "미제출", label: "미제출" },
+                          ]}
+                          className="w-20 bg-components-fill-standard-primary text-center"
+                        />
                       </div>
                     }
                   />

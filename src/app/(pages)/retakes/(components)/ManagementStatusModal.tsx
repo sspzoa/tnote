@@ -1,8 +1,9 @@
 "use client";
 
 import { useAtom, useAtomValue } from "jotai";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Modal, StatusBadge } from "@/shared/components/ui";
+import { Button, IconButton, Modal, StatusBadge } from "@/shared/components/ui";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import type { StatusColor } from "@/shared/types";
 import { showManagementStatusModalAtom } from "../(atoms)/useModalStore";
@@ -12,6 +13,9 @@ import { useRetakeManagementStatus } from "../(hooks)/useRetakeManagementStatus"
 interface ManagementStatusModalProps {
   onSuccess: () => void;
 }
+
+const ITEM_WIDTH = 100;
+const GAP = 100;
 
 export default function ManagementStatusModal({ onSuccess }: ManagementStatusModalProps) {
   const [showModal, setShowModal] = useAtom(showManagementStatusModalAtom);
@@ -58,7 +62,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
 
   if (!selectedRetake) return null;
 
-  const currentStatusItem = statuses.find((s) => s.name === selectedStatus);
+  const offset = currentIndex * (ITEM_WIDTH + GAP);
 
   return (
     <Modal
@@ -86,46 +90,68 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
           <span className="text-content-standard-tertiary">로딩 중...</span>
         </div>
       ) : (
-        <div className="flex flex-col gap-spacing-400">
-          <div className="flex items-center justify-between gap-spacing-300">
-            <Button variant="secondary" onClick={handlePrev} disabled={!hasPrev || isUpdating} className="flex-1">
-              ← 이전
-            </Button>
-            <Button variant="secondary" onClick={handleNext} disabled={!hasNext || isUpdating} className="flex-1">
-              다음 →
-            </Button>
-          </div>
+        <div className="flex flex-col items-center gap-spacing-500">
+          <div className="flex w-full items-center justify-center gap-spacing-300">
+            <IconButton
+              variant="outline"
+              size="lg"
+              onClick={handlePrev}
+              disabled={!hasPrev || isUpdating}
+              aria-label="이전 상태">
+              <ChevronLeft className="size-6" />
+            </IconButton>
 
-          <div className="flex flex-col items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-400">
-            <span className="text-content-standard-tertiary text-caption">현재 선택</span>
-            {currentStatusItem ? (
-              <StatusBadge variant={currentStatusItem.color as StatusColor}>{currentStatusItem.name}</StatusBadge>
-            ) : (
-              <span className="text-content-standard-secondary">상태를 선택해주세요</span>
-            )}
-            <span className="text-content-standard-quaternary text-caption">
-              {currentIndex + 1} / {statuses.length}
-            </span>
-          </div>
-
-          <div className="-m-spacing-100 max-h-48 overflow-y-auto p-spacing-100">
-            <div className="flex flex-col gap-spacing-100">
-              {statuses.map((status) => (
-                <button
-                  key={status.id}
-                  type="button"
-                  onClick={() => setSelectedStatus(status.name)}
-                  disabled={isUpdating}
-                  className={`flex items-center justify-between rounded-radius-200 px-spacing-300 py-spacing-200 text-left transition-colors ${
-                    selectedStatus === status.name
-                      ? "bg-core-accent-translucent ring-1 ring-core-accent"
-                      : "hover:bg-components-fill-standard-secondary"
-                  }`}>
-                  <StatusBadge variant={status.color as StatusColor}>{status.name}</StatusBadge>
-                  <span className="text-content-standard-quaternary text-caption">{status.display_order}</span>
-                </button>
-              ))}
+            <div className="relative h-16 flex-1 overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary">
+              <div
+                className="absolute top-1/2 left-1/2 flex items-center transition-transform duration-300 ease-out"
+                style={{
+                  gap: GAP,
+                  transform: `translate(${-ITEM_WIDTH / 2 - offset}px, -50%)`,
+                }}>
+                {statuses.map((status, index) => (
+                  <div
+                    key={status.id}
+                    className="flex shrink-0 items-center justify-center whitespace-nowrap transition-all duration-300"
+                    style={{
+                      width: ITEM_WIDTH,
+                      opacity: index === currentIndex ? 1 : 0.4,
+                      transform: index === currentIndex ? "scale(1.1)" : "scale(1)",
+                    }}>
+                    <StatusBadge variant={status.color as StatusColor}>{status.name}</StatusBadge>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            <IconButton
+              variant="outline"
+              size="lg"
+              onClick={handleNext}
+              disabled={!hasNext || isUpdating}
+              aria-label="다음 상태">
+              <ChevronRight className="size-6" />
+            </IconButton>
+          </div>
+
+          <div className="flex items-center gap-spacing-200">
+            {statuses.map((status, index) => (
+              <button
+                key={status.id}
+                type="button"
+                onClick={() => {
+                  if (!isUpdating) {
+                    setSelectedStatus(status.name);
+                  }
+                }}
+                disabled={isUpdating}
+                className={`size-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex
+                    ? "scale-125 bg-core-accent"
+                    : "bg-line-outline hover:bg-content-standard-quaternary"
+                }`}
+                aria-label={status.name}
+              />
+            ))}
           </div>
         </div>
       )}

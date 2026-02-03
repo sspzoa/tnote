@@ -1,12 +1,11 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, RefreshCw, Settings, X } from "lucide-react";
+import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, RefreshCw, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
-import { SegmentedControl } from "@/shared/components/ui/segmentedControl";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { SegmentedControl, Skeleton, SlidePanel } from "@/shared/components/ui";
 import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/useMessageStore";
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
@@ -201,61 +200,42 @@ export default function MessagesPage() {
         {activeTab === "retake-notice" && <RetakeNoticeTab />}
       </div>
 
-      {showHistoryPanel && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-solid-black/50 backdrop-blur-sm transition-opacity"
-            onClick={() => setShowHistoryPanel(false)}
-          />
-
-          <div className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-line-outline border-l bg-components-fill-standard-primary">
-            <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
-              <div>
-                <h2 className="font-bold text-content-standard-primary text-heading">발송 이력</h2>
-                <p className="text-content-standard-tertiary text-label">최근 50건</p>
-              </div>
-              <button
-                onClick={() => setShowHistoryPanel(false)}
-                className="rounded-radius-200 p-spacing-200 transition-all duration-150 hover:bg-core-accent-translucent hover:text-core-accent">
-                <X className="size-5 text-content-standard-tertiary" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-              {isLoading ? (
-                <div className="space-y-spacing-300 p-spacing-600">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="space-y-spacing-200 border-line-divider border-b pb-spacing-300">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-spacing-200">
-                          <Skeleton className="h-6 w-24" />
-                          <Skeleton className="h-4 w-12 rounded-radius-200" />
-                        </div>
-                        <Skeleton className="h-6 w-20 rounded-radius-200" />
-                      </div>
-                      <Skeleton className="h-6 w-full" />
-                      <Skeleton className="h-5 w-32" />
-                    </div>
-                  ))}
-                </div>
-              ) : history.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-spacing-900">
-                  <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
-                    <History className="size-6 text-core-accent" />
+      <SlidePanel
+        isOpen={showHistoryPanel}
+        onClose={() => setShowHistoryPanel(false)}
+        title="발송 이력"
+        subtitle="최근 50건">
+        {isLoading ? (
+          <div className="space-y-spacing-300 p-spacing-600">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="space-y-spacing-200 border-line-divider border-b pb-spacing-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-spacing-200">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-4 w-12 rounded-radius-200" />
                   </div>
-                  <span className="text-content-standard-tertiary text-label">발송 이력이 없습니다.</span>
+                  <Skeleton className="h-6 w-20 rounded-radius-200" />
                 </div>
-              ) : (
-                <div>
-                  {history.map((batch) => (
-                    <HistoryItem key={batch.batch_id} batch={batch} />
-                  ))}
-                </div>
-              )}
-            </div>
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+            ))}
           </div>
-        </>
-      )}
+        ) : history.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-spacing-900">
+            <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+              <History className="size-6 text-core-accent" />
+            </div>
+            <span className="text-content-standard-tertiary text-label">발송 이력이 없습니다.</span>
+          </div>
+        ) : (
+          <div>
+            {history.map((batch) => (
+              <HistoryItem key={batch.batch_id} batch={batch} />
+            ))}
+          </div>
+        )}
+      </SlidePanel>
 
       <SenderPhoneSettings isOpen={showSenderPhoneSettings} onClose={() => setShowSenderPhoneSettings(false)} />
     </Container>

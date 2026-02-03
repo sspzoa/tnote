@@ -1,15 +1,12 @@
 "use client";
 
 import { useAtom, useAtomValue } from "jotai";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
-import { Button } from "@/shared/components/ui/button";
-import { EmptyState } from "@/shared/components/ui/emptyState";
-import { Modal } from "@/shared/components/ui/modal";
-import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
+import { Button, EmptyState, Modal, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import { searchQueryAtom, selectedTagIdsAtom } from "./(atoms)/useStudentsStore";
@@ -157,91 +154,72 @@ export default function StudentsPage() {
       <AddTagModal />
       <EditTagAssignmentModal />
 
-      {showConsultationPanel && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-solid-black/50 backdrop-blur-sm transition-opacity"
-            onClick={() => setShowConsultationPanel(false)}
-          />
-
-          <div className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-line-outline border-l bg-components-fill-standard-primary">
-            <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
-              <div>
-                <h2 className="font-bold text-content-standard-primary text-heading">최근 상담 내역</h2>
-                <p className="text-content-standard-tertiary text-label">최근 50건</p>
+      <SlidePanel
+        isOpen={showConsultationPanel}
+        onClose={() => setShowConsultationPanel(false)}
+        title="최근 상담 내역"
+        subtitle="최근 50건">
+        {consultationsLoading ? (
+          <div className="space-y-spacing-300 p-spacing-600">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="space-y-spacing-200">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="h-6 w-16 rounded-radius-200" />
+                </div>
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-5 w-24" />
               </div>
-              <button
-                onClick={() => setShowConsultationPanel(false)}
-                className="rounded-radius-200 p-spacing-200 transition-all duration-150 hover:bg-core-accent-translucent hover:text-core-accent">
-                <X className="size-5 text-content-standard-tertiary" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-              {consultationsLoading ? (
-                <div className="space-y-spacing-300 p-spacing-600">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="space-y-spacing-200">
-                      <div className="flex items-center justify-between">
-                        <Skeleton className="h-6 w-20" />
-                        <Skeleton className="h-6 w-16 rounded-radius-200" />
-                      </div>
-                      <Skeleton className="h-6 w-3/4" />
-                      <Skeleton className="h-5 w-24" />
-                    </div>
-                  ))}
-                </div>
-              ) : consultations.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-spacing-900">
-                  <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
-                    <MessageSquare className="size-6 text-core-accent" />
-                  </div>
-                  <span className="text-content-standard-tertiary text-label">상담 내역이 없습니다.</span>
-                </div>
-              ) : (
-                <div className="divide-y divide-line-divider">
-                  {consultations.map((consultation) => {
-                    const createdAt = new Date(consultation.created_at);
-                    const dateStr = createdAt.toLocaleDateString("ko-KR");
-                    const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
-
-                    return (
-                      <button
-                        key={consultation.id}
-                        onClick={() => {
-                          setSelectedConsultation(consultation);
-                          setShowConsultationPanel(false);
-                        }}
-                        className="w-full px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
-                        <div className="mb-spacing-100 flex items-center justify-between">
-                          <span className="font-medium text-body text-content-standard-primary">
-                            {consultation.student?.name || "-"}
-                          </span>
-                          <span className="rounded-radius-200 border border-core-accent/20 bg-core-accent-translucent px-spacing-200 py-spacing-50 text-core-accent text-footnote">
-                            {dateStr}
-                          </span>
-                        </div>
-                        <div className="mb-spacing-100 truncate text-body text-content-standard-secondary">
-                          {consultation.title}
-                        </div>
-                        <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
-                          <span>{timeStr}</span>
-                          {consultation.creator?.name && (
-                            <>
-                              <span>·</span>
-                              <span>{consultation.creator.name}</span>
-                            </>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            ))}
           </div>
-        </>
-      )}
+        ) : consultations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-spacing-900">
+            <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+              <MessageSquare className="size-6 text-core-accent" />
+            </div>
+            <span className="text-content-standard-tertiary text-label">상담 내역이 없습니다.</span>
+          </div>
+        ) : (
+          <div className="divide-y divide-line-divider">
+            {consultations.map((consultation) => {
+              const createdAt = new Date(consultation.created_at);
+              const dateStr = createdAt.toLocaleDateString("ko-KR");
+              const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+
+              return (
+                <button
+                  key={consultation.id}
+                  onClick={() => {
+                    setSelectedConsultation(consultation);
+                    setShowConsultationPanel(false);
+                  }}
+                  className="w-full px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
+                  <div className="mb-spacing-100 flex items-center justify-between">
+                    <span className="font-medium text-body text-content-standard-primary">
+                      {consultation.student?.name || "-"}
+                    </span>
+                    <span className="rounded-radius-200 border border-core-accent/20 bg-core-accent-translucent px-spacing-200 py-spacing-50 text-core-accent text-footnote">
+                      {dateStr}
+                    </span>
+                  </div>
+                  <div className="mb-spacing-100 truncate text-body text-content-standard-secondary">
+                    {consultation.title}
+                  </div>
+                  <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                    <span>{timeStr}</span>
+                    {consultation.creator?.name && (
+                      <>
+                        <span>·</span>
+                        <span>{consultation.creator.name}</span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </SlidePanel>
     </Container>
   );
 }
