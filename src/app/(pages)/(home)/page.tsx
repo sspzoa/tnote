@@ -4,7 +4,7 @@ import { createTypeStream } from "hangul-typing-animation";
 import { BookOpen, ClipboardList, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-
+import Container from "@/shared/components/common/Container";
 import { useUser } from "@/shared/hooks/useUser";
 import { getGreetingByTime } from "@/shared/lib/utils/date";
 import { useHomeStats } from "./(hooks)/useHomeStats";
@@ -96,55 +96,53 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen p-spacing-500 md:p-spacing-700">
-      <div className="mx-auto max-w-6xl flex flex-col gap-spacing-700">
-        <div className="rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          <div className="flex flex-col gap-spacing-400">
-            <h1 className="font-bold text-content-standard-primary text-display">
-              안녕하세요,
-              <br className="md:hidden" /> <span className="text-core-accent">{user?.name}</span>님
-            </h1>
-            <div className="flex w-fit items-center gap-spacing-200 rounded-full border border-core-accent/20 bg-core-accent-translucent px-spacing-400 py-spacing-200">
-              <Sparkles className="size-4 shrink-0 text-core-accent" />
-              <p className="text-core-accent text-label">{typedGreeting || "\u00A0"}</p>
-            </div>
+    <Container>
+      <div className="rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+        <div className="flex flex-col gap-spacing-400">
+          <h1 className="font-bold text-content-standard-primary text-display">
+            안녕하세요,
+            <br className="md:hidden" /> <span className="text-core-accent">{user?.name}</span>님
+          </h1>
+          <div className="flex w-fit items-center gap-spacing-200 rounded-full border border-core-accent/20 bg-core-accent-translucent px-spacing-400 py-spacing-200">
+            <Sparkles className="size-4 shrink-0 text-core-accent" />
+            <p className="text-core-accent text-label">{typedGreeting || "\u00A0"}</p>
           </div>
         </div>
+      </div>
 
-        {!isStudent && stats && (
-          <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
-            {statItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:-translate-y-spacing-50 hover:border-core-accent/30">
-                <div className="flex flex-col gap-spacing-400">
-                  <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
-                  <div className="relative flex flex-col gap-spacing-100">
-                    <div className="font-bold text-content-standard-primary text-display">{item.value}</div>
-                    <div>
-                      <div className="font-medium text-content-standard-primary text-label">{item.label}</div>
-                      <div className="text-content-standard-tertiary text-footnote">{item.description}</div>
-                    </div>
+      {!isStudent && stats && (
+        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+          {statItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:-translate-y-spacing-50 hover:border-core-accent/30">
+              <div className="flex flex-col gap-spacing-400">
+                <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
+                <div className="relative flex flex-col gap-spacing-100">
+                  <div className="font-bold text-content-standard-primary text-display">{item.value}</div>
+                  <div>
+                    <div className="font-medium text-content-standard-primary text-label">{item.label}</div>
+                    <div className="text-content-standard-tertiary text-footnote">{item.description}</div>
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
-        {isStudent && (
-          <div className="flex flex-col items-center gap-spacing-400 rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 text-center">
-            <div className="flex size-16 items-center justify-center rounded-full bg-core-accent-translucent">
-              <BookOpen className="size-8 text-core-accent" />
-            </div>
-            <div className="flex flex-col gap-spacing-200">
-              <h2 className="font-semibold text-content-standard-primary text-heading">학습을 시작하세요</h2>
-              <p className="text-content-standard-secondary text-body">사이드바 메뉴에서 원하는 기능을 선택해주세요.</p>
-            </div>
+      {isStudent && (
+        <div className="flex flex-col items-center gap-spacing-400 rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 text-center">
+          <div className="flex size-16 items-center justify-center rounded-full bg-core-accent-translucent">
+            <BookOpen className="size-8 text-core-accent" />
           </div>
-        )}
-      </div>
-    </div>
+          <div className="flex flex-col gap-spacing-200">
+            <h2 className="font-semibold text-content-standard-primary text-heading">학습을 시작하세요</h2>
+            <p className="text-content-standard-secondary text-body">사이드바 메뉴에서 원하는 기능을 선택해주세요.</p>
+          </div>
+        </div>
+      )}
+    </Container>
   );
 }
