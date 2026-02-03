@@ -1,7 +1,7 @@
 "use client";
 
 import { Info } from "lucide-react";
-import { Textarea } from "@/shared/components/ui";
+import { Badge, Textarea } from "@/shared/components/ui";
 import type { MessageTemplate } from "../../(hooks)/useMessageTemplates";
 import type { TemplateVariable } from "../../(utils)/messageUtils";
 import { getByteLength, getMessageType } from "../../(utils)/messageUtils";
@@ -40,12 +40,9 @@ export default function MessageComposer({
       <div className="mb-spacing-300 flex items-center justify-between">
         <label className="font-semibold text-content-standard-primary text-label">메시지 내용</label>
         <div className="flex items-center gap-spacing-300">
-          <span
-            className={`rounded-radius-200 px-spacing-200 py-spacing-100 font-semibold text-footnote ${
-              isLMS ? "bg-solid-translucent-yellow text-solid-yellow" : "bg-solid-translucent-blue text-solid-blue"
-            }`}>
+          <Badge variant={isLMS ? "yellow" : "blue"} size="xs">
             {isLMS ? "LMS" : "SMS"}
-          </span>
+          </Badge>
           <span className="text-content-standard-tertiary text-footnote">
             {byteLength} / {maxBytes} bytes
           </span>
