@@ -21,7 +21,7 @@ interface FilterState {
 export default function CalendarPage() {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [expandedDay, setExpandedDay] = useState<Date | null>(null);
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<FilterState>({
     course: true,
     retake: true,
@@ -93,9 +93,20 @@ export default function CalendarPage() {
           <CalendarGrid
             currentDate={currentDate}
             events={filteredEvents}
-            expandedDay={expandedDay}
+            expandedDays={expandedDays}
             onEventClick={setSelectedEvent}
-            onExpandDay={setExpandedDay}
+            onToggleExpand={(day: Date) => {
+              setExpandedDays((prev) => {
+                const key = day.toISOString();
+                const next = new Set(prev);
+                if (next.has(key)) {
+                  next.delete(key);
+                } else {
+                  next.add(key);
+                }
+                return next;
+              });
+            }}
           />
         )}
       </div>

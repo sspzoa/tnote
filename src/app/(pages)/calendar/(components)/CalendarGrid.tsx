@@ -16,12 +16,12 @@ const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 interface Props {
   currentDate: Date;
   events: CalendarEvent[];
-  expandedDay: Date | null;
+  expandedDays: Set<string>;
   onEventClick: (event: CalendarEvent) => void;
-  onExpandDay: (day: Date | null) => void;
+  onToggleExpand: (day: Date) => void;
 }
 
-export default function CalendarGrid({ currentDate, events, expandedDay, onEventClick, onExpandDay }: Props) {
+export default function CalendarGrid({ currentDate, events, expandedDays, onEventClick, onToggleExpand }: Props) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -47,7 +47,7 @@ export default function CalendarGrid({ currentDate, events, expandedDay, onEvent
           const dayEvents = getEventsForDay(day);
           const isCurrentMonth = isSameMonth(day, currentDate);
           const isTodayDate = isToday(day);
-          const isExpanded = expandedDay ? isSameDay(day, expandedDay) : false;
+          const isExpanded = expandedDays.has(day.toISOString());
           const isLastColumn = idx % 7 === 6;
           const isLastRow = idx >= calendarDays.length - 7;
 
@@ -62,8 +62,7 @@ export default function CalendarGrid({ currentDate, events, expandedDay, onEvent
               isLastColumn={isLastColumn}
               isLastRow={isLastRow}
               onEventClick={onEventClick}
-              onExpand={() => onExpandDay(day)}
-              onCollapse={() => onExpandDay(null)}
+              onToggleExpand={() => onToggleExpand(day)}
             />
           );
         })}

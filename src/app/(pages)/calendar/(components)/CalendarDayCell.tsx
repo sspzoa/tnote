@@ -11,8 +11,7 @@ interface Props {
   isLastColumn: boolean;
   isLastRow: boolean;
   onEventClick: (event: CalendarEvent) => void;
-  onExpand: () => void;
-  onCollapse: () => void;
+  onToggleExpand: () => void;
 }
 
 const MAX_VISIBLE_EVENTS = 3;
@@ -26,8 +25,7 @@ export default function CalendarDayCell({
   isLastColumn,
   isLastRow,
   onEventClick,
-  onExpand,
-  onCollapse,
+  onToggleExpand,
 }: Props) {
   const hasMoreEvents = events.length > MAX_VISIBLE_EVENTS;
   const visibleEvents = isExpanded ? events : events.slice(0, MAX_VISIBLE_EVENTS);
@@ -61,21 +59,16 @@ export default function CalendarDayCell({
           <CalendarEventItem key={event.id} event={event} onClick={() => onEventClick(event)} />
         ))}
 
-        {hasMoreEvents && !isExpanded && (
+        {hasMoreEvents && (
           <button
             type="button"
-            onClick={onExpand}
-            className="rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-core-accent text-footnote transition-all duration-150 hover:bg-core-accent-translucent">
-            +{events.length - MAX_VISIBLE_EVENTS}
-          </button>
-        )}
-
-        {isExpanded && (
-          <button
-            type="button"
-            onClick={onCollapse}
-            className="rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-content-standard-tertiary text-footnote transition-all duration-150 hover:bg-components-fill-standard-secondary hover:text-content-standard-primary">
-            접기
+            onClick={onToggleExpand}
+            className={`rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-footnote transition-all duration-150 ${
+              isExpanded
+                ? "text-content-standard-tertiary hover:bg-components-fill-standard-secondary hover:text-content-standard-primary"
+                : "text-core-accent hover:bg-core-accent-translucent"
+            }`}>
+            {isExpanded ? "접기" : `+${events.length - MAX_VISIBLE_EVENTS}`}
           </button>
         )}
       </div>
