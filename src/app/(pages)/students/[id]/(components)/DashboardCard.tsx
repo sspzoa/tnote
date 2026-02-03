@@ -30,8 +30,7 @@ export const DashboardCard = ({
         <span className="text-footnote">{emptyMessage}</span>
       </div>
     ) : (
-      <div
-        className={`${noPadding ? "" : "divide-y divide-line-divider"} ${scrollable ? "max-h-[400px] overflow-y-auto" : ""}`}>
+      <div className={`${noPadding ? "" : "divide-y divide-line-divider"} ${scrollable ? "overflow-y-auto" : ""}`}>
         {children}
       </div>
     )}

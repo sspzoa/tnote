@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
@@ -44,7 +45,24 @@ interface StudentInfoModalProps {
   isLoading: boolean;
 }
 
+const getAssignmentStatusStyle = (status: string) => {
+  if (status === "완료") return "bg-solid-translucent-green text-core-status-positive";
+  if (status === "미흡") return "bg-solid-translucent-yellow text-core-status-warning";
+  return "bg-solid-translucent-red text-core-status-negative";
+};
+
 export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoading }: StudentInfoModalProps) {
+  const examWithAssignments = useMemo(() => {
+    if (!studentDetail) return [];
+
+    const assignmentMap = new Map(studentDetail.assignmentHistory.map((a) => [a.exam.id, a]));
+
+    return studentDetail.examScores.map((score) => ({
+      examScore: score,
+      assignment: assignmentMap.get(score.exam.id),
+    }));
+  }, [studentDetail]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -143,7 +161,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 수강 중인 수업이 없습니다.
               </div>
             ) : (
-              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
                 {studentDetail.courses.map((course) => (
                   <div
                     key={course.id}
@@ -166,31 +184,34 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
           </section>
 
           <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 시험 성적</h3>
-            {studentDetail.examScores.length === 0 ? (
+            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">시험 성적 & 과제</h3>
+            {examWithAssignments.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
-                시험 성적이 없습니다.
+                시험 기록이 없습니다.
               </div>
             ) : (
-              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
-                {studentDetail.examScores.map((score) => {
-                  const isPassed = score.cutline !== null && score.score >= score.cutline;
-                  const isFailed = score.cutline !== null && score.score < score.cutline;
+              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+                {examWithAssignments.map(({ examScore, assignment }) => {
+                  const isPassed = examScore.cutline !== null && examScore.score >= examScore.cutline;
+                  const isFailed = examScore.cutline !== null && examScore.score < examScore.cutline;
 
                   return (
                     <div
-                      key={score.id}
+                      key={examScore.id}
                       className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                      <span className="min-w-0 flex-1 truncate font-medium text-body text-content-standard-primary">
-                        {score.exam.course.name} - {score.exam.name}
-                      </span>
-                      <div className="flex shrink-0 items-center gap-spacing-200">
-                        <span className="font-medium text-body text-content-standard-primary">
-                          {score.score}
-                          {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
+                      <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                        <span className="truncate font-medium text-body text-content-standard-primary">
+                          {examScore.exam.course.name} - {examScore.exam.name}
                         </span>
+                        <span className="text-content-standard-tertiary text-footnote">
+                          {examScore.score}
+                          {examScore.maxScore !== null && `/${examScore.maxScore}`}점 · {examScore.rank}/
+                          {examScore.totalStudents}등
+                        </span>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-spacing-200">
                         <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
-                          {score.exam.examNumber}회차
+                          {examScore.exam.examNumber}회차
                         </span>
                         {isPassed && (
                           <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 text-core-status-positive text-footnote">
@@ -202,51 +223,16 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                             재시험
                           </span>
                         )}
+                        {assignment && (
+                          <span
+                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${getAssignmentStatusStyle(assignment.status)}`}>
+                            과제 {assignment.status}
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
                 })}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 과제 상태</h3>
-            {studentDetail.assignmentHistory.length === 0 ? (
-              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
-                과제 기록이 없습니다.
-              </div>
-            ) : (
-              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
-                {studentDetail.assignmentHistory.map((assignment) => (
-                  <div
-                    key={assignment.id}
-                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                      <span className="truncate font-medium text-body text-content-standard-primary">
-                        {assignment.exam.course.name} - {assignment.exam.name}
-                      </span>
-                      {assignment.note && (
-                        <span className="truncate text-content-standard-tertiary text-footnote">{assignment.note}</span>
-                      )}
-                    </div>
-                    <div className="flex shrink-0 items-center gap-spacing-200">
-                      <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
-                        {assignment.exam.examNumber}회차
-                      </span>
-                      <span
-                        className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
-                          assignment.status === "완료"
-                            ? "bg-solid-translucent-green text-core-status-positive"
-                            : assignment.status === "미흡"
-                              ? "bg-solid-translucent-yellow text-core-status-warning"
-                              : "bg-solid-translucent-red text-core-status-negative"
-                        }`}>
-                        {assignment.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
               </div>
             )}
           </section>
@@ -258,7 +244,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 클리닉 출석 기록이 없습니다.
               </div>
             ) : (
-              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
                 {studentDetail.clinicHistory.map((history) => (
                   <div
                     key={history.id}
@@ -287,7 +273,7 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                 재시험 기록이 없습니다.
               </div>
             ) : (
-              <div className="max-h-64 divide-y divide-line-divider overflow-y-auto rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
                 {studentDetail.retakeHistory.map((retake) => (
                   <div
                     key={retake.id}
