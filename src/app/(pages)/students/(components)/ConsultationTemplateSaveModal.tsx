@@ -56,18 +56,20 @@ export default function ConsultationTemplateSaveModal({
           </Button>
         </>
       }>
-      <FormInput
-        label="템플릿 이름"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="템플릿 이름을 입력하세요"
-        required
-        disabled={isLoading}
-      />
-      <div className="flex flex-col gap-spacing-200">
-        <label className="block font-semibold text-content-standard-primary text-label">저장할 내용</label>
-        <div className="max-h-40 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
-          <p className="whitespace-pre-wrap text-body text-content-standard-secondary">{content}</p>
+      <div className="flex flex-col gap-spacing-400">
+        <FormInput
+          label="템플릿 이름"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="템플릿 이름을 입력하세요"
+          required
+          disabled={isLoading}
+        />
+        <div className="flex flex-col gap-spacing-200">
+          <label className="block font-semibold text-content-standard-primary text-label">저장할 내용</label>
+          <div className="max-h-40 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
+            <p className="whitespace-pre-wrap text-body text-content-standard-secondary">{content}</p>
+          </div>
         </div>
       </div>
     </Modal>

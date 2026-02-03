@@ -1,9 +1,10 @@
 "use client";
 
-import { Save } from "lucide-react";
+import { Save, Settings, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button, Select } from "@/shared/components/ui";
 import type { MessageTemplate } from "../(hooks)/useMessageTemplates";
+import TemplateManageModal from "./TemplateManageModal";
 import TemplateSaveModal from "./TemplateSaveModal";
 
 interface TemplateSelectorProps {
@@ -22,13 +23,22 @@ export default function TemplateSelector({
   onDelete,
 }: TemplateSelectorProps) {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
   const handleSave = async (name: string) => {
     await onSave(name, currentContent);
   };
 
+  const matchingTemplate = templates.find((t) => t.content === currentContent);
+
+  const handleDeleteMatching = () => {
+    if (matchingTemplate && confirm(`"${matchingTemplate.name}" 템플릿을 삭제하시겠습니까?`)) {
+      onDelete(matchingTemplate.id);
+    }
+  };
+
   return (
-    <div className="flex items-center gap-spacing-300">
+    <div className="flex flex-wrap items-center gap-spacing-300">
       <Select
         value=""
         onChange={(e) => {
@@ -54,17 +64,26 @@ export default function TemplateSelector({
         </span>
       </Button>
 
-      {templates.length > 0 && (
-        <Select
-          value=""
-          onChange={(e) => {
-            if (e.target.value && confirm("이 템플릿을 삭제하시겠습니까?")) {
-              onDelete(e.target.value);
-            }
-          }}
-          placeholder="삭제"
-          options={templates.map((template) => ({ value: template.id, label: template.name }))}
-        />
+      {matchingTemplate ? (
+        <Button
+          variant="danger"
+          size="sm"
+          onClick={handleDeleteMatching}
+          title={`"${matchingTemplate.name}" 템플릿 삭제`}>
+          <span className="flex items-center gap-spacing-200">
+            <Trash2 className="size-4" />
+            삭제
+          </span>
+        </Button>
+      ) : (
+        templates.length > 0 && (
+          <Button variant="secondary" size="sm" onClick={() => setIsManageModalOpen(true)} title="템플릿 관리">
+            <span className="flex items-center gap-spacing-200">
+              <Settings className="size-4" />
+              관리
+            </span>
+          </Button>
+        )
       )}
 
       <TemplateSaveModal
@@ -72,6 +91,13 @@ export default function TemplateSelector({
         onClose={() => setIsSaveModalOpen(false)}
         onSave={handleSave}
         content={currentContent}
+      />
+
+      <TemplateManageModal
+        isOpen={isManageModalOpen}
+        onClose={() => setIsManageModalOpen(false)}
+        templates={templates}
+        onDelete={onDelete}
       />
     </div>
   );
