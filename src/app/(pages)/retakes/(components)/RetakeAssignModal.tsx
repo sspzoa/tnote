@@ -13,6 +13,7 @@ import {
   StudentListItem,
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
+import { useToast } from "@/shared/hooks/useToast";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
 import { useExamScoresForAssign } from "../(hooks)/useExamScoresForAssign";
@@ -31,6 +32,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [scheduledDate, setScheduledDate] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const toast = useToast();
 
   const { courses, isLoading: coursesLoading } = useCoursesForAssign();
   const { exams, isLoading: examsLoading } = useExamsForAssign(selectedCourseId || null);
@@ -110,7 +112,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
 
   const handleAssign = async () => {
     if (!selectedExamId || selectedStudentIds.length === 0) {
-      alert("모든 필수 항목을 입력해 주세요.");
+      toast.info("모든 필수 항목을 입력해 주세요.");
       return;
     }
 
@@ -120,11 +122,11 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
         studentIds: selectedStudentIds,
         scheduledDate: scheduledDate || null,
       });
-      alert(`${selectedStudentIds.length}명의 재시험이 배정되었습니다.`);
+      toast.success(`${selectedStudentIds.length}명의 재시험이 배정되었습니다.`);
       handleClose();
       onSuccess?.();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "재시험 배정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "재시험 배정에 실패했습니다.");
     }
   };
 

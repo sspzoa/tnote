@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button, IconButton, Modal, StatusBadge } from "@/shared/components/ui";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
+import { useToast } from "@/shared/hooks/useToast";
 import type { StatusColor } from "@/shared/types";
 import { showManagementStatusModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -23,6 +24,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
   const { updateManagementStatus, isUpdating } = useRetakeManagementStatus();
   const { statuses, isLoading: isLoadingStatuses } = useManagementStatuses();
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const toast = useToast();
 
   useEffect(() => {
     if (selectedRetake?.management_status) {
@@ -52,11 +54,11 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
 
     try {
       await updateManagementStatus({ retakeId: selectedRetake.id, status: selectedStatus });
-      alert("관리 상태가 변경되었습니다.");
+      toast.success("관리 상태가 변경되었습니다.");
       setShowModal(false);
       onSuccess();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "관리 상태 변경에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "관리 상태 변경에 실패했습니다.");
     }
   };
 

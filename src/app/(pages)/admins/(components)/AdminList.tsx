@@ -9,6 +9,7 @@ import {
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
+import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
@@ -26,6 +27,7 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const { deleteAdmin } = useAdminDelete();
   const { resetPassword } = useAdminResetPassword();
+  const toast = useToast();
 
   const comparators = useMemo(
     () => ({
@@ -45,7 +47,7 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
 
   const handleDelete = async (admin: Admin) => {
     if (admin.role === "owner") {
-      alert("워크스페이스 소유자는 삭제할 수 없습니다.");
+      toast.error("워크스페이스 소유자는 삭제할 수 없습니다.");
       return;
     }
 
@@ -55,9 +57,9 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
 
     try {
       await deleteAdmin(admin.id);
-      alert("관리자가 삭제되었습니다.");
+      toast.success("관리자가 삭제되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "관리자 삭제에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "관리자 삭제에 실패했습니다.");
     }
   };
 
@@ -68,9 +70,9 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
 
     try {
       await resetPassword(admin.id);
-      alert("비밀번호가 전화번호로 초기화되었습니다.");
+      toast.success("비밀번호가 전화번호로 초기화되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "비밀번호 초기화에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "비밀번호 초기화에 실패했습니다.");
     }
   };
 

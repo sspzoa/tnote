@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
 import { clinicNameAtom, endDateAtom, operatingDaysAtom, startDateAtom } from "../(atoms)/useFormStore";
 import { showEditModalAtom } from "../(atoms)/useModalStore";
@@ -18,6 +19,7 @@ export default function ClinicEditModal() {
   const [startDate, setStartDate] = useAtom(startDateAtom);
   const [endDate, setEndDate] = useAtom(endDateAtom);
   const { updateClinic, isUpdating } = useClinicUpdate();
+  const toast = useToast();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -25,22 +27,22 @@ export default function ClinicEditModal() {
 
   const handleEdit = async () => {
     if (!selectedClinic || !clinicName.trim()) {
-      alert("클리닉 이름을 입력해 주세요.");
+      toast.info("클리닉 이름을 입력해 주세요.");
       return;
     }
 
     if (operatingDays.length === 0) {
-      alert("운영 요일을 선택해 주세요.");
+      toast.info("운영 요일을 선택해 주세요.");
       return;
     }
 
     if (!startDate || !endDate) {
-      alert("시작 날짜와 종료 날짜를 입력해 주세요.");
+      toast.info("시작 날짜와 종료 날짜를 입력해 주세요.");
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
-      alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
+      toast.info("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
       return;
     }
 
@@ -52,10 +54,10 @@ export default function ClinicEditModal() {
         startDate,
         endDate,
       });
-      alert("클리닉이 수정되었습니다.");
+      toast.success("클리닉이 수정되었습니다.");
       handleClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "클리닉 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "클리닉 수정에 실패했습니다.");
     }
   };
 

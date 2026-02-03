@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { useUser } from "@/shared/hooks/useUser";
 import { showWorkspaceDeleteModalAtom } from "../(atoms)/useModalStore";
 import { useWorkspaceDelete } from "../(hooks)/useWorkspaceDelete";
@@ -16,6 +17,7 @@ export default function WorkspaceDeleteModal() {
   const [confirmInput, setConfirmInput] = useState("");
   const { user } = useUser();
   const { deleteWorkspace, isDeleting } = useWorkspaceDelete();
+  const toast = useToast();
 
   const isConfirmed = confirmInput === CONFIRM_TEXT;
 
@@ -30,7 +32,7 @@ export default function WorkspaceDeleteModal() {
     try {
       await deleteWorkspace(user.workspace);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "워크스페이스 삭제에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "워크스페이스 삭제에 실패했습니다.");
     }
   };
 

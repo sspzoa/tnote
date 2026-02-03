@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { postponeDateAtom, postponeNoteAtom } from "../(atoms)/useFormStore";
 import { showPostponeModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -22,6 +23,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
   const [postponeNote, setPostponeNote] = useAtom(postponeNoteAtom);
   const { postponeRetake, isPostponing } = useRetakePostpone();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
+  const toast = useToast();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -31,11 +33,11 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
 
   const handlePostpone = async () => {
     if (!selectedRetake || !postponeDate) {
-      alert("새로운 날짜를 입력해 주세요.");
+      toast.info("새로운 날짜를 입력해 주세요.");
       return;
     }
     if (!postponeNote.trim()) {
-      alert("연기 사유를 입력해 주세요.");
+      toast.info("연기 사유를 입력해 주세요.");
       return;
     }
 
@@ -44,12 +46,12 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
         retakeId: selectedRetake.id,
         data: { newDate: postponeDate, note: postponeNote || null },
       });
-      alert("재시험이 연기되었습니다.");
+      toast.success("재시험이 연기되었습니다.");
       await refetchHistory();
       handleClose();
       onSuccess?.();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "연기 처리에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "연기 처리에 실패했습니다.");
     }
   };
 

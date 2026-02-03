@@ -2,8 +2,8 @@
 
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { CheckCircle, Info, X, XCircle } from "lucide-react";
-import { useEffect } from "react";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export type ToastType = "success" | "error" | "info";
 
@@ -15,22 +15,10 @@ export interface ToastMessage {
 
 export const toastsAtom = atomWithStorage<ToastMessage[]>("toasts", []);
 
-const toastStyles: Record<ToastType, { bg: string; icon: typeof CheckCircle; iconColor: string }> = {
-  success: {
-    bg: "bg-solid-translucent-green border-core-status-positive",
-    icon: CheckCircle,
-    iconColor: "text-core-status-positive",
-  },
-  error: {
-    bg: "bg-solid-translucent-red border-core-status-negative",
-    icon: XCircle,
-    iconColor: "text-core-status-negative",
-  },
-  info: {
-    bg: "bg-core-accent-translucent border-core-accent",
-    icon: Info,
-    iconColor: "text-core-accent",
-  },
+const toastStyles: Record<ToastType, string> = {
+  success: "bg-core-status-positive",
+  error: "bg-core-status-negative",
+  info: "bg-core-accent",
 };
 
 export function ToastContainer() {
@@ -41,7 +29,7 @@ export function ToastContainer() {
   };
 
   return (
-    <div className="pointer-events-none fixed right-4 bottom-4 z-50 flex flex-col gap-spacing-300">
+    <div className="pointer-events-none fixed right-4 bottom-4 z-50 flex flex-col gap-spacing-300 md:bottom-8 md:right-8">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
       ))}
@@ -55,26 +43,37 @@ interface ToastItemProps {
 }
 
 function ToastItem({ toast, onRemove }: ToastItemProps) {
-  const style = toastStyles[toast.type];
-  const Icon = style.icon;
+  const bgColor = toastStyles[toast.type];
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const exitTimer = setTimeout(() => {
+      setIsExiting(true);
+    }, 3700);
+
+    const removeTimer = setTimeout(() => {
       onRemove(toast.id);
     }, 4000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(removeTimer);
+    };
   }, [toast.id, onRemove]);
+
+  const handleClose = () => {
+    setIsExiting(true);
+    setTimeout(() => onRemove(toast.id), 200);
+  };
 
   return (
     <div
-      className={`pointer-events-auto flex items-center gap-spacing-300 rounded-radius-400 border px-spacing-500 py-spacing-400 backdrop-blur-sm ${style.bg}`}
+      className={`pointer-events-auto flex max-w-80 items-center gap-spacing-300 rounded-radius-400 px-spacing-500 py-spacing-400 shadow-lg ${bgColor} ${isExiting ? "animate-toast-out" : "animate-toast-in"}`}
       role="alert">
-      <Icon className={`size-5 shrink-0 ${style.iconColor}`} />
-      <span className="text-body text-content-standard-primary">{toast.message}</span>
+      <span className="font-medium text-body text-solid-white">{toast.message}</span>
       <button
-        onClick={() => onRemove(toast.id)}
-        className="ml-spacing-200 shrink-0 rounded-radius-200 p-spacing-100 text-content-standard-tertiary transition-all duration-150 hover:bg-components-interactive-hover hover:text-content-standard-primary">
+        onClick={handleClose}
+        className="ml-spacing-200 shrink-0 rounded-radius-200 p-spacing-100 text-solid-white/70 transition-all duration-150 hover:bg-solid-white/20 hover:text-solid-white">
         <X className="size-4" />
       </button>
     </div>

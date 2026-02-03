@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { useStudentDetail } from "../(hooks)/useStudentDetail";
@@ -24,15 +25,16 @@ export default function StudentDetailPage() {
   const router = useRouter();
   const params = useParams();
   const studentId = params.id as string;
+  const toast = useToast();
 
   const { studentDetail, isLoading, error } = useStudentDetail(studentId);
 
   useEffect(() => {
     if (error) {
-      alert("학생을 찾을 수 없습니다.");
+      toast.error("학생을 찾을 수 없습니다.");
       router.push("/students");
     }
-  }, [error, router]);
+  }, [error, router, toast]);
 
   const examWithAssignments = useMemo(() => {
     if (!studentDetail) return [];

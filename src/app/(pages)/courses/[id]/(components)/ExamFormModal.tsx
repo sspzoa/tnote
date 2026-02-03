@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 
 interface ExamFormData {
   examNumber: number;
@@ -35,6 +36,7 @@ export function ExamFormModal({
   const [examName, setExamName] = useState("");
   const [maxScore, setMaxScore] = useState("8");
   const [cutline, setCutline] = useState("4");
+  const toast = useToast();
 
   // Reset form when modal opens with initial data
   useEffect(() => {
@@ -62,7 +64,7 @@ export function ExamFormModal({
 
   const handleSubmit = async () => {
     if (!examNumber || !examName.trim() || !maxScore || !cutline) {
-      alert("모든 정보를 입력해 주세요.");
+      toast.info("모든 정보를 입력해 주세요.");
       return;
     }
 

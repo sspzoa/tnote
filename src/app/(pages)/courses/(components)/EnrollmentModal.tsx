@@ -9,6 +9,7 @@ import {
   StudentListItem,
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
+import { useToast } from "@/shared/hooks/useToast";
 import { enrolledSearchQueryAtom, selectedCourseAtom, unenrolledSearchQueryAtom } from "../(atoms)/useCoursesStore";
 import { showEnrollModalAtom } from "../(atoms)/useModalStore";
 import { useAllStudents } from "../(hooks)/useAllStudents";
@@ -22,6 +23,7 @@ export default function EnrollmentModal() {
   const [enrolledSearchQuery, setEnrolledSearchQuery] = useAtom(enrolledSearchQueryAtom);
   const [unenrolledSearchQuery, setUnenrolledSearchQuery] = useAtom(unenrolledSearchQueryAtom);
   const [loadingStudentId, setLoadingStudentId] = useState<string | null>(null);
+  const toast = useToast();
 
   const { students: allStudents } = useAllStudents();
   const { enrolledStudents, isLoading: isLoadingEnrolled } = useEnrolledStudents(selectedCourse?.id || null);
@@ -47,7 +49,7 @@ export default function EnrollmentModal() {
     try {
       await enrollStudent({ courseId: selectedCourse.id, studentId });
     } catch (error) {
-      alert(error instanceof Error ? error.message : "학생 등록에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "학생 등록에 실패했습니다.");
     } finally {
       setLoadingStudentId(null);
     }
@@ -58,7 +60,7 @@ export default function EnrollmentModal() {
     try {
       await unenrollStudent({ courseId: selectedCourse.id, studentId });
     } catch {
-      alert("학생 제거에 실패했습니다.");
+      toast.error("학생 제거에 실패했습니다.");
     } finally {
       setLoadingStudentId(null);
     }

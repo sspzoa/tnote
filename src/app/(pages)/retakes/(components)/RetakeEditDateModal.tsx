@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { editDateAtom } from "../(atoms)/useFormStore";
 import { showEditDateModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -20,6 +21,7 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
   const [editDate, setEditDate] = useAtom(editDateAtom);
   const { editDate: updateDate, isEditing } = useRetakeEditDate();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
+  const toast = useToast();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -28,7 +30,7 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
 
   const handleSave = async () => {
     if (!selectedRetake || !editDate) {
-      alert("새로운 날짜를 입력해 주세요.");
+      toast.info("새로운 날짜를 입력해 주세요.");
       return;
     }
 
@@ -37,12 +39,12 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
         retakeId: selectedRetake.id,
         newDate: editDate,
       });
-      alert("날짜가 수정되었습니다.");
+      toast.success("날짜가 수정되었습니다.");
       await refetchHistory();
       handleClose();
       onSuccess?.();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "날짜 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "날짜 수정에 실패했습니다.");
     }
   };
 

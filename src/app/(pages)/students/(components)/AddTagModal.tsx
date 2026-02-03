@@ -3,6 +3,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { Badge, Button, FormCheckbox, FormInput, FormSelect, Modal } from "@/shared/components/ui";
+import { useToast } from "@/shared/hooks/useToast";
 import { getTodayKST } from "@/shared/lib/utils/date";
 import { showAddTagModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
@@ -14,6 +15,7 @@ export default function AddTagModal() {
   const selectedStudent = useAtomValue(selectedStudentAtom);
   const { tags, isLoading: isTagsLoading } = useTags();
   const { mutateAsync: assignTag, isPending: isAssigning } = useAssignTag();
+  const toast = useToast();
 
   const [selectedTagId, setSelectedTagId] = useState<string>("");
   const [startDate, setStartDate] = useState<string>(getTodayKST());
@@ -42,10 +44,10 @@ export default function AddTagModal() {
         startDate,
         endDate: isIndefinite ? null : endDate || null,
       });
-      alert("태그가 추가되었습니다.");
+      toast.success("태그가 추가되었습니다.");
       handleClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "태그 추가에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "태그 추가에 실패했습니다.");
     }
   };
 

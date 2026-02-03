@@ -50,6 +50,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
+    const isDefaultPassword = await bcrypt.compare(user.phone_number, user.password);
+
     const tokenPayload = {
       userId: user.id,
       phoneNumber: user.phone_number,
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
+      isDefaultPassword,
       user: {
         id: user.id,
         name: user.name,

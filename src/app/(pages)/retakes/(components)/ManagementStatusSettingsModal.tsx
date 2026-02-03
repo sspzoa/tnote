@@ -27,6 +27,7 @@ import {
   useManagementStatusReorder,
   useManagementStatusUpdate,
 } from "@/shared/hooks/useManagementStatuses";
+import { useToast } from "@/shared/hooks/useToast";
 import type { ManagementStatusItem, StatusColor } from "@/shared/types";
 import { showManagementStatusSettingsModalAtom } from "../(atoms)/useModalStore";
 
@@ -144,6 +145,7 @@ export default function ManagementStatusSettingsModal() {
   const { mutateAsync: updateStatus } = useManagementStatusUpdate();
   const { mutateAsync: deleteStatus } = useManagementStatusDelete();
   const { mutateAsync: reorderStatuses } = useManagementStatusReorder();
+  const toast = useToast();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -213,7 +215,7 @@ export default function ManagementStatusSettingsModal() {
       setNewName("");
       setNewColor("neutral");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "추가에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "추가에 실패했습니다.");
     }
   };
 
@@ -263,7 +265,7 @@ export default function ManagementStatusSettingsModal() {
 
       setDeletedIds([]);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "저장에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "저장에 실패했습니다.");
     } finally {
       setIsSaving(false);
     }

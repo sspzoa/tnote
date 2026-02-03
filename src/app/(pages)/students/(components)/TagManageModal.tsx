@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { useToast } from "@/shared/hooks/useToast";
 import { TAG_COLOR_STYLES, TAG_COLORS, TAG_SOLID_COLORS } from "@/shared/lib/utils/tagColors";
 import type { StudentTag, TagColor } from "@/shared/types";
 import { showTagManageModalAtom } from "../(atoms)/useModalStore";
@@ -27,6 +28,7 @@ export default function TagManageModal() {
   const { mutateAsync: createTag, isPending: isCreating } = useCreateTag();
   const { mutateAsync: updateTag, isPending: isUpdating } = useUpdateTag();
   const { mutateAsync: deleteTag, isPending: isDeleting } = useDeleteTag();
+  const toast = useToast();
 
   const [form, setForm] = useState<TagFormState>(initialFormState);
   const [editingTag, setEditingTag] = useState<StudentTag | null>(null);
@@ -38,10 +40,10 @@ export default function TagManageModal() {
 
     try {
       await createTag({ name: form.name.trim(), color: form.color, hiddenByDefault: form.hiddenByDefault });
-      alert("태그가 추가되었습니다.");
+      toast.success("태그가 추가되었습니다.");
       setForm(initialFormState);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "태그 추가에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "태그 추가에 실패했습니다.");
     }
   };
 
@@ -65,11 +67,11 @@ export default function TagManageModal() {
         color: form.color,
         hiddenByDefault: form.hiddenByDefault,
       });
-      alert("태그가 수정되었습니다.");
+      toast.success("태그가 수정되었습니다.");
       setEditingTag(null);
       setForm(initialFormState);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "태그 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "태그 수정에 실패했습니다.");
     }
   };
 
@@ -80,13 +82,13 @@ export default function TagManageModal() {
 
     try {
       await deleteTag(tag.id);
-      alert("태그가 삭제되었습니다.");
+      toast.success("태그가 삭제되었습니다.");
       if (editingTag?.id === tag.id) {
         setEditingTag(null);
         setForm(initialFormState);
       }
     } catch (error) {
-      alert(error instanceof Error ? error.message : "태그 삭제에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "태그 삭제에 실패했습니다.");
     }
   };
 

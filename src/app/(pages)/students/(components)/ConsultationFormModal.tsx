@@ -3,6 +3,7 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import { showAddConsultationModalAtom, showEditConsultationModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
@@ -22,6 +23,7 @@ export default function ConsultationFormModal() {
   const { updateConsultation, isUpdating } = useConsultationUpdate();
   const { deleteConsultation, isDeleting } = useConsultationDelete();
   const { templates, addTemplate, deleteTemplate } = useConsultationTemplates();
+  const toast = useToast();
 
   const isEditMode = showEditModal;
   const showModal = showAddModal || showEditModal;
@@ -47,7 +49,7 @@ export default function ConsultationFormModal() {
 
   const handleAdd = async () => {
     if (!form.title.trim() || !form.content.trim()) {
-      alert("제목과 상담 내용을 입력해 주세요.");
+      toast.info("제목과 상담 내용을 입력해 주세요.");
       return;
     }
 
@@ -57,17 +59,17 @@ export default function ConsultationFormModal() {
         title: form.title,
         content: form.content,
       });
-      alert("상담일지가 추가되었습니다.");
+      toast.success("상담일지가 추가되었습니다.");
       setShowAddModal(false);
       setForm({ title: "", content: "" });
     } catch (error) {
-      alert(error instanceof Error ? error.message : "상담일지 추가에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "상담일지 추가에 실패했습니다.");
     }
   };
 
   const handleEdit = async () => {
     if (!selectedConsultation || !form.title.trim() || !form.content.trim()) {
-      alert("제목과 상담 내용을 입력해 주세요.");
+      toast.info("제목과 상담 내용을 입력해 주세요.");
       return;
     }
 
@@ -78,10 +80,10 @@ export default function ConsultationFormModal() {
         title: form.title,
         content: form.content,
       });
-      alert("상담일지가 수정되었습니다.");
+      toast.success("상담일지가 수정되었습니다.");
       setShowEditModal(false);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "상담일지 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "상담일지 수정에 실패했습니다.");
     }
   };
 
@@ -97,10 +99,10 @@ export default function ConsultationFormModal() {
         consultationId: selectedConsultation.id,
         studentId: selectedStudent.id,
       });
-      alert("상담일지가 삭제되었습니다.");
+      toast.success("상담일지가 삭제되었습니다.");
       setShowEditModal(false);
     } catch {
-      alert("상담일지 삭제에 실패했습니다.");
+      toast.error("상담일지 삭제에 실패했습니다.");
     }
   };
 

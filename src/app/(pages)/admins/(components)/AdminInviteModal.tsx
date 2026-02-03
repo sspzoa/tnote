@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { formErrorAtom, inviteFormAtom } from "../(atoms)/useFormStore";
 import { showInviteModalAtom } from "../(atoms)/useModalStore";
@@ -10,30 +11,20 @@ export default function AdminInviteModal() {
   const [form, setForm] = useAtom(inviteFormAtom);
   const [error, setError] = useAtom(formErrorAtom);
   const { createAdmin, isCreating } = useAdminCreate();
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (form.password !== form.confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
-    if (form.password.length < 8) {
-      setError("비밀번호는 8자 이상이어야 합니다.");
-      return;
-    }
-
     try {
       await createAdmin({
         name: form.name,
         phoneNumber: removePhoneHyphens(form.phoneNumber),
-        password: form.password,
       });
-      alert("관리자가 추가되었습니다.");
+      toast.success("관리자가 추가되었습니다.");
       setShowModal(false);
-      setForm({ name: "", phoneNumber: "", password: "", confirmPassword: "" });
+      setForm({ name: "", phoneNumber: "" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "관리자 추가에 실패했습니다.");
     }
@@ -87,23 +78,7 @@ export default function AdminInviteModal() {
           required
         />
 
-        <FormInput
-          label="비밀번호"
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          placeholder="최소 8자 이상"
-          required
-        />
-
-        <FormInput
-          label="비밀번호 확인"
-          type="password"
-          value={form.confirmPassword}
-          onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-          placeholder="비밀번호를 다시 입력하세요"
-          required
-        />
+        <p className="text-caption text-content-standard-tertiary">초기 비밀번호는 전화번호로 자동 설정됩니다.</p>
 
         {error && (
           <div className="rounded-radius-300 border border-core-status-negative/20 bg-solid-translucent-red px-spacing-400 py-spacing-300 font-medium text-core-status-negative text-label">

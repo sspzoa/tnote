@@ -7,6 +7,7 @@ import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
+import { useToast } from "@/shared/hooks/useToast";
 import {
   scoreExamAtom,
   selectedExamAtom,
@@ -31,6 +32,7 @@ export default function CourseDetailPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.id as string;
+  const toast = useToast();
 
   const { course, isLoading: courseLoading, error: courseError } = useCourseDetail(courseId);
   const { exams, isLoading: examsLoading } = useExams(courseId);
@@ -61,17 +63,17 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     if (courseError) {
-      alert("수업을 찾을 수 없습니다.");
+      toast.error("수업을 찾을 수 없습니다.");
       router.push("/courses");
     }
-  }, [courseError, router]);
+  }, [courseError, router, toast]);
 
   const handleCreate = async (data: { examNumber: number; name: string; maxScore: number; cutline: number }) => {
     try {
       await createExam({ courseId, ...data });
-      alert("시험이 생성되었습니다.");
+      toast.success("시험이 생성되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
     }
   };
 
@@ -80,9 +82,9 @@ export default function CourseDetailPage() {
 
     try {
       await updateExam({ examId: selectedExam.id, ...data });
-      alert("시험이 수정되었습니다.");
+      toast.success("시험이 수정되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "시험 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "시험 수정에 실패했습니다.");
     }
   };
 
@@ -95,9 +97,9 @@ export default function CourseDetailPage() {
 
     try {
       await deleteExam(exam.id);
-      alert("시험이 삭제되었습니다.");
+      toast.success("시험이 삭제되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "시험 삭제에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "시험 삭제에 실패했습니다.");
     }
   };
 
@@ -111,10 +113,10 @@ export default function CourseDetailPage() {
     try {
       await saveScores({ examId: scoreExam.id, scores, toDelete: toDeleteScores });
       await saveAssignments({ examId: scoreExam.id, assignments });
-      alert("저장되었습니다.");
+      toast.success("저장되었습니다.");
       closeScoreModal();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "저장에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "저장에 실패했습니다.");
     }
   };
 

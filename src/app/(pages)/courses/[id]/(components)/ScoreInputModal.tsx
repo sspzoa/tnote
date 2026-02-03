@@ -9,6 +9,7 @@ import {
   StudentListSkeleton,
   type StudentListStudent,
 } from "@/shared/components/ui/studentList";
+import { useToast } from "@/shared/hooks/useToast";
 import type { Exam } from "../(hooks)/useExams";
 
 interface ScoreData {
@@ -52,6 +53,7 @@ export function ScoreInputModal({
   const [scoreInputs, setScoreInputs] = useState<Record<string, string>>({});
   const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
   const [existingScoreStudentIds, setExistingScoreStudentIds] = useState<string[]>([]);
+  const toast = useToast();
 
   useEffect(() => {
     if (isOpen) {
@@ -122,7 +124,7 @@ export function ScoreInputModal({
     const maxScoreValue = exam.max_score || 8;
     const invalidScores = scores.filter((s) => s.score > maxScoreValue);
     if (invalidScores.length > 0) {
-      alert(`만점(${maxScoreValue}점)을 초과하는 점수가 있습니다.`);
+      toast.info(`만점(${maxScoreValue}점)을 초과하는 점수가 있습니다.`);
       return;
     }
 

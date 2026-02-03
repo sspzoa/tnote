@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { Button } from "@/shared/components/ui/button";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { absentNoteAtom } from "../(atoms)/useFormStore";
 import { showAbsentModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -20,6 +21,7 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
   const [absentNote, setAbsentNote] = useAtom(absentNoteAtom);
   const { markAbsent, isMarkingAbsent } = useRetakeAbsent();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
+  const toast = useToast();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -34,12 +36,12 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
         retakeId: selectedRetake.id,
         data: { note: absentNote || null },
       });
-      alert("결석 처리되었습니다.");
+      toast.success("결석 처리되었습니다.");
       await refetchHistory();
       handleClose();
       onSuccess?.();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "결석 처리에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "결석 처리에 실패했습니다.");
     }
   };
 

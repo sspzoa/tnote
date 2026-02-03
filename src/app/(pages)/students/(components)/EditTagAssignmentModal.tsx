@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Badge, Button, FormCheckbox, FormInput, Modal } from "@/shared/components/ui";
+import { useToast } from "@/shared/hooks/useToast";
 import { editTagAssignmentDataAtom, showEditTagAssignmentModalAtom } from "../(atoms)/useModalStore";
 import { useRemoveTag, useUpdateTagAssignment } from "../(hooks)/useStudentTags";
 
@@ -11,6 +12,7 @@ export default function EditTagAssignmentModal() {
   const [editData, setEditData] = useAtom(editTagAssignmentDataAtom);
   const { mutateAsync: updateTagAssignment, isPending: isUpdating } = useUpdateTagAssignment();
   const { mutateAsync: removeTag, isPending: isRemoving } = useRemoveTag();
+  const toast = useToast();
 
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -39,10 +41,10 @@ export default function EditTagAssignmentModal() {
         startDate,
         endDate: isIndefinite ? null : endDate || null,
       });
-      alert("태그 날짜가 수정되었습니다.");
+      toast.success("태그 날짜가 수정되었습니다.");
       handleClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "태그 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "태그 수정에 실패했습니다.");
     }
   };
 
@@ -55,10 +57,10 @@ export default function EditTagAssignmentModal() {
         studentId: editData.studentId,
         tagId: editData.assignment.tag_id,
       });
-      alert("태그가 제거되었습니다.");
+      toast.success("태그가 제거되었습니다.");
       handleClose();
     } catch {
-      alert("태그 제거에 실패했습니다.");
+      toast.error("태그 제거에 실패했습니다.");
     }
   };
 

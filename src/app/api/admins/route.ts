@@ -41,14 +41,10 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const { name, phoneNumber, password } = await request.json();
+  const { name, phoneNumber } = await request.json();
 
-  if (!name || !phoneNumber || !password) {
-    return NextResponse.json({ error: "모든 필수 정보를 입력해주세요." }, { status: 400 });
-  }
-
-  if (password.length < 8) {
-    return NextResponse.json({ error: "비밀번호는 최소 8자 이상이어야 합니다." }, { status: 400 });
+  if (!name || !phoneNumber) {
+    return NextResponse.json({ error: "이름과 전화번호를 입력해주세요." }, { status: 400 });
   }
 
   const { data: existingUser } = await supabase
@@ -62,7 +58,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(phoneNumber, 10);
 
   const { data: newAdmin, error: adminError } = await supabase
     .from("Users")

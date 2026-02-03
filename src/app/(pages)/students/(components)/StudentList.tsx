@@ -9,6 +9,7 @@ import {
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
+import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 
@@ -61,6 +62,7 @@ export default function StudentList({ students }: StudentListProps) {
   const [, setEditTagAssignmentData] = useAtom(editTagAssignmentDataAtom);
   const { deleteStudent } = useStudentDelete();
   const { resetPassword } = useStudentPasswordReset();
+  const toast = useToast();
 
   const comparators = useMemo(
     () => ({
@@ -108,12 +110,12 @@ export default function StudentList({ students }: StudentListProps) {
 
       try {
         await resetPassword(student.id);
-        alert("비밀번호가 전화번호로 초기화되었습니다.");
+        toast.success("비밀번호가 전화번호로 초기화되었습니다.");
       } catch {
-        alert("비밀번호 초기화에 실패했습니다.");
+        toast.error("비밀번호 초기화에 실패했습니다.");
       }
     },
-    [resetPassword],
+    [resetPassword, toast],
   );
 
   const handleDelete = useCallback(
@@ -128,12 +130,12 @@ export default function StudentList({ students }: StudentListProps) {
 
       try {
         await deleteStudent(student.id);
-        alert("학생이 삭제되었습니다.");
+        toast.success("학생이 삭제되었습니다.");
       } catch (error) {
-        alert(error instanceof Error ? error.message : "학생 삭제에 실패했습니다.");
+        toast.error(error instanceof Error ? error.message : "학생 삭제에 실패했습니다.");
       }
     },
-    [deleteStudent],
+    [deleteStudent, toast],
   );
 
   const openConsultationModal = useCallback(

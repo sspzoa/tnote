@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
 import type { History } from "../(atoms)/useRetakesStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -22,6 +23,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
   const [selectedRetake] = useAtom(selectedRetakeAtom);
   const { history, isLoading, refetch } = useRetakeHistory(selectedRetake?.id || null);
   const { undoAction, isUndoing } = useRetakeUndo();
+  const toast = useToast();
 
   // 모달이 열릴 때마다 이력 새로고침
   useEffect(() => {
@@ -76,11 +78,11 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
         retakeId: selectedRetake.id,
         historyId: item.id,
       });
-      alert("작업이 되돌려졌습니다.");
+      toast.success("작업이 되돌려졌습니다.");
       await refetch();
       onSuccess?.();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "되돌리기에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "되돌리기에 실패했습니다.");
     }
   };
 

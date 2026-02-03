@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { StudentListItem } from "@/shared/components/ui/studentList";
+import { useToast } from "@/shared/hooks/useToast";
 import type { TagColor } from "@/shared/types";
 import {
   examMessageTemplateAtom,
@@ -28,6 +29,7 @@ export default function ExamResultsTab() {
   const { exportData, isFetching: exportFetching } = useExamExport(selectedExamId);
   const { sendExamResults, isSending } = useSendExamResults();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("exam");
+  const toast = useToast();
 
   const [recipientType, setRecipientType] = useAtom(recipientTypeAtom);
   const [messageTemplate, setMessageTemplate] = useAtom(examMessageTemplateAtom);
@@ -111,11 +113,11 @@ export default function ExamResultsTab() {
 
   const handleSend = useCallback(async () => {
     if (!selectedExamId) {
-      alert("시험을 선택하세요.");
+      toast.info("시험을 선택하세요.");
       return;
     }
     if (selectedCount === 0) {
-      alert("수신자를 선택하세요.");
+      toast.info("수신자를 선택하세요.");
       return;
     }
 
@@ -128,15 +130,24 @@ export default function ExamResultsTab() {
       });
 
       if (result.success && result.data) {
-        alert(
+        toast.success(
           `${result.data.successCount}건 발송 완료${result.data.failCount > 0 ? `, ${result.data.failCount}건 실패` : ""}`,
         );
         resetSelection();
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
     }
-  }, [selectedExamId, selectedIds, selectedCount, recipientType, messageTemplate, sendExamResults, resetSelection]);
+  }, [
+    selectedExamId,
+    selectedIds,
+    selectedCount,
+    recipientType,
+    messageTemplate,
+    sendExamResults,
+    resetSelection,
+    toast,
+  ]);
 
   const examSelector = (
     <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">

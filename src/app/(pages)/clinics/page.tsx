@@ -8,6 +8,7 @@ import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
+import { useToast } from "@/shared/hooks/useToast";
 import { getTodayKST } from "@/shared/lib/utils/date";
 import { type Clinic, selectedClinicAtom, showEndedClinicsAtom } from "./(atoms)/useClinicsStore";
 import {
@@ -30,6 +31,7 @@ export default function ClinicsPage() {
   const { clinics, isLoading, error } = useClinics();
   const { deleteClinic } = useClinicDelete();
   const showEndedClinics = useAtomValue(showEndedClinicsAtom);
+  const toast = useToast();
 
   const setShowCreateModal = useSetAtom(showCreateModalAtom);
   const setShowEditModal = useSetAtom(showEditModalAtom);
@@ -79,9 +81,9 @@ export default function ClinicsPage() {
 
     try {
       await deleteClinic(clinic.id);
-      alert("클리닉이 삭제되었습니다.");
+      toast.success("클리닉이 삭제되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "클리닉 삭제에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "클리닉 삭제에 실패했습니다.");
     }
   };
 

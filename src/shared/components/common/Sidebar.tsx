@@ -25,6 +25,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Modal, SegmentedControl, Skeleton } from "@/shared/components/ui";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { useToast } from "@/shared/hooks/useToast";
 import { sidebarCollapsedAtom, sidebarOpenAtom } from "./(atoms)/useSidebarStore";
 import { PasswordChangeModal } from "./PasswordChangeModal";
 
@@ -142,6 +143,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -196,10 +198,10 @@ export default function Sidebar() {
         queryClient.clear();
         router.push("/login");
       } else {
-        alert("로그아웃에 실패했습니다.");
+        toast.error("로그아웃에 실패했습니다.");
       }
     } catch {
-      alert("로그아웃에 실패했습니다.");
+      toast.error("로그아웃에 실패했습니다.");
     }
   };
 

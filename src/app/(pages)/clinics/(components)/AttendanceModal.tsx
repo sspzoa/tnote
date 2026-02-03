@@ -12,6 +12,7 @@ import {
   StudentListItem,
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
+import { useToast } from "@/shared/hooks/useToast";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
 import { attendanceSearchQueryAtom, selectedDateAtom, selectedStudentIdsAtom } from "../(atoms)/useFormStore";
 import { showAttendanceModalAtom } from "../(atoms)/useModalStore";
@@ -25,6 +26,7 @@ export default function AttendanceModal() {
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
   const [selectedStudentIds, setSelectedStudentIds] = useAtom(selectedStudentIdsAtom);
   const [searchQuery, setSearchQuery] = useAtom(attendanceSearchQueryAtom);
+  const toast = useToast();
 
   const { students } = useAllStudents();
   const { attendance, isLoading: loadingAttendance } = useAttendance(selectedClinic?.id || null, selectedDate || null);
@@ -49,7 +51,7 @@ export default function AttendanceModal() {
 
   const handleSave = async () => {
     if (!selectedClinic || !selectedDate) {
-      alert("날짜를 선택해 주세요.");
+      toast.info("날짜를 선택해 주세요.");
       return;
     }
 
@@ -59,9 +61,9 @@ export default function AttendanceModal() {
         studentIds: selectedStudentIds,
         date: selectedDate,
       });
-      alert("출석이 저장되었습니다.");
+      toast.success("출석이 저장되었습니다.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "출석 저장에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "출석 저장에 실패했습니다.");
     }
   };
 

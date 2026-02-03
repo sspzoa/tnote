@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 
 interface PasswordChangeModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface PasswordChangeModalProps {
 }
 
 export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProps) {
+  const toast = useToast();
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -25,12 +27,12 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
 
   const handlePasswordChange = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("새 비밀번호가 일치하지 않습니다.");
+      toast.error("새 비밀번호가 일치하지 않습니다.");
       return;
     }
 
     if (passwordForm.newPassword.length < 8) {
-      alert("비밀번호는 8자 이상이어야 합니다.");
+      toast.error("비밀번호는 8자 이상이어야 합니다.");
       return;
     }
 
@@ -48,13 +50,13 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
       const result = await response.json();
 
       if (response.ok) {
-        alert("비밀번호가 변경되었습니다.");
+        toast.success("비밀번호가 변경되었습니다.");
         handleClose();
       } else {
-        alert(result.error || "비밀번호 변경에 실패했습니다.");
+        toast.error(result.error || "비밀번호 변경에 실패했습니다.");
       }
     } catch {
-      alert("비밀번호 변경에 실패했습니다.");
+      toast.error("비밀번호 변경에 실패했습니다.");
     } finally {
       setPasswordChanging(false);
     }

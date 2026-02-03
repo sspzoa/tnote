@@ -144,6 +144,20 @@ const config: Config = {
         "radius-800": "24px",
         "radius-full": "9999px",
       },
+      keyframes: {
+        "toast-slide-in": {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "toast-slide-out": {
+          "0%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(100%)", opacity: "0" },
+        },
+      },
+      animation: {
+        "toast-in": "toast-slide-in 0.3s ease-out forwards",
+        "toast-out": "toast-slide-out 0.2s ease-in forwards",
+      },
     },
   },
   plugins: [],

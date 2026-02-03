@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
+import { useToast } from "@/shared/hooks/useToast";
 import type { StatusColor } from "@/shared/types";
 import {
   recipientTypeAtom,
@@ -52,6 +53,7 @@ export default function RetakeNoticeTab() {
   const { statuses: managementStatuses } = useManagementStatuses();
   const { sendRetakeNotice, isSending } = useSendRetakeNotice();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("retake");
+  const toast = useToast();
 
   const [recipientType, setRecipientType] = useAtom(recipientTypeAtom);
   const [messageTemplate, setMessageTemplate] = useAtom(retakeMessageTemplateAtom);
@@ -96,7 +98,7 @@ export default function RetakeNoticeTab() {
 
   const handleSend = useCallback(async () => {
     if (selectedCount === 0) {
-      alert("수신자를 선택하세요.");
+      toast.info("수신자를 선택하세요.");
       return;
     }
 
@@ -108,15 +110,15 @@ export default function RetakeNoticeTab() {
       });
 
       if (result.success && result.data) {
-        alert(
+        toast.success(
           `${result.data.successCount}건 발송 완료${result.data.failCount > 0 ? `, ${result.data.failCount}건 실패` : ""}`,
         );
         resetSelection();
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
     }
-  }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection]);
+  }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection, toast]);
 
   const filterHeader = (
     <div className="border-line-divider border-b px-spacing-500 py-spacing-400">

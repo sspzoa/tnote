@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { createFormAtom } from "../(atoms)/useFormStore";
 import { showCreateModalAtom } from "../(atoms)/useModalStore";
@@ -9,6 +10,7 @@ export default function StudentCreateModal() {
   const [showModal, setShowModal] = useAtom(showCreateModalAtom);
   const [form, setForm] = useAtom(createFormAtom);
   const { createStudent, isCreating } = useStudentCreate();
+  const toast = useToast();
 
   const handleCreate = async () => {
     try {
@@ -20,11 +22,11 @@ export default function StudentCreateModal() {
         branch: form.branch || null,
         birthYear: form.birthYear || null,
       });
-      alert("학생이 추가되었습니다.");
+      toast.success("학생이 추가되었습니다.");
       setShowModal(false);
       setForm({ name: "", phoneNumber: "", parentPhoneNumber: "", school: "", branch: "", birthYear: "" });
     } catch (error) {
-      alert(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
     }
   };
 

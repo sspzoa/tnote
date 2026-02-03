@@ -10,6 +10,7 @@ import {
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
+import { useToast } from "@/shared/hooks/useToast";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
@@ -38,6 +39,7 @@ export default function CourseList({ courses }: CourseListProps) {
   const setEndDate = useSetAtom(courseEndDateAtom);
   const setDaysOfWeek = useSetAtom(courseDaysOfWeekAtom);
   const { deleteCourse } = useCourseDelete();
+  const toast = useToast();
 
   const comparators = useMemo(
     () => ({
@@ -74,9 +76,9 @@ export default function CourseList({ courses }: CourseListProps) {
 
     try {
       await deleteCourse(course.id);
-      alert("수업이 삭제되었습니다.");
+      toast.success("수업이 삭제되었습니다.");
     } catch {
-      alert("수업 삭제에 실패했습니다.");
+      toast.error("수업 삭제에 실패했습니다.");
     }
   };
 

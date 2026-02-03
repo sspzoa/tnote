@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { StudentListItem } from "@/shared/components/ui/studentList";
+import { useToast } from "@/shared/hooks/useToast";
 import { messageTextAtom, recipientTypeAtom } from "../(atoms)/useMessageStore";
 import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
 import { useSelectionList } from "../(hooks)/useSelectionList";
@@ -15,6 +16,7 @@ export default function GeneralTab() {
   const { students, isLoading } = useStudents();
   const { sendMessage, isSending } = useSendMessage();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("general");
+  const toast = useToast();
 
   const {
     selectedIds,
@@ -49,11 +51,11 @@ export default function GeneralTab() {
 
   const handleSend = useCallback(async () => {
     if (selectedCount === 0) {
-      alert("수신자를 선택하세요.");
+      toast.info("수신자를 선택하세요.");
       return;
     }
     if (!messageText.trim()) {
-      alert("메시지를 입력하세요.");
+      toast.info("메시지를 입력하세요.");
       return;
     }
 
@@ -65,16 +67,16 @@ export default function GeneralTab() {
       });
 
       if (result.success && result.data) {
-        alert(
+        toast.success(
           `${result.data.successCount}건 발송 완료${result.data.failCount > 0 ? `, ${result.data.failCount}건 실패` : ""}`,
         );
         setMessageText("");
         resetSelection();
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
+      toast.error(err instanceof Error ? err.message : "문자 발송에 실패했습니다.");
     }
-  }, [selectedIds, selectedCount, messageText, recipientType, sendMessage, setMessageText, resetSelection]);
+  }, [selectedIds, selectedCount, messageText, recipientType, sendMessage, setMessageText, resetSelection, toast]);
 
   if (isLoading) {
     return <MessageTabSkeleton />;

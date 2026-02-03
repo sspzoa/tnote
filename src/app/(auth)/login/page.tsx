@@ -7,6 +7,7 @@ import { FormInput } from "@/shared/components/ui/formInput";
 import { FormSelect } from "@/shared/components/ui/formSelect";
 import { Modal } from "@/shared/components/ui/modal";
 import { SegmentedControl } from "@/shared/components/ui/segmentedControl";
+import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 interface Workspace {
@@ -16,6 +17,7 @@ interface Workspace {
 
 export default function LoginPage() {
   const router = useRouter();
+  const toast = useToast();
   const [tab, setTab] = useState<"teacher" | "student">("teacher");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -70,14 +72,18 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || "로그인에 실패했습니다.");
+        toast.error(data.error || "로그인에 실패했습니다.");
         return;
+      }
+
+      if (data.isDefaultPassword) {
+        toast.info("보안을 위해 비밀번호를 변경해주세요.");
       }
 
       router.push("/");
       router.refresh();
     } catch {
-      alert("로그인에 실패했습니다.");
+      toast.error("로그인에 실패했습니다.");
     } finally {
       setLoading(false);
     }
@@ -87,17 +93,17 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!agreements.terms || !agreements.privacy) {
-      alert("이용약관과 개인정보처리방침에 동의해주세요.");
+      toast.error("이용약관과 개인정보처리방침에 동의해주세요.");
       return;
     }
 
     if (registerForm.password !== registerForm.confirmPassword) {
-      alert("비밀번호가 일치하지 않습니다.");
+      toast.error("비밀번호가 일치하지 않습니다.");
       return;
     }
 
     if (registerForm.password.length < 8) {
-      alert("비밀번호는 8자 이상이어야 합니다.");
+      toast.error("비밀번호는 8자 이상이어야 합니다.");
       return;
     }
 
@@ -122,16 +128,16 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || "회원가입에 실패했습니다.");
+        toast.error(data.error || "회원가입에 실패했습니다.");
         return;
       }
 
-      alert(data.message || "회원가입이 완료되었습니다.");
+      toast.success(data.message || "회원가입이 완료되었습니다.");
       setShowRegisterModal(false);
       setRegisterForm({ name: "", phoneNumber: "", password: "", confirmPassword: "", workspaceName: "" });
       setAgreements({ terms: false, privacy: false });
     } catch {
-      alert("회원가입에 실패했습니다.");
+      toast.error("회원가입에 실패했습니다.");
     } finally {
       setRegistering(false);
     }

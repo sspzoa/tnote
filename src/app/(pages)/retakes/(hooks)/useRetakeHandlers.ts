@@ -2,6 +2,7 @@
 
 import { useSetAtom } from "jotai";
 import { useCallback } from "react";
+import { useToast } from "@/shared/hooks/useToast";
 import type { Retake } from "@/shared/types";
 import { editDateAtom, postponeDateAtom, postponeNoteAtom } from "../(atoms)/useFormStore";
 import {
@@ -33,6 +34,7 @@ export const useRetakeHandlers = (refetch: () => void) => {
   const setPostponeDate = useSetAtom(postponeDateAtom);
   const setPostponeNote = useSetAtom(postponeNoteAtom);
   const setEditDate = useSetAtom(editDateAtom);
+  const toast = useToast();
 
   const { deleteRetake } = useRetakeDelete();
 
@@ -83,9 +85,9 @@ export const useRetakeHandlers = (refetch: () => void) => {
 
       try {
         await deleteRetake(retake.id);
-        alert("재시험이 삭제되었습니다.");
+        toast.success("재시험이 삭제되었습니다.");
       } catch (err) {
-        alert(err instanceof Error ? err.message : "재시험 삭제에 실패했습니다.");
+        toast.error(err instanceof Error ? err.message : "재시험 삭제에 실패했습니다.");
       }
     },
     [deleteRetake, setOpenMenuId],

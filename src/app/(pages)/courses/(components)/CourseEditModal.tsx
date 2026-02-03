@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { showEditModalAtom } from "../(atoms)/useModalStore";
@@ -18,6 +19,7 @@ export default function CourseEditModal() {
   const [startDate, setStartDate] = useAtom(courseStartDateAtom);
   const [endDate, setEndDate] = useAtom(courseEndDateAtom);
   const { updateCourse, isUpdating } = useCourseUpdate();
+  const toast = useToast();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -25,7 +27,7 @@ export default function CourseEditModal() {
 
   const handleEdit = async () => {
     if (!selectedCourse || !courseName.trim()) {
-      alert("수업 이름을 입력해 주세요.");
+      toast.info("수업 이름을 입력해 주세요.");
       return;
     }
 
@@ -37,10 +39,10 @@ export default function CourseEditModal() {
         endDate: endDate || null,
         daysOfWeek: daysOfWeek.length > 0 ? daysOfWeek : null,
       });
-      alert("수업이 수정되었습니다.");
+      toast.success("수업이 수정되었습니다.");
       handleClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "수업 수정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "수업 수정에 실패했습니다.");
     }
   };
 

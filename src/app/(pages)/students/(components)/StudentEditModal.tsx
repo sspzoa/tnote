@@ -1,5 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import { showEditModalAtom } from "../(atoms)/useModalStore";
@@ -11,6 +12,7 @@ export default function StudentEditModal() {
   const [form, setForm] = useAtom(editFormAtom);
   const selectedStudent = useAtomValue(selectedStudentAtom);
   const { updateStudent, isUpdating } = useStudentUpdate();
+  const toast = useToast();
 
   if (!selectedStudent) return null;
 
@@ -25,10 +27,10 @@ export default function StudentEditModal() {
         branch: form.branch || null,
         birthYear: form.birthYear ? Number.parseInt(form.birthYear) : null,
       });
-      alert("학생 정보가 수정되었습니다.");
+      toast.success("학생 정보가 수정되었습니다.");
       setShowModal(false);
     } catch {
-      alert("정보 수정에 실패했습니다.");
+      toast.error("정보 수정에 실패했습니다.");
     }
   };
 

@@ -5,7 +5,6 @@ import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 interface CreateAdminData {
   name: string;
   phoneNumber: string;
-  password: string;
 }
 
 export const useAdminCreate = () => {

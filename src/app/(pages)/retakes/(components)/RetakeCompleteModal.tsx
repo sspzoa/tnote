@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { Button } from "@/shared/components/ui/button";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
+import { useToast } from "@/shared/hooks/useToast";
 import { completeNoteAtom } from "../(atoms)/useFormStore";
 import { showCompleteModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -20,6 +21,7 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
   const [completeNote, setCompleteNote] = useAtom(completeNoteAtom);
   const { completeRetake, isCompleting } = useRetakeComplete();
   const { refetch: refetchHistory } = useRetakeHistory(selectedRetake?.id || null);
+  const toast = useToast();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -34,12 +36,12 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
         retakeId: selectedRetake.id,
         data: { note: completeNote || null },
       });
-      alert("완료 처리되었습니다.");
+      toast.success("완료 처리되었습니다.");
       await refetchHistory();
       handleClose();
       onSuccess?.();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "완료 처리에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "완료 처리에 실패했습니다.");
     }
   };
 
