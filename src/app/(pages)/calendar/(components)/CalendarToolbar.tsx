@@ -25,33 +25,39 @@ export default function CalendarToolbar({
   onFilterChange,
 }: Props) {
   return (
-    <div className="mb-spacing-500 flex items-center justify-between">
-      <div className="flex items-center gap-spacing-200">
-        <button
-          onClick={onPrevMonth}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent"
-          type="button">
-          ←
-        </button>
-        <button
-          onClick={onToday}
-          className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-body text-solid-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
-          type="button">
-          오늘
-        </button>
-        <button
-          onClick={onNextMonth}
-          className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent"
-          type="button">
-          →
-        </button>
+    <div className="mb-spacing-500 flex flex-col gap-spacing-400 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-center justify-between gap-spacing-200 md:justify-start">
+        <div className="flex items-center gap-spacing-200">
+          <button
+            onClick={onPrevMonth}
+            className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent"
+            type="button">
+            ←
+          </button>
+          <button
+            onClick={onToday}
+            className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-body text-solid-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+            type="button">
+            오늘
+          </button>
+          <button
+            onClick={onNextMonth}
+            className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-body text-content-standard-primary transition-all duration-150 hover:border-core-accent/30 hover:bg-core-accent-translucent hover:text-core-accent"
+            type="button">
+            →
+          </button>
+        </div>
+
+        <h2 className="font-bold text-content-standard-primary text-heading md:hidden">
+          {format(currentDate, "yyyy년 M월", { locale: ko })}
+        </h2>
       </div>
 
-      <h2 className="font-bold text-content-standard-primary text-heading">
+      <h2 className="hidden font-bold text-content-standard-primary text-heading md:block">
         {format(currentDate, "yyyy년 M월", { locale: ko })}
       </h2>
 
-      <div className="flex gap-spacing-200">
+      <div className="flex flex-wrap gap-spacing-200">
         <button
           type="button"
           onClick={() => onFilterChange({ ...filters, course: !filters.course })}

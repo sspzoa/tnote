@@ -100,7 +100,8 @@ export default function Home() {
 
           <div className="relative">
             <h1 className="mb-spacing-400 font-bold text-content-standard-primary text-display">
-              안녕하세요, <span className="text-core-accent">{user?.name}</span>님
+              안녕하세요,
+              <br className="md:hidden" /> <span className="text-core-accent">{user?.name}</span>님
             </h1>
             <div className="inline-flex items-center gap-spacing-200 rounded-full border border-core-accent/20 bg-core-accent-translucent px-spacing-400 py-spacing-200">
               <Sparkles className="size-4 text-core-accent" />

@@ -21,12 +21,12 @@ export default function Header({ title, subtitle, action, backLink }: HeaderProp
           <span>{backLink.label}</span>
         </Link>
       )}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col gap-spacing-400 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{title}</h1>
           {subtitle && <p className="text-body text-content-standard-secondary">{subtitle}</p>}
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="flex flex-wrap gap-spacing-200">{action}</div>}
       </div>
     </div>
   );

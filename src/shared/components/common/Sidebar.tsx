@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ClipboardList,
   ExternalLink,
+  Home,
   Hospital,
   LogOut,
   MessageSquare,
@@ -376,71 +377,120 @@ export default function Sidebar() {
     </>
   );
 
+  const mobileMenuItems = isAdmin
+    ? [
+        { href: "/", icon: Home, label: "홈" },
+        { href: "/retakes", icon: ClipboardList, label: "재시험" },
+        { href: "/students", icon: Users, label: "학생" },
+        { href: "/courses", icon: BookOpen, label: "수업" },
+      ]
+    : [{ href: "/calendar", icon: Calendar, label: "캘린더" }];
+
   return (
     <>
-      <div className="fixed inset-0 z-50 flex flex-col bg-components-fill-standard-primary md:hidden">
-        <div className="flex items-center justify-between border-line-divider border-b px-spacing-500 py-spacing-400">
-          <div className="flex items-center gap-spacing-300">
-            <div className="flex size-8 items-center justify-center rounded-radius-300 bg-core-accent">
-              <span className="font-bold text-solid-white text-label">T</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-content-standard-primary text-body leading-tight">Tnote</span>
-              {isLoading ? (
-                <Skeleton className="h-4 w-12" />
-              ) : (
-                userInfo?.workspaceName && (
-                  <span className="text-content-standard-tertiary text-caption">{userInfo.workspaceName}</span>
-                )
+      <nav className="fixed right-0 bottom-0 left-0 z-50 border-line-outline border-t bg-components-fill-standard-primary md:hidden">
+        <div className="flex items-center justify-around px-spacing-200 py-spacing-300">
+          {mobileMenuItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-1 flex-col items-center gap-spacing-100 rounded-radius-300 px-spacing-200 py-spacing-200 transition-colors ${
+                  active ? "text-core-accent" : "text-content-standard-tertiary"
+                }`}>
+                <item.icon className="size-5" />
+                <span className="text-caption">{item.label}</span>
+              </Link>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className={`flex flex-1 flex-col items-center gap-spacing-100 rounded-radius-300 px-spacing-200 py-spacing-200 transition-colors ${
+              isOpen ? "text-core-accent" : "text-content-standard-tertiary"
+            }`}>
+            <Settings className="size-5" />
+            <span className="text-caption">더보기</span>
+          </button>
+        </div>
+      </nav>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="absolute inset-0 bg-solid-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 bottom-[73px] left-0 rounded-t-radius-600 bg-components-fill-standard-primary p-spacing-500">
+            <div className="mb-spacing-400 flex items-center justify-between">
+              <div className="flex items-center gap-spacing-300">
+                <div className="flex size-9 items-center justify-center rounded-full bg-core-accent-translucent ring-2 ring-core-accent/20">
+                  <span className="font-semibold text-core-accent text-label">{userInfo?.name?.charAt(0) || "U"}</span>
+                </div>
+                <div>
+                  <div className="font-medium text-content-standard-primary text-label">
+                    {isLoading ? <Skeleton className="h-5 w-16" /> : userInfo?.name}
+                  </div>
+                  <div className="text-content-standard-tertiary text-caption">
+                    {isLoading ? (
+                      <Skeleton className="h-4 w-10" />
+                    ) : userInfo?.role === "owner" ? (
+                      "소유자"
+                    ) : userInfo?.role === "student" ? (
+                      "학생"
+                    ) : (
+                      "관리자"
+                    )}
+                  </div>
+                </div>
+              </div>
+              {!isLoading && userInfo?.workspaceName && (
+                <span className="rounded-radius-200 bg-core-accent-translucent px-spacing-200 py-spacing-100 text-core-accent text-caption">
+                  {userInfo.workspaceName}
+                </span>
               )}
             </div>
-          </div>
-          {isLoading ? (
-            <div className="flex items-center gap-spacing-200">
-              <Skeleton className="h-6 w-10 rounded-radius-200" />
-              <Skeleton className="h-6 w-12 rounded-radius-200" />
-            </div>
-          ) : (
-            userInfo && (
-              <div className="flex items-center gap-spacing-200 text-body text-content-standard-primary">
-                <span className="text-content-standard-tertiary">
-                  {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
-                </span>
-                <span className="font-medium">{userInfo.name}</span>
-              </div>
-            )
-          )}
-        </div>
 
-        <div className="flex flex-1 flex-col items-center justify-center p-spacing-600">
-          <div className="flex flex-col items-center gap-spacing-600 text-center">
-            <p className="text-body text-content-standard-secondary">
-              모바일 환경은 지원하지 않습니다.
-              <br />
-              PC에서 이용해 주세요.
-            </p>
-
-            {!isLoading && userInfo && (
-              <div className="flex w-full max-w-xs flex-col gap-spacing-300">
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowSettingsModal(true)}
-                  className="flex w-full items-center justify-center gap-spacing-200">
-                  <Settings className="size-4" />
-                  설정
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-spacing-200">
-                  <LogOut className="size-4" />
-                  로그아웃
-                </Button>
+            {isAdmin && (
+              <div className="mb-spacing-400 grid grid-cols-4 gap-spacing-200">
+                {[
+                  { href: "/calendar", icon: Calendar, label: "캘린더" },
+                  { href: "/messages", icon: MessageSquare, label: "문자" },
+                  { href: "/clinics", icon: Hospital, label: "클리닉" },
+                  { href: "/admins", icon: UserCog, label: "관리자" },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex flex-col items-center gap-spacing-100 rounded-radius-300 bg-components-fill-standard-secondary p-spacing-300 transition-colors hover:bg-components-interactive-hover">
+                    <item.icon className="size-5 text-content-standard-secondary" />
+                    <span className="text-caption text-content-standard-primary">{item.label}</span>
+                  </Link>
+                ))}
               </div>
             )}
+
+            <div className="flex gap-spacing-200">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowSettingsModal(true);
+                }}
+                className="flex flex-1 items-center justify-center gap-spacing-200">
+                <Settings className="size-4" />
+                설정
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleLogout}
+                className="flex flex-1 items-center justify-center gap-spacing-200">
+                <LogOut className="size-4" />
+                로그아웃
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <aside
         className={`fixed top-0 left-0 hidden h-full flex-col border-line-outline border-r bg-components-fill-standard-primary transition-[width] duration-300 md:flex ${isCollapsed ? "w-16" : "w-64"}`}>

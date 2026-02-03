@@ -178,7 +178,7 @@ export default function CourseDetailPage() {
           <Link href="/courses" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
             ← 수업 목록으로 돌아가기
           </Link>
-          <div className="flex items-end justify-between">
+          <div className="flex flex-col gap-spacing-400 md:flex-row md:items-end md:justify-between">
             <div>
               <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{course.name}</h1>
               <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
