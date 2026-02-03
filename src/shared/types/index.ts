@@ -170,6 +170,7 @@ export interface Admin {
   name: string;
   role: "owner" | "admin";
   created_at: string;
+  is_default_password?: boolean;
 }
 
 export interface CalendarEvent {

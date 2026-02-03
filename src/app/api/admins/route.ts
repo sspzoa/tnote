@@ -3,6 +3,33 @@ import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 const handleGet = async ({ supabase, session }: ApiContext) => {
+  const isOwner = session.role === "owner";
+
+  if (isOwner) {
+    const { data, error } = await supabase
+      .from("Users")
+      .select("id, phone_number, name, role, created_at, password")
+      .in("role", ["owner", "admin"])
+      .eq("workspace", session.workspace);
+
+    if (error) throw error;
+
+    const adminsWithPasswordStatus = await Promise.all(
+      (data ?? []).map(async (admin) => {
+        const isDefaultPassword = await bcrypt.compare(admin.phone_number, admin.password);
+        return {
+          id: admin.id,
+          phone_number: admin.phone_number,
+          name: admin.name,
+          role: admin.role,
+          created_at: admin.created_at,
+          is_default_password: isDefaultPassword,
+        };
+      }),
+    );
+    return NextResponse.json({ data: adminsWithPasswordStatus });
+  }
+
   const { data, error } = await supabase
     .from("Users")
     .select("id, phone_number, name, role, created_at")

@@ -112,6 +112,11 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
               onSort={toggleSort}
             />
             {isOwner && (
+              <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                비밀번호
+              </th>
+            )}
+            {isOwner && (
               <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
             )}
           </tr>
@@ -140,6 +145,18 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {new Date(admin.created_at).toLocaleDateString("ko-KR")}
               </td>
+              {isOwner && (
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                  <span
+                    className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${
+                      admin.is_default_password
+                        ? "bg-solid-translucent-red text-solid-red"
+                        : "bg-solid-translucent-green text-solid-green"
+                    }`}>
+                    {admin.is_default_password ? "미변경" : "변경됨"}
+                  </span>
+                </td>
+              )}
               {isOwner && (
                 <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                   {admin.role !== "owner" && (

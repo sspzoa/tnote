@@ -67,9 +67,6 @@ const adminMenuItems = [
     icon: Hospital,
     label: "클리닉 관리",
   },
-];
-
-const ownerMenuItems = [
   {
     href: "/admins",
     icon: UserCog,
@@ -213,7 +210,7 @@ export default function Sidebar() {
       label: "캘린더",
     },
   ];
-  const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems, ...ownerMenuItems] : studentMenuItems;
+  const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems] : studentMenuItems;
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
