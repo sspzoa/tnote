@@ -98,11 +98,8 @@ export default function Home() {
   return (
     <div className="min-h-screen p-spacing-500 md:p-spacing-700">
       <div className="mx-auto max-w-6xl flex flex-col gap-spacing-700">
-        <div className="relative overflow-hidden rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          <div className="absolute -right-20 -top-20 size-64 rounded-full bg-core-accent-translucent opacity-50 blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 size-48 rounded-full bg-solid-translucent-purple opacity-30 blur-3xl" />
-
-          <div className="relative flex flex-col gap-spacing-400">
+        <div className="rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+          <div className="flex flex-col gap-spacing-400">
             <h1 className="font-bold text-content-standard-primary text-display">
               안녕하세요,
               <br className="md:hidden" /> <span className="text-core-accent">{user?.name}</span>님
@@ -121,8 +118,6 @@ export default function Home() {
                 key={item.href}
                 href={item.href}
                 className="group relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:-translate-y-spacing-50 hover:border-core-accent/30">
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-core-accent-translucent/0 transition-all duration-300 group-hover:to-core-accent-translucent/30" />
-
                 <div className="flex flex-col gap-spacing-400">
                   <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
                   <div className="relative flex flex-col gap-spacing-100">

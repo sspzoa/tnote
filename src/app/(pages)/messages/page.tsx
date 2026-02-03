@@ -5,7 +5,7 @@ import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, Refres
 import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
-import { SegmentedControl, Skeleton, SlidePanel } from "@/shared/components/ui";
+import { Button, SegmentedControl, Skeleton, SlidePanel } from "@/shared/components/ui";
 import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/useMessageStore";
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
@@ -166,9 +166,10 @@ export default function MessagesPage() {
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
           <div className="flex items-center gap-spacing-300">
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setShowSenderPhoneSettings(true)}
-              className="flex items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+              className="flex items-center gap-spacing-200">
               <Phone className="size-4" />
               <span className="hidden sm:inline">발신번호:</span>
               {isSenderPhoneLoading ? (
@@ -179,13 +180,14 @@ export default function MessagesPage() {
                 </span>
               )}
               <Settings className="size-3 text-content-standard-tertiary" />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => setShowHistoryPanel(true)}
-              className="flex items-center gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 font-medium text-body text-content-standard-secondary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+              className="flex items-center gap-spacing-200">
               <History className="size-4" />
               발송 이력
-            </button>
+            </Button>
           </div>
         }
       />

@@ -69,13 +69,6 @@ export default function RetakesPage() {
           <div className="flex items-center gap-spacing-300">
             <Button
               variant="secondary"
-              onClick={() => setShowSettingsModal(true)}
-              className="flex items-center gap-spacing-200">
-              <Settings className="size-4" />
-              관리 상태 설정
-            </Button>
-            <Button
-              variant="secondary"
               onClick={() => setShowHistoryPanel(true)}
               className="flex items-center gap-spacing-200">
               <History className="size-4" />
@@ -85,6 +78,13 @@ export default function RetakesPage() {
                   {allHistory.length}
                 </span>
               )}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setShowSettingsModal(true)}
+              className="flex items-center gap-spacing-200">
+              <Settings className="size-4" />
+              관리 상태 설정
             </Button>
             <Button onClick={handleAssignClick}>+ 재시험 할당</Button>
           </div>

@@ -1,8 +1,25 @@
 "use client";
 
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useAtom } from "jotai";
-import { useCallback, useEffect, useState } from "react";
-import { Button, IconButton, Input, Modal, Select, StatusBadge } from "@/shared/components/ui";
+import { GripVertical } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button, Input, Modal, Select, StatusBadge } from "@/shared/components/ui";
 import {
   useManagementStatusCreate,
   useManagementStatusDelete,
@@ -21,13 +38,112 @@ const COLOR_OPTIONS: { value: StatusColor; label: string }[] = [
   { value: "neutral", label: "회색 (기본)" },
 ];
 
+interface SortableItemProps {
+  status: ManagementStatusItem;
+  index: number;
+  editingId: string | null;
+  editName: string;
+  editColor: StatusColor;
+  isBusy: boolean;
+  onStartEdit: (status: ManagementStatusItem) => void;
+  onCancelEdit: () => void;
+  onConfirmEdit: () => void;
+  onDelete: (id: string) => void;
+  onEditNameChange: (value: string) => void;
+  onEditColorChange: (value: StatusColor) => void;
+}
+
+const SortableItem = ({
+  status,
+  index,
+  editingId,
+  editName,
+  editColor,
+  isBusy,
+  onStartEdit,
+  onCancelEdit,
+  onConfirmEdit,
+  onDelete,
+  onEditNameChange,
+  onEditColorChange,
+}: SortableItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: status.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0 ${isDragging ? "z-10 bg-components-fill-standard-secondary opacity-90 shadow-lg" : "bg-background-standard-primary"}`}>
+      <button
+        type="button"
+        className="cursor-grab touch-none text-content-standard-tertiary hover:text-content-standard-primary active:cursor-grabbing"
+        {...attributes}
+        {...listeners}>
+        <GripVertical className="size-4" />
+      </button>
+
+      <span className="w-6 text-center text-content-standard-quaternary text-caption">{index + 1}</span>
+
+      {editingId === status.id ? (
+        <>
+          <Input
+            type="text"
+            value={editName}
+            onChange={(e) => onEditNameChange(e.target.value)}
+            disabled={isBusy}
+            className="flex-1"
+          />
+          <Select
+            value={editColor}
+            onChange={(e) => onEditColorChange(e.target.value as StatusColor)}
+            disabled={isBusy}
+            options={COLOR_OPTIONS}
+            className="w-32"
+          />
+          <Button variant="primary" size="sm" onClick={onConfirmEdit} disabled={isBusy || !editName.trim()}>
+            확인
+          </Button>
+          <Button variant="secondary" size="sm" onClick={onCancelEdit} disabled={isBusy}>
+            취소
+          </Button>
+        </>
+      ) : (
+        <>
+          <div className="flex-1">
+            <StatusBadge variant={status.color}>{status.name}</StatusBadge>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onStartEdit(status)}
+            disabled={isBusy || editingId !== null}>
+            수정
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete(status.id)}
+            disabled={isBusy || editingId !== null}>
+            삭제
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
+
 export default function ManagementStatusSettingsModal() {
   const [showModal, setShowModal] = useAtom(showManagementStatusSettingsModalAtom);
-  const { statuses, isLoading, refetch } = useManagementStatuses();
+  const { statuses, isLoading } = useManagementStatuses();
   const { mutateAsync: createStatus, isPending: isCreating } = useManagementStatusCreate();
-  const { mutateAsync: updateStatus, isPending: isUpdating } = useManagementStatusUpdate();
-  const { mutateAsync: deleteStatus, isPending: isDeleting } = useManagementStatusDelete();
-  const { mutateAsync: reorderStatuses, isPending: isReordering } = useManagementStatusReorder();
+  const { mutateAsync: updateStatus } = useManagementStatusUpdate();
+  const { mutateAsync: deleteStatus } = useManagementStatusDelete();
+  const { mutateAsync: reorderStatuses } = useManagementStatusReorder();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -37,12 +153,22 @@ export default function ManagementStatusSettingsModal() {
   const [newColor, setNewColor] = useState<StatusColor>("neutral");
 
   const [localStatuses, setLocalStatuses] = useState<ManagementStatusItem[]>([]);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   useEffect(() => {
     setLocalStatuses(statuses);
+    setDeletedIds([]);
   }, [statuses]);
 
-  const isBusy = isCreating || isUpdating || isDeleting || isReordering;
+  const isBusy = isCreating || isSaving;
 
   const handleStartEdit = (status: ManagementStatusItem) => {
     setEditingId(status.id);
@@ -56,25 +182,27 @@ export default function ManagementStatusSettingsModal() {
     setEditColor("neutral");
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingId || !editName.trim()) return;
-
-    try {
-      await updateStatus({ id: editingId, name: editName.trim(), color: editColor });
-      handleCancelEdit();
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "수정에 실패했습니다.");
-    }
+  const handleClose = () => {
+    setLocalStatuses(statuses);
+    setDeletedIds([]);
+    setEditingId(null);
+    setEditName("");
+    setEditColor("neutral");
+    setShowModal(false);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("이 관리 상태를 삭제하시겠습니까?")) return;
+  const handleConfirmEdit = () => {
+    if (!editingId || !editName.trim()) return;
 
-    try {
-      await deleteStatus(id);
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "삭제에 실패했습니다.");
-    }
+    setLocalStatuses((prev) =>
+      prev.map((s) => (s.id === editingId ? { ...s, name: editName.trim(), color: editColor } : s)),
+    );
+    handleCancelEdit();
+  };
+
+  const handleDelete = (id: string) => {
+    setLocalStatuses((prev) => prev.filter((s) => s.id !== id));
+    setDeletedIds((prev) => [...prev, id]);
   };
 
   const handleCreate = async () => {
@@ -89,53 +217,78 @@ export default function ManagementStatusSettingsModal() {
     }
   };
 
-  const handleMoveUp = useCallback(
-    (index: number) => {
-      if (index === 0) return;
-      const newList = [...localStatuses];
-      [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
-      setLocalStatuses(newList);
-    },
-    [localStatuses],
-  );
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-  const handleMoveDown = useCallback(
-    (index: number) => {
-      if (index === localStatuses.length - 1) return;
+    if (over && active.id !== over.id) {
+      const oldIndex = localStatuses.findIndex((s) => s.id === active.id);
+      const newIndex = localStatuses.findIndex((s) => s.id === over.id);
+
       const newList = [...localStatuses];
-      [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+      const [removed] = newList.splice(oldIndex, 1);
+      newList.splice(newIndex, 0, removed);
+
       setLocalStatuses(newList);
-    },
-    [localStatuses],
-  );
+    }
+  };
 
   const hasOrderChanged = localStatuses.some((s, i) => s.id !== statuses[i]?.id);
+  const hasUpdates = localStatuses.some((local) => {
+    const original = statuses.find((s) => s.id === local.id);
+    return original && (original.name !== local.name || original.color !== local.color);
+  });
+  const hasDeletes = deletedIds.length > 0;
+  const hasChanges = hasOrderChanged || hasUpdates || hasDeletes;
 
-  const handleSaveOrder = async () => {
+  const handleSaveAll = async () => {
+    setIsSaving(true);
     try {
-      await reorderStatuses(localStatuses.map((s) => s.id));
+      // 1. 삭제 처리
+      for (const id of deletedIds) {
+        await deleteStatus(id);
+      }
+
+      // 2. 수정 처리
+      for (const local of localStatuses) {
+        const original = statuses.find((s) => s.id === local.id);
+        if (original && (original.name !== local.name || original.color !== local.color)) {
+          await updateStatus({ id: local.id, name: local.name, color: local.color });
+        }
+      }
+
+      // 3. 순서 변경 처리
+      if (hasOrderChanged) {
+        await reorderStatuses(localStatuses.map((s) => s.id));
+      }
+
+      setDeletedIds([]);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "순서 변경에 실패했습니다.");
+      alert(error instanceof Error ? error.message : "저장에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
     <Modal
       isOpen={showModal}
-      onClose={() => setShowModal(false)}
+      onClose={handleClose}
       title="관리 상태 설정"
       subtitle="관리 상태 목록을 추가, 수정, 삭제하고 순서를 변경할 수 있습니다"
       footer={
-        <>
-          {hasOrderChanged && (
-            <Button variant="primary" onClick={handleSaveOrder} disabled={isBusy} isLoading={isReordering}>
-              순서 저장
-            </Button>
-          )}
-          <Button variant="secondary" onClick={() => setShowModal(false)} disabled={isBusy}>
+        <div className="flex w-full gap-spacing-300">
+          <Button variant="secondary" onClick={handleClose} disabled={isBusy} className="flex-1">
             닫기
           </Button>
-        </>
+          <Button
+            variant="primary"
+            onClick={handleSaveAll}
+            disabled={isBusy || !hasChanges}
+            isLoading={isSaving}
+            className="flex-1">
+            저장
+          </Button>
+        </div>
       }>
       {isLoading ? (
         <div className="flex h-48 items-center justify-center">
@@ -174,85 +327,27 @@ export default function ManagementStatusSettingsModal() {
           <div className="flex flex-col gap-spacing-200">
             <span className="font-semibold text-content-standard-secondary text-label">상태 목록</span>
             <div className="max-h-80 overflow-y-auto rounded-radius-300 border border-line-outline">
-              {localStatuses.map((status, index) => (
-                <div
-                  key={status.id}
-                  className="flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0">
-                  <div className="flex gap-spacing-100">
-                    <IconButton
-                      variant="ghost"
-                      size="sm"
-                      type="button"
-                      onClick={() => handleMoveUp(index)}
-                      disabled={index === 0 || isBusy}
-                      aria-label="위로 이동">
-                      ↑
-                    </IconButton>
-                    <IconButton
-                      variant="ghost"
-                      size="sm"
-                      type="button"
-                      onClick={() => handleMoveDown(index)}
-                      disabled={index === localStatuses.length - 1 || isBusy}
-                      aria-label="아래로 이동">
-                      ↓
-                    </IconButton>
-                  </div>
-
-                  <span className="w-6 text-center text-content-standard-quaternary text-caption">{index + 1}</span>
-
-                  {editingId === status.id ? (
-                    <>
-                      <Input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        disabled={isBusy}
-                        className="flex-1"
-                      />
-                      <Select
-                        value={editColor}
-                        onChange={(e) => setEditColor(e.target.value as StatusColor)}
-                        disabled={isBusy}
-                        options={COLOR_OPTIONS}
-                        className="w-32"
-                      />
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={handleSaveEdit}
-                        disabled={isBusy}
-                        isLoading={isUpdating}>
-                        저장
-                      </Button>
-                      <Button variant="secondary" size="sm" onClick={handleCancelEdit} disabled={isBusy}>
-                        취소
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex-1">
-                        <StatusBadge variant={status.color}>{status.name}</StatusBadge>
-                      </div>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleStartEdit(status)}
-                        disabled={isBusy || editingId !== null}>
-                        수정
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDelete(status.id)}
-                        disabled={isBusy || editingId !== null}
-                        isLoading={isDeleting}>
-                        삭제
-                      </Button>
-                    </>
-                  )}
-                </div>
-              ))}
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={localStatuses.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                  {localStatuses.map((status, index) => (
+                    <SortableItem
+                      key={status.id}
+                      status={status}
+                      index={index}
+                      editingId={editingId}
+                      editName={editName}
+                      editColor={editColor}
+                      isBusy={isBusy}
+                      onStartEdit={handleStartEdit}
+                      onCancelEdit={handleCancelEdit}
+                      onConfirmEdit={handleConfirmEdit}
+                      onDelete={handleDelete}
+                      onEditNameChange={setEditName}
+                      onEditColorChange={setEditColor}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
 
               {localStatuses.length === 0 && (
                 <div className="flex h-24 items-center justify-center text-content-standard-tertiary">
