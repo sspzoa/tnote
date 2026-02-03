@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { Undo2 } from "lucide-react";
 import { useEffect } from "react";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
@@ -43,16 +44,16 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
     return labels[actionType] || actionType;
   };
 
-  const getActionBadgeStyle = (actionType: string) => {
-    if (actionType === "assign") return "bg-solid-translucent-purple text-solid-purple";
-    if (actionType === "postpone") return "bg-solid-translucent-blue text-solid-blue";
-    if (actionType === "absent") return "bg-solid-translucent-red text-solid-red";
-    if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
-    if (actionType === "status_change") return "bg-solid-translucent-purple text-solid-purple";
-    if (actionType === "management_status_change") return "bg-solid-translucent-yellow text-solid-yellow";
-    if (actionType === "date_edit") return "bg-solid-translucent-blue text-solid-blue";
-    if (actionType === "note_update") return "bg-components-fill-standard-secondary text-content-standard-secondary";
-    return "bg-components-fill-standard-secondary text-content-standard-secondary";
+  const getActionBadgeVariant = (actionType: string): BadgeVariant => {
+    if (actionType === "assign") return "purple";
+    if (actionType === "postpone") return "blue";
+    if (actionType === "absent") return "red";
+    if (actionType === "complete") return "green";
+    if (actionType === "status_change") return "purple";
+    if (actionType === "management_status_change") return "yellow";
+    if (actionType === "date_edit") return "blue";
+    if (actionType === "note_update") return "neutral";
+    return "neutral";
   };
 
   const canUndo = (item: History, index: number) => {
@@ -112,10 +113,9 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
               className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
               <div className="flex items-center justify-between gap-spacing-300">
                 <div className="flex min-w-0 flex-1 items-center gap-spacing-300">
-                  <span
-                    className={`shrink-0 rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
+                  <Badge variant={getActionBadgeVariant(item.action_type)} size="sm">
                     {getActionLabel(item.action_type)}
-                  </span>
+                  </Badge>
                   {item.action_type === "assign" && item.new_date && (
                     <span className="truncate text-body text-content-standard-primary">예정일: {item.new_date}</span>
                   )}

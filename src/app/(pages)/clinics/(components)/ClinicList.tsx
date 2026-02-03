@@ -2,6 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useMemo, useState } from "react";
+import { Badge, Button } from "@/shared/components/ui";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -91,11 +92,9 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <div className="flex gap-spacing-100">
                   {clinic.operating_days.sort().map((day) => (
-                    <span
-                      key={day}
-                      className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-100 font-medium text-footnote text-solid-blue">
+                    <Badge key={day} variant="blue" size="sm">
                       {dayNames[day]}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </td>
@@ -105,11 +104,9 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
                 </span>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <button
-                  onClick={() => onAttendance(clinic)}
-                  className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                <Button variant="primary" size="xs" className="font-medium" onClick={() => onAttendance(clinic)}>
                   출석 관리
-                </button>
+                </Button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <MoreOptionsButton

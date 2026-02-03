@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
 import type { StudentTagAssignment } from "@/shared/types";
 
 export interface StudentListStudent {
@@ -76,13 +76,10 @@ export function StudentListItem({
             activeTags.map((assignment) => {
               const tag = assignment.tag;
               if (!tag) return null;
-              const colorClasses = TAG_COLOR_CLASSES[tag.color];
               return (
-                <span
-                  key={assignment.id}
-                  className={`rounded-radius-200 px-spacing-150 py-spacing-50 font-medium text-caption ${colorClasses.bg} ${colorClasses.text}`}>
+                <Badge key={assignment.id} variant={tag.color} size="xs">
                   {tag.name}
-                </span>
+                </Badge>
               );
             })}
           {badge}

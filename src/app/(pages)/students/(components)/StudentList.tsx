@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -10,7 +11,7 @@ import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
+
 import type { StudentTagAssignment } from "@/shared/types";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import {
@@ -255,15 +256,16 @@ export default function StudentList({ students }: StudentListProps) {
                       {activeTags.map((assignment) => {
                         const tag = assignment.tag;
                         if (!tag) return null;
-                        const colorClasses = TAG_COLOR_CLASSES[tag.color];
                         return (
-                          <button
+                          <Badge
                             key={assignment.id}
+                            variant={tag.color}
+                            size="xs"
+                            interactive
                             onClick={() => openEditTagAssignmentModal(student, assignment)}
-                            className={`group flex items-center gap-spacing-50 rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote transition-opacity hover:opacity-70 ${colorClasses.bg} ${colorClasses.text}`}
                             title="클릭하여 수정">
                             {tag.name}
-                          </button>
+                          </Badge>
                         );
                       })}
                     </div>
@@ -276,9 +278,9 @@ export default function StudentList({ students }: StudentListProps) {
                 </td>
                 <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {student.birth_year && getGrade(student.birth_year) ? (
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                    <Badge variant="blue" size="sm">
                       {getGrade(student.birth_year)}
-                    </span>
+                    </Badge>
                   ) : (
                     "-"
                   )}

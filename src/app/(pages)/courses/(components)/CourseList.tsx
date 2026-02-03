@@ -1,6 +1,7 @@
 import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Badge, Button } from "@/shared/components/ui";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -125,9 +126,9 @@ export default function CourseList({ courses }: CourseListProps) {
                 </Link>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                <Badge variant="blue" size="sm">
                   {course.student_count || 0}명
-                </span>
+                </Badge>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span className="text-body text-content-standard-secondary">
@@ -137,15 +138,17 @@ export default function CourseList({ courses }: CourseListProps) {
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <div className="flex gap-spacing-200">
                   <Link href={`/courses/${course.id}`}>
-                    <button className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                    <Button variant="primary" size="xs" className="font-medium">
                       시험 및 과제 관리
-                    </button>
+                    </Button>
                   </Link>
-                  <button
-                    onClick={() => openEnrollModal(course)}
-                    className="rounded-radius-300 bg-solid-translucent-blue px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-blue transition-colors hover:bg-solid-translucent-indigo">
+                  <Button
+                    variant="translucent"
+                    size="xs"
+                    className="font-medium"
+                    onClick={() => openEnrollModal(course)}>
                     학생 관리
-                  </button>
+                  </Button>
                 </div>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

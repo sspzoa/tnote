@@ -2,6 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import type { StatusColor } from "@/shared/types";
@@ -23,12 +24,12 @@ const STATUS_OPTIONS = [
   { value: "absent", label: "결석" },
 ];
 
-const STATUS_COLOR_CLASSES: Record<StatusColor, string> = {
-  success: "bg-solid-translucent-green text-core-status-positive",
-  warning: "bg-solid-translucent-yellow text-core-status-warning",
-  danger: "bg-solid-translucent-red text-core-status-negative",
-  info: "bg-core-accent-translucent text-core-accent",
-  neutral: "bg-components-fill-standard-secondary text-content-standard-secondary",
+const STATUS_COLOR_TO_BADGE_VARIANT: Record<StatusColor, BadgeVariant> = {
+  success: "success",
+  warning: "warning",
+  danger: "danger",
+  info: "info",
+  neutral: "neutral",
 };
 
 const formatStatusLabel = (status: string) => {
@@ -187,14 +188,13 @@ export default function RetakeNoticeTab() {
                     {retake.management_status &&
                       (() => {
                         const statusItem = managementStatuses.find((s) => s.name === retake.management_status);
-                        const colorClass = statusItem
-                          ? STATUS_COLOR_CLASSES[statusItem.color as StatusColor]
-                          : STATUS_COLOR_CLASSES.neutral;
+                        const variant = statusItem
+                          ? STATUS_COLOR_TO_BADGE_VARIANT[statusItem.color as StatusColor]
+                          : "neutral";
                         return (
-                          <span
-                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${colorClass}`}>
+                          <Badge variant={variant} size="xs">
                             {retake.management_status}
-                          </span>
+                          </Badge>
                         );
                       })()}
                   </div>

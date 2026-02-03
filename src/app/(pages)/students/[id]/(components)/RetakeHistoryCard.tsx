@@ -2,9 +2,16 @@
 
 import { Calendar, ChevronDown, Clock, User } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
-import { getActionBadgeStyle, getActionLabel, getManagementStatusStyle, RETAKE_STATUS_LABELS } from "./utils";
+import {
+  getActionBadgeVariant,
+  getActionLabel,
+  getManagementStatusVariant,
+  getRetakeStatusVariant,
+  RETAKE_STATUS_LABELS,
+} from "./utils";
 
 interface RetakeHistoryItem {
   id: string;
@@ -109,37 +116,29 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
             </span>
 
             {retake.managementStatus && (
-              <span
-                className={`rounded-radius-200 px-spacing-150 py-spacing-50 font-medium text-footnote ${getManagementStatusStyle(retake.managementStatus)}`}>
+              <Badge variant={getManagementStatusVariant(retake.managementStatus)} size="xs">
                 {retake.managementStatus}
-              </span>
+              </Badge>
             )}
 
             {retake.postponeCount > 0 && (
-              <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-150 py-spacing-50 text-footnote text-solid-blue">
+              <Badge variant="blue" size="xs">
                 연기 {retake.postponeCount}회
-              </span>
+              </Badge>
             )}
 
             {retake.absentCount > 0 && (
-              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-150 py-spacing-50 text-footnote text-solid-red">
+              <Badge variant="red" size="xs">
                 결석 {retake.absentCount}회
-              </span>
+              </Badge>
             )}
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-spacing-300">
-          <span
-            className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-label ${
-              retake.status === "completed"
-                ? "bg-solid-translucent-green text-core-status-positive"
-                : retake.status === "absent"
-                  ? "bg-solid-translucent-red text-core-status-negative"
-                  : "bg-solid-translucent-yellow text-core-status-warning"
-            }`}>
+          <Badge variant={getRetakeStatusVariant(retake.status)} size="sm">
             {RETAKE_STATUS_LABELS[retake.status]}
-          </span>
+          </Badge>
           <ChevronDown
             className={`h-5 w-5 text-content-standard-tertiary transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
           />
@@ -179,10 +178,9 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
                     <div className="flex-1 rounded-radius-300 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
                       <div className="flex items-start justify-between gap-spacing-300">
                         <div className="flex flex-col gap-spacing-200">
-                          <span
-                            className={`inline-flex w-fit rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-label ${getActionBadgeStyle(item.action_type)}`}>
+                          <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
                             {getActionLabel(item.action_type)}
-                          </span>
+                          </Badge>
 
                           <div className="text-content-standard-primary text-label">
                             {item.action_type === "assign" && (

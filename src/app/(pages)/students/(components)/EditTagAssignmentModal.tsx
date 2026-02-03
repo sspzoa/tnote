@@ -2,8 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { Button, FormCheckbox, FormInput, Modal } from "@/shared/components/ui";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
+import { Badge, Button, FormCheckbox, FormInput, Modal } from "@/shared/components/ui";
 import { editTagAssignmentDataAtom, showEditTagAssignmentModalAtom } from "../(atoms)/useModalStore";
 import { useRemoveTag, useUpdateTagAssignment } from "../(hooks)/useStudentTags";
 
@@ -97,10 +96,9 @@ export default function EditTagAssignmentModal() {
         {tag && (
           <div className="flex items-center gap-spacing-200">
             <span className="text-content-standard-tertiary text-footnote">태그:</span>
-            <span
-              className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${TAG_COLOR_CLASSES[tag.color].bg} ${TAG_COLOR_CLASSES[tag.color].text}`}>
+            <Badge variant={tag.color} size="xs">
               {tag.name}
-            </span>
+            </Badge>
           </div>
         )}
 

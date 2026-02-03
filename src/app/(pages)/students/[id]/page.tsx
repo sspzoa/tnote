@@ -4,11 +4,10 @@ import { BookOpen, FileText, MessageSquare, RefreshCw, Stethoscope, TrendingUp }
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
-import type { TagColor } from "@/shared/types";
 import { useStudentDetail } from "../(hooks)/useStudentDetail";
 import {
   ConsultationCard,
@@ -87,9 +86,9 @@ export default function StudentDetailPage() {
                 <div className="flex items-center gap-spacing-300">
                   <h1 className="font-bold text-content-standard-primary text-title">{studentDetail.student.name}</h1>
                   {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 font-medium text-footnote text-solid-blue">
+                    <Badge variant="blue" size="xs">
                       {getGrade(studentDetail.student.birthYear)}
-                    </span>
+                    </Badge>
                   )}
                 </div>
 
@@ -113,16 +112,11 @@ export default function StudentDetailPage() {
 
               {activeTags.length > 0 && (
                 <div className="flex flex-wrap gap-spacing-100">
-                  {activeTags.map((assignment) => {
-                    const colorClasses = TAG_COLOR_CLASSES[assignment.tag.color as TagColor];
-                    return (
-                      <span
-                        key={assignment.id}
-                        className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${colorClasses.bg} ${colorClasses.text}`}>
-                        {assignment.tag.name}
-                      </span>
-                    );
-                  })}
+                  {activeTags.map((assignment) => (
+                    <Badge key={assignment.id} variant={assignment.tag.color} size="xs">
+                      {assignment.tag.name}
+                    </Badge>
+                  ))}
                 </div>
               )}
             </div>
@@ -178,9 +172,9 @@ export default function StudentDetailPage() {
                       등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
                     </span>
                   </div>
-                  <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 font-medium text-footnote text-solid-blue">
+                  <Badge variant="blue" size="xs">
                     {formatDaysOfWeek(course.days_of_week)}
-                  </span>
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -231,9 +225,9 @@ export default function StudentDetailPage() {
                       <span className="truncate text-content-standard-tertiary text-footnote">{history.note}</span>
                     )}
                   </div>
-                  <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 font-medium text-footnote text-solid-blue">
+                  <Badge variant="blue" size="xs">
                     {new Date(history.attendanceDate).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}
-                  </span>
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -262,17 +256,12 @@ export default function StudentDetailPage() {
               <div key={message.id} className="flex flex-col gap-spacing-200 px-spacing-500 py-spacing-400">
                 <div className="flex items-center justify-between gap-spacing-300">
                   <div className="flex items-center gap-spacing-200">
-                    <span
-                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${
-                        message.isSuccess
-                          ? "bg-solid-translucent-green text-core-status-positive"
-                          : "bg-solid-translucent-red text-core-status-negative"
-                      }`}>
+                    <Badge variant={message.isSuccess ? "success" : "danger"} size="xs">
                       {message.isSuccess ? "성공" : "실패"}
-                    </span>
-                    <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 font-medium text-footnote text-solid-blue">
+                    </Badge>
+                    <Badge variant="blue" size="xs">
                       {message.recipientType === "student" ? "학생" : "학부모"}
-                    </span>
+                    </Badge>
                     <span className="text-content-standard-secondary text-footnote">
                       {formatPhoneNumber(message.recipientPhone)}
                     </span>

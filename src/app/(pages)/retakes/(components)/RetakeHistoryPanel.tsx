@@ -1,6 +1,7 @@
 "use client";
 
 import { History, X } from "lucide-react";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 
 interface HistoryItem {
@@ -44,15 +45,15 @@ const getActionLabel = (actionType: string) => {
   return labels[actionType] || actionType;
 };
 
-const getActionBadgeStyle = (actionType: string) => {
-  if (actionType === "assign") return "bg-solid-translucent-purple text-solid-purple";
-  if (actionType === "postpone") return "bg-solid-translucent-blue text-solid-blue";
-  if (actionType === "absent") return "bg-solid-translucent-red text-solid-red";
-  if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
-  if (actionType === "status_change") return "bg-solid-translucent-purple text-solid-purple";
-  if (actionType === "management_status_change") return "bg-solid-translucent-yellow text-solid-yellow";
-  if (actionType === "date_edit") return "bg-solid-translucent-blue text-solid-blue";
-  return "bg-components-fill-standard-secondary text-content-standard-secondary";
+const getActionBadgeVariant = (actionType: string): BadgeVariant => {
+  if (actionType === "assign") return "purple";
+  if (actionType === "postpone") return "blue";
+  if (actionType === "absent") return "red";
+  if (actionType === "complete") return "green";
+  if (actionType === "status_change") return "purple";
+  if (actionType === "management_status_change") return "yellow";
+  if (actionType === "date_edit") return "blue";
+  return "neutral";
 };
 
 export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading }: RetakeHistoryPanelProps) {
@@ -109,10 +110,9 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
                           <span className="font-semibold text-body text-content-standard-primary">
                             {item.retake.student.name}
                           </span>
-                          <span
-                            className={`shrink-0 rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${getActionBadgeStyle(item.action_type)}`}>
+                          <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
                             {getActionLabel(item.action_type)}
-                          </span>
+                          </Badge>
                         </div>
                         <div className="truncate text-content-standard-secondary text-label">
                           {item.retake.exam.course.name} · {item.retake.exam.name} {item.retake.exam.exam_number}

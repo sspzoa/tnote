@@ -1,3 +1,5 @@
+import type { BadgeVariant } from "@/shared/components/ui/badge";
+
 export const isTagActive = (startDate: string, endDate: string | null): boolean => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -39,22 +41,25 @@ export const getActionLabel = (actionType: string) => {
   return labels[actionType] || actionType;
 };
 
-export const getActionBadgeStyle = (actionType: string) => {
-  if (actionType === "assign") return "bg-solid-translucent-purple text-solid-purple";
-  if (actionType === "postpone") return "bg-solid-translucent-blue text-solid-blue";
-  if (actionType === "absent") return "bg-solid-translucent-red text-solid-red";
-  if (actionType === "complete") return "bg-solid-translucent-green text-solid-green";
-  if (actionType === "status_change") return "bg-solid-translucent-purple text-solid-purple";
-  if (actionType === "management_status_change") return "bg-solid-translucent-yellow text-solid-yellow";
-  if (actionType === "date_edit") return "bg-solid-translucent-blue text-solid-blue";
-  if (actionType === "note_update") return "bg-components-fill-standard-secondary text-content-standard-secondary";
-  return "bg-components-fill-standard-secondary text-content-standard-secondary";
+export const getActionBadgeVariant = (actionType: string): BadgeVariant => {
+  if (actionType === "assign") return "purple";
+  if (actionType === "postpone") return "blue";
+  if (actionType === "absent") return "red";
+  if (actionType === "complete") return "green";
+  if (actionType === "status_change") return "purple";
+  if (actionType === "management_status_change") return "yellow";
+  if (actionType === "date_edit") return "blue";
+  if (actionType === "note_update") return "neutral";
+  return "neutral";
 };
 
-export const getManagementStatusStyle = (status: string) => {
+export const getManagementStatusVariant = (status: string): BadgeVariant => {
   const isCompleted = status.includes("완료");
-  if (isCompleted) {
-    return "bg-solid-translucent-green text-core-status-positive";
-  }
-  return "bg-solid-translucent-red text-core-status-negative";
+  return isCompleted ? "success" : "danger";
+};
+
+export const getRetakeStatusVariant = (status: string): BadgeVariant => {
+  if (status === "completed") return "success";
+  if (status === "absent") return "danger";
+  return "warning";
 };

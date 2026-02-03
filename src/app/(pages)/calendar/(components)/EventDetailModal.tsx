@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import type { CalendarEvent } from "@/shared/types";
@@ -52,27 +53,27 @@ const getRetakeStatusLabel = (status: string) => {
   }
 };
 
-const getClinicStatusStyle = (status: string) => {
+const getClinicStatusVariant = (status: string): BadgeVariant => {
   switch (status) {
     case "attended":
-      return "bg-solid-translucent-green text-core-status-positive";
+      return "success";
     case "absent":
-      return "bg-solid-translucent-red text-core-status-negative";
+      return "danger";
     default:
-      return "bg-solid-translucent-yellow text-core-status-warning";
+      return "warning";
   }
 };
 
-const getRetakeStatusStyle = (status: string) => {
+const getRetakeStatusVariant = (status: string): BadgeVariant => {
   switch (status) {
     case "completed":
-      return "bg-solid-translucent-green text-core-status-positive";
+      return "success";
     case "absent":
-      return "bg-solid-translucent-red text-core-status-negative";
+      return "danger";
     case "postponed":
-      return "bg-solid-translucent-yellow text-core-status-warning";
+      return "warning";
     default:
-      return "bg-solid-translucent-yellow text-core-status-warning";
+      return "warning";
   }
 };
 
@@ -113,10 +114,9 @@ export default function EventDetailModal({ event, onClose }: Props) {
             <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
               상태
             </label>
-            <span
-              className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${getClinicStatusStyle(event.metadata.status)}`}>
+            <Badge variant={getClinicStatusVariant(event.metadata.status)} size="sm">
               {getClinicStatusLabel(event.metadata.status)}
-            </span>
+            </Badge>
           </div>
         )}
 
@@ -125,10 +125,9 @@ export default function EventDetailModal({ event, onClose }: Props) {
             <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
               상태
             </label>
-            <span
-              className={`inline-block rounded-radius-300 px-spacing-300 py-spacing-100 font-medium text-footnote ${getRetakeStatusStyle(event.metadata.status)}`}>
+            <Badge variant={getRetakeStatusVariant(event.metadata.status)} size="sm">
               {getRetakeStatusLabel(event.metadata.status)}
-            </span>
+            </Badge>
           </div>
         )}
       </div>

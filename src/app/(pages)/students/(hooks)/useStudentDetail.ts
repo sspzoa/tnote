@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import type { TagColor } from "@/shared/types";
 
 interface CourseInfo {
   id: string;
@@ -95,7 +96,7 @@ interface MessageHistoryInfo {
 interface TagInfo {
   id: string;
   name: string;
-  color: string;
+  color: TagColor;
 }
 
 interface TagAssignmentInfo {

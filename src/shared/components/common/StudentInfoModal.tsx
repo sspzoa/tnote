@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
-import type { TagColor } from "@/shared/types";
 import { StudentInfoSkeleton } from "./StudentInfoSkeleton";
 
 const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
@@ -44,12 +43,6 @@ interface StudentInfoModalProps {
   studentDetail: StudentDetail | null | undefined;
   isLoading: boolean;
 }
-
-const getAssignmentStatusStyle = (status: string) => {
-  if (status === "완료") return "bg-solid-translucent-green text-core-status-positive";
-  if (status === "미흡") return "bg-solid-translucent-yellow text-core-status-warning";
-  return "bg-solid-translucent-red text-core-status-negative";
-};
 
 export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoading }: StudentInfoModalProps) {
   const examWithAssignments = useMemo(() => {
@@ -137,16 +130,11 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                   <div className="col-span-2 flex flex-col gap-spacing-50">
                     <span className="text-content-standard-tertiary text-footnote">태그</span>
                     <div className="flex flex-wrap items-center gap-spacing-100">
-                      {activeTags.map((assignment) => {
-                        const colorClasses = TAG_COLOR_CLASSES[assignment.tag.color as TagColor];
-                        return (
-                          <span
-                            key={assignment.id}
-                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${colorClasses.bg} ${colorClasses.text}`}>
-                            {assignment.tag.name}
-                          </span>
-                        );
-                      })}
+                      {activeTags.map((assignment) => (
+                        <Badge key={assignment.id} variant={assignment.tag?.color} size="xs">
+                          {assignment.tag?.name}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 );
@@ -174,9 +162,9 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                         등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
                       </span>
                     </div>
-                    <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                    <Badge variant="blue" size="xs">
                       {formatDaysOfWeek(course.days_of_week)}
-                    </span>
+                    </Badge>
                   </div>
                 ))}
               </div>
@@ -217,24 +205,31 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                         </span>
                       </div>
                       <div className="flex shrink-0 items-center gap-spacing-200">
-                        <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                        <Badge variant="blue" size="xs">
                           {examScore.exam.examNumber}회차
-                        </span>
+                        </Badge>
                         {isPassed && (
-                          <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 text-core-status-positive text-footnote">
+                          <Badge variant="success" size="xs">
                             통과
-                          </span>
+                          </Badge>
                         )}
                         {isFailed && (
-                          <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
+                          <Badge variant="danger" size="xs">
                             재시험
-                          </span>
+                          </Badge>
                         )}
                         {assignment && (
-                          <span
-                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${getAssignmentStatusStyle(assignment.status)}`}>
+                          <Badge
+                            variant={
+                              assignment.status === "완료"
+                                ? "success"
+                                : assignment.status === "미흡"
+                                  ? "warning"
+                                  : "danger"
+                            }
+                            size="xs">
                             과제 {assignment.status}
-                          </span>
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -271,9 +266,9 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                         <span className="truncate text-content-standard-tertiary text-footnote">{history.note}</span>
                       )}
                     </div>
-                    <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                    <Badge variant="blue" size="xs">
                       {new Date(history.attendanceDate).toLocaleDateString("ko-KR")}
-                    </span>
+                    </Badge>
                   </div>
                 ))}
               </div>
@@ -321,16 +316,13 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
                         )}
                       </div>
                     </div>
-                    <span
-                      className={`shrink-0 rounded-radius-200 px-spacing-200 py-spacing-50 text-footnote ${
-                        retake.status === "completed"
-                          ? "bg-solid-translucent-green text-core-status-positive"
-                          : retake.status === "absent"
-                            ? "bg-solid-translucent-red text-core-status-negative"
-                            : "bg-solid-translucent-yellow text-core-status-warning"
-                      }`}>
+                    <Badge
+                      variant={
+                        retake.status === "completed" ? "success" : retake.status === "absent" ? "danger" : "warning"
+                      }
+                      size="xs">
                       {RETAKE_STATUS_LABELS[retake.status]}
-                    </span>
+                    </Badge>
                   </div>
                 ))}
               </div>

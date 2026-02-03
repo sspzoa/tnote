@@ -1,3 +1,5 @@
+export type { BadgeProps, BadgeVariant } from "./badge";
+export { Badge, StatusBadge } from "./badge";
 export { Button } from "./button";
 export { FormCheckbox, FormCheckboxGroup } from "./formCheckbox";
 export { FormInput } from "./formInput";
@@ -8,4 +10,3 @@ export { SearchInput } from "./searchInput";
 export { SegmentedControl } from "./segmentedControl";
 export type { SkeletonColumnDef } from "./skeleton";
 export { Skeleton, SkeletonAvatar, SkeletonButton, SkeletonCard, SkeletonTable, SkeletonText } from "./skeleton";
-export { StatusBadge } from "./statusBadge";

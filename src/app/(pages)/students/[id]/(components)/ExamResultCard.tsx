@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import { ScoreProgress } from "./ScoreProgress";
 
 interface ExamScore {
@@ -46,10 +47,10 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
   const isPassed = examScore.cutline !== null && examScore.score >= examScore.cutline;
   const isFailed = examScore.cutline !== null && examScore.score < examScore.cutline;
 
-  const getAssignmentStatusStyle = (status: string) => {
-    if (status === "완료") return "bg-solid-translucent-green text-core-status-positive";
-    if (status === "미흡") return "bg-solid-translucent-yellow text-core-status-warning";
-    return "bg-solid-translucent-red text-core-status-negative";
+  const getAssignmentVariant = (status: string): "success" | "warning" | "danger" => {
+    if (status === "완료") return "success";
+    if (status === "미흡") return "warning";
+    return "danger";
   };
 
   return (
@@ -73,20 +74,19 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
         <div className="flex shrink-0 items-center gap-spacing-300">
           <div className="flex items-center gap-spacing-200">
             {isPassed && (
-              <span className="rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-50 font-medium text-core-status-positive text-footnote">
+              <Badge variant="success" size="xs">
                 통과
-              </span>
+              </Badge>
             )}
             {isFailed && (
-              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 font-medium text-core-status-negative text-footnote">
+              <Badge variant="danger" size="xs">
                 재시험
-              </span>
+              </Badge>
             )}
             {assignment && (
-              <span
-                className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${getAssignmentStatusStyle(assignment.status)}`}>
+              <Badge variant={getAssignmentVariant(assignment.status)} size="xs">
                 과제 {assignment.status}
-              </span>
+              </Badge>
             )}
           </div>
           <span className="font-semibold text-body text-content-standard-primary">
@@ -126,10 +126,9 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
               <div className="flex items-center justify-between text-label">
                 <span className="text-content-standard-secondary">과제 상태</span>
                 <div className="flex items-center gap-spacing-200">
-                  <span
-                    className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${getAssignmentStatusStyle(assignment.status)}`}>
+                  <Badge variant={getAssignmentVariant(assignment.status)} size="xs">
                     {assignment.status}
-                  </span>
+                  </Badge>
                   {assignment.note && <span className="text-content-standard-tertiary">({assignment.note})</span>}
                 </div>
               </div>

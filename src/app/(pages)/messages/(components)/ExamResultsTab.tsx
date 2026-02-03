@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import { FileText } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { StudentListItem } from "@/shared/components/ui/studentList";
 import type { TagColor } from "@/shared/types";
@@ -210,25 +211,21 @@ export default function ExamResultsTab() {
                 onToggle={() => handleToggleStudent(student.id)}
                 rightContent={
                   <div className="flex items-center gap-spacing-200">
-                    <span
-                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
-                        student.isFailed
-                          ? "bg-solid-translucent-red text-core-status-negative"
-                          : "bg-solid-translucent-green text-core-status-positive"
-                      }`}>
+                    <Badge variant={student.isFailed ? "danger" : "success"} size="xs">
                       {student.score ?? "-"}/{exportData?.exam?.maxScore ?? "-"}점 · {student.rank ?? "-"}/
                       {students.length}등
-                    </span>
-                    <span
-                      className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
+                    </Badge>
+                    <Badge
+                      variant={
                         student.assignmentStatus === "완료"
-                          ? "bg-solid-translucent-green text-core-status-positive"
+                          ? "success"
                           : student.assignmentStatus === "미흡"
-                            ? "bg-solid-translucent-yellow text-core-status-warning"
-                            : "bg-solid-translucent-red text-core-status-negative"
-                      }`}>
+                            ? "warning"
+                            : "danger"
+                      }
+                      size="xs">
                       {student.assignmentStatus}
-                    </span>
+                    </Badge>
                   </div>
                 }
               />

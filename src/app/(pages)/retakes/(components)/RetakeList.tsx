@@ -2,6 +2,7 @@
 
 import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -9,11 +10,9 @@ import {
   MoreOptionsButton,
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { StatusBadge } from "@/shared/components/ui/statusBadge";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import { useTableSort } from "@/shared/hooks/useTableSort";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
-import type { StatusColor, TagColor } from "@/shared/types";
+import type { StatusColor } from "@/shared/types";
 import { openMenuIdAtom, type Retake } from "../(atoms)/useRetakesStore";
 
 const isTagActive = (startDate: string, endDate: string | null): boolean => {
@@ -105,21 +104,20 @@ export default function RetakeList({
   });
 
   const getStatusBadge = (status: string) => {
-    const styles = {
-      pending: "bg-solid-translucent-yellow text-core-status-warning",
-      completed: "bg-solid-translucent-green text-core-status-positive",
-      absent: "bg-solid-translucent-red text-core-status-negative",
+    const variants: Record<string, "warning" | "success" | "danger"> = {
+      pending: "warning",
+      completed: "success",
+      absent: "danger",
     };
-    const labels = {
+    const labels: Record<string, string> = {
       pending: "대기중",
       completed: "완료",
       absent: "결석",
     };
     return (
-      <span
-        className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${styles[status as keyof typeof styles]}`}>
-        {labels[status as keyof typeof labels]}
-      </span>
+      <Badge variant={variants[status]} size="sm">
+        {labels[status]}
+      </Badge>
     );
   };
 
@@ -127,7 +125,7 @@ export default function RetakeList({
     const statusItem = managementStatuses.find((s) => s.name === status);
     const color = (statusItem?.color ?? "neutral") as StatusColor;
 
-    return <StatusBadge variant={color}>{status}</StatusBadge>;
+    return <Badge variant={color}>{status}</Badge>;
   };
 
   return (
@@ -192,16 +190,11 @@ export default function RetakeList({
                     if (activeTags.length === 0) return null;
                     return (
                       <div className="flex flex-nowrap gap-spacing-100">
-                        {activeTags.map((assignment) => {
-                          const colorClasses = TAG_COLOR_CLASSES[assignment.tag?.color as TagColor];
-                          return (
-                            <span
-                              key={assignment.id}
-                              className={`rounded-radius-200 px-spacing-150 py-spacing-50 text-caption ${colorClasses?.bg || "bg-solid-translucent-gray"} ${colorClasses?.text || "text-content-standard-secondary"}`}>
-                              {assignment.tag?.name}
-                            </span>
-                          );
-                        })}
+                        {activeTags.map((assignment) => (
+                          <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
+                            {assignment.tag?.name}
+                          </Badge>
+                        ))}
                       </div>
                     );
                   })()}

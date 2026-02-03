@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { useMemo, useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -133,28 +134,18 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
                 {formatPhoneNumber(admin.phone_number)}
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span
-                  className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${
-                    admin.role === "owner"
-                      ? "bg-solid-translucent-purple text-solid-purple"
-                      : "bg-solid-translucent-blue text-solid-blue"
-                  }`}>
+                <Badge variant={admin.role === "owner" ? "purple" : "blue"} size="sm">
                   {admin.role === "owner" ? "소유자" : "관리자"}
-                </span>
+                </Badge>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                 {new Date(admin.created_at).toLocaleDateString("ko-KR")}
               </td>
               {isOwner && (
                 <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                  <span
-                    className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-semibold text-footnote ${
-                      admin.is_default_password
-                        ? "bg-solid-translucent-red text-solid-red"
-                        : "bg-solid-translucent-green text-solid-green"
-                    }`}>
+                  <Badge variant={admin.is_default_password ? "red" : "green"} size="sm">
                     {admin.is_default_password ? "미변경" : "변경됨"}
-                  </span>
+                  </Badge>
                 </td>
               )}
               {isOwner && (

@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -123,9 +125,9 @@ export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps)
                 <div className="font-medium text-body text-content-standard-primary">{exam.name}</div>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="rounded-radius-200 bg-solid-translucent-blue px-spacing-300 py-spacing-100 font-semibold text-footnote text-solid-blue">
+                <Badge variant="blue" size="sm">
                   {exam.exam_number}회차
-                </span>
+                </Badge>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span className="text-body text-content-standard-primary">{exam.max_score || 8}점</span>
@@ -164,11 +166,9 @@ export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps)
                 )}
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <button
-                  onClick={() => onManage(exam)}
-                  className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                <Button variant="primary" size="xs" className="font-medium" onClick={() => onManage(exam)}>
                   점수 및 과제 입력
-                </button>
+                </Button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <MoreOptionsButton

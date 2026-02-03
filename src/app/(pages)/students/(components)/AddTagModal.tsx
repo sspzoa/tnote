@@ -2,9 +2,8 @@
 
 import { useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
-import { Button, FormCheckbox, FormInput, FormSelect, Modal } from "@/shared/components/ui";
+import { Badge, Button, FormCheckbox, FormInput, FormSelect, Modal } from "@/shared/components/ui";
 import { getTodayKST } from "@/shared/lib/utils/date";
-import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
 import { showAddTagModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useAssignTag } from "../(hooks)/useStudentTags";
@@ -91,10 +90,9 @@ export default function AddTagModal() {
           {selectedTag && (
             <div className="mt-spacing-200 flex items-center gap-spacing-200">
               <span className="text-content-standard-tertiary text-footnote">선택된 태그:</span>
-              <span
-                className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-medium text-footnote ${TAG_COLOR_CLASSES[selectedTag.color].bg} ${TAG_COLOR_CLASSES[selectedTag.color].text}`}>
+              <Badge variant={selectedTag.color} size="xs">
                 {selectedTag.name}
-              </span>
+              </Badge>
             </div>
           )}
         </div>

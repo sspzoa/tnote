@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "danger" | "success";
-type ButtonSize = "sm" | "md" | "lg";
+type ButtonVariant = "primary" | "secondary" | "danger" | "success" | "translucent";
+type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -20,9 +20,12 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-core-status-negative text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
   success:
     "bg-core-status-positive text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
+  translucent:
+    "bg-solid-translucent-blue text-solid-blue hover:bg-solid-translucent-indigo active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-solid-translucent-blue disabled:active:scale-100",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
+  xs: "px-spacing-400 py-spacing-200 text-footnote",
   sm: "px-spacing-300 py-spacing-200 text-label",
   md: "px-spacing-500 py-spacing-300 text-body",
   lg: "px-spacing-600 py-spacing-400 text-title",
