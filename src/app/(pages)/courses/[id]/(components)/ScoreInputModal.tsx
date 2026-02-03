@@ -226,7 +226,7 @@ export function ScoreInputModal({
                                 : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
                             }`}
                           />
-                          <span className="text-footnote text-content-standard-tertiary">/ {exam.max_score || 8}</span>
+                          <span className="text-content-standard-tertiary text-footnote">/ {exam.max_score || 8}</span>
                         </div>
                         <div className="h-6 w-px bg-line-divider" />
                         <Select

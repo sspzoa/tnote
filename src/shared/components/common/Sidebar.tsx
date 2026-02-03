@@ -227,16 +227,16 @@ export default function Sidebar() {
             className={`group flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 transition-colors hover:bg-core-accent-translucent ${isCollapsed ? "justify-center" : ""}`}
             onClick={() => setIsOpen(false)}>
             <div className="flex size-8 shrink-0 items-center justify-center rounded-radius-300 bg-core-accent">
-              <span className="font-bold text-solid-white text-label">T</span>
+              <span className="font-bold text-label text-solid-white">T</span>
             </div>
             {!isCollapsed && (
               <div className="flex min-w-0 flex-col">
-                <span className="font-bold text-content-standard-primary text-body leading-tight">Tnote</span>
+                <span className="font-bold text-body text-content-standard-primary leading-tight">Tnote</span>
                 {isLoading ? (
                   <Skeleton className="h-4 w-16" />
                 ) : (
                   userInfo?.workspaceName && (
-                    <span className="truncate text-content-standard-tertiary text-caption">
+                    <span className="truncate text-caption text-content-standard-tertiary">
                       {userInfo.workspaceName}
                     </span>
                   )
@@ -303,7 +303,7 @@ export default function Sidebar() {
               className={`flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 ${isCollapsed ? "justify-center" : ""}`}>
               <Skeleton className="size-9 shrink-0 rounded-full" />
               {!isCollapsed && (
-                <div className="min-w-0 flex-1 flex flex-col gap-spacing-100">
+                <div className="flex min-w-0 flex-1 flex-col gap-spacing-100">
                   <Skeleton className="h-[22px] w-16" />
                   <Skeleton className="h-4 w-10" />
                 </div>
@@ -326,7 +326,7 @@ export default function Sidebar() {
               {!isCollapsed && (
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium text-content-standard-primary text-label">{userInfo.name}</div>
-                  <div className="text-content-standard-tertiary text-caption">
+                  <div className="text-caption text-content-standard-tertiary">
                     {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
                   </div>
                 </div>
@@ -429,7 +429,7 @@ export default function Sidebar() {
                   <div className="font-medium text-content-standard-primary text-label">
                     {isLoading ? <Skeleton className="h-5 w-16" /> : userInfo?.name}
                   </div>
-                  <div className="text-content-standard-tertiary text-caption">
+                  <div className="text-caption text-content-standard-tertiary">
                     {isLoading ? (
                       <Skeleton className="h-4 w-10" />
                     ) : userInfo?.role === "owner" ? (
@@ -443,7 +443,7 @@ export default function Sidebar() {
                 </div>
               </div>
               {!isLoading && userInfo?.workspaceName && (
-                <span className="rounded-radius-200 bg-core-accent-translucent px-spacing-200 py-spacing-100 text-core-accent text-caption">
+                <span className="rounded-radius-200 bg-core-accent-translucent px-spacing-200 py-spacing-100 text-caption text-core-accent">
                   {userInfo.workspaceName}
                 </span>
               )}

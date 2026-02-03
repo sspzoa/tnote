@@ -10,7 +10,7 @@ export default function Container({ children, className = "" }: ContainerProps) 
 
   return (
     <div className={`${baseClasses} ${className}`}>
-      <div className="mx-auto max-w-7xl flex flex-col gap-spacing-600">{children}</div>
+      <div className="mx-auto flex max-w-7xl flex-col gap-spacing-600">{children}</div>
     </div>
   );
 }

@@ -74,7 +74,7 @@ export default function StudentDetailPage() {
 
   return (
     <div className="min-h-screen bg-background-standard-secondary p-spacing-500 md:p-spacing-700">
-      <div className="mx-auto max-w-7xl flex flex-col gap-spacing-600">
+      <div className="mx-auto flex max-w-7xl flex-col gap-spacing-600">
         <section className="flex flex-col gap-spacing-400">
           <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
             ← 학생 목록으로 돌아가기

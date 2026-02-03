@@ -87,7 +87,7 @@ const SortableItem = ({
         <GripVertical className="size-4" />
       </button>
 
-      <span className="w-6 text-center text-content-standard-quaternary text-caption">{index + 1}</span>
+      <span className="w-6 text-center text-caption text-content-standard-quaternary">{index + 1}</span>
 
       {editingId === status.id ? (
         <>

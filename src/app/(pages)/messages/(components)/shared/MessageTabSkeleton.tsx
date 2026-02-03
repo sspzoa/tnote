@@ -16,13 +16,13 @@ export default function MessageTabSkeleton() {
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-spacing-300 p-spacing-500">
           <Skeleton className="h-12 w-full rounded-radius-300" />
-          <div className="flex-1 flex flex-col gap-spacing-200 overflow-hidden">
+          <div className="flex flex-1 flex-col gap-spacing-200 overflow-hidden">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
                 className="flex items-center gap-spacing-300 rounded-radius-300 border border-line-outline p-spacing-300">
                 <Skeleton className="size-5 rounded-radius-100" />
-                <div className="flex-1 flex flex-col gap-spacing-100">
+                <div className="flex flex-1 flex-col gap-spacing-100">
                   <Skeleton className="h-6 w-20" />
                   <Skeleton className="h-5 w-28" />
                 </div>

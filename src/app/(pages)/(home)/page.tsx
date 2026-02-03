@@ -43,8 +43,8 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="min-h-screen p-spacing-500 md:p-spacing-700">
-        <div className="mx-auto max-w-6xl flex flex-col gap-spacing-700">
-          <div className="flex flex-col gap-spacing-400 animate-pulse rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+        <div className="mx-auto flex max-w-6xl flex-col gap-spacing-700">
+          <div className="flex animate-pulse flex-col gap-spacing-400 rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
             <div className="h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
             <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
           </div>
@@ -116,7 +116,7 @@ export default function Home() {
             <Link
               key={item.href}
               href={item.href}
-              className="group relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:-translate-y-spacing-50 hover:border-core-accent/30">
+              className="group hover:-translate-y-spacing-50 relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:border-core-accent/30">
               <div className="flex flex-col gap-spacing-400">
                 <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
                 <div className="relative flex flex-col gap-spacing-100">
@@ -139,7 +139,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-spacing-200">
             <h2 className="font-semibold text-content-standard-primary text-heading">학습을 시작하세요</h2>
-            <p className="text-content-standard-secondary text-body">사이드바 메뉴에서 원하는 기능을 선택해주세요.</p>
+            <p className="text-body text-content-standard-secondary">사이드바 메뉴에서 원하는 기능을 선택해주세요.</p>
           </div>
         </div>
       )}

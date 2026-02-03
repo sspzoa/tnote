@@ -112,7 +112,7 @@ export default function EventDetailModal({ event, onClose }: Props) {
         {event.type === "clinic" && event.metadata?.status && (
           <div className="flex flex-col gap-spacing-100">
             <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
-            <Badge variant={getClinicStatusVariant(event.metadata.status)} size="sm">
+            <Badge variant={getClinicStatusVariant(event.metadata.status)} size="sm" className="w-fit">
               {getClinicStatusLabel(event.metadata.status)}
             </Badge>
           </div>
@@ -121,7 +121,7 @@ export default function EventDetailModal({ event, onClose }: Props) {
         {event.type === "retake" && event.metadata?.status && (
           <div className="flex flex-col gap-spacing-100">
             <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
-            <Badge variant={getRetakeStatusVariant(event.metadata.status)} size="sm">
+            <Badge variant={getRetakeStatusVariant(event.metadata.status)} size="sm" className="w-fit">
               {getRetakeStatusLabel(event.metadata.status)}
             </Badge>
           </div>
