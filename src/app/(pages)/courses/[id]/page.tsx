@@ -7,15 +7,12 @@ import { useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
 import {
-  assignmentExamAtom,
   scoreExamAtom,
   selectedExamAtom,
-  showAssignmentModalAtom,
   showCreateModalAtom,
   showEditModalAtom,
   showScoreModalAtom,
 } from "./(atoms)/useExamStore";
-import { AssignmentModal } from "./(components)/AssignmentModal";
 import { ExamFormModal } from "./(components)/ExamFormModal";
 import { ExamTable } from "./(components)/ExamTable";
 import { ScoreInputModal } from "./(components)/ScoreInputModal";
@@ -47,32 +44,18 @@ export default function CourseDetailPage() {
   const selectedExam = useAtomValue(selectedExamAtom);
   const showScoreModal = useAtomValue(showScoreModalAtom);
   const scoreExam = useAtomValue(scoreExamAtom);
-  const showAssignmentModal = useAtomValue(showAssignmentModalAtom);
-  const assignmentExam = useAtomValue(assignmentExamAtom);
 
-  const {
-    openCreateModal,
-    closeCreateModal,
-    openEditModal,
-    closeEditModal,
-    openScoreModal,
-    closeScoreModal,
-    openAssignmentModal,
-    closeAssignmentModal,
-  } = useCoursePageHandlers();
+  const { openCreateModal, closeCreateModal, openEditModal, closeEditModal, openScoreModal, closeScoreModal } =
+    useCoursePageHandlers();
 
   const { students: scoreStudents, isLoading: loadingScoreStudents } = useCourseStudents(courseId, showScoreModal);
   const { scores: existingScores, isLoading: loadingExistingScores } = useExamScores(
     scoreExam?.id ?? "",
     showScoreModal && !!scoreExam,
   );
-  const { students: assignmentStudents, isLoading: loadingAssignmentStudents } = useCourseStudents(
-    courseId,
-    showAssignmentModal,
-  );
   const { assignments: existingAssignments, isLoading: loadingExistingAssignments } = useExamAssignments(
-    assignmentExam?.id ?? "",
-    showAssignmentModal && !!assignmentExam,
+    scoreExam?.id ?? "",
+    showScoreModal && !!scoreExam,
   );
 
   useEffect(() => {
@@ -117,27 +100,20 @@ export default function CourseDetailPage() {
     }
   };
 
-  const handleSaveScores = async (scores: Array<{ studentId: string; score: number }>, toDelete: string[]) => {
+  const handleSaveScoresAndAssignments = async (
+    scores: Array<{ studentId: string; score: number }>,
+    toDeleteScores: string[],
+    assignments: Array<{ studentId: string; status: string }>,
+  ) => {
     if (!scoreExam) return;
 
     try {
-      await saveScores({ examId: scoreExam.id, scores, toDelete });
-      alert("점수가 저장되었습니다.");
+      await saveScores({ examId: scoreExam.id, scores, toDelete: toDeleteScores });
+      await saveAssignments({ examId: scoreExam.id, assignments });
+      alert("저장되었습니다.");
       closeScoreModal();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "점수 저장에 실패했습니다.");
-    }
-  };
-
-  const handleSaveAssignments = async (assignments: Array<{ studentId: string; status: string }>) => {
-    if (!assignmentExam) return;
-
-    try {
-      await saveAssignments({ examId: assignmentExam.id, assignments });
-      alert("과제 상태가 저장되었습니다.");
-      closeAssignmentModal();
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "과제 상태 저장에 실패했습니다.");
+      alert(error instanceof Error ? error.message : "저장에 실패했습니다.");
     }
   };
 
@@ -161,8 +137,7 @@ export default function CourseDetailPage() {
     };
   };
 
-  const loadingScores = loadingScoreStudents || loadingExistingScores;
-  const loadingAssignments = loadingAssignmentStudents || loadingExistingAssignments;
+  const loadingScores = loadingScoreStudents || loadingExistingScores || loadingExistingAssignments;
 
   if (courseLoading || examsLoading || !course) {
     return (
@@ -220,13 +195,7 @@ export default function CourseDetailPage() {
             </Button>
           </div>
         ) : (
-          <ExamTable
-            exams={exams}
-            onScoreInput={openScoreModal}
-            onAssignment={openAssignmentModal}
-            onEdit={openEditModal}
-            onDelete={handleDelete}
-          />
+          <ExamTable exams={exams} onManage={openScoreModal} onEdit={openEditModal} onDelete={handleDelete} />
         )}
 
         <ExamFormModal
@@ -255,19 +224,9 @@ export default function CourseDetailPage() {
           students={scoreStudents}
           isLoading={loadingScores}
           existingScores={existingScores}
-          onSave={handleSaveScores}
-          isSaving={isSavingScores}
-        />
-
-        <AssignmentModal
-          isOpen={showAssignmentModal}
-          onClose={closeAssignmentModal}
-          exam={assignmentExam}
-          students={assignmentStudents}
-          isLoading={loadingAssignments}
           existingAssignments={existingAssignments}
-          onSave={handleSaveAssignments}
-          isSaving={isSavingAssignments}
+          onSave={handleSaveScoresAndAssignments}
+          isSaving={isSavingScores || isSavingAssignments}
         />
       </div>
     </div>

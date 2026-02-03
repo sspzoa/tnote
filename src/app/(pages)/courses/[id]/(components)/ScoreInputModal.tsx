@@ -18,6 +18,11 @@ interface ScoreData {
   score: number;
 }
 
+interface ExistingAssignment {
+  student: { id: string };
+  status: string;
+}
+
 interface ScoreInputModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,7 +30,12 @@ interface ScoreInputModalProps {
   students: StudentListStudent[];
   isLoading: boolean;
   existingScores: ScoreData[];
-  onSave: (scores: Array<{ studentId: string; score: number }>, toDelete: string[]) => Promise<void>;
+  existingAssignments: ExistingAssignment[];
+  onSave: (
+    scores: Array<{ studentId: string; score: number }>,
+    toDeleteScores: string[],
+    assignments: Array<{ studentId: string; status: string }>,
+  ) => Promise<void>;
   isSaving: boolean;
 }
 
@@ -36,36 +46,62 @@ export function ScoreInputModal({
   students,
   isLoading,
   existingScores,
+  existingAssignments,
   onSave,
   isSaving,
 }: ScoreInputModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [scoreInputs, setScoreInputs] = useState<Record<string, string>>({});
+  const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
   const [existingScoreStudentIds, setExistingScoreStudentIds] = useState<string[]>([]);
 
   useEffect(() => {
-    if (isOpen && existingScores.length > 0) {
-      setExistingScoreStudentIds(existingScores.map((s) => s.student_id));
-      const initialScores: Record<string, string> = {};
-      for (const score of existingScores) {
-        initialScores[score.student_id] = score.score.toString();
+    if (isOpen) {
+      if (existingScores.length > 0) {
+        setExistingScoreStudentIds(existingScores.map((s) => s.student_id));
+        const initialScores: Record<string, string> = {};
+        for (const score of existingScores) {
+          initialScores[score.student_id] = score.score.toString();
+        }
+        setScoreInputs(initialScores);
+      } else {
+        setExistingScoreStudentIds([]);
+        setScoreInputs({});
       }
-      setScoreInputs(initialScores);
-    } else if (isOpen) {
-      setExistingScoreStudentIds([]);
-      setScoreInputs({});
+
+      if (existingAssignments.length > 0) {
+        const initialAssignments: Record<string, string> = {};
+        for (const assignment of existingAssignments) {
+          initialAssignments[assignment.student.id] = assignment.status;
+        }
+        setAssignmentInputs(initialAssignments);
+      } else {
+        setAssignmentInputs({});
+      }
     }
-  }, [isOpen, existingScores]);
+  }, [isOpen, existingScores, existingAssignments]);
 
   const handleClose = () => {
     setSearchQuery("");
     setScoreInputs({});
+    setAssignmentInputs({});
     setExistingScoreStudentIds([]);
     onClose();
   };
 
   const handleScoreChange = (studentId: string, value: string) => {
     setScoreInputs((prev) => ({ ...prev, [studentId]: value }));
+  };
+
+  const handleAssignmentChange = (studentId: string, status: string) => {
+    setAssignmentInputs((prev) => {
+      if (status === "") {
+        const newInputs = { ...prev };
+        delete newInputs[studentId];
+        return newInputs;
+      }
+      return { ...prev, [studentId]: status };
+    });
   };
 
   const handleSave = async () => {
@@ -79,12 +115,11 @@ export function ScoreInputModal({
       }));
 
     const scoreStudentIds = scores.map((s) => s.studentId);
-    const toDelete = existingScoreStudentIds.filter((id) => !scoreStudentIds.includes(id));
+    const toDeleteScores = existingScoreStudentIds.filter((id) => !scoreStudentIds.includes(id));
 
-    if (scores.length === 0 && toDelete.length === 0) {
-      alert("저장할 변경사항이 없습니다.");
-      return;
-    }
+    const assignments = Object.entries(assignmentInputs)
+      .filter(([, status]) => status !== "")
+      .map(([studentId, status]) => ({ studentId, status }));
 
     const maxScoreValue = exam.max_score || 8;
     const invalidScores = scores.filter((s) => s.score > maxScoreValue);
@@ -93,7 +128,7 @@ export function ScoreInputModal({
       return;
     }
 
-    await onSave(scores, toDelete);
+    await onSave(scores, toDeleteScores, assignments);
   };
 
   if (!exam) return null;
@@ -101,24 +136,27 @@ export function ScoreInputModal({
   const filteredStudents = students
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name, "ko"));
-  const inputCount = Object.values(scoreInputs).filter((v) => v !== "" && !Number.isNaN(Number.parseInt(v))).length;
+
+  const scoreCount = Object.values(scoreInputs).filter((v) => v !== "" && !Number.isNaN(Number.parseInt(v))).length;
   const cutlineValue = exam.cutline || 4;
   const belowCutlineCount = Object.entries(scoreInputs).filter(([, value]) => {
     const score = Number.parseInt(value);
     return !Number.isNaN(score) && score < cutlineValue;
   }).length;
 
+  const assignmentCount = Object.values(assignmentInputs).filter((v) => v !== "").length;
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="점수 입력"
+      title="점수 및 과제 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
         <div className="w-full">
-          <div className="mb-spacing-300 flex items-center justify-between text-body">
+          <div className="mb-spacing-300 flex flex-wrap items-center justify-between gap-spacing-200 text-body">
             <span className="text-content-standard-secondary">
-              입력된 점수: {inputCount}명 / {students.length}명
+              점수: {scoreCount}명 / 과제: {assignmentCount}명
             </span>
             {belowCutlineCount > 0 && (
               <span className="text-core-status-negative">커트라인 미달: {belowCutlineCount}명</span>
@@ -171,6 +209,7 @@ export function ScoreInputModal({
                 const scoreValue = scoreInputs[student.id] || "";
                 const score = Number.parseInt(scoreValue);
                 const isBelowCutline = !Number.isNaN(score) && score < (exam.cutline || 4);
+                const currentAssignment = assignmentInputs[student.id] || "";
 
                 return (
                   <StudentListItem
@@ -178,21 +217,33 @@ export function ScoreInputModal({
                     student={student}
                     highlighted={isBelowCutline}
                     rightContent={
-                      <div className="flex items-center gap-spacing-200">
-                        <input
-                          type="number"
-                          value={scoreValue}
-                          onChange={(e) => handleScoreChange(student.id, e.target.value)}
-                          placeholder="-"
-                          min="0"
-                          max={exam.max_score || 8}
-                          className={`w-20 rounded-radius-300 border px-spacing-300 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
-                            isBelowCutline
-                              ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
-                              : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
-                          }`}
-                        />
-                        <span className="text-body text-content-standard-tertiary">/ {exam.max_score || 8}</span>
+                      <div className="flex flex-wrap items-center gap-spacing-300">
+                        <div className="flex items-center gap-spacing-200">
+                          <input
+                            type="number"
+                            value={scoreValue}
+                            onChange={(e) => handleScoreChange(student.id, e.target.value)}
+                            placeholder="-"
+                            min="0"
+                            max={exam.max_score || 8}
+                            className={`w-16 rounded-radius-300 border px-spacing-200 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
+                              isBelowCutline
+                                ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
+                                : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
+                            }`}
+                          />
+                          <span className="text-footnote text-content-standard-tertiary">/ {exam.max_score || 8}</span>
+                        </div>
+                        <div className="h-6 w-px bg-line-divider" />
+                        <select
+                          value={currentAssignment}
+                          onChange={(e) => handleAssignmentChange(student.id, e.target.value)}
+                          className="w-20 rounded-radius-300 border border-line-outline bg-components-fill-standard-primary px-spacing-200 py-spacing-200 text-center text-body text-content-standard-primary transition-all focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent">
+                          <option value="">-</option>
+                          <option value="완료">완료</option>
+                          <option value="미흡">미흡</option>
+                          <option value="미제출">미제출</option>
+                        </select>
                       </div>
                     }
                   />

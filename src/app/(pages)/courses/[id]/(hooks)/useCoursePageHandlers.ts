@@ -3,10 +3,8 @@
 import { useSetAtom } from "jotai";
 import { useCallback } from "react";
 import {
-  assignmentExamAtom,
   scoreExamAtom,
   selectedExamAtom,
-  showAssignmentModalAtom,
   showCreateModalAtom,
   showEditModalAtom,
   showScoreModalAtom,
@@ -19,8 +17,6 @@ export const useCoursePageHandlers = () => {
   const setSelectedExam = useSetAtom(selectedExamAtom);
   const setShowScoreModal = useSetAtom(showScoreModalAtom);
   const setScoreExam = useSetAtom(scoreExamAtom);
-  const setShowAssignmentModal = useSetAtom(showAssignmentModalAtom);
-  const setAssignmentExam = useSetAtom(assignmentExamAtom);
 
   const openCreateModal = useCallback(() => {
     setShowCreateModal(true);
@@ -56,19 +52,6 @@ export const useCoursePageHandlers = () => {
     setScoreExam(null);
   }, [setShowScoreModal, setScoreExam]);
 
-  const openAssignmentModal = useCallback(
-    (exam: Exam) => {
-      setAssignmentExam(exam);
-      setShowAssignmentModal(true);
-    },
-    [setAssignmentExam, setShowAssignmentModal],
-  );
-
-  const closeAssignmentModal = useCallback(() => {
-    setShowAssignmentModal(false);
-    setAssignmentExam(null);
-  }, [setShowAssignmentModal, setAssignmentExam]);
-
   return {
     openCreateModal,
     closeCreateModal,
@@ -76,7 +59,5 @@ export const useCoursePageHandlers = () => {
     closeEditModal,
     openScoreModal,
     closeScoreModal,
-    openAssignmentModal,
-    closeAssignmentModal,
   };
 };

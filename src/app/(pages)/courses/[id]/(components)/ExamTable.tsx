@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -14,15 +13,14 @@ import type { Exam } from "../(hooks)/useExams";
 
 interface ExamTableProps {
   exams: Exam[];
-  onScoreInput: (exam: Exam) => void;
-  onAssignment: (exam: Exam) => void;
+  onManage: (exam: Exam) => void;
   onEdit: (exam: Exam) => void;
   onDelete: (exam: Exam) => void;
 }
 
 type ExamSortKey = "name" | "examNumber" | "maxScore" | "cutline" | "highest" | "average" | "median" | "retakers";
 
-export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete }: ExamTableProps) {
+export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
 
@@ -166,14 +164,11 @@ export function ExamTable({ exams, onScoreInput, onAssignment, onEdit, onDelete 
                 )}
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="flex gap-spacing-200">
-                  <Button size="sm" onClick={() => onScoreInput(exam)}>
-                    점수 입력
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={() => onAssignment(exam)}>
-                    과제
-                  </Button>
-                </div>
+                <button
+                  onClick={() => onManage(exam)}
+                  className="rounded-radius-300 bg-core-accent px-spacing-400 py-spacing-200 font-medium text-footnote text-solid-white transition-opacity hover:opacity-90">
+                  점수 및 과제 입력
+                </button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <MoreOptionsButton
