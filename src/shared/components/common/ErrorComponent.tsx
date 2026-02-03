@@ -15,8 +15,8 @@ export default function ErrorComponent({ errorMessage }: ErrorComponentProps) {
           />
         </svg>
       </div>
-      <div className="text-center">
-        <p className="mb-spacing-100 font-medium text-body text-content-standard-primary">문제가 발생했습니다</p>
+      <div className="flex flex-col gap-spacing-100 text-center">
+        <p className="font-medium text-body text-content-standard-primary">문제가 발생했습니다</p>
         <p className="text-content-standard-tertiary text-label">{errorMessage}</p>
       </div>
     </div>

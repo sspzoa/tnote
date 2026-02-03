@@ -88,32 +88,30 @@ export default function EventDetailModal({ event, onClose }: Props) {
           닫기
         </Button>
       }>
-      <div className="space-y-spacing-400">
-        <div>
-          <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">타입</label>
+      <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-spacing-100">
+          <label className="block font-semibold text-content-standard-secondary text-label">타입</label>
           <div className="flex items-center gap-spacing-200">
             <div className="h-4 w-4 rounded-radius-100" style={{ backgroundColor: getEventColor(event) }} />
             <span className="text-body text-content-standard-primary">{getEventTypeLabel(event.type)}</span>
           </div>
         </div>
 
-        <div>
-          <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">제목</label>
+        <div className="flex flex-col gap-spacing-100">
+          <label className="block font-semibold text-content-standard-secondary text-label">제목</label>
           <p className="text-body text-content-standard-primary">{event.title}</p>
         </div>
 
-        <div>
-          <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">날짜</label>
+        <div className="flex flex-col gap-spacing-100">
+          <label className="block font-semibold text-content-standard-secondary text-label">날짜</label>
           <p className="text-body text-content-standard-primary">
             {format(new Date(event.date), "yyyy년 M월 d일 (EEE)", { locale: ko })}
           </p>
         </div>
 
         {event.type === "clinic" && event.metadata?.status && (
-          <div>
-            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-              상태
-            </label>
+          <div className="flex flex-col gap-spacing-100">
+            <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
             <Badge variant={getClinicStatusVariant(event.metadata.status)} size="sm">
               {getClinicStatusLabel(event.metadata.status)}
             </Badge>
@@ -121,10 +119,8 @@ export default function EventDetailModal({ event, onClose }: Props) {
         )}
 
         {event.type === "retake" && event.metadata?.status && (
-          <div>
-            <label className="mb-spacing-100 block font-semibold text-content-standard-secondary text-label">
-              상태
-            </label>
+          <div className="flex flex-col gap-spacing-100">
+            <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
             <Badge variant={getRetakeStatusVariant(event.metadata.status)} size="sm">
               {getRetakeStatusLabel(event.metadata.status)}
             </Badge>

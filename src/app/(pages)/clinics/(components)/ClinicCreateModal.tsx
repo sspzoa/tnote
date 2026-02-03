@@ -78,7 +78,7 @@ export default function ClinicCreateModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-500">
+      <div className="flex flex-col gap-spacing-500">
         <FormInput
           label="클리닉 이름"
           required

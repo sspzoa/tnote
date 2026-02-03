@@ -11,8 +11,8 @@ interface RecipientTypeSelectorProps {
 
 export default function RecipientTypeSelector({ value, onChange }: RecipientTypeSelectorProps) {
   return (
-    <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-      <label className="mb-spacing-300 block font-semibold text-content-standard-primary text-label">수신자 유형</label>
+    <div className="flex flex-col gap-spacing-300 border-line-divider border-b px-spacing-500 py-spacing-400">
+      <label className="block font-semibold text-content-standard-primary text-label">수신자 유형</label>
       <div className="flex flex-wrap gap-spacing-200">
         {RECIPIENT_OPTIONS.map((option) => (
           <FilterButton key={option.value} active={value === option.value} onClick={() => onChange(option.value)}>

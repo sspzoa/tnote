@@ -25,7 +25,7 @@ export default function CalendarToolbar({
   onFilterChange,
 }: Props) {
   return (
-    <div className="mb-spacing-500 flex flex-col gap-spacing-400 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-spacing-400 md:flex-row md:items-center md:justify-between">
       <div className="flex items-center justify-between gap-spacing-200 md:justify-start">
         <div className="flex items-center gap-spacing-200">
           <button

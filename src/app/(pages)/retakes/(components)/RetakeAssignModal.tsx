@@ -164,7 +164,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           </Button>
         </>
       }>
-      <div className="space-y-spacing-500">
+      <div className="flex flex-col gap-spacing-500">
         <FormSelect
           label="수업 선택"
           required
@@ -190,8 +190,8 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           onChange={(e) => setScheduledDate(e.target.value)}
         />
 
-        <div>
-          <div className="mb-spacing-200 flex items-center justify-between">
+        <div className="flex flex-col gap-spacing-200">
+          <div className="flex items-center justify-between">
             <label className="font-semibold text-body text-content-standard-primary">
               학생 선택 <span className="text-core-status-negative">*</span>
               {selectedExam && examScores.length > 0 && (
@@ -224,7 +224,6 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             placeholder="학생 검색..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-spacing-300"
             disabled={!selectedCourseId}
           />
 
@@ -269,9 +268,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             )}
           </StudentListContainer>
 
-          <div className="mt-spacing-200 text-body text-content-standard-secondary">
-            선택된 학생: {selectedStudentIds.length}명
-          </div>
+          <div className="text-body text-content-standard-secondary">선택된 학생: {selectedStudentIds.length}명</div>
         </div>
       </div>
     </Modal>

@@ -56,10 +56,10 @@ export default function WorkspaceDeleteModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-500">
-        <div className="rounded-radius-300 border border-core-status-negative/30 bg-solid-translucent-red p-spacing-400">
+      <div className="flex flex-col gap-spacing-500">
+        <div className="flex flex-col gap-spacing-200 rounded-radius-300 border border-core-status-negative/30 bg-solid-translucent-red p-spacing-400">
           <p className="font-semibold text-body text-core-status-negative">경고: 이 작업은 되돌릴 수 없습니다!</p>
-          <ul className="mt-spacing-200 list-inside list-disc space-y-spacing-100 text-content-standard-secondary text-label">
+          <ul className="list-inside list-disc flex flex-col gap-spacing-100 text-content-standard-secondary text-label">
             <li>모든 학생 데이터가 삭제됩니다</li>
             <li>모든 수업 및 시험 데이터가 삭제됩니다</li>
             <li>모든 재시험 기록이 삭제됩니다</li>
@@ -69,8 +69,8 @@ export default function WorkspaceDeleteModal() {
           </ul>
         </div>
 
-        <div>
-          <p className="mb-spacing-200 text-body text-content-standard-primary">
+        <div className="flex flex-col gap-spacing-200">
+          <p className="text-body text-content-standard-primary">
             삭제를 확인하려면 <span className="font-bold text-core-status-negative">{CONFIRM_TEXT}</span>를 입력하세요.
           </p>
           <FormInput

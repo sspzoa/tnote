@@ -107,8 +107,8 @@ export default function TagManageModal() {
           닫기
         </Button>
       }>
-      <div className="space-y-spacing-600">
-        <div className="space-y-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary/50 p-spacing-500">
+      <div className="flex flex-col gap-spacing-600">
+        <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary/50 p-spacing-500">
           <h3 className="font-semibold text-body text-content-standard-primary">
             {editingTag ? "태그 수정" : "새 태그 추가"}
           </h3>
@@ -122,8 +122,8 @@ export default function TagManageModal() {
             required
           />
 
-          <div>
-            <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+          <div className="flex flex-col gap-spacing-200">
+            <label className="block font-semibold text-content-standard-primary text-label">
               색상 <span className="text-core-status-negative">*</span>
             </label>
             <div className="flex flex-wrap gap-spacing-200">
@@ -184,7 +184,7 @@ export default function TagManageModal() {
           </div>
         </div>
 
-        <div className="space-y-spacing-300">
+        <div className="flex flex-col gap-spacing-300">
           <h3 className="font-semibold text-body text-content-standard-primary">등록된 태그</h3>
 
           {isLoading ? (
@@ -194,7 +194,7 @@ export default function TagManageModal() {
               등록된 태그가 없습니다.
             </div>
           ) : (
-            <div className="space-y-spacing-200">
+            <div className="flex flex-col gap-spacing-200">
               {tags.map((tag) => (
                 <div
                   key={tag.id}

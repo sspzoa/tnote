@@ -48,8 +48,8 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
 
   return (
     <div className="flex flex-col gap-spacing-400">
-      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
-        <span className="mb-spacing-400 block font-medium text-content-standard-tertiary text-label">필터</span>
+      <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
+        <span className="block font-medium text-content-standard-tertiary text-label">필터</span>
 
         <div className="flex flex-col gap-spacing-400">
           <div className="flex flex-wrap items-center gap-spacing-300">

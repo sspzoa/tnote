@@ -63,9 +63,9 @@ export default function ConsultationListModal() {
       {isLoading ? (
         <ConsultationListSkeleton count={4} />
       ) : consultations.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="mb-spacing-200 text-body text-content-standard-tertiary">상담일지가 없습니다.</p>
-          <p className="mb-spacing-500 text-content-standard-quaternary text-footnote">첫 상담일지를 작성해보세요.</p>
+        <div className="flex flex-col items-center gap-spacing-200 py-spacing-900 text-center">
+          <p className="text-body text-content-standard-tertiary">상담일지가 없습니다.</p>
+          <p className="text-content-standard-quaternary text-footnote">첫 상담일지를 작성해보세요.</p>
           <button
             onClick={openAddModal}
             className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
@@ -83,8 +83,8 @@ export default function ConsultationListModal() {
               <button
                 key={log.id}
                 onClick={() => openEditConsultationModal(log)}
-                className="w-full px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-interactive-hover">
-                <div className="mb-spacing-100 flex items-center justify-between">
+                className="flex w-full flex-col gap-spacing-100 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-interactive-hover">
+                <div className="flex items-center justify-between">
                   <span className="font-medium text-body text-content-standard-primary">{log.title}</span>
                   <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
                     {dateStr}

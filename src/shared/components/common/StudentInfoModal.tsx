@@ -80,8 +80,8 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
         <div className="py-spacing-900 text-center text-content-standard-tertiary">학생 정보를 불러올 수 없습니다.</div>
       ) : (
         <div className="flex flex-col gap-spacing-600">
-          <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">기본 정보</h3>
+          <section className="flex flex-col gap-spacing-300">
+            <h3 className="font-semibold text-body text-content-standard-primary">기본 정보</h3>
             <div className="grid grid-cols-2 gap-spacing-300 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
               <div className="flex flex-col gap-spacing-50">
                 <span className="text-content-standard-tertiary text-footnote">이름</span>
@@ -142,8 +142,8 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
             </div>
           </section>
 
-          <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">수강 중인 수업</h3>
+          <section className="flex flex-col gap-spacing-300">
+            <h3 className="font-semibold text-body text-content-standard-primary">수강 중인 수업</h3>
             {studentDetail.courses.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
                 수강 중인 수업이 없습니다.
@@ -171,8 +171,8 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
             )}
           </section>
 
-          <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-spacing-300">
+            <h3 className="font-semibold text-body text-content-standard-primary">
               시험 성적 & 과제
               {examWithAssignments.length > 0 && (
                 <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
@@ -239,8 +239,8 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
             )}
           </section>
 
-          <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-spacing-300">
+            <h3 className="font-semibold text-body text-content-standard-primary">
               최근 클리닉 출석
               {studentDetail.clinicHistory.length > 0 && (
                 <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
@@ -275,8 +275,8 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
             )}
           </section>
 
-          <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-spacing-300">
+            <h3 className="font-semibold text-body text-content-standard-primary">
               최근 재시험
               {studentDetail.retakeHistory.length > 0 && (
                 <span className="ml-spacing-100 font-normal text-content-standard-tertiary">

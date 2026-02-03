@@ -89,7 +89,7 @@ export default function AttendanceModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-500">
+      <div className="flex flex-col gap-spacing-500">
         <FormInput
           label="날짜 선택"
           required
@@ -98,28 +98,25 @@ export default function AttendanceModal() {
           onChange={(e) => setSelectedDate(e.target.value)}
         />
 
-        <div>
-          <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
-            참석 학생 선택 ({students.length}명)
-          </h3>
+        <div className="flex flex-col gap-spacing-300">
+          <h3 className="font-bold text-body text-content-standard-primary">참석 학생 선택 ({students.length}명)</h3>
           {loadingAttendance ? (
-            <>
-              <div className="mb-spacing-300 h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+            <div className="flex flex-col gap-spacing-300">
+              <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
               <StudentListContainer>
                 <StudentListSkeleton count={6} showCheckbox />
               </StudentListContainer>
-            </>
+            </div>
           ) : students.length === 0 ? (
             <StudentListContainer>
               <StudentListEmpty />
             </StudentListContainer>
           ) : (
-            <>
+            <div className="flex flex-col gap-spacing-300">
               <SearchInput
                 placeholder="학생 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-spacing-300"
               />
               <StudentListContainer>
                 {filteredStudents.length === 0 ? (
@@ -135,7 +132,7 @@ export default function AttendanceModal() {
                   ))
                 )}
               </StudentListContainer>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -6,7 +6,7 @@ interface TagListSkeletonProps {
 
 export function TagListSkeleton({ count = 4 }: TagListSkeletonProps) {
   return (
-    <div className="space-y-spacing-200">
+    <div className="flex flex-col gap-spacing-200">
       {[...Array(count)].map((_, i) => (
         <div
           key={i}

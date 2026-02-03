@@ -96,7 +96,7 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
       {isLoading ? (
         <SkeletonSpinner className="py-spacing-600" size="md" />
       ) : (
-        <div className="space-y-spacing-400">
+        <div className="flex flex-col gap-spacing-400">
           <FormInput
             label="발신번호"
             value={phoneInput}
@@ -104,9 +104,9 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
             placeholder="010-1234-5678"
             error={error || undefined}
           />
-          <div className="rounded-radius-300 bg-solid-translucent-yellow p-spacing-400">
+          <div className="flex flex-col gap-spacing-200 rounded-radius-300 bg-solid-translucent-yellow p-spacing-400">
             <p className="font-semibold text-core-status-warning text-label">주의사항</p>
-            <ul className="mt-spacing-200 list-inside list-disc space-y-spacing-100 text-content-standard-secondary text-footnote">
+            <ul className="list-inside list-disc flex flex-col gap-spacing-100 text-content-standard-secondary text-footnote">
               <li>SOLAPI에 등록된 발신번호만 사용 가능합니다.</li>
               <li>미등록 번호로 발송 시 실패할 수 있습니다.</li>
               <li>발신번호 등록은 SOLAPI 콘솔에서 진행해주세요.</li>

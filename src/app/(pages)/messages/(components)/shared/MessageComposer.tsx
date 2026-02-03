@@ -36,8 +36,8 @@ export default function MessageComposer({
   };
 
   return (
-    <div className={`flex flex-col ${className}`}>
-      <div className="mb-spacing-300 flex items-center justify-between">
+    <div className={`flex flex-col gap-spacing-300 ${className}`}>
+      <div className="flex items-center justify-between">
         <label className="font-semibold text-content-standard-primary text-label">메시지 내용</label>
         <div className="flex items-center gap-spacing-300">
           <Badge variant={isLMS ? "yellow" : "blue"} size="xs">
@@ -61,11 +61,11 @@ export default function MessageComposer({
         value={messageText}
         onChange={(e) => handleTextChange(e.target.value)}
         placeholder="메시지를 입력하세요..."
-        className="mt-spacing-300 min-h-32 flex-1 resize-none"
+        className="min-h-32 flex-1 resize-none"
       />
 
-      <div className="mt-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
-        <div className="mb-spacing-200 flex items-center gap-spacing-200">
+      <div className="flex flex-col gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
+        <div className="flex items-center gap-spacing-200">
           <Info className="size-4 text-content-standard-tertiary" />
           <span className="font-semibold text-content-standard-secondary text-footnote">사용 가능한 변수</span>
         </div>

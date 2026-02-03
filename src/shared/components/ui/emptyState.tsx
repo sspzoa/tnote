@@ -10,15 +10,15 @@ interface EmptyStateProps {
 
 export function EmptyState({ message, actionLabel, onAction, icon }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-spacing-900 text-center">
+    <div className="flex flex-col items-center justify-center gap-spacing-400 py-spacing-900 text-center">
       {icon && (
-        <div className="mb-spacing-400 flex size-16 items-center justify-center rounded-full bg-core-accent-translucent text-core-accent">
+        <div className="flex size-16 items-center justify-center rounded-full bg-core-accent-translucent text-core-accent">
           {icon}
         </div>
       )}
       <p className="text-body text-content-standard-tertiary">{message}</p>
       {actionLabel && onAction && (
-        <Button variant="primary" onClick={onAction} className="mt-spacing-500">
+        <Button variant="primary" onClick={onAction}>
           {actionLabel}
         </Button>
       )}

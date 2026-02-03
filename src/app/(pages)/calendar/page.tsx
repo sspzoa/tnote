@@ -1,7 +1,6 @@
 "use client";
 
 import { addMonths, subMonths } from "date-fns";
-import Link from "next/link";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
@@ -39,16 +38,13 @@ export default function CalendarPage() {
 
   return (
     <Container>
-      <Link
-        href="/"
-        className="group mb-spacing-400 inline-flex items-center gap-spacing-100 text-body text-core-accent transition-all duration-150 hover:gap-spacing-200">
-        <span className="group-hover:-translate-x-spacing-50 transition-transform duration-150">←</span>
-        <span>홈으로 돌아가기</span>
-      </Link>
+      <Header
+        title="캘린더"
+        subtitle="수업, 재시험, 클리닉 일정을 확인하세요"
+        backLink={{ href: "/", label: "홈으로 돌아가기" }}
+      />
 
-      <Header title="캘린더" subtitle="수업, 재시험, 클리닉 일정을 확인하세요" />
-
-      <div className="overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
+      <div className="flex flex-col gap-spacing-500 overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
         <CalendarToolbar
           currentDate={currentDate}
           filters={filters}
@@ -76,11 +72,11 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={i}
-                    className={`min-h-[120px] p-spacing-200 ${!isLastColumn ? "border-line-outline border-r" : ""} ${!isLastRow ? "border-line-outline border-b" : ""}`}>
-                    <div className="mb-spacing-100 flex justify-end">
+                    className={`flex min-h-[120px] flex-col gap-spacing-100 p-spacing-200 ${!isLastColumn ? "border-line-outline border-r" : ""} ${!isLastRow ? "border-line-outline border-b" : ""}`}>
+                    <div className="flex justify-end">
                       <Skeleton className="size-6 rounded-full" />
                     </div>
-                    <div className="space-y-spacing-100">
+                    <div className="flex flex-col gap-spacing-100">
                       <Skeleton className="h-6 w-full rounded-radius-200" />
                       <Skeleton className="h-6 w-4/5 rounded-radius-200" />
                     </div>

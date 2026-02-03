@@ -1,10 +1,10 @@
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 export const DashboardSkeleton = () => (
-  <div className="space-y-spacing-600">
+  <div className="flex flex-col gap-spacing-600">
     <div className="flex items-start gap-spacing-500 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-600">
       <Skeleton className="h-16 w-16 rounded-radius-full" />
-      <div className="flex-1 space-y-spacing-200">
+      <div className="flex-1 flex flex-col gap-spacing-200">
         <Skeleton className="h-7 w-48" />
         <Skeleton className="h-5 w-32" />
         <div className="flex gap-spacing-200">

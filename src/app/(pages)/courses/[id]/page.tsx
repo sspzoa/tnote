@@ -1,9 +1,10 @@
 "use client";
 
 import { useAtomValue } from "jotai";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Container from "@/shared/components/common/Container";
+import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
 import {
@@ -141,94 +142,81 @@ export default function CourseDetailPage() {
 
   if (courseLoading || examsLoading || !course) {
     return (
-      <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-        <div className="mx-auto max-w-7xl">
-          <Skeleton className="mb-spacing-400 h-6 w-40" />
-          <div className="mb-spacing-700 flex items-end justify-between">
-            <div className="space-y-spacing-200">
+      <Container>
+        <div className="flex flex-col gap-spacing-400">
+          <Skeleton className="h-6 w-40" />
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col gap-spacing-200">
               <Skeleton className="h-8 w-48" />
               <Skeleton className="h-6 w-24" />
             </div>
             <Skeleton className="h-12 w-28 rounded-radius-300" />
           </div>
-          <SkeletonTable
-            rows={5}
-            columns={[
-              "w-20",
-              { width: "w-14", rounded: true },
-              "w-8",
-              "w-8",
-              "w-8",
-              "w-10",
-              "w-8",
-              "w-16",
-              { width: "w-16", buttons: ["w-16", "w-12"] },
-              "action",
-            ]}
-          />
         </div>
-      </div>
+        <SkeletonTable
+          rows={5}
+          columns={[
+            "w-20",
+            { width: "w-14", rounded: true },
+            "w-8",
+            "w-8",
+            "w-8",
+            "w-10",
+            "w-8",
+            "w-16",
+            { width: "w-16", buttons: ["w-16", "w-12"] },
+            "action",
+          ]}
+        />
+      </Container>
     );
   }
 
   return (
-    <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-spacing-700">
-          <Link href="/courses" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
-            ← 수업 목록으로 돌아가기
-          </Link>
-          <div className="flex flex-col gap-spacing-400 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-title">{course.name}</h1>
-              <p className="text-body text-content-standard-secondary">총 {exams.length}개의 시험</p>
-            </div>
-            <Button onClick={openCreateModal}>+ 시험 생성</Button>
-          </div>
+    <Container>
+      <Header
+        title={course.name}
+        subtitle={`총 ${exams.length}개의 시험`}
+        backLink={{ href: "/", label: "홈으로 돌아가기" }}
+        action={<Button onClick={openCreateModal}>+ 시험 생성</Button>}
+      />
+
+      {exams.length === 0 ? (
+        <div className="flex flex-col items-center gap-spacing-500 py-spacing-900 text-center">
+          <p className="text-body text-content-standard-tertiary">시험이 없습니다.</p>
+          <Button onClick={openCreateModal}>첫 시험 만들기</Button>
         </div>
-
-        {exams.length === 0 ? (
-          <div className="py-spacing-900 text-center">
-            <p className="text-body text-content-standard-tertiary">시험이 없습니다.</p>
-            <Button onClick={openCreateModal} className="mt-spacing-500">
-              첫 시험 만들기
-            </Button>
-          </div>
-        ) : (
-          <ExamTable exams={exams} onManage={openScoreModal} onEdit={openEditModal} onDelete={handleDelete} />
-        )}
-
-        <ExamFormModal
-          isOpen={showCreateModal}
-          onClose={closeCreateModal}
-          mode="create"
-          courseName={course.name}
-          initialData={showCreateModal ? getCreateInitialData() : undefined}
-          onSubmit={handleCreate}
-          isSubmitting={isCreating}
-        />
-
-        <ExamFormModal
-          isOpen={showEditModal}
-          onClose={closeEditModal}
-          mode="edit"
-          initialData={getEditInitialData()}
-          onSubmit={handleEdit}
-          isSubmitting={isUpdating}
-        />
-
-        <ScoreInputModal
-          isOpen={showScoreModal}
-          onClose={closeScoreModal}
-          exam={scoreExam}
-          students={scoreStudents}
-          isLoading={loadingScores}
-          existingScores={existingScores}
-          existingAssignments={existingAssignments}
-          onSave={handleSaveScoresAndAssignments}
-          isSaving={isSavingScores || isSavingAssignments}
-        />
-      </div>
-    </div>
+      ) : (
+        <ExamTable exams={exams} onManage={openScoreModal} onEdit={openEditModal} onDelete={handleDelete} />
+      )}
+      <ExamFormModal
+        isOpen={showCreateModal}
+        onClose={closeCreateModal}
+        mode="create"
+        courseName={course.name}
+        initialData={showCreateModal ? getCreateInitialData() : undefined}
+        onSubmit={handleCreate}
+        isSubmitting={isCreating}
+      />
+      <ExamFormModal
+        isOpen={showEditModal}
+        onClose={closeEditModal}
+        mode="edit"
+        initialData={getEditInitialData()}
+        onSubmit={handleEdit}
+        isSubmitting={isUpdating}
+      />
+      <ScoreInputModal
+        isOpen={showScoreModal}
+        onClose={closeScoreModal}
+        exam={scoreExam}
+        students={scoreStudents}
+        isLoading={loadingScores}
+        existingScores={existingScores}
+        existingAssignments={existingAssignments}
+        onSave={handleSaveScoresAndAssignments}
+        isSaving={isSavingScores || isSavingAssignments}
+      />
+    </Container>
   );
 }

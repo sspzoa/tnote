@@ -68,9 +68,9 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
           </Button>
         </>
       }>
-      <div className="space-y-spacing-400">
-        <div>
-          <label className="mb-spacing-200 block font-semibold text-body text-content-standard-primary">예정일</label>
+      <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-spacing-200">
+          <label className="block font-semibold text-body text-content-standard-primary">예정일</label>
           <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
             {selectedRetake.current_scheduled_date}
           </div>

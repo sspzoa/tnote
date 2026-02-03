@@ -18,8 +18,8 @@ export function DayOfWeekPicker({ label, required = false, selectedDays, onChang
   };
 
   return (
-    <div>
-      <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+    <div className="flex flex-col gap-spacing-200">
+      <label className="block font-semibold text-content-standard-primary text-label">
         {label} {required && <span className="text-core-status-negative">*</span>}
       </label>
       <div className="grid grid-cols-7 gap-spacing-200">

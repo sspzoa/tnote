@@ -61,8 +61,8 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
     <div className="border-line-divider border-b">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
-        <div className="mb-spacing-100 flex items-center justify-between">
+        className="flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-spacing-200">
             <span className="font-medium text-body text-content-standard-primary">{title}</span>
             <span
@@ -87,9 +87,7 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
               ))}
           </div>
         </div>
-        <div className="mb-spacing-100 line-clamp-2 text-body text-content-standard-secondary">
-          {batch.message_content}
-        </div>
+        <div className="line-clamp-2 text-body text-content-standard-secondary">{batch.message_content}</div>
         <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
           <span>{timeStr}</span>
           <span>·</span>
@@ -107,7 +105,7 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
 
       {isExpanded && batch.recipients.length > 1 && (
         <div className="border-line-divider border-t bg-components-fill-standard-secondary/50 px-spacing-600 py-spacing-300">
-          <div className="space-y-spacing-200">
+          <div className="flex flex-col gap-spacing-200">
             {batch.recipients.map((recipient) => (
               <div key={recipient.id} className="flex items-center justify-between text-footnote">
                 <div className="flex items-center gap-spacing-200">
@@ -192,13 +190,11 @@ export default function MessagesPage() {
         }
       />
 
-      <div className="flex flex-col gap-spacing-600">
-        <SegmentedControl items={TABS} value={activeTab} onChange={setActiveTab} />
+      <SegmentedControl items={TABS} value={activeTab} onChange={setActiveTab} />
 
-        {activeTab === "general" && <GeneralTab />}
-        {activeTab === "exam-results" && <ExamResultsTab />}
-        {activeTab === "retake-notice" && <RetakeNoticeTab />}
-      </div>
+      {activeTab === "general" && <GeneralTab />}
+      {activeTab === "exam-results" && <ExamResultsTab />}
+      {activeTab === "retake-notice" && <RetakeNoticeTab />}
 
       <SlidePanel
         isOpen={showHistoryPanel}
@@ -206,9 +202,9 @@ export default function MessagesPage() {
         title="발송 이력"
         subtitle="최근 50건">
         {isLoading ? (
-          <div className="space-y-spacing-300 p-spacing-600">
+          <div className="flex flex-col gap-spacing-300 p-spacing-600">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="space-y-spacing-200 border-line-divider border-b pb-spacing-300">
+              <div key={i} className="flex flex-col gap-spacing-200 border-line-divider border-b pb-spacing-300">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-spacing-200">
                     <Skeleton className="h-6 w-24" />
@@ -222,8 +218,8 @@ export default function MessagesPage() {
             ))}
           </div>
         ) : history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-spacing-900">
-            <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+          <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
+            <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
               <History className="size-6 text-core-accent" />
             </div>
             <span className="text-content-standard-tertiary text-label">발송 이력이 없습니다.</span>

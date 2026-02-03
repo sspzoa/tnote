@@ -38,9 +38,9 @@ export default function MessagePreviewModal({
         <p className="whitespace-pre-wrap text-body text-content-standard-primary">{previewMessage}</p>
       </div>
       {variables.length > 0 && (
-        <div className="mt-spacing-400 rounded-radius-300 bg-solid-translucent-blue p-spacing-400">
+        <div className="flex flex-col gap-spacing-200 rounded-radius-300 bg-solid-translucent-blue p-spacing-400">
           <p className="font-semibold text-label text-solid-blue">적용된 변수</p>
-          <div className="mt-spacing-200 grid grid-cols-2 gap-spacing-200 text-content-standard-secondary text-footnote">
+          <div className="grid grid-cols-2 gap-spacing-200 text-content-standard-secondary text-footnote">
             {variables.map((variable) => (
               <span key={variable.label}>
                 {variable.label}: {variable.value ?? "-"}

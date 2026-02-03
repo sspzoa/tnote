@@ -6,7 +6,7 @@ interface HistoryListSkeletonProps {
 
 export function HistoryListSkeleton({ count = 4 }: HistoryListSkeletonProps) {
   return (
-    <div className="space-y-spacing-400">
+    <div className="flex flex-col gap-spacing-400">
       {[...Array(count)].map((_, i) => (
         <div
           key={i}

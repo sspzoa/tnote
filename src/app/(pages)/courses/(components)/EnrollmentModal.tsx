@@ -77,16 +77,16 @@ export default function EnrollmentModal() {
       }>
       {isLoadingEnrolled ? (
         <div className="flex h-96 gap-spacing-500">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            <div className="mb-spacing-300 h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
-            <div className="mb-spacing-300 h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
+            <div className="h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
             <StudentListContainer className="flex-1">
               <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
             </StudentListContainer>
           </div>
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            <div className="mb-spacing-300 h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
-            <div className="mb-spacing-300 h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
+            <div className="h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
+            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
             <StudentListContainer className="flex-1">
               <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
             </StudentListContainer>
@@ -94,8 +94,8 @@ export default function EnrollmentModal() {
         </div>
       ) : (
         <div className="flex h-96 gap-spacing-500">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
+            <h3 className="font-bold text-body text-content-standard-primary">
               등록된 학생 ({enrolledStudents.length}명)
             </h3>
             {enrolledStudents.length === 0 ? (
@@ -108,7 +108,6 @@ export default function EnrollmentModal() {
                   placeholder="학생 검색..."
                   value={enrolledSearchQuery}
                   onChange={(e) => setEnrolledSearchQuery(e.target.value)}
-                  className="mb-spacing-300"
                 />
                 <StudentListContainer className="flex-1">
                   {filteredEnrolledStudents.length === 0 ? (
@@ -134,8 +133,8 @@ export default function EnrollmentModal() {
             )}
           </div>
 
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            <h3 className="mb-spacing-300 font-bold text-body text-content-standard-primary">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
+            <h3 className="font-bold text-body text-content-standard-primary">
               학생 추가 ({unenrolledStudents.length}명)
             </h3>
             {unenrolledStudents.length === 0 ? (
@@ -148,7 +147,6 @@ export default function EnrollmentModal() {
                   placeholder="학생 검색..."
                   value={unenrolledSearchQuery}
                   onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
-                  className="mb-spacing-300"
                 />
                 <StudentListContainer className="flex-1">
                   {filteredUnenrolledStudents.length === 0 ? (

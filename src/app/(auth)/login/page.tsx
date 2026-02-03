@@ -145,10 +145,10 @@ export default function LoginPage() {
   return (
     <div className="flex h-dvh items-center justify-center p-spacing-400 md:p-spacing-600">
       <div className="w-full max-w-md">
-        <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          <div className="mb-spacing-600 text-center">
+        <div className="flex flex-col gap-spacing-600 rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+          <div className="flex flex-col gap-spacing-200 text-center">
             <h1 className="font-bold text-content-standard-primary text-title">Tnote</h1>
-            <p className="mt-spacing-200 text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
+            <p className="text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
           </div>
           <SegmentedControl
             items={[
@@ -160,10 +160,9 @@ export default function LoginPage() {
               setTab(v);
               if (v === "teacher") setWorkspaceId("");
             }}
-            className="mb-spacing-600"
           />
 
-          <form onSubmit={handleLogin} className="space-y-spacing-500">
+          <form onSubmit={handleLogin} className="flex flex-col gap-spacing-500">
             {tab === "student" && (
               <FormSelect
                 label="워크스페이스"
@@ -235,7 +234,7 @@ export default function LoginPage() {
             </Button>
           </>
         }>
-        <form id="register-form" onSubmit={handleRegister} className="space-y-spacing-400">
+        <form id="register-form" onSubmit={handleRegister} className="flex flex-col gap-spacing-400">
           <FormInput
             label="이름"
             required
@@ -280,11 +279,11 @@ export default function LoginPage() {
             placeholder="비밀번호를 다시 입력하세요"
           />
 
-          <div className="border-line-divider border-t pt-spacing-400">
-            <p className="mb-spacing-300 font-semibold text-content-standard-primary text-label">
+          <div className="flex flex-col gap-spacing-300 border-line-divider border-t pt-spacing-400">
+            <p className="font-semibold text-content-standard-primary text-label">
               약관 동의 <span className="text-core-status-negative">*</span>
             </p>
-            <div className="space-y-spacing-300">
+            <div className="flex flex-col gap-spacing-300">
               <label className="group flex cursor-pointer items-center gap-spacing-200">
                 <input
                   type="checkbox"
@@ -294,7 +293,7 @@ export default function LoginPage() {
                 />
                 <span className="font-medium text-body text-content-standard-primary">전체 동의</span>
               </label>
-              <div className="space-y-spacing-200 pl-spacing-100">
+              <div className="flex flex-col gap-spacing-200 pl-spacing-100">
                 <label className="group flex cursor-pointer items-center gap-spacing-200">
                   <input
                     type="checkbox"

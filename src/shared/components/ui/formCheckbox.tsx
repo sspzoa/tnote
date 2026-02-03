@@ -27,11 +27,11 @@ interface FormCheckboxGroupProps {
 
 export function FormCheckboxGroup({ label, required = false, children }: FormCheckboxGroupProps) {
   return (
-    <div>
-      <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
+    <div className="flex flex-col gap-spacing-200">
+      <label className="block font-semibold text-content-standard-primary text-label">
         {label} {required && <span className="text-core-status-negative">*</span>}
       </label>
-      <div className="space-y-spacing-200">{children}</div>
+      <div className="flex flex-col gap-spacing-200">{children}</div>
     </div>
   );
 }

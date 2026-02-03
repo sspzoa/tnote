@@ -151,8 +151,8 @@ export function ScoreInputModal({
       title="점수 및 과제 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
-        <div className="w-full">
-          <div className="mb-spacing-300 flex flex-wrap items-center justify-between gap-spacing-200 text-body">
+        <div className="flex w-full flex-col gap-spacing-300">
+          <div className="flex flex-wrap items-center justify-between gap-spacing-200 text-body">
             <span className="text-content-standard-secondary">
               점수: {scoreCount}명 / 과제: {assignmentCount}명
             </span>
@@ -177,27 +177,23 @@ export function ScoreInputModal({
         </div>
       }>
       {isLoading ? (
-        <>
-          <div className="mb-spacing-400">
-            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
-          </div>
+        <div className="flex flex-col gap-spacing-400">
+          <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
           <StudentListContainer>
             <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
           </StudentListContainer>
-        </>
+        </div>
       ) : students.length === 0 ? (
         <StudentListContainer>
           <StudentListEmpty message="수강생이 없습니다." />
         </StudentListContainer>
       ) : (
-        <>
-          <div className="mb-spacing-400">
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="학생 검색..."
-            />
-          </div>
+        <div className="flex flex-col gap-spacing-400">
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="학생 검색..."
+          />
 
           <StudentListContainer>
             {filteredStudents.length === 0 ? (
@@ -251,7 +247,7 @@ export function ScoreInputModal({
               })
             )}
           </StudentListContainer>
-        </>
+        </div>
       )}
     </Modal>
   );

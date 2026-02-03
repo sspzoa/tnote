@@ -61,7 +61,7 @@ export default function CourseEditModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-500">
+      <div className="flex flex-col gap-spacing-500">
         <FormInput label="수업 이름" required value={courseName} onChange={(e) => setCourseName(e.target.value)} />
 
         <DayOfWeekPicker label="수업 요일" selectedDays={daysOfWeek} onChange={setDaysOfWeek} />

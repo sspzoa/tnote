@@ -32,13 +32,13 @@ export default function CalendarDayCell({
 
   return (
     <div
-      className={`relative flex min-h-[120px] flex-col border-line-outline border-r border-b p-spacing-200 transition-colors duration-150 hover:bg-core-accent-translucent/30 ${
+      className={`relative flex min-h-[120px] flex-col gap-spacing-100 border-line-outline border-r border-b p-spacing-200 transition-colors duration-150 hover:bg-core-accent-translucent/30 ${
         isLastColumn ? "border-r-0" : ""
       } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-components-fill-standard-secondary/50" : ""} ${
         isToday ? "bg-core-accent-translucent" : ""
       }`}>
       <div
-        className={`mb-spacing-100 text-right text-footnote ${
+        className={`text-right text-footnote ${
           !isCurrentMonth
             ? "text-content-standard-quaternary"
             : isToday

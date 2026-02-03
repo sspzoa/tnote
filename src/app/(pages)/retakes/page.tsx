@@ -91,39 +91,37 @@ export default function RetakesPage() {
         }
       />
 
-      <div className="flex flex-col gap-spacing-600">
-        <RetakeFilters />
+      <RetakeFilters />
 
-        {isLoading ? (
-          <SkeletonTable
-            rows={8}
-            columns={[
-              { width: "w-16", stacked: ["w-16", "w-24"] },
-              { width: "w-20", stacked: ["w-20", "w-24"] },
-              { width: "w-20", stacked: ["w-20", "w-16"] },
-              { width: "w-12", rounded: true },
-              { width: "w-24", rounded: true },
-              "action",
-            ]}
-          />
-        ) : fetchedRetakes.length === 0 ? (
-          <EmptyState message="재시험이 없습니다." />
-        ) : filteredRetakes.length === 0 ? (
-          <EmptyState message="검색 결과가 없습니다." />
-        ) : (
-          <RetakeList
-            retakes={filteredRetakes}
-            onViewStudent={handleViewStudent}
-            onPostpone={handlePostpone}
-            onAbsent={handleAbsent}
-            onComplete={handleComplete}
-            onViewHistory={handleViewHistory}
-            onDelete={handleDelete}
-            onManagementStatusChange={handleManagementStatusChange}
-            onEditDate={handleEditDate}
-          />
-        )}
-      </div>
+      {isLoading ? (
+        <SkeletonTable
+          rows={8}
+          columns={[
+            { width: "w-16", stacked: ["w-16", "w-24"] },
+            { width: "w-20", stacked: ["w-20", "w-24"] },
+            { width: "w-20", stacked: ["w-20", "w-16"] },
+            { width: "w-12", rounded: true },
+            { width: "w-24", rounded: true },
+            "action",
+          ]}
+        />
+      ) : fetchedRetakes.length === 0 ? (
+        <EmptyState message="재시험이 없습니다." />
+      ) : filteredRetakes.length === 0 ? (
+        <EmptyState message="검색 결과가 없습니다." />
+      ) : (
+        <RetakeList
+          retakes={filteredRetakes}
+          onViewStudent={handleViewStudent}
+          onPostpone={handlePostpone}
+          onAbsent={handleAbsent}
+          onComplete={handleComplete}
+          onViewHistory={handleViewHistory}
+          onDelete={handleDelete}
+          onManagementStatusChange={handleManagementStatusChange}
+          onEditDate={handleEditDate}
+        />
+      )}
 
       <RetakePostponeModal onSuccess={handleActionSuccess} />
       <RetakeAbsentModal onSuccess={handleActionSuccess} />

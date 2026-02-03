@@ -100,34 +100,32 @@ export default function ClinicsPage() {
         action={<Button onClick={() => setShowCreateModal(true)}>+ 클리닉 생성</Button>}
       />
 
-      <div className="flex flex-col gap-spacing-600">
-        <ClinicFilters />
+      <ClinicFilters />
 
-        {isLoading ? (
-          <SkeletonTable
-            rows={5}
-            columns={[
-              "w-20",
-              { width: "w-16", badges: ["w-6", "w-6", "w-6"] },
-              { width: "w-20", buttons: ["w-20"] },
-              "action",
-            ]}
-          />
-        ) : filteredClinics.length === 0 ? (
-          <EmptyState
-            message={showEndedClinics ? "클리닉이 없습니다." : "진행 중인 클리닉이 없습니다."}
-            actionLabel="첫 클리닉 만들기"
-            onAction={() => setShowCreateModal(true)}
-          />
-        ) : (
-          <ClinicList
-            clinics={filteredClinics}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onAttendance={handleAttendance}
-          />
-        )}
-      </div>
+      {isLoading ? (
+        <SkeletonTable
+          rows={5}
+          columns={[
+            "w-20",
+            { width: "w-16", badges: ["w-6", "w-6", "w-6"] },
+            { width: "w-20", buttons: ["w-20"] },
+            "action",
+          ]}
+        />
+      ) : filteredClinics.length === 0 ? (
+        <EmptyState
+          message={showEndedClinics ? "클리닉이 없습니다." : "진행 중인 클리닉이 없습니다."}
+          actionLabel="첫 클리닉 만들기"
+          onAction={() => setShowCreateModal(true)}
+        />
+      ) : (
+        <ClinicList
+          clinics={filteredClinics}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onAttendance={handleAttendance}
+        />
+      )}
 
       <ClinicCreateModal />
       <ClinicEditModal />

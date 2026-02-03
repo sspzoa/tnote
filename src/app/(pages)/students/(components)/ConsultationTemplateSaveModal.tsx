@@ -64,10 +64,8 @@ export default function ConsultationTemplateSaveModal({
         required
         disabled={isLoading}
       />
-      <div className="mt-spacing-400">
-        <label className="mb-spacing-200 block font-semibold text-content-standard-primary text-label">
-          저장할 내용
-        </label>
+      <div className="flex flex-col gap-spacing-200">
+        <label className="block font-semibold text-content-standard-primary text-label">저장할 내용</label>
         <div className="max-h-40 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
           <p className="whitespace-pre-wrap text-body text-content-standard-secondary">{content}</p>
         </div>

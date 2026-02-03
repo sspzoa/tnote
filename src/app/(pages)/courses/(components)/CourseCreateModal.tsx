@@ -60,7 +60,7 @@ export default function CourseCreateModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-500">
+      <div className="flex flex-col gap-spacing-500">
         <FormInput
           label="수업 이름"
           required

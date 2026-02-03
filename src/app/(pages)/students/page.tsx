@@ -102,33 +102,31 @@ export default function StudentsPage() {
         }
       />
 
-      <div className="flex flex-col gap-spacing-600">
-        <StudentFilterBar courses={courses} tags={tags} />
+      <StudentFilterBar courses={courses} tags={tags} />
 
-        {isLoading ? (
-          <SkeletonTable
-            rows={8}
-            columns={[
-              "w-16",
-              { width: "w-12", badges: ["w-12", "w-10"] },
-              "w-14",
-              { width: "w-10", rounded: true },
-              "w-24",
-              "w-24",
-              "w-16",
-              "action",
-            ]}
-          />
-        ) : filteredStudents.length === 0 ? (
-          <EmptyState
-            message={students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
-            actionLabel={students.length === 0 ? "학생 추가" : undefined}
-            onAction={students.length === 0 ? () => setShowCreateModal(true) : undefined}
-          />
-        ) : (
-          <StudentList students={filteredStudents} />
-        )}
-      </div>
+      {isLoading ? (
+        <SkeletonTable
+          rows={8}
+          columns={[
+            "w-16",
+            { width: "w-12", badges: ["w-12", "w-10"] },
+            "w-14",
+            { width: "w-10", rounded: true },
+            "w-24",
+            "w-24",
+            "w-16",
+            "action",
+          ]}
+        />
+      ) : filteredStudents.length === 0 ? (
+        <EmptyState
+          message={students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
+          actionLabel={students.length === 0 ? "학생 추가" : undefined}
+          onAction={students.length === 0 ? () => setShowCreateModal(true) : undefined}
+        />
+      ) : (
+        <StudentList students={filteredStudents} />
+      )}
 
       <Modal
         isOpen={!!selectedConsultation}
@@ -160,9 +158,9 @@ export default function StudentsPage() {
         title="최근 상담 내역"
         subtitle="최근 50건">
         {consultationsLoading ? (
-          <div className="space-y-spacing-300 p-spacing-600">
+          <div className="flex flex-col gap-spacing-300 p-spacing-600">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="space-y-spacing-200">
+              <div key={i} className="flex flex-col gap-spacing-200">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-6 w-20" />
                   <Skeleton className="h-6 w-16 rounded-radius-200" />
@@ -173,8 +171,8 @@ export default function StudentsPage() {
             ))}
           </div>
         ) : consultations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-spacing-900">
-            <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+          <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
+            <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
               <MessageSquare className="size-6 text-core-accent" />
             </div>
             <span className="text-content-standard-tertiary text-label">상담 내역이 없습니다.</span>
@@ -193,8 +191,8 @@ export default function StudentsPage() {
                     setSelectedConsultation(consultation);
                     setShowConsultationPanel(false);
                   }}
-                  className="w-full px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
-                  <div className="mb-spacing-100 flex items-center justify-between">
+                  className="flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
+                  <div className="flex items-center justify-between">
                     <span className="font-medium text-body text-content-standard-primary">
                       {consultation.student?.name || "-"}
                     </span>
@@ -202,9 +200,7 @@ export default function StudentsPage() {
                       {dateStr}
                     </span>
                   </div>
-                  <div className="mb-spacing-100 truncate text-body text-content-standard-secondary">
-                    {consultation.title}
-                  </div>
+                  <div className="truncate text-body text-content-standard-secondary">{consultation.title}</div>
                   <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
                     <span>{timeStr}</span>
                     {consultation.creator?.name && (

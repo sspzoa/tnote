@@ -54,7 +54,7 @@ export default function StudentEditModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-400">
+      <div className="flex flex-col gap-spacing-400">
         <FormInput
           label="이름"
           type="text"

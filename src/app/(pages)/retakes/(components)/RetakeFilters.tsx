@@ -74,8 +74,8 @@ export default function RetakeFilters() {
 
   return (
     <div className="flex flex-col gap-spacing-400">
-      <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
-        <div className="mb-spacing-400 flex items-center justify-between">
+      <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
+        <div className="flex items-center justify-between">
           <span className="font-medium text-content-standard-tertiary text-label">필터</span>
           {isFilterActive && (
             <button

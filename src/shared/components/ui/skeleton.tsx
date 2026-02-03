@@ -97,7 +97,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     if ("stacked" in col) {
       return (
         <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <div className="space-y-spacing-100">
+          <div className="flex flex-col gap-spacing-100">
             <Skeleton className={`h-6 ${col.stacked[0]}`} />
             <Skeleton className={`h-5 ${col.stacked[1]}`} />
           </div>

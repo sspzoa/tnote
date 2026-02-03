@@ -106,11 +106,11 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
           <p className="text-body text-content-standard-tertiary">이력이 없습니다.</p>
         </div>
       ) : (
-        <div className="space-y-spacing-400">
+        <div className="flex flex-col gap-spacing-400">
           {history.map((item, index) => (
             <div
               key={item.id}
-              className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
+              className="flex flex-col gap-spacing-300 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
               <div className="flex items-center justify-between gap-spacing-300">
                 <div className="flex min-w-0 flex-1 items-center gap-spacing-300">
                   <Badge variant={getActionBadgeVariant(item.action_type)} size="sm">
@@ -168,7 +168,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
                   )}
                 </div>
               </div>
-              {item.note && <p className="mt-spacing-300 text-body text-content-standard-secondary">{item.note}</p>}
+              {item.note && <p className="text-body text-content-standard-secondary">{item.note}</p>}
             </div>
           ))}
         </div>

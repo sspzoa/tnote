@@ -103,8 +103,8 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
         className="grid transition-[grid-template-rows] duration-200 ease-out"
         style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}>
         <div className="overflow-hidden">
-          <div className="space-y-spacing-400 border-line-divider border-t bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-            <div className="space-y-spacing-200">
+          <div className="flex flex-col gap-spacing-400 border-line-divider border-t bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+            <div className="flex flex-col gap-spacing-200">
               <div className="flex items-center justify-between text-label">
                 <span className="text-content-standard-secondary">점수</span>
                 <span className="font-medium text-content-standard-primary">

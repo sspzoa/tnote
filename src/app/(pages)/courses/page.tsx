@@ -53,24 +53,22 @@ export default function CoursesPage() {
         action={<Button onClick={() => setShowCreateModal(true)}>+ 수업 생성</Button>}
       />
 
-      <div className="flex flex-col gap-spacing-600">
-        <CourseFilters />
+      <CourseFilters />
 
-        {isLoading ? (
-          <SkeletonTable
-            rows={5}
-            columns={["w-24", { width: "w-10", rounded: true }, { width: "w-28", buttons: ["w-28", "w-20"] }, "action"]}
-          />
-        ) : filteredCourses.length === 0 ? (
-          <EmptyState
-            message={showEndedCourses ? "수업이 없습니다." : "진행 중인 수업이 없습니다."}
-            actionLabel="첫 수업 만들기"
-            onAction={() => setShowCreateModal(true)}
-          />
-        ) : (
-          <CourseList courses={filteredCourses} />
-        )}
-      </div>
+      {isLoading ? (
+        <SkeletonTable
+          rows={5}
+          columns={["w-24", { width: "w-10", rounded: true }, { width: "w-28", buttons: ["w-28", "w-20"] }, "action"]}
+        />
+      ) : filteredCourses.length === 0 ? (
+        <EmptyState
+          message={showEndedCourses ? "수업이 없습니다." : "진행 중인 수업이 없습니다."}
+          actionLabel="첫 수업 만들기"
+          onAction={() => setShowCreateModal(true)}
+        />
+      ) : (
+        <CourseList courses={filteredCourses} />
+      )}
 
       <CourseCreateModal />
       <CourseEditModal />

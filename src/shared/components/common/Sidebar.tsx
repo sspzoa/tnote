@@ -96,21 +96,21 @@ function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             닫기
           </Button>
         }>
-        <div className="space-y-spacing-500">
-          <div>
-            <p className="mb-spacing-300 font-medium text-body text-content-standard-primary">테마</p>
+        <div className="flex flex-col gap-spacing-500">
+          <div className="flex flex-col gap-spacing-300">
+            <p className="font-medium text-body text-content-standard-primary">테마</p>
             <SegmentedControl items={themeOptions} value={theme} onChange={setTheme} />
           </div>
 
-          <div className="border-line-divider border-t pt-spacing-500">
-            <p className="mb-spacing-300 font-medium text-body text-content-standard-primary">계정</p>
+          <div className="flex flex-col gap-spacing-300 border-line-divider border-t pt-spacing-500">
+            <p className="font-medium text-body text-content-standard-primary">계정</p>
             <Button variant="secondary" onClick={() => setShowPasswordModal(true)} className="w-full">
               비밀번호 변경
             </Button>
           </div>
 
-          <div className="border-line-divider border-t pt-spacing-500">
-            <p className="mb-spacing-300 font-medium text-body text-content-standard-primary">법적 고지</p>
+          <div className="flex flex-col gap-spacing-300 border-line-divider border-t pt-spacing-500">
+            <p className="font-medium text-body text-content-standard-primary">법적 고지</p>
             <div className="flex flex-col gap-spacing-200">
               <a
                 href="/terms"
@@ -257,14 +257,14 @@ export default function Sidebar() {
           <button
             type="button"
             onClick={() => setIsCollapsed(false)}
-            className="mt-spacing-200 flex w-full items-center justify-center rounded-radius-300 p-spacing-200 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+            className="flex w-full items-center justify-center rounded-radius-300 p-spacing-200 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
             <ChevronRight className="size-5" />
           </button>
         )}
       </div>
 
       <nav className="flex-1 overflow-y-auto px-spacing-300 py-spacing-400">
-        <div className="space-y-spacing-100">
+        <div className="flex flex-col gap-spacing-100">
           {isLoading
             ? [...Array(6)].map((_, i) => (
                 <div
@@ -298,12 +298,12 @@ export default function Sidebar() {
 
       <div className="border-line-divider border-t p-spacing-300">
         {isLoading ? (
-          <>
+          <div className="flex flex-col gap-spacing-200">
             <div
-              className={`mb-spacing-200 flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 ${isCollapsed ? "justify-center" : ""}`}>
+              className={`flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 ${isCollapsed ? "justify-center" : ""}`}>
               <Skeleton className="size-9 shrink-0 rounded-full" />
               {!isCollapsed && (
-                <div className="min-w-0 flex-1 space-y-spacing-100">
+                <div className="min-w-0 flex-1 flex flex-col gap-spacing-100">
                   <Skeleton className="h-[22px] w-16" />
                   <Skeleton className="h-4 w-10" />
                 </div>
@@ -315,11 +315,11 @@ export default function Sidebar() {
                 <Skeleton className="h-[38px] w-[88px] rounded-radius-300" />
               </div>
             )}
-          </>
+          </div>
         ) : userInfo ? (
-          <>
+          <div className="flex flex-col gap-spacing-200">
             <div
-              className={`mb-spacing-200 flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 transition-colors hover:bg-components-interactive-hover ${isCollapsed ? "justify-center" : ""}`}>
+              className={`flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 transition-colors hover:bg-components-interactive-hover ${isCollapsed ? "justify-center" : ""}`}>
               <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-core-accent-translucent ring-2 ring-core-accent/20">
                 <span className="font-semibold text-core-accent text-label">{userInfo.name?.charAt(0) || "U"}</span>
               </div>
@@ -371,7 +371,7 @@ export default function Sidebar() {
                 </Button>
               </div>
             )}
-          </>
+          </div>
         ) : null}
       </div>
     </>
@@ -419,8 +419,8 @@ export default function Sidebar() {
       {isOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-solid-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 bottom-[73px] left-0 rounded-t-radius-600 bg-components-fill-standard-primary p-spacing-500">
-            <div className="mb-spacing-400 flex items-center justify-between">
+          <div className="absolute right-0 bottom-[73px] left-0 flex flex-col gap-spacing-400 rounded-t-radius-600 bg-components-fill-standard-primary p-spacing-500">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-spacing-300">
                 <div className="flex size-9 items-center justify-center rounded-full bg-core-accent-translucent ring-2 ring-core-accent/20">
                   <span className="font-semibold text-core-accent text-label">{userInfo?.name?.charAt(0) || "U"}</span>
@@ -450,7 +450,7 @@ export default function Sidebar() {
             </div>
 
             {isAdmin && (
-              <div className="mb-spacing-400 grid grid-cols-4 gap-spacing-200">
+              <div className="grid grid-cols-4 gap-spacing-200">
                 {[
                   { href: "/calendar", icon: Calendar, label: "캘린더" },
                   { href: "/messages", icon: MessageSquare, label: "문자" },

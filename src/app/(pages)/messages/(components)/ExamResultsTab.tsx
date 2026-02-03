@@ -139,8 +139,8 @@ export default function ExamResultsTab() {
   }, [selectedExamId, selectedIds, selectedCount, recipientType, messageTemplate, sendExamResults, resetSelection]);
 
   const examSelector = (
-    <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
-      <div className="mb-spacing-400">
+    <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+      <div>
         <h3 className="font-semibold text-body text-content-standard-primary">시험 선택</h3>
         <p className="text-content-standard-tertiary text-footnote">결과를 발송할 시험을 선택하세요</p>
       </div>

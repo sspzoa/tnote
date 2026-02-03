@@ -44,11 +44,11 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
       <div
         className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
         onClick={(e) => e.stopPropagation()}>
-        <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
+        <div className="flex flex-col gap-spacing-100 border-line-divider border-b px-spacing-600 py-spacing-500">
           <h2 id={titleId} className="font-bold text-content-standard-primary text-heading">
             {title}
           </h2>
-          {subtitle && <p className="mt-spacing-100 text-content-standard-secondary text-label">{subtitle}</p>}
+          {subtitle && <p className="text-content-standard-secondary text-label">{subtitle}</p>}
         </div>
 
         <div className="flex-1 overflow-y-auto p-spacing-600">{children}</div>

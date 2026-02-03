@@ -128,7 +128,7 @@ export default function ConsultationFormModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-400">
+      <div className="flex flex-col gap-spacing-400">
         <ConsultationTemplateSelector
           templates={templates}
           currentTitle={form.title}

@@ -151,7 +151,7 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
         <div className="overflow-hidden">
           <div className="border-line-divider border-t bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
             {isLoading ? (
-              <div className="space-y-spacing-300">
+              <div className="flex flex-col gap-spacing-300">
                 {Array.from({ length: 2 }).map((_, i) => (
                   <Skeleton key={i} className="h-16 w-full rounded-radius-300" />
                 ))}
@@ -162,7 +162,7 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
                 <p className="text-center text-content-standard-secondary text-label">이력이 없습니다.</p>
               </div>
             ) : (
-              <div className="relative space-y-spacing-300">
+              <div className="relative flex flex-col gap-spacing-300">
                 <div className="absolute top-spacing-400 bottom-spacing-400 left-[11px] w-0.5 bg-line-divider" />
 
                 {history.map((item, index) => (

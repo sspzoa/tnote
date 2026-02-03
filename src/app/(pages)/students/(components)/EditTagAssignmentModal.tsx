@@ -92,7 +92,7 @@ export default function EditTagAssignmentModal() {
           </Button>
         </>
       }>
-      <div className="space-y-spacing-400">
+      <div className="flex flex-col gap-spacing-400">
         {tag && (
           <div className="flex items-center gap-spacing-200">
             <span className="text-content-standard-tertiary text-footnote">태그:</span>
@@ -110,7 +110,7 @@ export default function EditTagAssignmentModal() {
           required
         />
 
-        <div className="space-y-spacing-200">
+        <div className="flex flex-col gap-spacing-200">
           <FormCheckbox label="무기한" checked={isIndefinite} onChange={(e) => setIsIndefinite(e.target.checked)} />
           {!isIndefinite && (
             <FormInput label="종료일" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />

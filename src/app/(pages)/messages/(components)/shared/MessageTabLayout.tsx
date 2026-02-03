@@ -80,9 +80,9 @@ export default function MessageTabLayout({ selection, message, send, preview, is
       <div className="flex h-[700px] flex-row items-stretch gap-spacing-600">
         <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
           {selection.showPlaceholder ? (
-            <div className="flex flex-1 flex-col items-center justify-center py-spacing-900">
+            <div className="flex flex-1 flex-col items-center justify-center gap-spacing-300 py-spacing-900">
               {selection.placeholderIcon && (
-                <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+                <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
                   {selection.placeholderIcon}
                 </div>
               )}
@@ -114,7 +114,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                 unit={selection.unit || "명"}
               />
 
-              <div className="relative flex min-h-0 flex-1 flex-col p-spacing-500">
+              <div className="relative flex min-h-0 flex-1 flex-col gap-spacing-300 p-spacing-500">
                 {isLoading && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-components-fill-standard-primary/60">
                     <div className="size-6 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
@@ -124,7 +124,6 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                   placeholder="학생 검색..."
                   value={selection.searchQuery}
                   onChange={(e) => selection.onSearchChange(e.target.value)}
-                  className="mb-spacing-300"
                 />
                 <StudentListContainer className="h-0 flex-1">
                   {selection.filteredCount === 0 ? (
@@ -148,7 +147,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
 
           <RecipientTypeSelector value={message.recipientType} onChange={message.onRecipientTypeChange} />
 
-          <div className="flex min-h-0 flex-1 flex-col px-spacing-500 py-spacing-400">
+          <div className="flex min-h-0 flex-1 flex-col gap-spacing-400 px-spacing-500 py-spacing-400">
             <MessageComposer
               messageText={message.messageText}
               onMessageChange={message.onMessageChange}
@@ -159,7 +158,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
               className="min-h-0 flex-1"
             />
 
-            <div className="mt-spacing-400 flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div className="text-content-standard-tertiary text-footnote">
                 {selection.selectedCount > 0 ? (
                   <span>

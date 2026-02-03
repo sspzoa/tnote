@@ -48,8 +48,8 @@ export default function StudentDetailPage() {
   if (isLoading || !studentDetail) {
     return (
       <div className="min-h-screen p-spacing-600 md:p-spacing-800">
-        <div className="mx-auto max-w-7xl">
-          <Skeleton className="mb-spacing-500 h-5 w-40" />
+        <div className="mx-auto flex max-w-7xl flex-col gap-spacing-500">
+          <Skeleton className="h-5 w-40" />
           <DashboardSkeleton />
         </div>
       </div>
@@ -74,15 +74,15 @@ export default function StudentDetailPage() {
 
   return (
     <div className="min-h-screen bg-background-standard-secondary p-spacing-500 md:p-spacing-700">
-      <div className="mx-auto max-w-7xl space-y-spacing-600">
-        <section>
-          <Link href="/students" className="mb-spacing-400 inline-block text-body text-core-accent hover:underline">
+      <div className="mx-auto max-w-7xl flex flex-col gap-spacing-600">
+        <section className="flex flex-col gap-spacing-400">
+          <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
             ← 학생 목록으로 돌아가기
           </Link>
 
           <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
             <div className="flex flex-col gap-spacing-300 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-spacing-200">
+              <div className="flex flex-col gap-spacing-200">
                 <div className="flex items-center gap-spacing-300">
                   <h1 className="font-bold text-content-standard-primary text-title">{studentDetail.student.name}</h1>
                   {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (

@@ -207,19 +207,23 @@ export default function RetakeList({
                 </div>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="text-body text-content-standard-primary">{retake.current_scheduled_date || "-"}</div>
-                {(retake.postpone_count > 0 || retake.absent_count > 0) && (
-                  <div className="mt-spacing-100 flex gap-spacing-200">
-                    {retake.postpone_count > 0 && (
-                      <span className="text-content-standard-tertiary text-footnote">
-                        연기 {retake.postpone_count}회
-                      </span>
-                    )}
-                    {retake.absent_count > 0 && (
-                      <span className="text-content-standard-tertiary text-footnote">결석 {retake.absent_count}회</span>
-                    )}
-                  </div>
-                )}
+                <div className="flex flex-col gap-spacing-100">
+                  <div className="text-body text-content-standard-primary">{retake.current_scheduled_date || "-"}</div>
+                  {(retake.postpone_count > 0 || retake.absent_count > 0) && (
+                    <div className="flex gap-spacing-200">
+                      {retake.postpone_count > 0 && (
+                        <span className="text-content-standard-tertiary text-footnote">
+                          연기 {retake.postpone_count}회
+                        </span>
+                      )}
+                      {retake.absent_count > 0 && (
+                        <span className="text-content-standard-tertiary text-footnote">
+                          결석 {retake.absent_count}회
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">{getStatusBadge(retake.status)}</td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

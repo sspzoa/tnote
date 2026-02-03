@@ -69,7 +69,7 @@ export default function AdminInviteModal() {
           </Button>
         </>
       }>
-      <form onSubmit={handleSubmit} className="space-y-spacing-400">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-spacing-400">
         <FormInput
           label="이름"
           type="text"

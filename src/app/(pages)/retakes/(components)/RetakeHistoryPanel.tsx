@@ -61,8 +61,8 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
       {isLoading ? (
         <SkeletonSpinner className="py-spacing-900" size="md" />
       ) : history.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-spacing-900">
-          <div className="mb-spacing-300 flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+        <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
+          <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
             <History className="size-6 text-core-accent" />
           </div>
           <span className="text-content-standard-tertiary text-label">이력이 없습니다.</span>
@@ -80,8 +80,8 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
             return (
               <div
                 key={item.id}
-                className="px-spacing-600 py-spacing-400 transition-colors hover:bg-components-fill-standard-secondary">
-                <div className="mb-spacing-200 flex items-center justify-between gap-spacing-200">
+                className="flex flex-col gap-spacing-200 px-spacing-600 py-spacing-400 transition-colors hover:bg-components-fill-standard-secondary">
+                <div className="flex items-center justify-between gap-spacing-200">
                   <div className="flex items-center gap-spacing-200">
                     <span className="font-semibold text-body text-content-standard-primary">
                       {item.retake.student.name}
@@ -95,7 +95,7 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
                     {item.performed_by && ` · ${item.performed_by.name}`}
                   </span>
                 </div>
-                <div className="mb-spacing-200 truncate text-content-standard-secondary text-label">
+                <div className="truncate text-content-standard-secondary text-label">
                   {item.retake.exam.course.name} · {item.retake.exam.name} {item.retake.exam.exam_number}회차
                 </div>
 
@@ -129,7 +129,7 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
                 )}
 
                 {item.note && (
-                  <div className="mt-spacing-200 truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
+                  <div className="truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
                     "{item.note}"
                   </div>
                 )}
