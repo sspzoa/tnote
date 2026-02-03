@@ -81,28 +81,22 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
               <div
                 key={item.id}
                 className="px-spacing-600 py-spacing-400 transition-colors hover:bg-components-fill-standard-secondary">
-                <div className="mb-spacing-200 flex items-start justify-between gap-spacing-300">
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-spacing-50 flex items-center gap-spacing-200">
-                      <span className="font-semibold text-body text-content-standard-primary">
-                        {item.retake.student.name}
-                      </span>
-                      <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
-                        {getActionLabel(item.action_type)}
-                      </Badge>
-                    </div>
-                    <div className="truncate text-content-standard-secondary text-label">
-                      {item.retake.exam.course.name} · {item.retake.exam.name} {item.retake.exam.exam_number}
-                      회차
-                    </div>
+                <div className="mb-spacing-200 flex items-center justify-between gap-spacing-200">
+                  <div className="flex items-center gap-spacing-200">
+                    <span className="font-semibold text-body text-content-standard-primary">
+                      {item.retake.student.name}
+                    </span>
+                    <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
+                      {getActionLabel(item.action_type)}
+                    </Badge>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <div className="text-content-standard-tertiary text-footnote">{dateStr}</div>
-                    <div className="text-content-standard-quaternary text-footnote">{timeStr}</div>
-                    {item.performed_by && (
-                      <div className="text-content-standard-quaternary text-footnote">{item.performed_by.name}</div>
-                    )}
-                  </div>
+                  <span className="shrink-0 text-content-standard-tertiary text-footnote">
+                    {dateStr} {timeStr}
+                    {item.performed_by && ` · ${item.performed_by.name}`}
+                  </span>
+                </div>
+                <div className="mb-spacing-200 truncate text-content-standard-secondary text-label">
+                  {item.retake.exam.course.name} · {item.retake.exam.name} {item.retake.exam.exam_number}회차
                 </div>
 
                 {item.action_type === "assign" && (
