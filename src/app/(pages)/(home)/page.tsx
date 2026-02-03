@@ -4,7 +4,7 @@ import { createTypeStream } from "hangul-typing-animation";
 import { BookOpen, ClipboardList, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
+
 import { useUser } from "@/shared/hooks/useUser";
 import { getGreetingByTime } from "@/shared/lib/utils/date";
 import { useHomeStats } from "./(hooks)/useHomeStats";
@@ -41,7 +41,30 @@ export default function Home() {
   const typedGreeting = useHangulTyping(isLoading ? "" : greeting);
 
   if (isLoading) {
-    return <SkeletonSpinner className="min-h-screen" />;
+    return (
+      <div className="min-h-screen p-spacing-500 md:p-spacing-700">
+        <div className="mx-auto max-w-6xl space-y-spacing-700">
+          <div className="animate-pulse rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+            <div className="mb-spacing-400 h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
+            <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
+          </div>
+          <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="animate-pulse rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+                <div className="size-8 rounded-radius-200 bg-components-fill-standard-secondary" />
+                <div className="mt-spacing-400">
+                  <div className="h-16 w-12 rounded-radius-200 bg-components-fill-standard-secondary" />
+                  <div className="mt-spacing-100 h-[22px] w-14 rounded-radius-200 bg-components-fill-standard-secondary" />
+                  <div className="mt-spacing-50 h-5 w-24 rounded-radius-200 bg-components-fill-standard-secondary" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const statItems = [
@@ -50,62 +73,74 @@ export default function Home() {
       icon: BookOpen,
       value: stats?.courseCount || 0,
       label: "수업",
-      bgColor: "bg-solid-translucent-blue",
-      iconColor: "text-solid-blue",
-      hoverBorder: "hover:border-solid-blue",
-      gradientFrom: "group-hover:from-solid-translucent-blue/30",
+      description: "진행 중인 수업",
     },
     {
       href: "/students",
       icon: Users,
       value: stats?.studentCount || 0,
       label: "학생",
-      bgColor: "bg-solid-translucent-green",
-      iconColor: "text-solid-green",
-      hoverBorder: "hover:border-solid-green",
-      gradientFrom: "group-hover:from-solid-translucent-green/30",
+      description: "등록된 학생 수",
     },
     {
       href: "/retakes",
       icon: ClipboardList,
       value: stats?.pendingRetakeCount || 0,
-      label: "남은 재시험",
-      bgColor: "bg-solid-translucent-yellow",
-      iconColor: "text-solid-yellow",
-      hoverBorder: "hover:border-solid-yellow",
-      gradientFrom: "group-hover:from-solid-translucent-yellow/30",
+      label: "재시험",
+      description: "대기 중인 재시험",
     },
   ];
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-spacing-600">
-      <div className="w-full max-w-2xl text-center">
-        <h1 className="mb-spacing-200 font-bold text-content-standard-primary text-display">
-          안녕하세요, {user?.name}님
-        </h1>
-        <div className="mt-spacing-300 inline-flex items-center gap-spacing-200 rounded-full bg-core-accent-translucent py-spacing-300 pr-spacing-500 pl-spacing-400">
-          <Sparkles className="size-4 text-core-accent" />
-          <p className="text-body text-content-standard-secondary">{typedGreeting || "\u00A0"}</p>
+    <div className="min-h-screen p-spacing-500 md:p-spacing-700">
+      <div className="mx-auto max-w-6xl space-y-spacing-700">
+        <div className="relative overflow-hidden rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+          <div className="absolute -right-20 -top-20 size-64 rounded-full bg-core-accent-translucent opacity-50 blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 size-48 rounded-full bg-solid-translucent-purple opacity-30 blur-3xl" />
+
+          <div className="relative">
+            <h1 className="mb-spacing-400 font-bold text-content-standard-primary text-display">
+              안녕하세요, <span className="text-core-accent">{user?.name}</span>님
+            </h1>
+            <div className="inline-flex items-center gap-spacing-200 rounded-full border border-core-accent/20 bg-core-accent-translucent px-spacing-400 py-spacing-200">
+              <Sparkles className="size-4 text-core-accent" />
+              <p className="text-core-accent text-label">{typedGreeting || "\u00A0"}</p>
+            </div>
+          </div>
         </div>
 
         {!isStudent && stats && (
-          <div className="mt-spacing-800 grid grid-cols-3 gap-spacing-400">
+          <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
             {statItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group relative flex flex-col items-center gap-spacing-300 overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary p-spacing-600 transition-all duration-200 ${item.hoverBorder}`}>
-                <div
-                  className={`absolute inset-0 bg-gradient-to-b from-transparent to-transparent transition-all duration-200 ${item.gradientFrom} group-hover:to-transparent`}
-                />
-                <div
-                  className={`relative flex size-16 items-center justify-center rounded-full ${item.bgColor} transition-all duration-200 group-hover:scale-110`}>
-                  <item.icon className={`size-8 ${item.iconColor}`} />
+                className="group relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:-translate-y-spacing-50 hover:border-core-accent/30">
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-core-accent-translucent/0 transition-all duration-300 group-hover:to-core-accent-translucent/30" />
+
+                <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
+
+                <div className="relative mt-spacing-400">
+                  <div className="font-bold text-content-standard-primary text-display">{item.value}</div>
+                  <div className="mt-spacing-100 font-medium text-content-standard-primary text-label">
+                    {item.label}
+                  </div>
+                  <div className="text-content-standard-tertiary text-footnote">{item.description}</div>
                 </div>
-                <div className="relative font-bold text-content-standard-primary text-display">{item.value}</div>
-                <div className="relative text-body text-content-standard-secondary">{item.label}</div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {isStudent && (
+          <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 text-center">
+            <div className="mx-auto mb-spacing-400 flex size-16 items-center justify-center rounded-full bg-core-accent-translucent">
+              <BookOpen className="size-8 text-core-accent" />
+            </div>
+            <h2 className="mb-spacing-200 font-semibold text-content-standard-primary text-heading">
+              학습을 시작하세요
+            </h2>
+            <p className="text-content-standard-secondary text-body">사이드바 메뉴에서 원하는 기능을 선택해주세요.</p>
           </div>
         )}
       </div>

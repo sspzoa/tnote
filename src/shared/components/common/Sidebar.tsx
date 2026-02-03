@@ -5,6 +5,8 @@ import { useAtom } from "jotai";
 import {
   BookOpen,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   ExternalLink,
   Hospital,
@@ -22,7 +24,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Modal, SegmentedControl, Skeleton } from "@/shared/components/ui";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { sidebarOpenAtom } from "./(atoms)/useSidebarStore";
+import { sidebarCollapsedAtom, sidebarOpenAtom } from "./(atoms)/useSidebarStore";
 import { PasswordChangeModal } from "./PasswordChangeModal";
 
 interface UserInfo {
@@ -36,10 +38,6 @@ const menuItems = [
     href: "/calendar",
     icon: Calendar,
     label: "캘린더",
-    bgColor: "bg-solid-translucent-red",
-    iconColor: "text-solid-red",
-    activeBg: "bg-solid-red",
-    activeIndicator: "bg-solid-red",
   },
 ];
 
@@ -48,46 +46,26 @@ const adminMenuItems = [
     href: "/messages",
     icon: MessageSquare,
     label: "문자 관리",
-    bgColor: "bg-solid-translucent-orange",
-    iconColor: "text-solid-orange",
-    activeBg: "bg-solid-orange",
-    activeIndicator: "bg-solid-orange",
   },
   {
     href: "/retakes",
     icon: ClipboardList,
     label: "재시험 관리",
-    bgColor: "bg-solid-translucent-yellow",
-    iconColor: "text-solid-yellow",
-    activeBg: "bg-solid-yellow",
-    activeIndicator: "bg-solid-yellow",
   },
   {
     href: "/students",
     icon: Users,
     label: "학생 관리",
-    bgColor: "bg-solid-translucent-green",
-    iconColor: "text-solid-green",
-    activeBg: "bg-solid-green",
-    activeIndicator: "bg-solid-green",
   },
   {
     href: "/courses",
     icon: BookOpen,
     label: "수업 관리",
-    bgColor: "bg-solid-translucent-blue",
-    iconColor: "text-solid-blue",
-    activeBg: "bg-solid-blue",
-    activeIndicator: "bg-solid-blue",
   },
   {
     href: "/clinics",
     icon: Hospital,
     label: "클리닉 관리",
-    bgColor: "bg-solid-translucent-indigo",
-    iconColor: "text-solid-indigo",
-    activeBg: "bg-solid-indigo",
-    activeIndicator: "bg-solid-indigo",
   },
 ];
 
@@ -96,10 +74,6 @@ const ownerMenuItems = [
     href: "/admins",
     icon: UserCog,
     label: "관리자 관리",
-    bgColor: "bg-solid-translucent-purple",
-    iconColor: "text-solid-purple",
-    activeBg: "bg-solid-purple",
-    activeIndicator: "bg-solid-purple",
   },
 ];
 
@@ -174,6 +148,7 @@ export default function Sidebar() {
   const [isLoading, setIsLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isOpen, setIsOpen] = useAtom(sidebarOpenAtom);
+  const [isCollapsed, setIsCollapsed] = useAtom(sidebarCollapsedAtom);
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -236,10 +211,6 @@ export default function Sidebar() {
       href: "/calendar",
       icon: Calendar,
       label: "캘린더",
-      bgColor: "bg-solid-translucent-red",
-      iconColor: "text-solid-red",
-      activeBg: "bg-solid-red",
-      activeIndicator: "bg-solid-red",
     },
   ];
   const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems, ...ownerMenuItems] : studentMenuItems;
@@ -251,26 +222,58 @@ export default function Sidebar() {
 
   const sidebarContent = (
     <>
-      {/* 로고 */}
-      <div className="border-line-divider border-b px-spacing-600 py-spacing-500">
-        <Link href="/" className="flex items-center gap-spacing-300" onClick={() => setIsOpen(false)}>
-          <h1 className="font-bold text-content-standard-primary text-heading">Tnote</h1>
-          {userInfo?.workspaceName && (
-            <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
-              {userInfo.workspaceName}
-            </span>
+      <div className="border-line-divider border-b px-spacing-300 py-spacing-400">
+        <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"}`}>
+          <Link
+            href="/"
+            className={`group flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 transition-colors hover:bg-core-accent-translucent ${isCollapsed ? "justify-center" : ""}`}
+            onClick={() => setIsOpen(false)}>
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-radius-300 bg-core-accent">
+              <span className="font-bold text-solid-white text-label">T</span>
+            </div>
+            {!isCollapsed && (
+              <div className="flex min-w-0 flex-col">
+                <span className="font-bold text-content-standard-primary text-body leading-tight">Tnote</span>
+                {isLoading ? (
+                  <Skeleton className="h-4 w-16" />
+                ) : (
+                  userInfo?.workspaceName && (
+                    <span className="truncate text-content-standard-tertiary text-caption">
+                      {userInfo.workspaceName}
+                    </span>
+                  )
+                )}
+              </div>
+            )}
+          </Link>
+          {!isCollapsed && (
+            <button
+              type="button"
+              onClick={() => setIsCollapsed(true)}
+              className="rounded-radius-300 p-spacing-200 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+              <ChevronLeft className="size-5" />
+            </button>
           )}
-        </Link>
+        </div>
+        {isCollapsed && (
+          <button
+            type="button"
+            onClick={() => setIsCollapsed(false)}
+            className="mt-spacing-200 flex w-full items-center justify-center rounded-radius-300 p-spacing-200 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary">
+            <ChevronRight className="size-5" />
+          </button>
+        )}
       </div>
 
-      {/* 메뉴 목록 */}
-      <nav className="flex-1 overflow-y-auto p-spacing-400">
+      <nav className="flex-1 overflow-y-auto px-spacing-300 py-spacing-400">
         <div className="space-y-spacing-100">
           {isLoading
             ? [...Array(6)].map((_, i) => (
-                <div key={i} className="flex items-center gap-spacing-300 px-spacing-400 py-spacing-300">
-                  <Skeleton className="size-9 shrink-0 rounded-radius-300" />
-                  <Skeleton className="h-6 w-20" />
+                <div
+                  key={i}
+                  className={`flex items-center gap-spacing-300 px-spacing-300 py-spacing-300 ${isCollapsed ? "justify-center" : ""}`}>
+                  <Skeleton className="size-5 shrink-0 rounded-radius-100" />
+                  {!isCollapsed && <Skeleton className="h-[22px] w-20 rounded-radius-200" />}
                 </div>
               ))
             : allMenuItems.map((item) => {
@@ -279,74 +282,97 @@ export default function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`group relative flex items-center gap-spacing-300 rounded-radius-300 px-spacing-400 py-spacing-300 transition-all duration-150 ${
-                      active ? "bg-core-accent-translucent" : "hover:bg-core-accent-translucent/50"
+                    title={isCollapsed ? item.label : undefined}
+                    className={`group relative flex items-center gap-spacing-300 rounded-radius-300 px-spacing-300 py-spacing-300 transition-all duration-150 ${isCollapsed ? "justify-center" : ""} ${
+                      active
+                        ? "bg-core-accent text-solid-white"
+                        : "text-content-standard-secondary hover:bg-components-interactive-hover hover:text-content-standard-primary"
                     }`}>
-                    {active && (
-                      <div className="-translate-y-1/2 absolute top-1/2 left-0 h-6 w-1 rounded-r-full bg-core-accent" />
-                    )}
-                    <div
-                      className={`flex size-9 shrink-0 items-center justify-center rounded-radius-300 transition-all duration-150 ${active ? "bg-core-accent" : `${item.bgColor} group-hover:scale-105`}`}>
-                      <item.icon className={`size-5 ${active ? "text-solid-white" : item.iconColor}`} />
-                    </div>
-                    <span
-                      className={`font-medium text-body transition-colors duration-150 ${active ? "text-core-accent" : "text-content-standard-primary group-hover:text-core-accent"}`}>
-                      {item.label}
-                    </span>
+                    <item.icon
+                      className={`size-5 shrink-0 transition-colors ${active ? "text-solid-white" : "text-content-standard-tertiary group-hover:text-content-standard-secondary"}`}
+                    />
+                    {!isCollapsed && <span className="font-medium text-label">{item.label}</span>}
                   </Link>
                 );
               })}
         </div>
       </nav>
 
-      <div className="border-line-divider border-t p-spacing-400">
+      <div className="border-line-divider border-t p-spacing-300">
         {isLoading ? (
           <>
-            <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
-              <Skeleton className="size-9 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-spacing-100">
-                <Skeleton className="h-6 w-16" />
-                <Skeleton className="h-5 w-10" />
+            <div
+              className={`mb-spacing-200 flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 ${isCollapsed ? "justify-center" : ""}`}>
+              <Skeleton className="size-9 shrink-0 rounded-full" />
+              {!isCollapsed && (
+                <div className="min-w-0 flex-1 space-y-spacing-100">
+                  <Skeleton className="h-[22px] w-16" />
+                  <Skeleton className="h-4 w-10" />
+                </div>
+              )}
+            </div>
+            {!isCollapsed && (
+              <div className="flex gap-spacing-200">
+                <Skeleton className="h-[38px] flex-1 rounded-radius-300" />
+                <Skeleton className="h-[38px] w-[88px] rounded-radius-300" />
               </div>
-            </div>
-            <div className="flex gap-spacing-200">
-              <Skeleton className="h-[38px] flex-1 rounded-radius-300" />
-              <Skeleton className="h-[38px] w-20 rounded-radius-300" />
-            </div>
+            )}
           </>
         ) : userInfo ? (
           <>
-            <div className="mb-spacing-300 flex items-center gap-spacing-300 px-spacing-200">
-              <div className="flex size-9 items-center justify-center rounded-full bg-components-fill-standard-secondary">
-                <span className="font-semibold text-content-standard-secondary text-label">
-                  {userInfo.name?.charAt(0) || "U"}
-                </span>
+            <div
+              className={`mb-spacing-200 flex items-center gap-spacing-300 rounded-radius-300 p-spacing-200 transition-colors hover:bg-components-interactive-hover ${isCollapsed ? "justify-center" : ""}`}>
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-core-accent-translucent ring-2 ring-core-accent/20">
+                <span className="font-semibold text-core-accent text-label">{userInfo.name?.charAt(0) || "U"}</span>
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-medium text-body text-content-standard-primary">{userInfo.name}</div>
-                <div className="text-content-standard-tertiary text-footnote">
-                  {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
+              {!isCollapsed && (
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-medium text-content-standard-primary text-label">{userInfo.name}</div>
+                  <div className="text-content-standard-tertiary text-caption">
+                    {userInfo.role === "owner" ? "소유자" : userInfo.role === "student" ? "학생" : "관리자"}
+                  </div>
                 </div>
+              )}
+            </div>
+            {isCollapsed ? (
+              <div className="flex flex-col gap-spacing-200">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowSettingsModal(true)}
+                  title="설정"
+                  className="flex items-center justify-center">
+                  <Settings className="size-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleLogout}
+                  title="로그아웃"
+                  className="flex items-center justify-center">
+                  <LogOut className="size-4" />
+                </Button>
               </div>
-            </div>
-            <div className="flex gap-spacing-200">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowSettingsModal(true)}
-                className="flex flex-1 items-center justify-center gap-spacing-100">
-                <Settings className="size-3" />
-                설정
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleLogout}
-                className="flex items-center justify-center gap-spacing-100">
-                <LogOut className="size-3" />
-                로그아웃
-              </Button>
-            </div>
+            ) : (
+              <div className="flex gap-spacing-200">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowSettingsModal(true)}
+                  className="flex flex-1 items-center justify-center gap-spacing-100">
+                  <Settings className="size-3.5" />
+                  설정
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="flex items-center justify-center gap-spacing-100">
+                  <LogOut className="size-3.5" />
+                  로그아웃
+                </Button>
+              </div>
+            )}
           </>
         ) : null}
       </div>
@@ -356,23 +382,26 @@ export default function Sidebar() {
   return (
     <>
       <div className="fixed inset-0 z-50 flex flex-col bg-components-fill-standard-primary md:hidden">
-        <div className="flex items-center justify-between border-line-divider border-b px-spacing-600 py-spacing-500">
+        <div className="flex items-center justify-between border-line-divider border-b px-spacing-500 py-spacing-400">
           <div className="flex items-center gap-spacing-300">
-            <h1 className="font-bold text-content-standard-primary text-heading">Tnote</h1>
-            {isLoading ? (
-              <Skeleton className="h-7 w-12" />
-            ) : (
-              userInfo?.workspaceName && (
-                <span className="rounded-radius-200 bg-components-fill-standard-secondary px-spacing-200 py-spacing-100 text-content-standard-tertiary text-footnote">
-                  {userInfo.workspaceName}
-                </span>
-              )
-            )}
+            <div className="flex size-8 items-center justify-center rounded-radius-300 bg-core-accent">
+              <span className="font-bold text-solid-white text-label">T</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-content-standard-primary text-body leading-tight">Tnote</span>
+              {isLoading ? (
+                <Skeleton className="h-4 w-12" />
+              ) : (
+                userInfo?.workspaceName && (
+                  <span className="text-content-standard-tertiary text-caption">{userInfo.workspaceName}</span>
+                )
+              )}
+            </div>
           </div>
           {isLoading ? (
             <div className="flex items-center gap-spacing-200">
-              <Skeleton className="h-6 w-10" />
-              <Skeleton className="h-6 w-12" />
+              <Skeleton className="h-6 w-10 rounded-radius-200" />
+              <Skeleton className="h-6 w-12 rounded-radius-200" />
             </div>
           ) : (
             userInfo && (
@@ -416,7 +445,8 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <aside className="fixed top-0 left-0 hidden h-full w-64 flex-col border-line-outline border-r bg-components-fill-standard-primary md:flex">
+      <aside
+        className={`fixed top-0 left-0 hidden h-full flex-col border-line-outline border-r bg-components-fill-standard-primary transition-[width] duration-300 md:flex ${isCollapsed ? "w-16" : "w-64"}`}>
         {sidebarContent}
       </aside>
 

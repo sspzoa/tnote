@@ -1,4 +1,8 @@
+"use client";
+
+import { useAtom } from "jotai";
 import type React from "react";
+import { sidebarCollapsedAtom } from "@/shared/components/common/(atoms)/useSidebarStore";
 import Sidebar from "@/shared/components/common/Sidebar";
 
 export default function PagesLayout({
@@ -6,10 +10,15 @@ export default function PagesLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isCollapsed] = useAtom(sidebarCollapsedAtom);
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="hidden min-w-0 flex-1 overflow-x-auto md:ml-64 md:block">{children}</main>
+      <main
+        className={`hidden min-w-0 flex-1 overflow-x-auto transition-[margin] duration-300 md:block ${isCollapsed ? "md:ml-16" : "md:ml-64"}`}>
+        {children}
+      </main>
     </div>
   );
 }
