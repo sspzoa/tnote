@@ -106,8 +106,9 @@ export default function ClinicsPage() {
         <SkeletonTable
           rows={5}
           columns={[
-            "w-20",
-            { width: "w-16", badges: ["w-6", "w-6", "w-6"] },
+            "w-24",
+            { width: "w-20", badges: ["w-6", "w-6", "w-6"] },
+            "w-44",
             { width: "w-20", buttons: ["w-20"] },
             "action",
           ]}

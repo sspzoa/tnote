@@ -25,7 +25,10 @@ export default function AdminsPage() {
   }
 
   const adminTableSkeleton = (
-    <SkeletonTable rows={5} columns={["w-16", "w-24", { width: "w-12", rounded: true }, "w-20", "action"]} />
+    <SkeletonTable
+      rows={5}
+      columns={["w-16", "w-24", { width: "w-14", rounded: true }, "w-20", { width: "w-14", rounded: true }, "action"]}
+    />
   );
 
   const isDataLoading = isLoading || userLoading;

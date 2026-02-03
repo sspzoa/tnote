@@ -74,7 +74,7 @@ export default function CalendarPage() {
                     key={i}
                     className={`flex min-h-[120px] flex-col gap-spacing-100 p-spacing-200 ${!isLastColumn ? "border-line-outline border-r" : ""} ${!isLastRow ? "border-line-outline border-b" : ""}`}>
                     <div className="flex justify-end">
-                      <Skeleton className="size-6 rounded-full" />
+                      <Skeleton className="size-7 rounded-full" />
                     </div>
                     <div className="flex flex-col gap-spacing-100">
                       <Skeleton className="h-6 w-full rounded-radius-200" />

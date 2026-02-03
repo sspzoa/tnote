@@ -148,7 +148,7 @@ export function StudentListSkeleton({
           )}
           <div className="min-w-0 flex-1 flex flex-col gap-spacing-100">
             <div className="h-6 w-20 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
-            <div className="h-5 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
+            <div className="h-5 w-40 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
           </div>
           {showRightContent && (
             <div className="h-8 w-16 shrink-0 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />

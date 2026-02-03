@@ -156,15 +156,15 @@ export default function CourseDetailPage() {
         <SkeletonTable
           rows={5}
           columns={[
-            "w-20",
-            { width: "w-14", rounded: true },
-            "w-8",
-            "w-8",
-            "w-8",
+            "w-24",
+            { width: "w-16", rounded: true },
             "w-10",
-            "w-8",
-            "w-16",
-            { width: "w-16", buttons: ["w-16", "w-12"] },
+            "w-14",
+            "w-10",
+            "w-10",
+            "w-10",
+            "w-24",
+            { width: "w-28", buttons: ["w-28"] },
             "action",
           ]}
         />

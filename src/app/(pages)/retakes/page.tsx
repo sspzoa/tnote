@@ -97,11 +97,11 @@ export default function RetakesPage() {
         <SkeletonTable
           rows={8}
           columns={[
-            { width: "w-16", stacked: ["w-16", "w-24"] },
-            { width: "w-20", stacked: ["w-20", "w-24"] },
-            { width: "w-20", stacked: ["w-20", "w-16"] },
-            { width: "w-12", rounded: true },
-            { width: "w-24", rounded: true },
+            { width: "w-28", badges: ["w-16", "w-10"] },
+            { width: "w-24", stacked: ["w-24", "w-28"] },
+            { width: "w-24", stacked: ["w-20", "w-16"] },
+            { width: "w-14", rounded: true },
+            { width: "w-20", rounded: true },
             "action",
           ]}
         />

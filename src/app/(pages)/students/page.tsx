@@ -109,12 +109,12 @@ export default function StudentsPage() {
           rows={8}
           columns={[
             "w-16",
-            { width: "w-12", badges: ["w-12", "w-10"] },
+            { width: "w-20", badges: ["w-12", "w-10"] },
             "w-14",
-            { width: "w-10", rounded: true },
-            "w-24",
-            "w-24",
-            "w-16",
+            { width: "w-12", rounded: true },
+            "w-28",
+            "w-28",
+            "w-20",
             "action",
           ]}
         />
@@ -160,13 +160,15 @@ export default function StudentsPage() {
         {consultationsLoading ? (
           <div className="flex flex-col gap-spacing-300 p-spacing-600">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex flex-col gap-spacing-200">
+              <div
+                key={i}
+                className="flex flex-col gap-spacing-200 border-line-divider border-b pb-spacing-300 last:border-b-0">
                 <div className="flex items-center justify-between">
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-6 w-16 rounded-radius-200" />
+                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-5 w-16 rounded-radius-200" />
                 </div>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-6 w-4/5" />
+                <Skeleton className="h-4 w-28" />
               </div>
             ))}
           </div>

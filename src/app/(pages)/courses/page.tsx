@@ -58,7 +58,13 @@ export default function CoursesPage() {
       {isLoading ? (
         <SkeletonTable
           rows={5}
-          columns={["w-24", { width: "w-10", rounded: true }, { width: "w-28", buttons: ["w-28", "w-20"] }, "action"]}
+          columns={[
+            "w-24",
+            { width: "w-12", rounded: true },
+            "w-44",
+            { width: "w-32", buttons: ["w-32", "w-20"] },
+            "action",
+          ]}
         />
       ) : filteredCourses.length === 0 ? (
         <EmptyState

@@ -210,12 +210,12 @@ export default function MessagesPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-spacing-200">
                     <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-4 w-12 rounded-radius-200" />
+                    <Skeleton className="h-5 w-14 rounded-radius-200" />
                   </div>
-                  <Skeleton className="h-6 w-20 rounded-radius-200" />
+                  <Skeleton className="h-5 w-16 rounded-radius-200" />
                 </div>
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-4 w-36" />
               </div>
             ))}
           </div>
