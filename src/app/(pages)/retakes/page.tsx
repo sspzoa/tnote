@@ -1,6 +1,7 @@
 "use client";
 
-import { History } from "lucide-react";
+import { useSetAtom } from "jotai";
+import { History, Settings } from "lucide-react";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
@@ -8,7 +9,9 @@ import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
+import { showManagementStatusSettingsModalAtom } from "./(atoms)/useModalStore";
 import ManagementStatusModal from "./(components)/ManagementStatusModal";
+import ManagementStatusSettingsModal from "./(components)/ManagementStatusSettingsModal";
 import RetakeAbsentModal from "./(components)/RetakeAbsentModal";
 import RetakeAssignModal from "./(components)/RetakeAssignModal";
 import RetakeCompleteModal from "./(components)/RetakeCompleteModal";
@@ -25,6 +28,7 @@ import { useRetakeHandlers } from "./(hooks)/useRetakeHandlers";
 
 export default function RetakesPage() {
   const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+  const setShowSettingsModal = useSetAtom(showManagementStatusSettingsModalAtom);
 
   const { fetchedRetakes, filteredRetakes, isLoading, error, refetch } = useRetakeFilters();
   const { history: allHistory, isLoading: historyLoading } = useAllRetakeHistory();
@@ -63,6 +67,13 @@ export default function RetakesPage() {
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
           <div className="flex items-center gap-spacing-300">
+            <Button
+              variant="secondary"
+              onClick={() => setShowSettingsModal(true)}
+              className="flex items-center gap-spacing-200">
+              <Settings className="size-4" />
+              관리 상태 설정
+            </Button>
             <Button
               variant="secondary"
               onClick={() => setShowHistoryPanel(true)}
@@ -121,6 +132,7 @@ export default function RetakesPage() {
       <StudentInfoModal />
       <RetakeAssignModal onSuccess={handleActionSuccess} />
       <ManagementStatusModal onSuccess={handleActionSuccess} />
+      <ManagementStatusSettingsModal />
       <RetakeEditDateModal onSuccess={handleActionSuccess} />
 
       <RetakeHistoryPanel

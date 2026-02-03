@@ -1,24 +1,22 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const VALID_MANAGEMENT_STATUSES = [
-  "재시 안내 예정",
-  "재시 안내 완료",
-  "재시 날짜 확답 완료",
-  "클리닉 1회 불참 연락 필요",
-  "클리닉 1회 불참 연락 완료",
-  "클리닉 2회 불참 연락 필요",
-  "클리닉 2회 불참 연락 완료",
-  "실장 집중 상담 필요",
-  "실장 집중 상담 진행 중",
-  "실장 집중 상담 완료",
-] as const;
-
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { management_status } = await request.json();
 
-  if (!management_status || !VALID_MANAGEMENT_STATUSES.includes(management_status)) {
+  if (!management_status || typeof management_status !== "string") {
+    return NextResponse.json({ error: "관리 상태는 필수입니다." }, { status: 400 });
+  }
+
+  const { data: validStatuses } = await supabase
+    .from("ManagementStatuses")
+    .select("name")
+    .eq("workspace", session.workspace);
+
+  const validNames = validStatuses?.map((s) => s.name) ?? [];
+
+  if (!validNames.includes(management_status)) {
     return NextResponse.json({ error: "유효하지 않은 관리 상태입니다." }, { status: 400 });
   }
 
@@ -49,6 +47,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     new_management_status: management_status,
     performed_by: session.userId,
   });
+
   return NextResponse.json({ success: true });
 };
 

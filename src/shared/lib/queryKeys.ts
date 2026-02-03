@@ -2,6 +2,9 @@ export const QUERY_KEYS = {
   auth: {
     me: ["auth", "me"] as const,
   },
+  managementStatuses: {
+    all: ["management-statuses"] as const,
+  },
   home: {
     stats: ["home", "stats"] as const,
   },

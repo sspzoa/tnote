@@ -72,17 +72,18 @@ export interface AttendanceRecord {
   student: Student;
 }
 
-export type ManagementStatus =
-  | "재시 안내 예정"
-  | "재시 안내 완료"
-  | "재시 날짜 확답 완료"
-  | "클리닉 1회 불참 연락 필요"
-  | "클리닉 1회 불참 연락 완료"
-  | "클리닉 2회 불참 연락 필요"
-  | "클리닉 2회 불참 연락 완료"
-  | "실장 집중 상담 필요"
-  | "실장 집중 상담 진행 중"
-  | "실장 집중 상담 완료";
+export type StatusColor = "success" | "warning" | "danger" | "info" | "neutral";
+
+export interface ManagementStatusItem {
+  id: string;
+  name: string;
+  display_order: number;
+  color: StatusColor;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ManagementStatus = string;
 
 export interface Exam {
   id: string;

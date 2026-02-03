@@ -3,6 +3,8 @@
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
+import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
+import type { StatusColor } from "@/shared/types";
 import {
   recipientTypeAtom,
   retakeManagementFilterAtom,
@@ -21,19 +23,13 @@ const STATUS_OPTIONS = [
   { value: "absent", label: "결석" },
 ];
 
-const MANAGEMENT_STATUS_OPTIONS = [
-  { value: "all", label: "전체" },
-  { value: "재시 안내 예정", label: "재시 안내 예정" },
-  { value: "재시 안내 완료", label: "재시 안내 완료" },
-  { value: "재시 날짜 확답 완료", label: "재시 날짜 확답 완료" },
-  { value: "클리닉 1회 불참 연락 필요", label: "클리닉 1회 불참 연락 필요" },
-  { value: "클리닉 1회 불참 연락 완료", label: "클리닉 1회 불참 연락 완료" },
-  { value: "클리닉 2회 불참 연락 필요", label: "클리닉 2회 불참 연락 필요" },
-  { value: "클리닉 2회 불참 연락 완료", label: "클리닉 2회 불참 연락 완료" },
-  { value: "실장 집중 상담 필요", label: "실장 집중 상담 필요" },
-  { value: "실장 집중 상담 진행 중", label: "실장 집중 상담 진행 중" },
-  { value: "실장 집중 상담 완료", label: "실장 집중 상담 완료" },
-];
+const STATUS_COLOR_CLASSES: Record<StatusColor, string> = {
+  success: "bg-solid-translucent-green text-core-status-positive",
+  warning: "bg-solid-translucent-yellow text-core-status-warning",
+  danger: "bg-solid-translucent-red text-core-status-negative",
+  info: "bg-core-accent-translucent text-core-accent",
+  neutral: "bg-components-fill-standard-secondary text-content-standard-secondary",
+};
 
 const formatStatusLabel = (status: string) => {
   switch (status) {
@@ -52,6 +48,7 @@ export default function RetakeNoticeTab() {
   const [statusFilter, setStatusFilter] = useAtom(retakeStatusFilterAtom);
   const [managementFilter, setManagementFilter] = useAtom(retakeManagementFilterAtom);
   const { retakes, isFetching } = useRetakes(statusFilter, managementFilter);
+  const { statuses: managementStatuses } = useManagementStatuses();
   const { sendRetakeNotice, isSending } = useSendRetakeNotice();
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("retake");
 
@@ -139,9 +136,10 @@ export default function RetakeNoticeTab() {
             value={managementFilter}
             onChange={(e) => setManagementFilter(e.target.value)}
             className="w-full">
-            {MANAGEMENT_STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            <option value="all">전체</option>
+            {managementStatuses.map((status) => (
+              <option key={status.id} value={status.name}>
+                {status.name}
               </option>
             ))}
           </FilterSelect>
@@ -186,16 +184,19 @@ export default function RetakeNoticeTab() {
                     <span className="truncate font-medium text-body text-content-standard-primary">
                       {retake.student.name} - {formatDate(retake.current_scheduled_date)}
                     </span>
-                    {retake.management_status && (
-                      <span
-                        className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${
-                          retake.management_status.includes("완료")
-                            ? "bg-solid-translucent-green text-core-status-positive"
-                            : "bg-solid-translucent-red text-core-status-negative"
-                        }`}>
-                        {retake.management_status}
-                      </span>
-                    )}
+                    {retake.management_status &&
+                      (() => {
+                        const statusItem = managementStatuses.find((s) => s.name === retake.management_status);
+                        const colorClass = statusItem
+                          ? STATUS_COLOR_CLASSES[statusItem.color as StatusColor]
+                          : STATUS_COLOR_CLASSES.neutral;
+                        return (
+                          <span
+                            className={`rounded-radius-200 px-spacing-200 py-spacing-50 font-semibold text-footnote ${colorClass}`}>
+                            {retake.management_status}
+                          </span>
+                        );
+                      })()}
                   </div>
                   <div className="truncate text-content-standard-tertiary text-footnote">
                     {retake.exam.course.name} - {retake.exam.exam_number}회 {retake.exam.name}

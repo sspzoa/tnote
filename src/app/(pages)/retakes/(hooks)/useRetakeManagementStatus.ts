@@ -1,13 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
-import type { ManagementStatus } from "../(atoms)/useRetakesStore";
 
 export const useRetakeManagementStatus = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ retakeId, status }: { retakeId: string; status: ManagementStatus }) => {
+    mutationFn: async ({ retakeId, status }: { retakeId: string; status: string }) => {
       const response = await fetchWithAuth(`/api/retakes/${retakeId}/management-status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

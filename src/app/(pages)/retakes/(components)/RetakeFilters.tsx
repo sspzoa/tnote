@@ -4,9 +4,9 @@ import { useAtom } from "jotai";
 import { FilterButton } from "@/shared/components/ui/filterButton";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { SearchInput } from "@/shared/components/ui/searchInput";
+import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import {
   filterAtom,
-  type ManagementStatus,
   minAbsentCountAtom,
   minIncompleteCountAtom,
   minPostponeAbsentCountAtom,
@@ -21,19 +21,6 @@ import {
 } from "../(atoms)/useRetakesStore";
 import { useCourses } from "../(hooks)/useCourses";
 import { useExams } from "../(hooks)/useExams";
-
-const MANAGEMENT_STATUS_OPTIONS: ManagementStatus[] = [
-  "재시 안내 예정",
-  "재시 안내 완료",
-  "재시 날짜 확답 완료",
-  "클리닉 1회 불참 연락 필요",
-  "클리닉 1회 불참 연락 완료",
-  "클리닉 2회 불참 연락 필요",
-  "클리닉 2회 불참 연락 완료",
-  "실장 집중 상담 필요",
-  "실장 집중 상담 진행 중",
-  "실장 집중 상담 완료",
-];
 
 export default function RetakeFilters() {
   const [filter, setFilter] = useAtom(filterAtom);
@@ -51,6 +38,7 @@ export default function RetakeFilters() {
 
   const { courses } = useCourses();
   const { exams } = useExams(selectedCourse === "all" ? null : selectedCourse);
+  const { statuses: managementStatuses } = useManagementStatuses();
 
   const handleCourseChange = (courseId: string) => {
     setSelectedCourse(courseId);
@@ -113,11 +101,11 @@ export default function RetakeFilters() {
 
             <FilterSelect
               value={selectedManagementStatus}
-              onChange={(e) => setSelectedManagementStatus(e.target.value as ManagementStatus | "all")}>
+              onChange={(e) => setSelectedManagementStatus(e.target.value)}>
               <option value="all">전체 관리 상태</option>
-              {MANAGEMENT_STATUS_OPTIONS.map((status) => (
-                <option key={status} value={status}>
-                  {status}
+              {managementStatuses.map((status) => (
+                <option key={status.id} value={status.name}>
+                  {status.name}
                 </option>
               ))}
             </FilterSelect>

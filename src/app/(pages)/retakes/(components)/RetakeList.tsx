@@ -9,9 +9,11 @@ import {
   MoreOptionsButton,
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { StatusBadge } from "@/shared/components/ui/statusBadge";
+import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { TAG_COLOR_CLASSES } from "@/shared/lib/utils/tagColors";
-import type { TagColor } from "@/shared/types";
+import type { StatusColor, TagColor } from "@/shared/types";
 import { openMenuIdAtom, type Retake } from "../(atoms)/useRetakesStore";
 
 const isTagActive = (startDate: string, endDate: string | null): boolean => {
@@ -55,6 +57,7 @@ export default function RetakeList({
 }: RetakeListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
+  const { statuses: managementStatuses } = useManagementStatuses();
 
   const getMenuItems = useCallback(
     (retake: Retake): DropdownMenuItem[] => {
@@ -121,22 +124,10 @@ export default function RetakeList({
   };
 
   const getManagementStatusBadge = (status: string) => {
-    const isCompleted = status.includes("완료");
+    const statusItem = managementStatuses.find((s) => s.name === status);
+    const color = (statusItem?.color ?? "neutral") as StatusColor;
 
-    let bgColor = "bg-solid-translucent-red";
-    let textColor = "text-core-status-negative";
-
-    if (isCompleted) {
-      bgColor = "bg-solid-translucent-green";
-      textColor = "text-core-status-positive";
-    }
-
-    return (
-      <span
-        className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote ${bgColor} ${textColor}`}>
-        {status}
-      </span>
-    );
+    return <StatusBadge variant={color}>{status}</StatusBadge>;
   };
 
   return (
