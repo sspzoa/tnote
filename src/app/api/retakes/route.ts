@@ -30,10 +30,18 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "일부 학생을 찾을 수 없습니다." }, { status: 404 });
   }
 
+  const { data: defaultStatus } = await supabase
+    .from("ManagementStatuses")
+    .select("name")
+    .eq("workspace", session.workspace)
+    .eq("display_order", 1)
+    .single();
+
   const assignments = studentIds.map((studentId) => ({
     exam_id: examId,
     student_id: studentId,
     current_scheduled_date: scheduledDate || null,
+    management_status: defaultStatus?.name ?? null,
   }));
 
   const { data, error } = await supabase
