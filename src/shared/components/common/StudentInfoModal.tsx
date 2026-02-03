@@ -184,14 +184,21 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
           </section>
 
           <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">시험 성적 & 과제</h3>
+            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">
+              시험 성적 & 과제
+              {examWithAssignments.length > 0 && (
+                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                  ({Math.min(5, examWithAssignments.length)}/{examWithAssignments.length}개)
+                </span>
+              )}
+            </h3>
             {examWithAssignments.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
                 시험 기록이 없습니다.
               </div>
             ) : (
               <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
-                {examWithAssignments.map(({ examScore, assignment }) => {
+                {examWithAssignments.slice(0, 5).map(({ examScore, assignment }) => {
                   const isPassed = examScore.cutline !== null && examScore.score >= examScore.cutline;
                   const isFailed = examScore.cutline !== null && examScore.score < examScore.cutline;
 
@@ -238,14 +245,21 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
           </section>
 
           <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 클리닉 출석</h3>
+            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">
+              최근 클리닉 출석
+              {studentDetail.clinicHistory.length > 0 && (
+                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                  ({Math.min(5, studentDetail.clinicHistory.length)}/{studentDetail.clinicHistory.length}개)
+                </span>
+              )}
+            </h3>
             {studentDetail.clinicHistory.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
                 클리닉 출석 기록이 없습니다.
               </div>
             ) : (
               <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
-                {studentDetail.clinicHistory.map((history) => (
+                {studentDetail.clinicHistory.slice(0, 5).map((history) => (
                   <div
                     key={history.id}
                     className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
@@ -267,14 +281,21 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
           </section>
 
           <section>
-            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">최근 재시험</h3>
+            <h3 className="mb-spacing-300 font-semibold text-body text-content-standard-primary">
+              최근 재시험
+              {studentDetail.retakeHistory.length > 0 && (
+                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                  ({Math.min(5, studentDetail.retakeHistory.length)}/{studentDetail.retakeHistory.length}개)
+                </span>
+              )}
+            </h3>
             {studentDetail.retakeHistory.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
                 재시험 기록이 없습니다.
               </div>
             ) : (
               <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
-                {studentDetail.retakeHistory.map((retake) => (
+                {studentDetail.retakeHistory.slice(0, 5).map((retake) => (
                   <div
                     key={retake.id}
                     className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
