@@ -149,17 +149,45 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="flex h-dvh items-center justify-center p-spacing-400 md:p-spacing-600">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col gap-spacing-600 rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          <div className="flex flex-col gap-spacing-200 text-center">
-            <h1 className="font-bold text-content-standard-primary text-title">Tnote</h1>
-            <p className="text-body text-content-standard-secondary">선생님을 위한 학생관리 서비스</p>
+    <div className="flex min-h-dvh flex-col lg:flex-row">
+      <div className="relative flex min-h-[280px] flex-col justify-between overflow-hidden bg-core-accent p-spacing-600 lg:min-h-dvh lg:w-1/2 lg:p-spacing-800">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="-right-32 -top-32 absolute size-96 rounded-full bg-solid-white/10 blur-3xl" />
+          <div className="-bottom-48 -left-48 absolute size-[500px] rounded-full bg-solid-indigo/20 blur-3xl" />
+          <div className="absolute top-1/2 right-1/4 size-64 rounded-full bg-solid-white/5 blur-2xl" />
+        </div>
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-spacing-300">
+            <div className="flex size-12 items-center justify-center rounded-radius-300 bg-solid-white/20 backdrop-blur-sm lg:size-14">
+              <span className="font-bold text-solid-white text-xl lg:text-2xl">T</span>
+            </div>
+            <span className="font-bold text-solid-white text-xl lg:text-2xl">Tnote</span>
           </div>
+        </div>
+
+        <div className="relative z-10 flex flex-col gap-spacing-400">
+          <h1 className="font-bold text-3xl text-solid-white leading-tight lg:text-5xl">
+            학생 관리,
+            <br />더 스마트하게
+          </h1>
+          <p className="max-w-md text-body text-solid-white/80 lg:text-lg">
+            출결, 성적, 상담까지. 선생님의 모든 학생 관리를 한 곳에서.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col justify-center bg-background-standard-primary p-spacing-600 lg:p-spacing-800">
+        <div className="mx-auto w-full max-w-md">
+          <div className="mb-spacing-800 flex flex-col gap-spacing-200">
+            <h2 className="font-bold text-2xl text-content-standard-primary lg:text-3xl">로그인</h2>
+            <p className="text-body text-content-standard-secondary">계정에 로그인하여 시작하세요</p>
+          </div>
+
           <SegmentedControl
             items={[
-              { value: "teacher", label: "선생님 로그인" },
-              { value: "student", label: "학생 로그인" },
+              { value: "teacher", label: "선생님" },
+              { value: "student", label: "학생" },
             ]}
             value={tab}
             onChange={(v) => {
@@ -168,7 +196,7 @@ export default function LoginPage() {
             }}
           />
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-spacing-500">
+          <form onSubmit={handleLogin} className="mt-spacing-600 flex flex-col gap-spacing-500">
             {tab === "student" && (
               <FormSelect
                 label="워크스페이스"
@@ -200,7 +228,12 @@ export default function LoginPage() {
               disabled={loading}
             />
 
-            <Button type="submit" disabled={loading} isLoading={loading} loadingText="로그인 중..." className="w-full">
+            <Button
+              type="submit"
+              disabled={loading}
+              isLoading={loading}
+              loadingText="로그인 중..."
+              className="mt-spacing-200 w-full">
               로그인
             </Button>
 
@@ -216,6 +249,10 @@ export default function LoginPage() {
               </div>
             )}
           </form>
+
+          <p className="mt-spacing-800 text-center text-content-standard-tertiary text-footnote">
+            © {new Date().getFullYear()} Tnote. All rights reserved.
+          </p>
         </div>
       </div>
 
