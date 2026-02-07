@@ -135,7 +135,7 @@ export default function StudentDetailPage() {
             </div>
           </section>
 
-          <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:grid-cols-4 print:gap-spacing-200">
+          <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:grid-cols-3 print:gap-spacing-200">
             <StatCard
               icon={BookOpen}
               label="수강 중인 수업"
@@ -157,13 +157,15 @@ export default function StudentDetailPage() {
               subValue={`전체 ${totalRetakes}건 중`}
               colorClass="bg-solid-translucent-yellow text-solid-yellow"
             />
-            <StatCard
-              icon={MessageSquare}
-              label="상담 기록"
-              value={`${consultationCount}건`}
-              subValue={consultationCount > 0 ? "누적 상담" : "상담 기록 없음"}
-              colorClass="bg-solid-translucent-purple text-solid-purple"
-            />
+            <div className="print:hidden">
+              <StatCard
+                icon={MessageSquare}
+                label="상담 기록"
+                value={`${consultationCount}건`}
+                subValue={consultationCount > 0 ? "누적 상담" : "상담 기록 없음"}
+                colorClass="bg-solid-translucent-purple text-solid-purple"
+              />
+            </div>
           </section>
         </div>
 
@@ -247,7 +249,7 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </section>
 
-        <section>
+        <section className="print:hidden">
           <DashboardCard
             title="상담 기록"
             icon={MessageSquare}
