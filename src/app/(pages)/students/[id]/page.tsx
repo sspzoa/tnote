@@ -3,9 +3,10 @@
 import { BookOpen, FileText, MessageSquare, Printer, RefreshCw, Stethoscope, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { FilterButton } from "@/shared/components/ui/filterButton";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -28,6 +29,7 @@ export default function StudentDetailPage() {
   const studentId = params.id as string;
   const toast = useToast();
 
+  const [showConsultation, setShowConsultation] = useState(false);
   const { studentDetail, isLoading, error } = useStudentDetail(studentId);
 
   useEffect(() => {
@@ -84,12 +86,20 @@ export default function StudentDetailPage() {
               <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
                 ← 학생 목록으로 돌아가기
               </Link>
-              <Button variant="secondary" onClick={() => window.print()}>
-                <span className="flex items-center gap-spacing-200">
-                  <Printer className="h-4 w-4" />
-                  인쇄
-                </span>
-              </Button>
+              <div className="flex items-center gap-spacing-200">
+                <FilterButton
+                  active={showConsultation}
+                  onClick={() => setShowConsultation((prev) => !prev)}
+                  variant="toggle">
+                  상담 포함
+                </FilterButton>
+                <Button variant="secondary" onClick={() => window.print()}>
+                  <span className="flex items-center gap-spacing-200">
+                    <Printer className="h-4 w-4" />
+                    인쇄
+                  </span>
+                </Button>
+              </div>
             </div>
 
             <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 print:rounded-none print:border-0 print:border-line-divider print:border-b print:bg-white print:p-0 print:pb-spacing-300">
@@ -135,7 +145,8 @@ export default function StudentDetailPage() {
             </div>
           </section>
 
-          <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:grid-cols-3 print:gap-spacing-200">
+          <section
+            className={`grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:gap-spacing-200 ${showConsultation ? "print:grid-cols-4" : "print:grid-cols-3"}`}>
             <StatCard
               icon={BookOpen}
               label="수강 중인 수업"
@@ -157,7 +168,7 @@ export default function StudentDetailPage() {
               subValue={`전체 ${totalRetakes}건 중`}
               colorClass="bg-solid-translucent-yellow text-solid-yellow"
             />
-            <div className="print:hidden">
+            <div className={showConsultation ? "" : "print:hidden"}>
               <StatCard
                 icon={MessageSquare}
                 label="상담 기록"
@@ -249,7 +260,7 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </section>
 
-        <section className="print:hidden">
+        <section className={showConsultation ? "" : "print:hidden"}>
           <DashboardCard
             title="상담 기록"
             icon={MessageSquare}
