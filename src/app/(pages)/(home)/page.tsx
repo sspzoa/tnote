@@ -42,32 +42,30 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-spacing-500 md:p-spacing-700">
-        <div className="mx-auto flex max-w-6xl flex-col gap-spacing-700">
-          <div className="flex animate-pulse flex-col gap-spacing-400 rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-            <div className="h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
-            <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
-          </div>
-          <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="animate-pulse rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
-                <div className="flex flex-col gap-spacing-400">
-                  <div className="size-8 rounded-radius-200 bg-components-fill-standard-secondary" />
-                  <div className="flex flex-col gap-spacing-100">
-                    <div className="h-16 w-12 rounded-radius-200 bg-components-fill-standard-secondary" />
-                    <div>
-                      <div className="h-[22px] w-14 rounded-radius-200 bg-components-fill-standard-secondary" />
-                      <div className="h-5 w-24 rounded-radius-200 bg-components-fill-standard-secondary" />
-                    </div>
+      <Container>
+        <div className="flex animate-pulse flex-col gap-spacing-400 rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+          <div className="h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
+          <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
+        </div>
+        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="animate-pulse rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+              <div className="flex flex-col gap-spacing-400">
+                <div className="size-8 rounded-radius-200 bg-components-fill-standard-secondary" />
+                <div className="flex flex-col gap-spacing-100">
+                  <div className="h-16 w-12 rounded-radius-200 bg-components-fill-standard-secondary" />
+                  <div>
+                    <div className="h-[22px] w-14 rounded-radius-200 bg-components-fill-standard-secondary" />
+                    <div className="h-5 w-24 rounded-radius-200 bg-components-fill-standard-secondary" />
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      </div>
+      </Container>
     );
   }
 
