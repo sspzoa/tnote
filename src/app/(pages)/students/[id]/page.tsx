@@ -77,93 +77,97 @@ export default function StudentDetailPage() {
 
   return (
     <div className="min-h-screen bg-background-standard-secondary p-spacing-500 md:p-spacing-700 print:min-h-0 print:bg-white print:p-0">
-      <div className="mx-auto flex max-w-7xl flex-col gap-spacing-600 print:max-w-none print:gap-spacing-400">
-        <section className="flex flex-col gap-spacing-400">
-          <div className="flex items-center justify-between print:hidden">
-            <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
-              ← 학생 목록으로 돌아가기
-            </Link>
-            <Button variant="secondary" size="xs" onClick={() => window.print()}>
-              <span className="flex items-center gap-spacing-200">
-                <Printer className="h-4 w-4" />
-                인쇄
-              </span>
-            </Button>
-          </div>
-
-          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 print:rounded-none print:border-0 print:border-line-divider print:border-b print:bg-white print:p-0 print:pb-spacing-300">
-            <div className="flex flex-col gap-spacing-300 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex flex-col gap-spacing-200">
-                <div className="flex items-center gap-spacing-300">
-                  <h1 className="font-bold text-content-standard-primary text-title">{studentDetail.student.name}</h1>
-                  {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
-                    <Badge variant="blue" size="xs">
-                      {getGrade(studentDetail.student.birthYear)}
-                    </Badge>
-                  )}
-                </div>
-
-                <p className="text-body text-content-standard-secondary">
-                  {studentDetail.student.school || "학교 정보 없음"}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-spacing-400 text-content-standard-secondary text-label">
-                  <span className="flex items-center gap-spacing-100">
-                    <span className="text-content-standard-tertiary">본인</span>
-                    {formatPhoneNumber(studentDetail.student.phoneNumber)}
-                  </span>
-                  {studentDetail.student.parentPhoneNumber && (
-                    <span className="flex items-center gap-spacing-100">
-                      <span className="text-content-standard-tertiary">학부모</span>
-                      {formatPhoneNumber(studentDetail.student.parentPhoneNumber)}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {activeTags.length > 0 && (
-                <div className="flex flex-wrap gap-spacing-100">
-                  {activeTags.map((assignment) => (
-                    <Badge key={assignment.id} variant={assignment.tag.color} size="xs">
-                      {assignment.tag.name}
-                    </Badge>
-                  ))}
-                </div>
-              )}
+      <div className="mx-auto flex max-w-7xl flex-col gap-spacing-600 print:max-w-none print:gap-spacing-850">
+        <div className="flex flex-col gap-spacing-600 print:gap-spacing-300">
+          <section className="flex flex-col gap-spacing-400">
+            <div className="flex items-center justify-between print:hidden">
+              <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
+                ← 학생 목록으로 돌아가기
+              </Link>
+              <Button variant="secondary" onClick={() => window.print()}>
+                <span className="flex items-center gap-spacing-200">
+                  <Printer className="h-4 w-4" />
+                  인쇄
+                </span>
+              </Button>
             </div>
-          </div>
-        </section>
 
-        <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:grid-cols-4 print:gap-spacing-200">
-          <StatCard
-            icon={BookOpen}
-            label="수강 중인 수업"
-            value={`${courseCount}개`}
-            subValue={courseCount > 0 ? "현재 수강중" : "수강 수업 없음"}
-            colorClass="bg-solid-translucent-blue text-solid-blue"
-          />
-          <StatCard
-            icon={TrendingUp}
-            label="시험 평균"
-            value={studentDetail.examScores.length > 0 ? `${avgScore}점` : "-"}
-            subValue={studentDetail.examScores.length > 0 ? `평균 순위 ${avgRank}등` : "응시 기록 없음"}
-            colorClass="bg-solid-translucent-green text-solid-green"
-          />
-          <StatCard
-            icon={RefreshCw}
-            label="재시험 대기"
-            value={`${pendingRetakes}건`}
-            subValue={`전체 ${totalRetakes}건 중`}
-            colorClass="bg-solid-translucent-yellow text-solid-yellow"
-          />
-          <StatCard
-            icon={MessageSquare}
-            label="상담 기록"
-            value={`${consultationCount}건`}
-            subValue={consultationCount > 0 ? "누적 상담" : "상담 기록 없음"}
-            colorClass="bg-solid-translucent-purple text-solid-purple"
-          />
-        </section>
+            <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 print:rounded-none print:border-0 print:border-line-divider print:border-b print:bg-white print:p-0 print:pb-spacing-300">
+              <div className="flex flex-col gap-spacing-300 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex flex-col gap-spacing-200">
+                  <div className="flex items-center gap-spacing-300">
+                    <h1 className="font-bold text-content-standard-primary text-title">{studentDetail.student.name}</h1>
+                    {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
+                      <Badge variant="blue" size="xs">
+                        {getGrade(studentDetail.student.birthYear)}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <p className="text-body text-content-standard-secondary">
+                    {studentDetail.student.school || "학교 정보 없음"}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-spacing-400 text-content-standard-secondary text-label">
+                    <span className="flex items-center gap-spacing-100">
+                      <span className="text-content-standard-tertiary">본인</span>
+                      {formatPhoneNumber(studentDetail.student.phoneNumber)}
+                    </span>
+                    {studentDetail.student.parentPhoneNumber && (
+                      <span className="flex items-center gap-spacing-100">
+                        <span className="text-content-standard-tertiary">학부모</span>
+                        {formatPhoneNumber(studentDetail.student.parentPhoneNumber)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {activeTags.length > 0 && (
+                  <div className="flex flex-wrap gap-spacing-100">
+                    {activeTags.map((assignment) => (
+                      <Badge key={assignment.id} variant={assignment.tag.color} size="xs">
+                        {assignment.tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:grid-cols-3 print:gap-spacing-200">
+            <StatCard
+              icon={BookOpen}
+              label="수강 중인 수업"
+              value={`${courseCount}개`}
+              subValue={courseCount > 0 ? "현재 수강중" : "수강 수업 없음"}
+              colorClass="bg-solid-translucent-blue text-solid-blue"
+            />
+            <StatCard
+              icon={TrendingUp}
+              label="시험 평균"
+              value={studentDetail.examScores.length > 0 ? `${avgScore}점` : "-"}
+              subValue={studentDetail.examScores.length > 0 ? `평균 순위 ${avgRank}등` : "응시 기록 없음"}
+              colorClass="bg-solid-translucent-green text-solid-green"
+            />
+            <StatCard
+              icon={RefreshCw}
+              label="재시험 대기"
+              value={`${pendingRetakes}건`}
+              subValue={`전체 ${totalRetakes}건 중`}
+              colorClass="bg-solid-translucent-yellow text-solid-yellow"
+            />
+            <div className="print:hidden">
+              <StatCard
+                icon={MessageSquare}
+                label="상담 기록"
+                value={`${consultationCount}건`}
+                subValue={consultationCount > 0 ? "누적 상담" : "상담 기록 없음"}
+                colorClass="bg-solid-translucent-purple text-solid-purple"
+              />
+            </div>
+          </section>
+        </div>
 
         <section>
           <DashboardCard
@@ -176,7 +180,7 @@ export default function StudentDetailPage() {
               {studentDetail.courses.map((course) => (
                 <div
                   key={course.id}
-                  className="flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
+                  className="print-break-inside-avoid flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
                   <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
                     <span className="truncate font-medium text-body text-content-standard-primary">{course.name}</span>
                     <span className="text-content-standard-tertiary text-footnote">
@@ -192,7 +196,7 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </section>
 
-        <section className="grid gap-spacing-500 lg:grid-cols-2 print:gap-spacing-400">
+        <section className="grid gap-spacing-500 lg:grid-cols-2 print:gap-spacing-850">
           <DashboardCard
             title="시험 성적 & 과제"
             icon={TrendingUp}
@@ -227,7 +231,7 @@ export default function StudentDetailPage() {
               {studentDetail.clinicHistory.map((history) => (
                 <div
                   key={history.id}
-                  className="flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
+                  className="print-break-inside-avoid flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
                   <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
                     <span className="truncate font-medium text-body text-content-standard-primary">
                       {history.clinic.name}
@@ -245,7 +249,7 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </section>
 
-        <section>
+        <section className="print:hidden">
           <DashboardCard
             title="상담 기록"
             icon={MessageSquare}
@@ -257,7 +261,7 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </section>
 
-        <section>
+        <section className="print:hidden">
           <DashboardCard
             title="문자 발송 기록"
             icon={FileText}

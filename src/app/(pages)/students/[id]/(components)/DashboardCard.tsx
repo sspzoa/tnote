@@ -19,7 +19,7 @@ export const DashboardCard = ({
   scrollable,
   noPadding,
 }: DashboardCardProps) => (
-  <div className="print-break-inside-avoid flex flex-col overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary print:overflow-visible print:rounded-none print:border-0 print:bg-white">
+  <div className="flex flex-col overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-primary print:overflow-visible print:rounded-none print:border-0 print:bg-white">
     <div className="flex items-center gap-spacing-200 border-line-divider border-b bg-components-fill-standard-secondary px-spacing-500 py-spacing-400 print:bg-transparent print:px-0 print:py-spacing-200">
       <Icon className="h-4 w-4 text-content-standard-tertiary" />
       <h3 className="font-semibold text-body text-content-standard-primary">{title}</h3>
