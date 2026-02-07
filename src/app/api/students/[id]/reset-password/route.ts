@@ -1,13 +1,13 @@
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createAdminClient } from "@/shared/lib/supabase/server";
 
 const handlePost = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
 
   const { data: student, error: fetchError } = await supabase
     .from("Users")
-    .select("phone_number")
+    .select("phone_number, auth_id")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .single();
@@ -16,13 +16,14 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
   }
 
-  const hashedPassword = await bcrypt.hash(student.phone_number, 10);
+  if (!student.auth_id) {
+    return NextResponse.json({ error: "인증 정보를 찾을 수 없습니다." }, { status: 404 });
+  }
 
-  const { error: updateError } = await supabase
-    .from("Users")
-    .update({ password: hashedPassword })
-    .eq("id", id)
-    .eq("workspace", session.workspace);
+  const adminSupabase = createAdminClient();
+  const { error: updateError } = await adminSupabase.auth.admin.updateUserById(student.auth_id, {
+    password: student.phone_number,
+  });
 
   if (updateError) throw updateError;
   return NextResponse.json({

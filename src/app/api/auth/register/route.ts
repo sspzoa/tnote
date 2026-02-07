@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "비밀번호는 최소 8자 이상이어야 합니다." }, { status: 400 });
     }
 
-    const supabase = await createAdminClient();
+    const supabase = createAdminClient();
 
     const { data: existingUser } = await supabase
       .from("Users")
@@ -41,8 +40,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const { data: newWorkspace, error: workspaceError } = await supabase
       .from("Workspaces")
       .insert({
@@ -54,22 +51,50 @@ export async function POST(request: Request) {
 
     if (workspaceError) throw workspaceError;
 
+    const email = `${phoneNumber}@tnote.local`;
+
+    const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        name,
+        role: "owner",
+        workspace: newWorkspace.id,
+      },
+    });
+
+    if (authError) {
+      await supabase.from("Workspaces").delete().eq("id", newWorkspace.id);
+      throw authError;
+    }
+
     const { data: newUser, error: userError } = await supabase
       .from("Users")
       .insert({
         name,
         phone_number: phoneNumber,
-        password: hashedPassword,
         role: "owner",
         workspace: newWorkspace.id,
+        auth_id: authUser.user.id,
       })
       .select()
       .single();
 
     if (userError) {
+      await supabase.auth.admin.deleteUser(authUser.user.id);
       await supabase.from("Workspaces").delete().eq("id", newWorkspace.id);
       throw userError;
     }
+
+    await supabase.auth.admin.updateUserById(authUser.user.id, {
+      user_metadata: {
+        name,
+        role: "owner",
+        workspace: newWorkspace.id,
+        public_user_id: newUser.id,
+      },
+    });
 
     await supabase.from("Workspaces").update({ owner: newUser.id }).eq("id", newWorkspace.id);
 

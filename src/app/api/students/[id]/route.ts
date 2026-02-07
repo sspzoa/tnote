@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createAdminClient } from "@/shared/lib/supabase/server";
 import { isValidBirthYear, isValidPhoneNumber, removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 const handleGet = async ({ supabase, session, params }: ApiContext) => {
@@ -97,7 +98,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .update(updateData)
     .eq("id", id)
     .eq("workspace", session.workspace)
-    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, auth_id")
     .single();
 
   if (error) {
@@ -106,7 +107,25 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     }
     throw error;
   }
-  return NextResponse.json({ success: true, data });
+
+  if (data.auth_id && (updateData.phone_number || updateData.name)) {
+    const adminSupabase = createAdminClient();
+    const authUpdate: Record<string, unknown> = {};
+    if (updateData.phone_number) {
+      authUpdate.email = `${updateData.phone_number}@tnote.local`;
+    }
+    const metadataUpdate: Record<string, unknown> = {};
+    if (updateData.name) {
+      metadataUpdate.name = updateData.name;
+    }
+    await adminSupabase.auth.admin.updateUserById(data.auth_id, {
+      ...authUpdate,
+      ...(Object.keys(metadataUpdate).length > 0 ? { user_metadata: metadataUpdate } : {}),
+    });
+  }
+
+  const { auth_id: _, ...responseData } = data;
+  return NextResponse.json({ success: true, data: responseData });
 };
 
 const handleDelete = async ({ supabase, session, params }: ApiContext) => {
@@ -115,9 +134,22 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
   }
 
+  const { data: student } = await supabase
+    .from("Users")
+    .select("auth_id")
+    .eq("id", id)
+    .eq("workspace", session.workspace)
+    .single();
+
   const { error } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
   if (error) throw error;
+
+  if (student?.auth_id) {
+    const adminSupabase = createAdminClient();
+    await adminSupabase.auth.admin.deleteUser(student.auth_id);
+  }
+
   return NextResponse.json({ success: true });
 };
 

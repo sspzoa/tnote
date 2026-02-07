@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { refreshAccessToken } from "@/shared/lib/supabase/auth";
+import { getSession } from "@/shared/lib/supabase/auth";
 import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function POST(request: Request) {
   const logger = createLogger(request, null, "auth", "auth");
 
   try {
-    const session = await refreshAccessToken();
+    const session = await getSession();
 
     if (!session) {
       await logger.log("warn", 401);

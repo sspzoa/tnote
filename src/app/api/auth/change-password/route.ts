@@ -1,8 +1,8 @@
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createClient } from "@/shared/lib/supabase/server";
 
-const handlePost = async ({ request, supabase, session }: ApiContext) => {
+const handlePost = async ({ request, session }: ApiContext) => {
   const { currentPassword, newPassword } = await request.json();
 
   if (!currentPassword || !newPassword) {
@@ -13,27 +13,21 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "새 비밀번호는 8자 이상이어야 합니다." }, { status: 400 });
   }
 
-  const { data: user, error: fetchError } = await supabase
-    .from("Users")
-    .select("password")
-    .eq("id", session.userId)
-    .single();
+  const supabase = await createClient();
+  const email = `${session.phoneNumber}@tnote.local`;
 
-  if (fetchError || !user) {
-    return NextResponse.json({ error: "사용자를 찾을 수 없습니다." }, { status: 404 });
-  }
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email,
+    password: currentPassword,
+  });
 
-  const isValidPassword = await bcrypt.compare(currentPassword, user.password);
-  if (!isValidPassword) {
+  if (verifyError) {
     return NextResponse.json({ error: "현재 비밀번호가 일치하지 않습니다." }, { status: 400 });
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  const { error: updateError } = await supabase
-    .from("Users")
-    .update({ password: hashedPassword })
-    .eq("id", session.userId);
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
 
   if (updateError) throw updateError;
   return NextResponse.json({

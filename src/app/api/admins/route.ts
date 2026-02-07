@@ -1,35 +1,8 @@
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createAdminClient } from "@/shared/lib/supabase/server";
 
 const handleGet = async ({ supabase, session }: ApiContext) => {
-  const isOwner = session.role === "owner";
-
-  if (isOwner) {
-    const { data, error } = await supabase
-      .from("Users")
-      .select("id, phone_number, name, role, created_at, password")
-      .in("role", ["owner", "admin"])
-      .eq("workspace", session.workspace);
-
-    if (error) throw error;
-
-    const adminsWithPasswordStatus = await Promise.all(
-      (data ?? []).map(async (admin) => {
-        const isDefaultPassword = await bcrypt.compare(admin.phone_number, admin.password);
-        return {
-          id: admin.id,
-          phone_number: admin.phone_number,
-          name: admin.name,
-          role: admin.role,
-          created_at: admin.created_at,
-          is_default_password: isDefaultPassword,
-        };
-      }),
-    );
-    return NextResponse.json({ data: adminsWithPasswordStatus });
-  }
-
   const { data, error } = await supabase
     .from("Users")
     .select("id, phone_number, name, role, created_at")
@@ -58,26 +31,51 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
   }
 
-  const hashedPassword = await bcrypt.hash(phoneNumber, 10);
+  const adminSupabase = createAdminClient();
+  const email = `${phoneNumber}@tnote.local`;
+
+  const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
+    email,
+    password: phoneNumber,
+    email_confirm: true,
+    user_metadata: {
+      name,
+      role: "admin",
+      workspace: session.workspace,
+    },
+  });
+
+  if (authError) throw authError;
 
   const { data: newAdmin, error: adminError } = await supabase
     .from("Users")
     .insert({
       name,
       phone_number: phoneNumber,
-      password: hashedPassword,
       role: "admin",
       workspace: session.workspace,
+      auth_id: authUser.user.id,
     })
     .select("id, phone_number, name, role, created_at")
     .single();
 
   if (adminError) {
+    await adminSupabase.auth.admin.deleteUser(authUser.user.id);
     if (adminError.code === "23505") {
       return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
     }
     throw adminError;
   }
+
+  await adminSupabase.auth.admin.updateUserById(authUser.user.id, {
+    user_metadata: {
+      name,
+      role: "admin",
+      workspace: session.workspace,
+      public_user_id: newAdmin.id,
+    },
+  });
+
   return NextResponse.json({ success: true, data: newAdmin }, { status: 201 });
 };
 

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-import { clearSession } from "@/shared/lib/supabase/auth";
-import { createAdminClient } from "@/shared/lib/supabase/server";
+import { createAdminClient, createClient } from "@/shared/lib/supabase/server";
 
 const handleDelete = async ({ session, params }: ApiContext) => {
   const id = params?.id;
@@ -13,9 +12,9 @@ const handleDelete = async ({ session, params }: ApiContext) => {
     return NextResponse.json({ error: "자신의 워크스페이스만 삭제할 수 있습니다." }, { status: 403 });
   }
 
-  const supabase = await createAdminClient();
+  const adminSupabase = createAdminClient();
 
-  const { data: workspace, error: fetchError } = await supabase
+  const { data: workspace, error: fetchError } = await adminSupabase
     .from("Workspaces")
     .select("id, owner")
     .eq("id", id)
@@ -29,11 +28,12 @@ const handleDelete = async ({ session, params }: ApiContext) => {
     return NextResponse.json({ error: "워크스페이스 소유자만 삭제할 수 있습니다." }, { status: 403 });
   }
 
-  const { error: deleteError } = await supabase.from("Workspaces").delete().eq("id", id);
+  const { error: deleteError } = await adminSupabase.from("Workspaces").delete().eq("id", id);
 
   if (deleteError) throw deleteError;
 
-  await clearSession();
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 
   return NextResponse.json({ success: true, message: "워크스페이스가 삭제되었습니다." });
 };

@@ -1,7 +1,5 @@
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { setTokens } from "@/shared/lib/supabase/auth";
-import { createAdminClient } from "@/shared/lib/supabase/server";
+import { createAdminClient, createClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function POST(request: Request) {
@@ -22,11 +20,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "워크스페이스를 선택해주세요." }, { status: 400 });
     }
 
-    const supabase = await createAdminClient();
+    const adminSupabase = createAdminClient();
 
-    let query = supabase
+    let query = adminSupabase
       .from("Users")
-      .select("id, phone_number, name, password, role, workspace, school")
+      .select("id, phone_number, name, role, workspace, school")
       .eq("phone_number", phoneNumber);
 
     if (!isTeacher) {
@@ -35,24 +33,31 @@ export async function POST(request: Request) {
       query = query.in("role", ["owner", "admin"]);
     }
 
-    const { data: user, error } = await query.single();
+    const { data: user, error: userError } = await query.single();
 
-    if (error || !user) {
+    if (userError || !user) {
       await logger.log("warn", 401);
       await logger.flush();
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    const supabase = await createClient();
+    const email = `${phoneNumber}@tnote.local`;
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
       await logger.log("warn", 401);
       await logger.flush();
       return NextResponse.json({ error: "전화번호 또는 비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
-    const isDefaultPassword = await bcrypt.compare(user.phone_number, user.password);
+    const isDefaultPassword = password === phoneNumber;
 
-    const tokenPayload = {
+    const logSession = {
       userId: user.id,
       phoneNumber: user.phone_number,
       name: user.name,
@@ -60,9 +65,7 @@ export async function POST(request: Request) {
       workspace: user.workspace,
     };
 
-    await setTokens(tokenPayload);
-
-    const loggerWithSession = createLogger(request, tokenPayload, "login", "auth");
+    const loggerWithSession = createLogger(request, logSession, "login", "auth");
     await loggerWithSession.log("info", 200, undefined, user.id);
     await loggerWithSession.flush();
 

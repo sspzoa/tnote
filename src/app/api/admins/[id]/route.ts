@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createAdminClient } from "@/shared/lib/supabase/server";
 
 const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const id = params?.id;
@@ -13,7 +14,7 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: targetUser } = await supabase
     .from("Users")
-    .select("id, role, name")
+    .select("id, role, name, auth_id")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .single();
@@ -29,6 +30,12 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
   const { error: deleteError } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
   if (deleteError) throw deleteError;
+
+  if (targetUser.auth_id) {
+    const adminSupabase = createAdminClient();
+    await adminSupabase.auth.admin.deleteUser(targetUser.auth_id);
+  }
+
   return NextResponse.json({ success: true });
 };
 

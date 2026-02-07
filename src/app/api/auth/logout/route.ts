@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { clearSession, getSession } from "@/shared/lib/supabase/auth";
+import { getSession } from "@/shared/lib/supabase/auth";
+import { createClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
 
 export async function POST(request: Request) {
@@ -7,7 +8,8 @@ export async function POST(request: Request) {
   const logger = createLogger(request, session, "logout", "auth");
 
   try {
-    await clearSession();
+    const supabase = await createClient();
+    await supabase.auth.signOut();
     await logger.log("info", 200);
     await logger.flush();
     return NextResponse.json({ success: true });

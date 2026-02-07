@@ -3,7 +3,7 @@ import { type PublicApiContext, withPublicLogging } from "@/shared/lib/api/withL
 import { createAdminClient } from "@/shared/lib/supabase/server";
 
 const handleGet = async (_context: PublicApiContext) => {
-  const supabase = await createAdminClient();
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase.from("Workspaces").select("id, name").order("name", { ascending: true });
 

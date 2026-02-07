@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createAdminClient } from "@/shared/lib/supabase/server";
 import { isValidBirthYear, isValidPhoneNumber, removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
@@ -143,7 +143,26 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "올바른 출생연도가 아닙니다." }, { status: 400 });
   }
 
-  const hashedPassword = await bcrypt.hash(cleanedPhoneNumber, 10);
+  const adminSupabase = createAdminClient();
+  const email = `${cleanedPhoneNumber}@tnote.local`;
+
+  const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
+    email,
+    password: cleanedPhoneNumber,
+    email_confirm: true,
+    user_metadata: {
+      name: name.trim(),
+      role: "student",
+      workspace: session.workspace,
+    },
+  });
+
+  if (authError) {
+    if (authError.message?.includes("already been registered")) {
+      return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
+    }
+    throw authError;
+  }
 
   const { data, error } = await supabase
     .from("Users")
@@ -154,19 +173,30 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       school: school.trim(),
       branch: branch.trim(),
       birth_year: year,
-      password: hashedPassword,
       role: "student",
       workspace: session.workspace,
+      auth_id: authUser.user.id,
     })
     .select()
     .single();
 
   if (error) {
+    await adminSupabase.auth.admin.deleteUser(authUser.user.id);
     if (error.code === "23505") {
       return NextResponse.json({ error: "이미 등록된 전화번호입니다." }, { status: 409 });
     }
     throw error;
   }
+
+  await adminSupabase.auth.admin.updateUserById(authUser.user.id, {
+    user_metadata: {
+      name: name.trim(),
+      role: "student",
+      workspace: session.workspace,
+      public_user_id: data.id,
+    },
+  });
+
   return NextResponse.json({ success: true, data }, { status: 201 });
 };
 
