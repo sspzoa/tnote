@@ -138,3 +138,27 @@ body::selection {
   background-color: var(--core-accent);
   color: var(--solid-black);
 }
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  @page {
+    margin: 12mm 10mm;
+    size: A4;
+  }
+
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+
+  .print-break-before {
+    break-before: page;
+  }
+}

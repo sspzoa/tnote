@@ -85,19 +85,19 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
   };
 
   return (
-    <div className="border-line-divider border-b last:border-b-0">
+    <div className="print-break-inside-avoid border-line-divider border-b last:border-b-0">
       <button
         type="button"
         onClick={handleToggle}
-        className="flex w-full items-center justify-between gap-spacing-400 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-fill-standard-secondary">
+        className="flex w-full items-center justify-between gap-spacing-400 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-fill-standard-secondary print:px-0 print:py-spacing-200">
         <div className="flex min-w-0 flex-1 flex-col gap-spacing-200">
           <div className="flex items-center gap-spacing-200">
             <span className="truncate font-medium text-body text-content-standard-primary">
               {retake.exam.course.name}
             </span>
-            <span className="shrink-0 rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-150 py-spacing-50 text-content-standard-secondary text-footnote">
+            <Badge variant="neutral" size="xs">
               {retake.exam.examNumber}회차
-            </span>
+            </Badge>
           </div>
 
           <div className="flex items-center gap-spacing-300">
@@ -140,13 +140,13 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
             {RETAKE_STATUS_LABELS[retake.status]}
           </Badge>
           <ChevronDown
-            className={`h-5 w-5 text-content-standard-tertiary transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+            className={`h-5 w-5 text-content-standard-tertiary transition-transform duration-200 print:hidden ${isExpanded ? "rotate-180" : ""}`}
           />
         </div>
       </button>
 
       <div
-        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        className="grid transition-[grid-template-rows] duration-200 ease-out print:hidden"
         style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}>
         <div className="overflow-hidden">
           <div className="border-line-divider border-t bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
@@ -177,7 +177,7 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
 
                     <div className="flex-1 rounded-radius-300 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
                       <div className="flex items-start justify-between gap-spacing-300">
-                        <div className="flex flex-col gap-spacing-200">
+                        <div className="flex flex-col items-start gap-spacing-200">
                           <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
                             {getActionLabel(item.action_type)}
                           </Badge>

@@ -390,7 +390,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <nav className="fixed right-0 bottom-0 left-0 z-50 border-line-outline border-t bg-components-fill-standard-primary md:hidden">
+      <nav className="fixed right-0 bottom-0 left-0 z-50 border-line-outline border-t bg-components-fill-standard-primary print:hidden md:hidden">
         <div className="flex items-center justify-around px-spacing-200 py-spacing-300">
           {mobileMenuItems.map((item) => {
             const active = isActive(item.href);
@@ -495,7 +495,7 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed top-0 left-0 hidden h-full flex-col border-line-outline border-r bg-components-fill-standard-primary transition-[width] duration-300 md:flex ${isCollapsed ? "w-16" : "w-64"}`}>
+        className={`fixed top-0 left-0 hidden h-full flex-col border-line-outline border-r bg-components-fill-standard-primary transition-[width] duration-300 print:hidden md:flex ${isCollapsed ? "w-16" : "w-64"}`}>
         {sidebarContent}
       </aside>
 

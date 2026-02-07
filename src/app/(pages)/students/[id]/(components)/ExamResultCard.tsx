@@ -54,19 +54,19 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
   };
 
   return (
-    <div className="border-line-divider border-b last:border-b-0">
+    <div className="print-break-inside-avoid border-line-divider border-b last:border-b-0">
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between gap-spacing-300 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-fill-standard-secondary">
+        className="flex w-full items-center justify-between gap-spacing-300 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-fill-standard-secondary print:px-0 print:py-spacing-200 print:hover:bg-transparent">
         <div className="flex min-w-0 flex-1 flex-col gap-spacing-100">
           <div className="flex items-center gap-spacing-200">
             <span className="truncate font-medium text-body text-content-standard-primary">
               {examScore.exam.course.name}
             </span>
-            <span className="shrink-0 rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-150 py-spacing-50 text-content-standard-secondary text-footnote">
+            <Badge variant="neutral" size="xs">
               {examScore.exam.examNumber}회차
-            </span>
+            </Badge>
           </div>
           <span className="text-content-standard-secondary text-footnote">{examScore.exam.name}</span>
         </div>
@@ -89,18 +89,18 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
               </Badge>
             )}
           </div>
-          <span className="font-semibold text-body text-content-standard-primary">
+          <Badge variant="neutral" size="xs">
             {examScore.score}
-            {examScore.maxScore !== null && `/${examScore.maxScore}`}점
-          </span>
+            {examScore.maxScore !== null && `/${examScore.maxScore}`}점 · {examScore.rank}등/{examScore.totalStudents}명
+          </Badge>
           <ChevronDown
-            className={`h-4 w-4 text-content-standard-tertiary transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+            className={`h-4 w-4 text-content-standard-tertiary transition-transform duration-200 print:hidden ${isExpanded ? "rotate-180" : ""}`}
           />
         </div>
       </button>
 
       <div
-        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        className="grid transition-[grid-template-rows] duration-200 ease-out print:hidden"
         style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}>
         <div className="overflow-hidden">
           <div className="flex flex-col gap-spacing-400 border-line-divider border-t bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">

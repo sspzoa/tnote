@@ -1,10 +1,11 @@
 "use client";
 
-import { BookOpen, FileText, MessageSquare, RefreshCw, Stethoscope, TrendingUp } from "lucide-react";
+import { BookOpen, FileText, MessageSquare, Printer, RefreshCw, Stethoscope, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -75,14 +76,22 @@ export default function StudentDetailPage() {
   const consultationCount = studentDetail.consultationHistory.length;
 
   return (
-    <div className="min-h-screen bg-background-standard-secondary p-spacing-500 md:p-spacing-700">
-      <div className="mx-auto flex max-w-7xl flex-col gap-spacing-600">
+    <div className="min-h-screen bg-background-standard-secondary p-spacing-500 md:p-spacing-700 print:min-h-0 print:bg-white print:p-0">
+      <div className="mx-auto flex max-w-7xl flex-col gap-spacing-600 print:max-w-none print:gap-spacing-400">
         <section className="flex flex-col gap-spacing-400">
-          <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
-            ← 학생 목록으로 돌아가기
-          </Link>
+          <div className="flex items-center justify-between print:hidden">
+            <Link href="/students" className="inline-block text-body text-core-accent hover:underline">
+              ← 학생 목록으로 돌아가기
+            </Link>
+            <Button variant="secondary" size="xs" onClick={() => window.print()}>
+              <span className="flex items-center gap-spacing-200">
+                <Printer className="h-4 w-4" />
+                인쇄
+              </span>
+            </Button>
+          </div>
 
-          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 print:rounded-none print:border-0 print:border-line-divider print:border-b print:bg-white print:p-0 print:pb-spacing-300">
             <div className="flex flex-col gap-spacing-300 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-spacing-200">
                 <div className="flex items-center gap-spacing-300">
@@ -125,7 +134,7 @@ export default function StudentDetailPage() {
           </div>
         </section>
 
-        <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4">
+        <section className="grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:grid-cols-4 print:gap-spacing-200">
           <StatCard
             icon={BookOpen}
             label="수강 중인 수업"
@@ -163,11 +172,11 @@ export default function StudentDetailPage() {
             isEmpty={studentDetail.courses.length === 0}
             emptyMessage="수강 중인 수업이 없습니다."
             noPadding>
-            <div className="grid gap-spacing-300 p-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-spacing-300 p-spacing-400 sm:grid-cols-2 lg:grid-cols-3 print:gap-spacing-200 print:px-0 print:py-spacing-200">
               {studentDetail.courses.map((course) => (
                 <div
                   key={course.id}
-                  className="flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300">
+                  className="flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
                   <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
                     <span className="truncate font-medium text-body text-content-standard-primary">{course.name}</span>
                     <span className="text-content-standard-tertiary text-footnote">
@@ -183,7 +192,7 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </section>
 
-        <section className="grid gap-spacing-500 lg:grid-cols-2">
+        <section className="grid gap-spacing-500 lg:grid-cols-2 print:gap-spacing-400">
           <DashboardCard
             title="시험 성적 & 과제"
             icon={TrendingUp}
@@ -214,11 +223,11 @@ export default function StudentDetailPage() {
             isEmpty={studentDetail.clinicHistory.length === 0}
             emptyMessage="클리닉 출석 기록이 없습니다."
             noPadding>
-            <div className="grid gap-spacing-300 p-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-spacing-300 p-spacing-400 sm:grid-cols-2 lg:grid-cols-3 print:gap-spacing-200 print:px-0 print:py-spacing-200">
               {studentDetail.clinicHistory.map((history) => (
                 <div
                   key={history.id}
-                  className="flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300">
+                  className="flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
                   <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
                     <span className="truncate font-medium text-body text-content-standard-primary">
                       {history.clinic.name}
@@ -255,7 +264,9 @@ export default function StudentDetailPage() {
             isEmpty={studentDetail.messageHistory.length === 0}
             emptyMessage="문자 발송 기록이 없습니다.">
             {studentDetail.messageHistory.map((message) => (
-              <div key={message.id} className="flex flex-col gap-spacing-200 px-spacing-500 py-spacing-400">
+              <div
+                key={message.id}
+                className="print-break-inside-avoid flex flex-col gap-spacing-200 px-spacing-500 py-spacing-400 print:px-0 print:py-spacing-200">
                 <div className="flex items-center justify-between gap-spacing-300">
                   <div className="flex items-center gap-spacing-200">
                     <Badge variant={message.isSuccess ? "success" : "danger"} size="xs">
