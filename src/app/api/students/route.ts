@@ -167,6 +167,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { data, error } = await supabase
     .from("Users")
     .insert({
+      id: authUser.user.id,
       name: name.trim(),
       phone_number: cleanedPhoneNumber,
       parent_phone_number: cleanedParentPhone,
@@ -175,7 +176,6 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       birth_year: year,
       role: "student",
       workspace: session.workspace,
-      auth_id: authUser.user.id,
     })
     .select()
     .single();
@@ -187,15 +187,6 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     }
     throw error;
   }
-
-  await adminSupabase.auth.admin.updateUserById(authUser.user.id, {
-    user_metadata: {
-      name: name.trim(),
-      role: "student",
-      workspace: session.workspace,
-      public_user_id: data.id,
-    },
-  });
 
   return NextResponse.json({ success: true, data }, { status: 201 });
 };

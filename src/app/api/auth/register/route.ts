@@ -72,11 +72,11 @@ export async function POST(request: Request) {
     const { data: newUser, error: userError } = await supabase
       .from("Users")
       .insert({
+        id: authUser.user.id,
         name,
         phone_number: phoneNumber,
         role: "owner",
         workspace: newWorkspace.id,
-        auth_id: authUser.user.id,
       })
       .select()
       .single();
@@ -86,15 +86,6 @@ export async function POST(request: Request) {
       await supabase.from("Workspaces").delete().eq("id", newWorkspace.id);
       throw userError;
     }
-
-    await supabase.auth.admin.updateUserById(authUser.user.id, {
-      user_metadata: {
-        name,
-        role: "owner",
-        workspace: newWorkspace.id,
-        public_user_id: newUser.id,
-      },
-    });
 
     await supabase.from("Workspaces").update({ owner: newUser.id }).eq("id", newWorkspace.id);
 

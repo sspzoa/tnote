@@ -98,7 +98,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .update(updateData)
     .eq("id", id)
     .eq("workspace", session.workspace)
-    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, auth_id")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year")
     .single();
 
   if (error) {
@@ -108,7 +108,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     throw error;
   }
 
-  if (data.auth_id && (updateData.phone_number || updateData.name)) {
+  if (updateData.phone_number || updateData.name) {
     const adminSupabase = createAdminClient();
     const authUpdate: Record<string, unknown> = {};
     if (updateData.phone_number) {
@@ -118,14 +118,13 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     if (updateData.name) {
       metadataUpdate.name = updateData.name;
     }
-    await adminSupabase.auth.admin.updateUserById(data.auth_id, {
+    await adminSupabase.auth.admin.updateUserById(id!, {
       ...authUpdate,
       ...(Object.keys(metadataUpdate).length > 0 ? { user_metadata: metadataUpdate } : {}),
     });
   }
 
-  const { auth_id: _, ...responseData } = data;
-  return NextResponse.json({ success: true, data: responseData });
+  return NextResponse.json({ success: true, data });
 };
 
 const handleDelete = async ({ supabase, session, params }: ApiContext) => {
@@ -134,21 +133,12 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
   }
 
-  const { data: student } = await supabase
-    .from("Users")
-    .select("auth_id")
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .single();
-
   const { error } = await supabase.from("Users").delete().eq("id", id).eq("workspace", session.workspace);
 
   if (error) throw error;
 
-  if (student?.auth_id) {
-    const adminSupabase = createAdminClient();
-    await adminSupabase.auth.admin.deleteUser(student.auth_id);
-  }
+  const adminSupabase = createAdminClient();
+  await adminSupabase.auth.admin.deleteUser(id!);
 
   return NextResponse.json({ success: true });
 };

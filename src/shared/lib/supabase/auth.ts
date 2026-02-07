@@ -11,20 +11,21 @@ export interface Session {
 export async function getSession(): Promise<Session | null> {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     return null;
   }
 
+  const { user } = session;
   const metadata = user.user_metadata;
-  if (!metadata?.public_user_id || !metadata?.role || !metadata?.workspace) {
+  if (!metadata?.role || !metadata?.workspace) {
     return null;
   }
 
   return {
-    userId: metadata.public_user_id as string,
+    userId: user.id,
     phoneNumber: (user.email ?? "").replace("@tnote.local", ""),
     name: (metadata.name as string) ?? "",
     role: metadata.role as "owner" | "admin" | "student",

@@ -14,7 +14,7 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: targetUser } = await supabase
     .from("Users")
-    .select("id, role, name, auth_id")
+    .select("id, role, name")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .single();
@@ -31,10 +31,8 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
 
   if (deleteError) throw deleteError;
 
-  if (targetUser.auth_id) {
-    const adminSupabase = createAdminClient();
-    await adminSupabase.auth.admin.deleteUser(targetUser.auth_id);
-  }
+  const adminSupabase = createAdminClient();
+  await adminSupabase.auth.admin.deleteUser(id!);
 
   return NextResponse.json({ success: true });
 };

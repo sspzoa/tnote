@@ -11,7 +11,7 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: admin, error: fetchError } = await supabase
     .from("Users")
-    .select("phone_number, role, auth_id")
+    .select("phone_number, role")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .in("role", ["admin", "owner"])
@@ -25,12 +25,8 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "소유자의 비밀번호는 초기화할 수 없습니다." }, { status: 403 });
   }
 
-  if (!admin.auth_id) {
-    return NextResponse.json({ error: "인증 정보를 찾을 수 없습니다." }, { status: 404 });
-  }
-
   const adminSupabase = createAdminClient();
-  const { error: updateError } = await adminSupabase.auth.admin.updateUserById(admin.auth_id, {
+  const { error: updateError } = await adminSupabase.auth.admin.updateUserById(id!, {
     password: admin.phone_number,
   });
 

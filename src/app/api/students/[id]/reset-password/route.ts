@@ -7,7 +7,7 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: student, error: fetchError } = await supabase
     .from("Users")
-    .select("phone_number, auth_id")
+    .select("phone_number")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .single();
@@ -16,12 +16,8 @@ const handlePost = async ({ supabase, session, params }: ApiContext) => {
     return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
   }
 
-  if (!student.auth_id) {
-    return NextResponse.json({ error: "인증 정보를 찾을 수 없습니다." }, { status: 404 });
-  }
-
   const adminSupabase = createAdminClient();
-  const { error: updateError } = await adminSupabase.auth.admin.updateUserById(student.auth_id, {
+  const { error: updateError } = await adminSupabase.auth.admin.updateUserById(id!, {
     password: student.phone_number,
   });
 

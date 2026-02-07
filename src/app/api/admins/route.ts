@@ -50,11 +50,11 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { data: newAdmin, error: adminError } = await supabase
     .from("Users")
     .insert({
+      id: authUser.user.id,
       name,
       phone_number: phoneNumber,
       role: "admin",
       workspace: session.workspace,
-      auth_id: authUser.user.id,
     })
     .select("id, phone_number, name, role, created_at")
     .single();
@@ -66,15 +66,6 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     }
     throw adminError;
   }
-
-  await adminSupabase.auth.admin.updateUserById(authUser.user.id, {
-    user_metadata: {
-      name,
-      role: "admin",
-      workspace: session.workspace,
-      public_user_id: newAdmin.id,
-    },
-  });
 
   return NextResponse.json({ success: true, data: newAdmin }, { status: 201 });
 };
