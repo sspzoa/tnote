@@ -41,6 +41,9 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
     }
   }, []);
 
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -48,7 +51,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
       trapFocus(e);
@@ -68,7 +71,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
       cancelAnimationFrame(timer);
       previousFocusRef.current?.focus();
     };
-  }, [isOpen, onClose, trapFocus]);
+  }, [isOpen, trapFocus]);
 
   if (!isOpen) return null;
 
