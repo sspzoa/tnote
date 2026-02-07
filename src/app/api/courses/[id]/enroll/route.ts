@@ -69,6 +69,18 @@ const handleDelete = async ({ request, supabase, session, params }: ApiContext) 
     return NextResponse.json({ error: "수업을 찾을 수 없습니다." }, { status: 404 });
   }
 
+  const { data: student } = await supabase
+    .from("Users")
+    .select("id")
+    .eq("id", studentId)
+    .eq("workspace", session.workspace)
+    .eq("role", "student")
+    .single();
+
+  if (!student) {
+    return NextResponse.json({ error: "학생을 찾을 수 없습니다." }, { status: 404 });
+  }
+
   const { error } = await supabase.from("CourseEnrollments").delete().eq("course_id", id).eq("student_id", studentId);
 
   if (error) throw error;

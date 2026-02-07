@@ -80,8 +80,9 @@ export const sendSMS = async ({ to, text, from, subject }: SendSMSParams): Promi
     const groupId = result.groupInfo.groupId;
 
     const retryDelay = 1000;
+    const maxRetries = 30;
 
-    while (true) {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
       await sleep(retryDelay);
 
       const messages = await messageService.getMessages({ groupId });
@@ -113,6 +114,13 @@ export const sendSMS = async ({ to, text, from, subject }: SendSMSParams): Promi
         }
       }
     }
+
+    return {
+      success: true,
+      groupId,
+      statusCode: "2000",
+      statusMessage: "정상 접수 (전송 확인 타임아웃)",
+    };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
     return { success: false, error: errorMessage };

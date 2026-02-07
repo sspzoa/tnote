@@ -41,7 +41,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       created_at,
       student:Users!inner(id, name, phone_number, school)
     `)
-    .eq("tag_id", id);
+    .eq("tag_id", id)
+    .eq("student:Users.workspace", session.workspace);
 
   if (assignmentsError) throw assignmentsError;
 

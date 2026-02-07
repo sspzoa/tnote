@@ -30,23 +30,21 @@ const PUBLIC_PAGES = ["/login", "/terms", "/privacy"];
 
 const STUDENT_ALLOWED_PAGES = ["/", "/calendar"];
 
-const ADMIN_ONLY_PAGES = ["/students", "/courses", "/retakes", "/clinics", "/messages", "/admins"];
-
 const ACCESS_TOKEN_COOKIE = "access_token";
 const REFRESH_TOKEN_COOKIE = "refresh_token";
 
 const getJwtSecret = (): Uint8Array => {
-  const secret = process.env.JWT_ACCESS_SECRET || process.env.SUPABASE_JWT_SECRET;
+  const secret = process.env.JWT_ACCESS_SECRET;
   if (!secret) {
-    throw new Error("JWT secret not configured");
+    throw new Error("JWT_ACCESS_SECRET must be set in environment variables");
   }
   return new TextEncoder().encode(secret);
 };
 
 const getRefreshSecret = (): Uint8Array => {
-  const secret = process.env.JWT_REFRESH_SECRET || process.env.SUPABASE_JWT_SECRET;
+  const secret = process.env.JWT_REFRESH_SECRET;
   if (!secret) {
-    throw new Error("JWT refresh secret not configured");
+    throw new Error("JWT_REFRESH_SECRET must be set in environment variables");
   }
   return new TextEncoder().encode(secret);
 };
@@ -54,6 +52,9 @@ const getRefreshSecret = (): Uint8Array => {
 const verifyToken = async (token: string, secret: Uint8Array): Promise<TokenPayload | null> => {
   try {
     const { payload } = await jose.jwtVerify(token, secret);
+    if (!payload.userId || !payload.workspace || !payload.role) {
+      return null;
+    }
     return payload as unknown as TokenPayload;
   } catch {
     return null;
@@ -112,10 +113,6 @@ const handlePageRoute = (request: NextRequest, payload: TokenPayload): NextRespo
   const { role } = payload;
 
   if (role === "student" && !matchesPath(pathname, STUDENT_ALLOWED_PAGES)) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  if (matchesPath(pathname, ADMIN_ONLY_PAGES) && role === "student") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

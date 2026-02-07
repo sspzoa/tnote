@@ -21,7 +21,7 @@ export const useRetakeDelete = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.events("", "") });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
     },
   });

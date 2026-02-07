@@ -179,11 +179,10 @@ export interface CalendarEvent {
   title: string;
   date: string;
   type: "course" | "retake" | "clinic";
+  allDay?: boolean;
   start?: Date;
   end?: Date;
-  metadata?: {
-    status?: string;
-  };
+  metadata?: Record<string, unknown>;
 }
 
 export type RecipientType = "student" | "parent" | "both";

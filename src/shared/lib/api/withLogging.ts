@@ -43,6 +43,11 @@ const getResourceIdFromParams = (params?: Record<string, string>): string | unde
   return params.id || params.historyId || Object.values(params)[0];
 };
 
+const toError = (error: unknown): Error => {
+  if (error instanceof Error) return error;
+  return new Error(typeof error === "object" && error !== null ? JSON.stringify(error) : String(error));
+};
+
 export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggingOptions) => {
   return async (request: Request, context?: { params?: Promise<Record<string, string>> }) => {
     const session = await getSession();
@@ -86,17 +91,7 @@ export const withLogging = (handler: ApiHandler<ApiContext>, options: WithLoggin
       });
       return response;
     } catch (error: unknown) {
-      let err: Error;
-      if (error instanceof Error) {
-        err = error;
-      } else if (error && typeof error === "object" && "message" in error) {
-        err = new Error(String(error.message));
-      } else if (error && typeof error === "object") {
-        err = new Error(JSON.stringify(error));
-      } else {
-        err = new Error(String(error));
-      }
-
+      const err = toError(error);
       const resourceId = getResourceIdFromParams(resolvedParams);
 
       after(async () => {
@@ -133,16 +128,7 @@ export const withPublicLogging = (
       });
       return response;
     } catch (error: unknown) {
-      let err: Error;
-      if (error instanceof Error) {
-        err = error;
-      } else if (error && typeof error === "object" && "message" in error) {
-        err = new Error(String(error.message));
-      } else if (error && typeof error === "object") {
-        err = new Error(JSON.stringify(error));
-      } else {
-        err = new Error(String(error));
-      }
+      const err = toError(error);
 
       after(async () => {
         await logger.log("error", 500, err);

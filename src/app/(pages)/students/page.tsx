@@ -7,6 +7,7 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Button, EmptyState, Modal, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
+import { isTagActive } from "@/shared/lib/utils/tags";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import { searchQueryAtom, selectedTagIdsAtom } from "./(atoms)/useStudentsStore";
@@ -24,20 +25,6 @@ import { useAllConsultations } from "./(hooks)/useAllConsultations";
 import { useCourses } from "./(hooks)/useCourses";
 import { useStudents } from "./(hooks)/useStudents";
 import { useTags } from "./(hooks)/useTags";
-
-const isTagActive = (startDate: string, endDate: string | null): boolean => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-
-  if (today < start) return false;
-  if (endDate === null) return true;
-
-  const end = new Date(endDate);
-  end.setHours(0, 0, 0, 0);
-  return today <= end;
-};
 
 export default function StudentsPage() {
   const { students, isLoading: studentsLoading, error: studentsError } = useStudents();

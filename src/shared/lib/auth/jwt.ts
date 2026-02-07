@@ -56,23 +56,3 @@ export const verifyRefreshToken = (token: string): DecodedToken | null => {
     return null;
   }
 };
-
-export const isTokenExpired = (token: string, secret: string): boolean => {
-  try {
-    jwt.verify(token, secret);
-    return false;
-  } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      return true;
-    }
-    throw error;
-  }
-};
-
-export const decodeToken = (token: string): DecodedToken | null => {
-  try {
-    return jwt.decode(token) as DecodedToken;
-  } catch {
-    return null;
-  }
-};

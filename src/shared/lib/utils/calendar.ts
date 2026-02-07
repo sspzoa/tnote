@@ -1,11 +1,6 @@
-export interface CalendarEvent {
-  id: string;
-  type: "course" | "retake" | "clinic";
-  title: string;
-  date: string;
-  allDay: boolean;
-  metadata?: Record<string, unknown>;
-}
+import type { CalendarEvent } from "@/shared/types";
+
+export type { CalendarEvent } from "@/shared/types";
 
 interface CourseSessionParams {
   id: string;

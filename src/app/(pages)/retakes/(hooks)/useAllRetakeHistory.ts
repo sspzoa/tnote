@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export interface RetakeHistoryItem {
@@ -29,7 +30,7 @@ export const useAllRetakeHistory = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.retakes.historyAll,
     queryFn: async () => {
-      const res = await fetch("/api/retakes/history");
+      const res = await fetchWithAuth("/api/retakes/history");
       const result = await res.json();
       if (!res.ok) throw new Error(result.error);
       return result.data as RetakeHistoryItem[];

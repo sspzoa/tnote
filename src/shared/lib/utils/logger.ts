@@ -25,9 +25,7 @@ export interface LogEntry {
   errorStack?: string;
 }
 
-const axiom = new Axiom({
-  token: process.env.AXIOM_TOKEN!,
-});
+const axiom = process.env.AXIOM_TOKEN ? new Axiom({ token: process.env.AXIOM_TOKEN }) : null;
 
 const getClientIp = (request: Request): string | undefined => {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -76,6 +74,7 @@ const consoleLog = (entry: LogEntry) => {
 };
 
 const sendToAxiom = (entry: LogEntry) => {
+  if (!axiom) return;
   const dataset = process.env.AXIOM_DATASET || "tnote-logs";
   axiom.ingest(dataset, entry);
 };
@@ -126,7 +125,7 @@ export class ApiLogger {
   }
 
   async flush(): Promise<void> {
-    await axiom.flush();
+    await axiom?.flush();
   }
 }
 

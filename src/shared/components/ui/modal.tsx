@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useId } from "react";
+import { type ReactNode, useCallback, useEffect, useId, useRef } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,26 +11,64 @@ interface ModalProps {
   footer?: ReactNode;
 }
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function Modal({ isOpen, onClose, title, subtitle, children, footer }: ModalProps) {
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const trapFocus = useCallback((e: KeyboardEvent) => {
+    if (e.key !== "Tab" || !dialogRef.current) return;
+
+    const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+    if (focusableElements.length === 0) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      }
+    } else {
+      if (document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleEscape = (e: KeyboardEvent) => {
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
       }
+      trapFocus(e);
     };
 
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
 
+    const timer = requestAnimationFrame(() => {
+      const firstFocusable = dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      firstFocusable?.focus();
+    });
+
     return () => {
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      cancelAnimationFrame(timer);
+      previousFocusRef.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, trapFocus]);
 
   if (!isOpen) return null;
 
@@ -42,6 +80,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
       aria-modal="true"
       aria-labelledby={titleId}>
       <div
+        ref={dialogRef}
         className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
         onClick={(e) => e.stopPropagation()}>
         <div className="flex flex-col gap-spacing-100 border-line-divider border-b px-spacing-600 py-spacing-500">

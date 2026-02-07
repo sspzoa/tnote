@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { filterActiveCourses } from "@/shared/lib/utils/courses";
 import type { TagColor } from "@/shared/types";
 
 interface CourseInfo {
@@ -127,18 +128,6 @@ export interface StudentDetail {
   consultationHistory: ConsultationHistoryInfo[];
   messageHistory: MessageHistoryInfo[];
 }
-
-const filterActiveCourses = (courses: CourseInfo[]): CourseInfo[] => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  return courses.filter((course) => {
-    if (!course.end_date) return true;
-    const endDate = new Date(course.end_date);
-    endDate.setHours(0, 0, 0, 0);
-    return endDate >= today;
-  });
-};
 
 export const useStudentDetail = (studentId: string | null) => {
   const { data, isLoading, error } = useQuery({

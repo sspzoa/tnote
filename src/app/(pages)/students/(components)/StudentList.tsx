@@ -12,6 +12,7 @@ import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
+import { isTagActive } from "@/shared/lib/utils/tags";
 
 import type { StudentTagAssignment } from "@/shared/types";
 import { editFormAtom } from "../(atoms)/useFormStore";
@@ -32,20 +33,6 @@ import { useStudentPasswordReset } from "../(hooks)/useStudentPasswordReset";
 interface StudentListProps {
   students: Student[];
 }
-
-const isTagActive = (startDate: string, endDate: string | null): boolean => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-
-  if (today < start) return false;
-  if (endDate === null) return true;
-
-  const end = new Date(endDate);
-  end.setHours(0, 0, 0, 0);
-  return today <= end;
-};
 
 type StudentSortKey = "name" | "branch" | "grade" | "phone" | "parentPhone" | "school";
 

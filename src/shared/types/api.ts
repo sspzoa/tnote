@@ -185,14 +185,3 @@ export interface MessageHistoryGroupedBatch {
     error_message: string | null;
   }>;
 }
-
-// --- Student list query results ---
-
-export interface StudentEnrollmentWithStudent {
-  student_id: string;
-  enrolled_at: string;
-  student: {
-    name: string;
-    [key: string]: unknown;
-  };
-}

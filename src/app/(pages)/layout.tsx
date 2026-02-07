@@ -3,6 +3,7 @@
 import { useAtom } from "jotai";
 import type React from "react";
 import { sidebarCollapsedAtom } from "@/shared/components/common/(atoms)/useSidebarStore";
+import { ErrorBoundary } from "@/shared/components/common/ErrorBoundary";
 import Sidebar from "@/shared/components/common/Sidebar";
 
 export default function PagesLayout({
@@ -17,7 +18,7 @@ export default function PagesLayout({
       <Sidebar />
       <main
         className={`min-w-0 flex-1 overflow-x-auto pb-20 transition-[margin] duration-300 print:ml-0 print:pb-0 md:pb-0 ${isCollapsed ? "md:ml-16" : "md:ml-64"}`}>
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
       </main>
     </div>
   );

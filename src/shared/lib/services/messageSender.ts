@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import type { RecipientType } from "@/shared/types";
-import { isSMSServiceAvailable, sendSMS } from "./sms";
+import { isSMSServiceAvailable, type SendSMSResult, sendSMS } from "./sms";
 
 export interface MessageRecipient {
   phone: string;
@@ -130,37 +130,52 @@ export const sendMessagesWithHistory = async ({
   const batchId = crypto.randomUUID();
   const historyRecords: MessageHistoryRecord[] = [];
 
+  const BATCH_SIZE = 5;
   let successCount = 0;
   let failCount = 0;
 
-  for (const recipient of recipients) {
-    const result = await sendSMS({
-      to: recipient.phone,
-      text: recipient.text,
-      from: senderPhoneNumber,
-    });
+  for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+    const batch = recipients.slice(i, i + BATCH_SIZE);
+    const results = await Promise.allSettled(
+      batch.map((recipient) =>
+        sendSMS({
+          to: recipient.phone,
+          text: recipient.text,
+          from: senderPhoneNumber,
+        }),
+      ),
+    );
 
-    historyRecords.push({
-      workspace,
-      batch_id: batchId,
-      group_id: result.groupId || null,
-      message_type: messageType,
-      recipient_type: recipient.targetType,
-      recipient_phone: recipient.phone,
-      recipient_name: recipient.name,
-      student_id: recipient.studentId,
-      message_content: recipient.text,
-      status_code: result.statusCode || null,
-      status_message: result.statusMessage || null,
-      is_success: result.success,
-      error_message: result.error || null,
-      sent_by: userId,
-    });
+    for (let j = 0; j < batch.length; j++) {
+      const recipient = batch[j];
+      const settled = results[j];
+      const result: SendSMSResult =
+        settled.status === "fulfilled"
+          ? settled.value
+          : { success: false, error: settled.reason?.message || "발송 실패" };
 
-    if (result.success) {
-      successCount++;
-    } else {
-      failCount++;
+      historyRecords.push({
+        workspace,
+        batch_id: batchId,
+        group_id: result.groupId || null,
+        message_type: messageType,
+        recipient_type: recipient.targetType,
+        recipient_phone: recipient.phone,
+        recipient_name: recipient.name,
+        student_id: recipient.studentId,
+        message_content: recipient.text,
+        status_code: result.statusCode || null,
+        status_message: result.statusMessage || null,
+        is_success: result.success,
+        error_message: result.error || null,
+        sent_by: userId,
+      });
+
+      if (result.success) {
+        successCount++;
+      } else {
+        failCount++;
+      }
     }
   }
 

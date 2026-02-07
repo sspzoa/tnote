@@ -11,7 +11,6 @@ export interface AssignStudent {
   tags?: import("@/shared/types").StudentTagAssignment[];
 }
 
-export const retakesAtom = atom<Retake[]>([]);
 export const filterAtom = atom<"all" | "pending" | "completed" | "absent">("all");
 export const selectedCourseAtom = atom<string>("all");
 export const selectedExamAtom = atom<string>("all");

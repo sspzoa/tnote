@@ -13,8 +13,9 @@ interface Props {
 const getEventColor = (event: CalendarEvent) => {
   if (event.type === "course") return "#3B82F6";
   if (event.type === "retake") return "#EF4444";
-  if (event.metadata?.status === "attended") return "#10B981";
-  if (event.metadata?.status === "absent") return "#6B7280";
+  const status = event.metadata?.status;
+  if (status === "attended") return "#10B981";
+  if (status === "absent") return "#6B7280";
   return "#8B5CF6";
 };
 
@@ -77,6 +78,11 @@ const getRetakeStatusVariant = (status: string): BadgeVariant => {
   }
 };
 
+const getMetadataStatus = (event: CalendarEvent): string | undefined => {
+  const status = event.metadata?.status;
+  return typeof status === "string" ? status : undefined;
+};
+
 export default function EventDetailModal({ event, onClose }: Props) {
   return (
     <Modal
@@ -109,20 +115,20 @@ export default function EventDetailModal({ event, onClose }: Props) {
           </p>
         </div>
 
-        {event.type === "clinic" && event.metadata?.status && (
+        {event.type === "clinic" && getMetadataStatus(event) && (
           <div className="flex flex-col gap-spacing-100">
             <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
-            <Badge variant={getClinicStatusVariant(event.metadata.status)} size="sm" className="w-fit">
-              {getClinicStatusLabel(event.metadata.status)}
+            <Badge variant={getClinicStatusVariant(getMetadataStatus(event)!)} size="sm" className="w-fit">
+              {getClinicStatusLabel(getMetadataStatus(event)!)}
             </Badge>
           </div>
         )}
 
-        {event.type === "retake" && event.metadata?.status && (
+        {event.type === "retake" && getMetadataStatus(event) && (
           <div className="flex flex-col gap-spacing-100">
             <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
-            <Badge variant={getRetakeStatusVariant(event.metadata.status)} size="sm" className="w-fit">
-              {getRetakeStatusLabel(event.metadata.status)}
+            <Badge variant={getRetakeStatusVariant(getMetadataStatus(event)!)} size="sm" className="w-fit">
+              {getRetakeStatusLabel(getMetadataStatus(event)!)}
             </Badge>
           </div>
         )}

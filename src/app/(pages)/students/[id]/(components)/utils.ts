@@ -1,18 +1,6 @@
 import type { BadgeVariant } from "@/shared/components/ui/badge";
 
-export const isTagActive = (startDate: string, endDate: string | null): boolean => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const start = new Date(startDate);
-  start.setHours(0, 0, 0, 0);
-
-  if (today < start) return false;
-  if (endDate === null) return true;
-
-  const end = new Date(endDate);
-  end.setHours(0, 0, 0, 0);
-  return today <= end;
-};
+export { isTagActive } from "@/shared/lib/utils/tags";
 
 export const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
 
