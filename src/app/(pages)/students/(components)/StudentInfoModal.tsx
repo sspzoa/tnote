@@ -17,6 +17,7 @@ export default function StudentInfoModal() {
     <StudentInfoModalBase
       isOpen={showModal}
       onClose={() => setShowModal(false)}
+      studentId={selectedStudent.id}
       studentDetail={studentDetail}
       isLoading={isLoading}
     />

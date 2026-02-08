@@ -16,6 +16,12 @@ export default function StudentInfoModal() {
   };
 
   return (
-    <StudentInfoModalBase isOpen={isOpen} onClose={handleClose} studentDetail={studentDetail} isLoading={isLoading} />
+    <StudentInfoModalBase
+      isOpen={isOpen}
+      onClose={handleClose}
+      studentId={studentId || ""}
+      studentDetail={studentDetail}
+      isLoading={isLoading}
+    />
   );
 }

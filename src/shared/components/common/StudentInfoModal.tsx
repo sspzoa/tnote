@@ -27,11 +27,18 @@ const formatDaysOfWeek = (days: number[] | null): string => {
 interface StudentInfoModalProps {
   isOpen: boolean;
   onClose: () => void;
+  studentId: string;
   studentDetail: StudentDetail | null | undefined;
   isLoading: boolean;
 }
 
-export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoading }: StudentInfoModalProps) {
+export default function StudentInfoModal({
+  isOpen,
+  onClose,
+  studentId,
+  studentDetail,
+  isLoading,
+}: StudentInfoModalProps) {
   const examWithAssignments = useMemo(() => {
     if (!studentDetail) return [];
 
@@ -54,11 +61,9 @@ export default function StudentInfoModal({ isOpen, onClose, studentDetail, isLoa
           <Button variant="secondary" onClick={onClose} className="flex-1">
             닫기
           </Button>
-          {studentDetail && (
-            <Link href={`/students/${studentDetail.student.id}`} className="flex-1" onClick={onClose}>
-              <Button className="w-full">상세 페이지</Button>
-            </Link>
-          )}
+          <Link href={`/students/${studentId}`} className="flex-1" onClick={onClose}>
+            <Button className="w-full">상세 페이지</Button>
+          </Link>
         </div>
       }>
       {isLoading ? (
