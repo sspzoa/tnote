@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
+import { checkAuthRateLimit } from "@/shared/lib/utils/rateLimit";
 
 export async function POST(request: Request) {
   const logger = createLogger(request, null, "login", "auth");
 
   try {
+    const { success: rateLimitOk, retryAfterMs } = checkAuthRateLimit(request);
+    if (!rateLimitOk) {
+      await logger.log("warn", 429);
+      await logger.flush();
+      return NextResponse.json(
+        { error: "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(retryAfterMs / 1000)) } },
+      );
+    }
+
     const { phoneNumber, password, workspaceId, isTeacher } = await request.json();
 
     if (!phoneNumber || !password) {

@@ -11,14 +11,14 @@ export interface Session {
 export async function getSession(): Promise<Session | null> {
   const supabase = await createClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-  if (!session?.user) {
+  if (error || !user) {
     return null;
   }
 
-  const { user } = session;
   const metadata = user.user_metadata;
   if (!metadata?.role || !metadata?.workspace) {
     return null;

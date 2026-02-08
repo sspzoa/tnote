@@ -1,11 +1,23 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/shared/lib/supabase/server";
 import { createLogger } from "@/shared/lib/utils/logger";
+import { validatePassword } from "@/shared/lib/utils/password";
+import { checkAuthRateLimit } from "@/shared/lib/utils/rateLimit";
 
 export async function POST(request: Request) {
   const logger = createLogger(request, null, "create", "auth");
 
   try {
+    const { success: rateLimitOk, retryAfterMs } = checkAuthRateLimit(request);
+    if (!rateLimitOk) {
+      await logger.log("warn", 429);
+      await logger.flush();
+      return NextResponse.json(
+        { error: "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(retryAfterMs / 1000)) } },
+      );
+    }
+
     const { name, phoneNumber, password, workspaceName, agreedToTerms, agreedToPrivacy } = await request.json();
 
     if (!name || !phoneNumber || !password || !workspaceName) {
@@ -20,10 +32,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "이용약관과 개인정보처리방침에 동의해주세요." }, { status: 400 });
     }
 
-    if (password.length < 8) {
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
       await logger.log("warn", 400);
       await logger.flush();
-      return NextResponse.json({ error: "비밀번호는 최소 8자 이상이어야 합니다." }, { status: 400 });
+      return NextResponse.json({ error: passwordValidation.error }, { status: 400 });
     }
 
     const supabase = createAdminClient();
