@@ -85,24 +85,30 @@ const fetchClinicsWithAttendance = async (
   supabase: ApiContext["supabase"],
   workspace: string,
 ): Promise<{ clinics: CalendarClinicData[]; attendance: CalendarAttendanceRecord[] }> => {
-  const [clinicsResult, attendanceResult] = await Promise.all([
-    supabase
-      .from("Clinics")
-      .select("id, name, start_date, end_date, operating_days")
-      .eq("workspace", workspace)
-      .not("start_date", "is", null)
-      .not("end_date", "is", null),
-    supabase.from("ClinicAttendance").select("attendance_date, student_id, clinic_id"),
-  ]);
+  const clinicsResult = await supabase
+    .from("Clinics")
+    .select("id, name, start_date, end_date, operating_days")
+    .eq("workspace", workspace)
+    .not("start_date", "is", null)
+    .not("end_date", "is", null);
 
   if (clinicsResult.error) throw clinicsResult.error;
-  if (attendanceResult.error) throw attendanceResult.error;
 
   const clinics = (clinicsResult.data as CalendarClinicData[]) || [];
-  const clinicIds = new Set(clinics.map((c) => c.id));
-  const attendance = ((attendanceResult.data as CalendarAttendanceRecord[]) || []).filter(
-    (a) => a.clinic_id && clinicIds.has(a.clinic_id),
-  );
+  const clinicIds = clinics.map((c) => c.id);
+
+  if (clinicIds.length === 0) {
+    return { clinics, attendance: [] };
+  }
+
+  const attendanceResult = await supabase
+    .from("ClinicAttendance")
+    .select("attendance_date, student_id, clinic_id")
+    .in("clinic_id", clinicIds);
+
+  if (attendanceResult.error) throw attendanceResult.error;
+
+  const attendance = (attendanceResult.data as CalendarAttendanceRecord[]) || [];
 
   return { clinics, attendance };
 };

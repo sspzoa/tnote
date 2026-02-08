@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import { createAdminClient } from "@/shared/lib/supabase/server";
+import { isValidPhoneNumber, removePhoneHyphens } from "@/shared/lib/utils/phone";
 
 const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
@@ -20,10 +21,19 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "이름과 전화번호를 입력해주세요." }, { status: 400 });
   }
 
+  if (typeof name !== "string" || name.trim().length === 0 || name.length > 50) {
+    return NextResponse.json({ error: "이름은 1~50자 사이여야 합니다." }, { status: 400 });
+  }
+
+  const cleanedPhoneNumber = removePhoneHyphens(phoneNumber);
+  if (!isValidPhoneNumber(cleanedPhoneNumber)) {
+    return NextResponse.json({ error: "올바른 전화번호 형식이 아닙니다." }, { status: 400 });
+  }
+
   const { data: existingUser } = await supabase
     .from("Users")
     .select("phone_number")
-    .eq("phone_number", phoneNumber)
+    .eq("phone_number", cleanedPhoneNumber)
     .eq("workspace", session.workspace)
     .single();
 
@@ -32,14 +42,14 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   }
 
   const adminSupabase = createAdminClient();
-  const email = `${phoneNumber}@tnote.local`;
+  const email = `${cleanedPhoneNumber}@tnote.local`;
 
   const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
     email,
-    password: phoneNumber,
+    password: cleanedPhoneNumber,
     email_confirm: true,
     user_metadata: {
-      name,
+      name: name.trim(),
       role: "admin",
       workspace: session.workspace,
     },
@@ -51,8 +61,8 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .from("Users")
     .insert({
       id: authUser.user.id,
-      name,
-      phone_number: phoneNumber,
+      name: name.trim(),
+      phone_number: cleanedPhoneNumber,
       role: "admin",
       workspace: session.workspace,
     })

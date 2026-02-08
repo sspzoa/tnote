@@ -123,4 +123,8 @@ export const POST = withLogging(handlePost, {
   action: "create",
   allowedRoles: ["owner", "admin"],
 });
-export const GET = withLogging(handleGet, { resource: "retakes", action: "read" });
+export const GET = withLogging(handleGet, {
+  resource: "retakes",
+  action: "read",
+  allowedRoles: ["owner", "admin", "student"],
+});
