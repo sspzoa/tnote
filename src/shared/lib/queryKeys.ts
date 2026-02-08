@@ -32,6 +32,7 @@ export const QUERY_KEYS = {
     all: ["clinics"] as const,
     detail: (id: string) => ["clinics", "detail", id] as const,
     attendance: (clinicId: string, date: string) => ["clinics", "attendance", clinicId, date] as const,
+    recentAttendance: ["clinics", "recent-attendance"] as const,
   },
   retakes: {
     all: ["retakes"] as const,

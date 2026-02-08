@@ -1,6 +1,7 @@
 "use client";
 
 import { useAtomValue, useSetAtom } from "jotai";
+import { History } from "lucide-react";
 import { useMemo } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
@@ -18,24 +19,34 @@ import {
   selectedDateAtom,
   startDateAtom,
 } from "./(atoms)/useFormStore";
-import { showAttendanceModalAtom, showCreateModalAtom, showEditModalAtom } from "./(atoms)/useModalStore";
+import {
+  showAttendanceModalAtom,
+  showCreateModalAtom,
+  showEditModalAtom,
+  showHistoryPanelAtom,
+} from "./(atoms)/useModalStore";
 import AttendanceModal from "./(components)/AttendanceModal";
 import ClinicCreateModal from "./(components)/ClinicCreateModal";
 import ClinicEditModal from "./(components)/ClinicEditModal";
 import ClinicFilters from "./(components)/ClinicFilters";
+import ClinicHistoryPanel from "./(components)/ClinicHistoryPanel";
 import ClinicList from "./(components)/ClinicList";
 import { useClinicDelete } from "./(hooks)/useClinicDelete";
 import { useClinics } from "./(hooks)/useClinics";
+import { useRecentAttendance } from "./(hooks)/useRecentAttendance";
 
 export default function ClinicsPage() {
   const { clinics, isLoading, error } = useClinics();
   const { deleteClinic } = useClinicDelete();
+  const { recentAttendance, isLoading: historyLoading } = useRecentAttendance();
   const showEndedClinics = useAtomValue(showEndedClinicsAtom);
   const toast = useToast();
 
   const setShowCreateModal = useSetAtom(showCreateModalAtom);
   const setShowEditModal = useSetAtom(showEditModalAtom);
   const setShowAttendanceModal = useSetAtom(showAttendanceModalAtom);
+  const setShowHistoryPanel = useSetAtom(showHistoryPanelAtom);
+  const showHistoryPanel = useAtomValue(showHistoryPanelAtom);
   const setSelectedClinic = useSetAtom(selectedClinicAtom);
   const setClinicName = useSetAtom(clinicNameAtom);
   const setOperatingDays = useSetAtom(operatingDaysAtom);
@@ -99,7 +110,23 @@ export default function ClinicsPage() {
         title="클리닉 관리"
         subtitle={`전체 ${clinics.length}개 클리닉 (${filteredClinics.length}개 표시)`}
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={<Button onClick={() => setShowCreateModal(true)}>+ 클리닉 생성</Button>}
+        action={
+          <div className="flex items-center gap-spacing-300">
+            <Button
+              variant="secondary"
+              onClick={() => setShowHistoryPanel(true)}
+              className="flex items-center gap-spacing-200">
+              <History className="size-4" />
+              최근 출석
+              {recentAttendance.length > 0 && (
+                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
+                  {recentAttendance.length}
+                </span>
+              )}
+            </Button>
+            <Button onClick={() => setShowCreateModal(true)}>+ 클리닉 생성</Button>
+          </div>
+        }
       />
 
       <ClinicFilters />
@@ -133,6 +160,13 @@ export default function ClinicsPage() {
       <ClinicCreateModal />
       <ClinicEditModal />
       <AttendanceModal />
+
+      <ClinicHistoryPanel
+        isOpen={showHistoryPanel}
+        onClose={() => setShowHistoryPanel(false)}
+        attendance={recentAttendance}
+        isLoading={historyLoading}
+      />
     </Container>
   );
 }
