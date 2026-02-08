@@ -179,7 +179,7 @@ export default function CourseDetailPage() {
       <Header
         title={course.name}
         subtitle={`총 ${exams.length}개의 시험`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
+        backLink={{ href: "/courses", label: "수업 목록으로 돌아가기" }}
         action={<Button onClick={openCreateModal}>+ 시험 생성</Button>}
       />
 
