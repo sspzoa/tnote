@@ -303,6 +303,7 @@ export default function ManagementStatusSettingsModal() {
             <div className="flex items-center gap-spacing-300">
               <Input
                 type="text"
+                size="md"
                 placeholder="상태 이름"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
@@ -310,6 +311,7 @@ export default function ManagementStatusSettingsModal() {
                 className="flex-1"
               />
               <Select
+                size="md"
                 value={newColor}
                 onChange={(e) => setNewColor(e.target.value as StatusColor)}
                 disabled={isBusy}
