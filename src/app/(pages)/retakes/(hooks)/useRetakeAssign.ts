@@ -27,11 +27,14 @@ export const useRetakeAssign = () => {
 
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
+      for (const studentId of variables.studentIds) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.detail(studentId) });
+      }
     },
   });
 

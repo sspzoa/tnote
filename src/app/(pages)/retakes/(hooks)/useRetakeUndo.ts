@@ -22,6 +22,7 @@ export const useRetakeUndo = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
+      queryClient.invalidateQueries({ queryKey: ["students", "detail"] });
     },
   });
 

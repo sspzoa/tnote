@@ -33,7 +33,7 @@ export default function AttendanceModal() {
   const { saveAttendance, isSaving } = useAttendanceSave();
 
   useEffect(() => {
-    if (isOpen && attendance.length > 0) {
+    if (isOpen) {
       setSelectedStudentIds(attendance.map((record) => record.student.id));
     }
   }, [attendance, isOpen]);
