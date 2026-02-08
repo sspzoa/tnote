@@ -6,12 +6,13 @@ import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
-import { Button, EmptyState, Modal, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
+import { Button, EmptyState, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import { searchQueryAtom, selectedTagIdsAtom } from "./(atoms)/useStudentsStore";
 import AddTagModal from "./(components)/AddTagModal";
+import ConsultationDetailModal from "./(components)/ConsultationDetailModal";
 import ConsultationFormModal from "./(components)/ConsultationFormModal";
 import ConsultationListModal from "./(components)/ConsultationListModal";
 import EditTagAssignmentModal from "./(components)/EditTagAssignmentModal";
@@ -115,20 +116,11 @@ export default function StudentsPage() {
         <StudentList students={filteredStudents} />
       )}
 
-      <Modal
-        isOpen={!!selectedConsultation}
+      <ConsultationDetailModal
+        consultation={selectedConsultation}
+        studentName={selectedConsultation?.student?.name || "-"}
         onClose={() => setSelectedConsultation(null)}
-        title={selectedConsultation?.title || ""}
-        subtitle={`${selectedConsultation?.student?.name} - ${selectedConsultation?.created_at ? new Date(selectedConsultation.created_at).toLocaleDateString("ko-KR") : ""}${selectedConsultation?.creator?.name ? ` (작성자: ${selectedConsultation.creator.name})` : ""}`}
-        footer={
-          <Button variant="secondary" onClick={() => setSelectedConsultation(null)} className="flex-1">
-            닫기
-          </Button>
-        }>
-        <div className="whitespace-pre-wrap text-body text-content-standard-primary">
-          {selectedConsultation?.content}
-        </div>
-      </Modal>
+      />
 
       <StudentCreateModal />
       <StudentEditModal />
@@ -178,7 +170,6 @@ export default function StudentsPage() {
                   key={consultation.id}
                   onClick={() => {
                     setSelectedConsultation(consultation);
-                    setShowConsultationPanel(false);
                   }}
                   className="flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
                   <div className="flex items-center justify-between">

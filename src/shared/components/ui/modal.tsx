@@ -77,7 +77,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-solid-black/60 p-spacing-400 backdrop-blur-sm print:hidden"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-solid-black/60 p-spacing-400 backdrop-blur-sm print:hidden"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
