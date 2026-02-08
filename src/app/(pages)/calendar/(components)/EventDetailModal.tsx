@@ -89,6 +89,7 @@ export default function EventDetailModal({ event, onClose }: Props) {
       isOpen={true}
       onClose={onClose}
       title="일정 상세"
+      size="md"
       footer={
         <Button onClick={onClose} className="w-full">
           닫기

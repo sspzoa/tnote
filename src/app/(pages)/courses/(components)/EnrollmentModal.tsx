@@ -72,6 +72,7 @@ export default function EnrollmentModal() {
       onClose={() => setShowModal(false)}
       title="학생 관리"
       subtitle={selectedCourse.name}
+      size="xl"
       footer={
         <Button variant="secondary" onClick={() => setShowModal(false)} className="w-full">
           닫기

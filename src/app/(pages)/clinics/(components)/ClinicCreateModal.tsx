@@ -67,6 +67,7 @@ export default function ClinicCreateModal() {
       isOpen={isOpen}
       onClose={handleClose}
       title="클리닉 생성"
+      size="md"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} className="flex-1">

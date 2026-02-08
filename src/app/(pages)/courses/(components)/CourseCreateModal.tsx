@@ -52,6 +52,7 @@ export default function CourseCreateModal() {
       isOpen={isOpen}
       onClose={handleClose}
       title="수업 생성"
+      size="md"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} className="flex-1">

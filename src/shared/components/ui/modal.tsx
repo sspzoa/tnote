@@ -9,12 +9,20 @@ interface ModalProps {
   subtitle?: string;
   children: ReactNode;
   footer?: ReactNode;
+  size?: "sm" | "md" | "lg" | "xl";
 }
+
+const sizeStyles = {
+  sm: "max-w-md",
+  md: "max-w-xl",
+  lg: "max-w-3xl",
+  xl: "max-w-5xl",
+};
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function Modal({ isOpen, onClose, title, subtitle, children, footer }: ModalProps) {
+export function Modal({ isOpen, onClose, title, subtitle, children, footer, size = "lg" }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -84,7 +92,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer }: Mo
       aria-labelledby={titleId}>
       <div
         ref={dialogRef}
-        className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary"
+        className={`flex max-h-[80vh] w-full ${sizeStyles[size]} flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary`}
         onClick={(e) => e.stopPropagation()}>
         <div className="flex flex-col gap-spacing-100 border-line-divider border-b px-spacing-600 py-spacing-500">
           <h2 id={titleId} className="font-bold text-content-standard-primary text-heading">
