@@ -374,7 +374,15 @@ export default function StudentDetailPage() {
     studentDetail.examScores.length > 0
       ? (studentDetail.examScores.reduce((sum, s) => sum + s.rank, 0) / studentDetail.examScores.length).toFixed(1)
       : "-";
-  const pendingRetakes = studentDetail.retakeHistory.filter((r) => r.status === "pending").length;
+  const avgTotal =
+    studentDetail.examScores.length > 0
+      ? (
+          studentDetail.examScores.reduce((sum, s) => sum + s.totalStudents, 0) / studentDetail.examScores.length
+        ).toFixed(1)
+      : "-";
+  const pendingRetakes = studentDetail.retakeHistory.filter(
+    (r) => r.status === "pending" || r.status === "absent",
+  ).length;
   const totalRetakes = studentDetail.retakeHistory.length;
   const consultationCount = studentDetail.consultationHistory.length;
 
@@ -463,7 +471,7 @@ export default function StudentDetailPage() {
               icon={TrendingUp}
               label="시험 평균"
               value={studentDetail.examScores.length > 0 ? `${avgScore}점` : "-"}
-              subValue={studentDetail.examScores.length > 0 ? `평균 순위 ${avgRank}등` : "응시 기록 없음"}
+              subValue={studentDetail.examScores.length > 0 ? `평균 순위 ${avgRank}/${avgTotal}` : "응시 기록 없음"}
             />
           </div>
           <div className={printOptions.retakes ? "" : "print:hidden"}>
