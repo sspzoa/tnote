@@ -176,7 +176,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const examScores = (examScoreResult.data as unknown as StudentDetailExamScore[]) || [];
   const examIds = [...new Set(examScores.map((s) => s.exam.id))];
 
-  const rankMap = new Map<string, { rank: number; total: number }>();
+  const statsMap = new Map<string, { rank: number; total: number; average: number; median: number; highest: number }>();
   if (examIds.length > 0) {
     const { data: allScoresForExams, error: rankError } = await supabase
       .from("ExamScores")
@@ -196,20 +196,32 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       const scores = scoresByExam.get(scoreData.exam.id) || [];
       const total = scores.length;
       const rank = scores.filter((s) => s > scoreData.score).length + 1;
-      rankMap.set(scoreData.id, { rank, total });
+      const average = total > 0 ? Math.round((scores.reduce((sum, sc) => sum + sc, 0) / total) * 10) / 10 : 0;
+      const highest = total > 0 ? Math.max(...scores) : 0;
+      const sorted = [...scores].sort((a, b) => a - b);
+      const median =
+        total > 0
+          ? total % 2 === 1
+            ? sorted[Math.floor(total / 2)]
+            : Math.round(((sorted[total / 2 - 1] + sorted[total / 2]) / 2) * 10) / 10
+          : 0;
+      statsMap.set(scoreData.id, { rank, total, average, median, highest });
     }
   }
 
   const scoresWithRank = examScores
     .map((scoreData) => {
-      const rankInfo = rankMap.get(scoreData.id) || { rank: 1, total: 1 };
+      const stats = statsMap.get(scoreData.id) || { rank: 1, total: 1, average: 0, median: 0, highest: 0 };
       return {
         id: scoreData.id,
         score: scoreData.score,
         maxScore: scoreData.exam.max_score,
         cutline: scoreData.exam.cutline,
-        rank: rankInfo.rank,
-        totalStudents: rankInfo.total,
+        rank: stats.rank,
+        totalStudents: stats.total,
+        average: stats.average,
+        median: stats.median,
+        highest: stats.highest,
         createdAt: scoreData.created_at,
         exam: {
           id: scoreData.exam.id,

@@ -8,20 +8,310 @@ import Container from "@/shared/components/common/Container";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
+import type { ExamScoreInfo, RetakeHistoryInfo } from "../(hooks)/useStudentDetail";
 import { useStudentDetail } from "../(hooks)/useStudentDetail";
 import {
   ConsultationCard,
   DashboardCard,
   DashboardSkeleton,
-  ExamResultCard,
   formatDaysOfWeek,
   isTagActive,
-  RetakeHistoryCard,
   StatCard,
 } from "./(components)";
+
+const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
+  완료: { variant: "success", label: "완료" },
+  미흡: { variant: "warning", label: "미흡" },
+  미제출: { variant: "danger", label: "미제출" },
+};
+
+const retakeStatusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {
+  pending: { variant: "warning", label: "대기중" },
+  completed: { variant: "success", label: "완료" },
+  absent: { variant: "danger", label: "결석" },
+};
+
+const STATUS_ORDER: Record<string, number> = { pending: 0, absent: 1, completed: 2 };
+
+type ScoreSortKey = "exam" | "score" | "rank" | "average" | "median" | "highest";
+type RetakeSortKey = "exam" | "scheduledDate" | "status";
+
+const ExamScoreTable = ({
+  examScores,
+  assignmentMap,
+  printHidden,
+}: {
+  examScores: ExamScoreInfo[];
+  assignmentMap: Record<string, string>;
+  printHidden: boolean;
+}) => {
+  const comparators = useMemo(
+    () => ({
+      exam: (a: ExamScoreInfo, b: ExamScoreInfo) => a.exam.examNumber - b.exam.examNumber,
+      score: (a: ExamScoreInfo, b: ExamScoreInfo) => a.score - b.score,
+      rank: (a: ExamScoreInfo, b: ExamScoreInfo) => a.rank - b.rank,
+      average: (a: ExamScoreInfo, b: ExamScoreInfo) => a.average - b.average,
+      median: (a: ExamScoreInfo, b: ExamScoreInfo) => a.median - b.median,
+      highest: (a: ExamScoreInfo, b: ExamScoreInfo) => a.highest - b.highest,
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<ExamScoreInfo, ScoreSortKey>({
+    data: examScores,
+    comparators,
+    defaultSort: { key: "exam", direction: "desc" },
+  });
+
+  return (
+    <section className={printHidden ? "print:hidden" : ""}>
+      <DashboardCard
+        title="시험 성적 & 과제"
+        icon={TrendingUp}
+        isEmpty={examScores.length === 0}
+        emptyMessage="시험 기록이 없습니다."
+        noPadding>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-components-fill-standard-secondary">
+              <tr>
+                <SortableHeader
+                  label="시험"
+                  sortKey="exam"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="점수"
+                  sortKey="score"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="등수"
+                  sortKey="rank"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="평균"
+                  sortKey="average"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                  className="print:hidden"
+                />
+                <SortableHeader
+                  label="중앙값"
+                  sortKey="median"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                  className="print:hidden"
+                />
+                <SortableHeader
+                  label="최고점"
+                  sortKey="highest"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                  className="print:hidden"
+                />
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  결과
+                </th>
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  과제
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((score) => {
+                const passed = score.cutline != null && score.score >= score.cutline;
+                const failed = score.cutline != null && score.score < score.cutline;
+                const aStatus = assignmentMap[score.exam.id];
+                const assignment = aStatus ? assignmentStatusConfig[aStatus] : null;
+                return (
+                  <tr
+                    key={score.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <div className="text-body text-content-standard-primary">{score.exam.name}</div>
+                      <div className="text-content-standard-secondary text-footnote">
+                        {score.exam.course.name} {score.exam.examNumber}회차
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <span className="font-medium text-body text-content-standard-primary">
+                        {score.score}
+                        {score.maxScore != null && (
+                          <span className="text-content-standard-tertiary">/{score.maxScore}</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <span className="text-body text-content-standard-primary">
+                        {score.rank}
+                        <span className="text-content-standard-tertiary">/{score.totalStudents}</span>
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 print:hidden">
+                      <span className="text-body text-content-standard-primary">{score.average}</span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 print:hidden">
+                      <span className="text-body text-content-standard-primary">{score.median}</span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 print:hidden">
+                      <span className="text-body text-content-standard-primary">{score.highest}</span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      {passed && (
+                        <Badge variant="success" size="sm">
+                          통과
+                        </Badge>
+                      )}
+                      {failed && (
+                        <Badge variant="danger" size="sm">
+                          재시험
+                        </Badge>
+                      )}
+                      {score.cutline == null && <span className="text-content-standard-tertiary text-footnote">-</span>}
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      {assignment ? (
+                        <Badge variant={assignment.variant} size="sm">
+                          {assignment.label}
+                        </Badge>
+                      ) : (
+                        <span className="text-content-standard-tertiary text-footnote">-</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </DashboardCard>
+    </section>
+  );
+};
+
+const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; printHidden: boolean }) => {
+  const comparators = useMemo(
+    () => ({
+      exam: (a: RetakeHistoryInfo, b: RetakeHistoryInfo) => a.exam.examNumber - b.exam.examNumber,
+      scheduledDate: (a: RetakeHistoryInfo, b: RetakeHistoryInfo) =>
+        (a.scheduledDate || "").localeCompare(b.scheduledDate || ""),
+      status: (a: RetakeHistoryInfo, b: RetakeHistoryInfo) =>
+        (STATUS_ORDER[a.status] ?? 1) - (STATUS_ORDER[b.status] ?? 1),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<RetakeHistoryInfo, RetakeSortKey>({
+    data: retakes,
+    comparators,
+    defaultSort: { key: "exam", direction: "desc" },
+  });
+
+  return (
+    <section className={printHidden ? "print:hidden" : ""}>
+      <DashboardCard
+        title="재시험 이력"
+        icon={RefreshCw}
+        isEmpty={retakes.length === 0}
+        emptyMessage="재시험 기록이 없습니다."
+        noPadding>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-components-fill-standard-secondary">
+              <tr>
+                <SortableHeader
+                  label="시험"
+                  sortKey="exam"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="예정일"
+                  sortKey="scheduledDate"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="상태"
+                  sortKey="status"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  비고
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((retake) => {
+                const status = retakeStatusConfig[retake.status] || {
+                  variant: "neutral" as const,
+                  label: retake.status,
+                };
+                return (
+                  <tr
+                    key={retake.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <div className="text-body text-content-standard-primary">{retake.exam.name}</div>
+                      <div className="text-content-standard-secondary text-footnote">
+                        {retake.exam.course.name} {retake.exam.examNumber}회차
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <span className="text-body text-content-standard-primary">{retake.scheduledDate || "-"}</span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <Badge variant={status.variant} size="sm">
+                        {status.label}
+                      </Badge>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <div className="flex gap-spacing-200">
+                        {retake.postponeCount > 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">
+                            연기 {retake.postponeCount}회
+                          </span>
+                        )}
+                        {retake.absentCount > 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">
+                            결석 {retake.absentCount}회
+                          </span>
+                        )}
+                        {retake.postponeCount === 0 && retake.absentCount === 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">-</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </DashboardCard>
+    </section>
+  );
+};
 
 export default function StudentDetailPage() {
   const router = useRouter();
@@ -55,15 +345,13 @@ export default function StudentDetailPage() {
     }
   }, [error, router, toast]);
 
-  const examWithAssignments = useMemo(() => {
-    if (!studentDetail) return [];
-
-    const assignmentMap = new Map(studentDetail.assignmentHistory.map((a) => [a.exam.id, a]));
-
-    return studentDetail.examScores.map((score) => ({
-      examScore: score,
-      assignment: assignmentMap.get(score.exam.id),
-    }));
+  const assignmentMap = useMemo(() => {
+    if (!studentDetail) return {};
+    const map: Record<string, string> = {};
+    for (const a of studentDetail.assignmentHistory) {
+      map[a.exam.id] = a.status;
+    }
+    return map;
   }, [studentDetail]);
 
   if (isLoading || !studentDetail) {
@@ -222,33 +510,13 @@ export default function StudentDetailPage() {
           </div>
         </DashboardCard>
       </section>
-      <section className="grid gap-spacing-500 lg:grid-cols-2 print:gap-spacing-850">
-        <div className={printOptions.exams ? "" : "print:hidden"}>
-          <DashboardCard
-            title="시험 성적 & 과제"
-            icon={TrendingUp}
-            isEmpty={examWithAssignments.length === 0}
-            emptyMessage="시험 기록이 없습니다."
-            scrollable>
-            {examWithAssignments.map(({ examScore, assignment }) => (
-              <ExamResultCard key={examScore.id} examScore={examScore} assignment={assignment} />
-            ))}
-          </DashboardCard>
-        </div>
+      <ExamScoreTable
+        examScores={studentDetail.examScores}
+        assignmentMap={assignmentMap}
+        printHidden={!printOptions.exams}
+      />
 
-        <div className={printOptions.retakes ? "" : "print:hidden"}>
-          <DashboardCard
-            title="재시험 이력"
-            icon={RefreshCw}
-            isEmpty={studentDetail.retakeHistory.length === 0}
-            emptyMessage="재시험 기록이 없습니다."
-            scrollable>
-            {studentDetail.retakeHistory.map((retake) => (
-              <RetakeHistoryCard key={retake.id} retake={retake} />
-            ))}
-          </DashboardCard>
-        </div>
-      </section>
+      <RetakeTable retakes={studentDetail.retakeHistory} printHidden={!printOptions.retakes} />
       <section className={printOptions.clinics ? "" : "print:hidden"}>
         <DashboardCard
           title="클리닉 출석"

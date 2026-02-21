@@ -20,6 +20,9 @@ interface ExamScoreInfo {
   cutline: number | null;
   rank: number;
   totalStudents: number;
+  average: number;
+  median: number;
+  highest: number;
   createdAt: string;
   exam: {
     id: string;
@@ -116,6 +119,8 @@ interface StudentInfo {
   createdAt: string;
   tags: TagAssignmentInfo[];
 }
+
+export type { ExamScoreInfo, RetakeHistoryInfo };
 
 export interface StudentDetail {
   student: StudentInfo;
