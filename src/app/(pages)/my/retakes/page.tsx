@@ -7,6 +7,9 @@ import Header from "@/shared/components/common/Header";
 import { Badge } from "@/shared/components/ui/badge";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
+import { SortableHeader } from "@/shared/components/ui/sortableHeader";
+import { useTableSort } from "@/shared/hooks/useTableSort";
+import type { MyRetake } from "./(hooks)/useMyRetakes";
 import { useMyRetakes } from "./(hooks)/useMyRetakes";
 
 const statusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {
@@ -15,20 +18,27 @@ const statusConfig: Record<string, { variant: "warning" | "success" | "danger"; 
   absent: { variant: "danger", label: "결석" },
 };
 
+const STATUS_ORDER: Record<string, number> = { pending: 0, absent: 1, completed: 2 };
+
+type RetakeSortKey = "exam" | "scheduledDate" | "status";
+
 export default function MyRetakesPage() {
   const { retakes, isLoading, error } = useMyRetakes();
 
-  const sortedRetakes = useMemo(
-    () =>
-      [...retakes].sort((a, b) => {
-        const statusOrder = { pending: 0, absent: 1, completed: 2 };
-        const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 1;
-        const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 1;
-        if (aOrder !== bOrder) return aOrder - bOrder;
-        return (a.scheduledDate || "").localeCompare(b.scheduledDate || "");
-      }),
-    [retakes],
+  const comparators = useMemo(
+    () => ({
+      exam: (a: MyRetake, b: MyRetake) => a.exam.examNumber - b.exam.examNumber,
+      scheduledDate: (a: MyRetake, b: MyRetake) => (a.scheduledDate || "").localeCompare(b.scheduledDate || ""),
+      status: (a: MyRetake, b: MyRetake) => (STATUS_ORDER[a.status] ?? 1) - (STATUS_ORDER[b.status] ?? 1),
+    }),
+    [],
   );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<MyRetake, RetakeSortKey>({
+    data: retakes,
+    comparators,
+    defaultSort: { key: "exam", direction: "desc" },
+  });
 
   if (error) {
     return (
@@ -63,29 +73,41 @@ export default function MyRetakesPage() {
             { width: "w-20" },
           ]}
         />
-      ) : sortedRetakes.length === 0 ? (
+      ) : sortedData.length === 0 ? (
         <EmptyState message="재시험이 없습니다." />
       ) : (
         <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
           <table className="w-full rounded-radius-400">
             <thead className="bg-components-fill-standard-secondary">
               <tr>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  시험
-                </th>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  예정일
-                </th>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  상태
-                </th>
+                <SortableHeader
+                  label="시험"
+                  sortKey="exam"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="예정일"
+                  sortKey="scheduledDate"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="상태"
+                  sortKey="status"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
                 <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
                   비고
                 </th>
               </tr>
             </thead>
             <tbody>
-              {sortedRetakes.map((retake) => {
+              {sortedData.map((retake) => {
                 const status = statusConfig[retake.status] || { variant: "neutral" as const, label: retake.status };
                 return (
                   <tr
