@@ -45,7 +45,6 @@ interface ClinicHistoryInfo {
 interface AssignmentHistoryInfo {
   id: string;
   status: "완료" | "미흡" | "미제출";
-  note: string | null;
   exam: {
     id: string;
     name: string;

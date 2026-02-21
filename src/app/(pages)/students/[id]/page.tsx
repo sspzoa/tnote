@@ -8,7 +8,6 @@ import Container from "@/shared/components/common/Container";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
-
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
@@ -151,7 +150,7 @@ export default function StudentDetailPage() {
         </section>
 
         <section
-          className={`grid grid-cols-2 gap-spacing-400 lg:grid-cols-4 print:gap-spacing-200 ${
+          className={`grid grid-cols-2 gap-spacing-400 print:gap-spacing-200 lg:grid-cols-4 ${
             {
               1: "print:grid-cols-1",
               2: "print:grid-cols-2",
@@ -197,7 +196,6 @@ export default function StudentDetailPage() {
           </div>
         </section>
       </div>
-
       <section className={printOptions.courses ? "" : "print:hidden"}>
         <DashboardCard
           title="수강 중인 수업"
@@ -224,7 +222,6 @@ export default function StudentDetailPage() {
           </div>
         </DashboardCard>
       </section>
-
       <section className="grid gap-spacing-500 lg:grid-cols-2 print:gap-spacing-850">
         <div className={printOptions.exams ? "" : "print:hidden"}>
           <DashboardCard
@@ -252,7 +249,6 @@ export default function StudentDetailPage() {
           </DashboardCard>
         </div>
       </section>
-
       <section className={printOptions.clinics ? "" : "print:hidden"}>
         <DashboardCard
           title="클리닉 출석"
@@ -281,7 +277,6 @@ export default function StudentDetailPage() {
           </div>
         </DashboardCard>
       </section>
-
       <section className={printOptions.consultations ? "" : "print:hidden"}>
         <DashboardCard
           title="상담 기록"
@@ -293,7 +288,6 @@ export default function StudentDetailPage() {
           ))}
         </DashboardCard>
       </section>
-
       <section className={printOptions.messages ? "" : "print:hidden"}>
         <DashboardCard
           title="문자 발송 기록"
@@ -336,6 +330,7 @@ export default function StudentDetailPage() {
           ))}
         </DashboardCard>
       </section>
+
       <Modal
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}

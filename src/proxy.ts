@@ -15,7 +15,9 @@ const PUBLIC_APIS: PublicRoute[] = [
 
 const PUBLIC_PAGES = ["/login", "/terms", "/privacy"];
 
-const STUDENT_ALLOWED_PAGES = ["/", "/calendar"];
+const STUDENT_ALLOWED_PAGES = ["/", "/calendar", "/my"];
+
+const STUDENT_ALLOWED_API_PREFIXES = ["/api/auth/", "/api/my/"];
 
 const isPublicApi = (pathname: string, method: string): boolean => {
   return PUBLIC_APIS.some((api) => pathname.startsWith(api.path) && api.methods.includes(method));
@@ -27,6 +29,10 @@ const isPublicPage = (pathname: string): boolean => {
 
 const matchesPath = (pathname: string, paths: string[]): boolean => {
   return paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+};
+
+const isStudentAllowedApi = (pathname: string): boolean => {
+  return STUDENT_ALLOWED_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 };
 
 export const proxy = async (request: NextRequest): Promise<NextResponse> => {
@@ -81,8 +87,13 @@ export const proxy = async (request: NextRequest): Promise<NextResponse> => {
   }
 
   const role = user.user_metadata?.role as string | undefined;
-  if (role === "student" && !matchesPath(pathname, STUDENT_ALLOWED_PAGES)) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (role === "student") {
+    if (pathname.startsWith("/api/") && !isStudentAllowedApi(pathname)) {
+      return NextResponse.json({ error: "접근 권한이 없습니다." }, { status: 403 });
+    }
+    if (!pathname.startsWith("/api/") && !matchesPath(pathname, STUDENT_ALLOWED_PAGES)) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   return supabaseResponse;

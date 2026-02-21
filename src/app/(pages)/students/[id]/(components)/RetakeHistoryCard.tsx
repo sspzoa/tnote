@@ -86,10 +86,9 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
 
   return (
     <div className="print-break-inside-avoid border-line-divider border-b last:border-b-0">
-      <button
-        type="button"
+      <div
         onClick={handleToggle}
-        className="flex w-full items-center justify-between gap-spacing-400 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-fill-standard-secondary print:px-0 print:py-spacing-200 print:hover:bg-transparent">
+        className="flex w-full cursor-pointer items-center justify-between gap-spacing-400 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-fill-standard-secondary print:px-0 print:py-spacing-200 print:hover:bg-transparent">
         <div className="flex min-w-0 flex-1 flex-col gap-spacing-200">
           <div className="flex items-center gap-spacing-200">
             <span className="truncate font-medium text-body text-content-standard-primary">
@@ -143,7 +142,7 @@ export const RetakeHistoryCard = ({ retake }: RetakeHistoryCardProps) => {
             className={`h-5 w-5 text-content-standard-tertiary transition-transform duration-200 print:hidden ${isExpanded ? "rotate-180" : ""}`}
           />
         </div>
-      </button>
+      </div>
 
       <div
         className="grid transition-[grid-template-rows] duration-200 ease-out print:hidden"

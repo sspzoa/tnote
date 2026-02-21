@@ -25,7 +25,6 @@ interface ExamScore {
 interface Assignment {
   id: string;
   status: "완료" | "미흡" | "미제출";
-  note: string | null;
   exam: {
     id: string;
     name: string;
@@ -129,7 +128,6 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
                   <Badge variant={getAssignmentVariant(assignment.status)} size="xs">
                     {assignment.status}
                   </Badge>
-                  {assignment.note && <span className="text-content-standard-tertiary">({assignment.note})</span>}
                 </div>
               </div>
             )}

@@ -21,7 +21,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     .select(`
       id,
       status,
-      note,
       student:Users!CourseAssignments_student_id_fkey(id, name, phone_number, school)
     `)
     .eq("exam_id", examId);
@@ -33,7 +32,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 interface AssignmentInput {
   studentId: string;
   status: string;
-  note?: string;
 }
 
 const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
@@ -82,7 +80,6 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
       exam_id: examId,
       student_id: a.studentId,
       status: a.status,
-      note: a.note || null,
       updated_at: new Date().toISOString(),
     }));
 

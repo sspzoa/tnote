@@ -32,16 +32,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     tag: { id: string; name: string; color: string; workspace: string };
   }
 
-  const [
-    tagResult,
-    enrollmentResult,
-    examScoreResult,
-    clinicResult,
-    assignmentResult,
-    retakeResult,
-    consultationResult,
-    messageResult,
-  ] = await Promise.all([
+  const baseQueries = [
     supabase
       .from("StudentTagAssignments")
       .select(`
@@ -93,7 +84,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       .select(`
           id,
           status,
-          note,
           updated_at,
           exam:Exams!inner(
             id,
@@ -122,6 +112,19 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         `)
       .eq("student_id", studentId)
       .eq("exam.course.workspace", session.workspace),
+  ] as const;
+
+  const [tagResult, enrollmentResult, examScoreResult, clinicResult, assignmentResult, retakeResult] =
+    await Promise.all(baseQueries);
+
+  if (tagResult.error) throw tagResult.error;
+  if (enrollmentResult.error) throw enrollmentResult.error;
+  if (examScoreResult.error) throw examScoreResult.error;
+  if (clinicResult.error) throw clinicResult.error;
+  if (assignmentResult.error) throw assignmentResult.error;
+  if (retakeResult.error) throw retakeResult.error;
+
+  const [consultationResult, messageResult] = await Promise.all([
     supabase
       .from("ConsultationLogs")
       .select(`
@@ -151,12 +154,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       .order("sent_at", { ascending: false }),
   ]);
 
-  if (tagResult.error) throw tagResult.error;
-  if (enrollmentResult.error) throw enrollmentResult.error;
-  if (examScoreResult.error) throw examScoreResult.error;
-  if (clinicResult.error) throw clinicResult.error;
-  if (assignmentResult.error) throw assignmentResult.error;
-  if (retakeResult.error) throw retakeResult.error;
   if (consultationResult.error) throw consultationResult.error;
   if (messageResult.error) throw messageResult.error;
 
@@ -241,7 +238,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     .map((record) => ({
       id: record.id,
       status: record.status,
-      note: record.note,
       exam: {
         id: record.exam.id,
         name: record.exam.name,

@@ -212,6 +212,16 @@ export default function Sidebar() {
       icon: Calendar,
       label: "캘린더",
     },
+    {
+      href: "/my/courses",
+      icon: BookOpen,
+      label: "시험/과제 현황",
+    },
+    {
+      href: "/my/retakes",
+      icon: ClipboardList,
+      label: "재시험 현황",
+    },
   ];
   const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems] : studentMenuItems;
 
@@ -386,7 +396,12 @@ export default function Sidebar() {
         { href: "/students", icon: Users, label: "학생" },
         { href: "/courses", icon: BookOpen, label: "수업" },
       ]
-    : [{ href: "/calendar", icon: Calendar, label: "캘린더" }];
+    : [
+        { href: "/", icon: Home, label: "홈" },
+        { href: "/calendar", icon: Calendar, label: "캘린더" },
+        { href: "/my/courses", icon: BookOpen, label: "수업" },
+        { href: "/my/retakes", icon: ClipboardList, label: "재시험" },
+      ];
 
   return (
     <>

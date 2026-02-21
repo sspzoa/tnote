@@ -67,6 +67,10 @@ export const QUERY_KEYS = {
     all: ["calendarEvents"] as const,
     events: (startDate: string, endDate: string) => ["calendarEvents", startDate, endDate] as const,
   },
+  my: {
+    retakes: ["my", "retakes"] as const,
+    courses: ["my", "courses"] as const,
+  },
   messages: {
     templates: (type: string) => ["message-templates", type] as const,
     senderPhone: ["sender-phone"] as const,
