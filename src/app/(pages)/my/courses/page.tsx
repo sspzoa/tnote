@@ -20,22 +20,15 @@ const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | 
   미제출: { variant: "danger", label: "미제출" },
 };
 
-const formatRatio = (rank: number, total: number): string => {
-  if (total === 0) return "-";
-  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
-  const d = gcd(rank, total);
-  return `${rank / d}/${total / d}`;
-};
-
-const RankRatioChart = ({ scores }: { scores: MyExamScore[] }) => {
+const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
   const chartData = useMemo(
     () =>
       [...scores]
         .sort((a, b) => a.exam.examNumber - b.exam.examNumber)
         .map((s) => ({
-          name: `${s.exam.examNumber}회`,
-          ratio: Math.round(((s.totalStudents - s.rank + 1) / s.totalStudents) * 100),
-          label: formatRatio(s.rank, s.totalStudents),
+          name: `${s.exam.course.name} ${s.exam.examNumber}회`,
+          label: `${s.exam.examNumber}회`,
+          percentile: Math.round((1 - s.rank / s.totalStudents) * 100),
           rank: s.rank,
           total: s.totalStudents,
           examName: s.exam.name,
@@ -49,14 +42,19 @@ const RankRatioChart = ({ scores }: { scores: MyExamScore[] }) => {
   return (
     <div className="flex flex-col gap-spacing-300 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-body text-content-standard-primary">등수 비율 추이</span>
+        <span className="font-semibold text-body text-content-standard-primary">백분위 추이</span>
         <span className="text-content-standard-tertiary text-footnote">높을수록 좋음</span>
       </div>
       <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--line-divider)" />
-            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "var(--content-standard-tertiary)" }} tickLine={false} />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 12, fill: "var(--content-standard-tertiary)" }}
+              tickLine={false}
+              tickFormatter={(_v: any, i: number) => chartData[i]?.label ?? _v}
+            />
             <YAxis
               domain={[0, 100]}
               tick={{ fontSize: 12, fill: "var(--content-standard-tertiary)" }}
@@ -72,18 +70,18 @@ const RankRatioChart = ({ scores }: { scores: MyExamScore[] }) => {
               }}
               formatter={(_v: any, _n: any, props: any) => {
                 const d = props.payload;
-                return [`${d.rank}/${d.total} (${d.label})`, "등수"];
+                return [`${d.percentile}% (${d.rank}/${d.total}등)`, "백분위"];
               }}
               labelFormatter={(_label: any, payload: any) => {
                 if (payload && payload.length > 0) {
-                  return `${payload[0].payload.courseName} ${_label} - ${payload[0].payload.examName}`;
+                  return `${_label} - ${payload[0].payload.examName}`;
                 }
                 return _label;
               }}
             />
             <Line
               type="monotone"
-              dataKey="ratio"
+              dataKey="percentile"
               stroke="var(--core-accent)"
               strokeWidth={2.5}
               dot={{ r: 4, fill: "var(--core-accent)", strokeWidth: 0 }}
@@ -172,7 +170,7 @@ export default function MyCoursesPage() {
             </div>
           </div>
 
-          <RankRatioChart scores={filteredScores} />
+          <PercentileChart scores={filteredScores} />
 
           {sortedData.length === 0 ? (
             <EmptyState message="시험 및 과제 기록이 없습니다." />
