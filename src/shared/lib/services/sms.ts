@@ -1,15 +1,16 @@
 import { SolapiMessageService } from "solapi";
 
-const apiKey = process.env.SOLAPI_API_KEY;
-const apiSecret = process.env.SOLAPI_API_SECRET;
-
-const messageService = apiKey && apiSecret ? new SolapiMessageService(apiKey, apiSecret) : null;
+export interface SolapiCredentials {
+  apiKey: string;
+  apiSecret: string;
+}
 
 export interface SendSMSParams {
   to: string;
   text: string;
   from: string;
   subject?: string;
+  credentials: SolapiCredentials;
 }
 
 export interface SendSMSResult {
@@ -26,6 +27,7 @@ export interface BulkSendSMSParams {
   text: string;
   from: string;
   subject?: string;
+  credentials: SolapiCredentials;
 }
 
 export interface BulkSendSMSResult {
@@ -36,6 +38,10 @@ export interface BulkSendSMSResult {
   groupId?: string;
   error?: string;
 }
+
+const createMessageService = (credentials: SolapiCredentials): SolapiMessageService => {
+  return new SolapiMessageService(credentials.apiKey, credentials.apiSecret);
+};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -57,14 +63,12 @@ const isDeliveryFailed = (statusCode: string): boolean => {
   return (code >= 1000 && code < 2000) || (code > 3000 && code < 4000);
 };
 
-export const sendSMS = async ({ to, text, from, subject }: SendSMSParams): Promise<SendSMSResult> => {
-  if (!messageService) {
-    return { success: false, error: "SMS 서비스가 설정되지 않았습니다." };
-  }
-
+export const sendSMS = async ({ to, text, from, subject, credentials }: SendSMSParams): Promise<SendSMSResult> => {
   if (!from) {
     return { success: false, error: "발신번호가 설정되지 않았습니다." };
   }
+
+  const messageService = createMessageService(credentials);
 
   try {
     const cleanedTo = to.replace(/-/g, "");
@@ -132,17 +136,8 @@ export const sendBulkSMS = async ({
   text,
   from,
   subject,
+  credentials,
 }: BulkSendSMSParams): Promise<BulkSendSMSResult> => {
-  if (!messageService) {
-    return {
-      success: false,
-      total: recipients.length,
-      successCount: 0,
-      failCount: recipients.length,
-      error: "SMS 서비스가 설정되지 않았습니다.",
-    };
-  }
-
   if (!from) {
     return {
       success: false,
@@ -152,6 +147,8 @@ export const sendBulkSMS = async ({
       error: "발신번호가 설정되지 않았습니다.",
     };
   }
+
+  const messageService = createMessageService(credentials);
 
   try {
     const cleanedFrom = from.replace(/-/g, "");
@@ -185,8 +182,4 @@ export const sendBulkSMS = async ({
       error: errorMessage,
     };
   }
-};
-
-export const isSMSServiceAvailable = (): boolean => {
-  return messageService !== null;
 };

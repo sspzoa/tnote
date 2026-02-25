@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import {
   buildRecipientList,
-  checkSMSService,
-  getSenderPhoneNumber,
+  getWorkspaceSMSConfig,
   sendMessagesWithHistory,
   validateRecipientType,
 } from "@/shared/lib/services/messageSender";
@@ -25,14 +24,9 @@ const getAssignmentStatusText = (status: string): string => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const smsCheck = checkSMSService();
-  if (!smsCheck.available) {
-    return NextResponse.json({ error: smsCheck.error }, { status: 503 });
-  }
-
-  const senderResult = await getSenderPhoneNumber(supabase, session.workspace);
-  if (!senderResult.phone) {
-    return NextResponse.json({ error: senderResult.error }, { status: 400 });
+  const smsConfig = await getWorkspaceSMSConfig(supabase, session.workspace);
+  if (!smsConfig.config) {
+    return NextResponse.json({ error: smsConfig.error }, { status: 400 });
   }
 
   const { examId, recipientType, studentIds, messageTemplate } = await request.json();
@@ -159,7 +153,8 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     userId: session.userId,
     messageType: "exam",
     recipients,
-    senderPhoneNumber: senderResult.phone,
+    senderPhoneNumber: smsConfig.config.senderPhoneNumber,
+    credentials: smsConfig.config.credentials,
   });
 
   return NextResponse.json({

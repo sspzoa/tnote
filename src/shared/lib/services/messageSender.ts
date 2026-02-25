@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import type { RecipientType } from "@/shared/types";
-import { isSMSServiceAvailable, type SendSMSResult, sendSMS } from "./sms";
+import { type SendSMSResult, type SolapiCredentials, sendSMS } from "./sms";
 
 export interface MessageRecipient {
   phone: string;
@@ -35,6 +35,7 @@ export interface SendMessagesParams {
   messageType: "general" | "exam" | "retake";
   recipients: MessageRecipient[];
   senderPhoneNumber: string;
+  credentials: SolapiCredentials;
 }
 
 export interface SendMessagesResult {
@@ -45,27 +46,49 @@ export interface SendMessagesResult {
   batchId: string;
 }
 
-export const getSenderPhoneNumber = async (
+export interface WorkspaceSMSConfig {
+  senderPhoneNumber: string;
+  credentials: SolapiCredentials;
+}
+
+export const getWorkspaceSMSConfig = async (
   supabase: SupabaseClient,
   workspace: string,
-): Promise<{ phone: string | null; error: string | null }> => {
-  const { data, error } = await supabase.from("Workspaces").select("sender_phone_number").eq("id", workspace).single();
+): Promise<{ config: WorkspaceSMSConfig | null; error: string | null }> => {
+  const { data, error } = await supabase
+    .from("Workspaces")
+    .select("sender_phone_number, solapi_api_key, solapi_api_secret")
+    .eq("id", workspace)
+    .single();
 
-  if (error || !data?.sender_phone_number) {
+  if (error) {
+    return { config: null, error: "워크스페이스 정보를 조회할 수 없습니다." };
+  }
+
+  if (!data?.solapi_api_key || !data?.solapi_api_secret) {
     return {
-      phone: null,
+      config: null,
+      error: "SOLAPI API 키가 설정되지 않았습니다. 문자 관리에서 API 키를 먼저 설정해주세요.",
+    };
+  }
+
+  if (!data?.sender_phone_number) {
+    return {
+      config: null,
       error: "발신번호가 설정되지 않았습니다. 문자 관리에서 발신번호를 먼저 설정해주세요.",
     };
   }
 
-  return { phone: data.sender_phone_number, error: null };
-};
-
-export const checkSMSService = (): { available: boolean; error: string | null } => {
-  if (!isSMSServiceAvailable()) {
-    return { available: false, error: "SMS 서비스가 설정되지 않았습니다." };
-  }
-  return { available: true, error: null };
+  return {
+    config: {
+      senderPhoneNumber: data.sender_phone_number,
+      credentials: {
+        apiKey: data.solapi_api_key,
+        apiSecret: data.solapi_api_secret,
+      },
+    },
+    error: null,
+  };
 };
 
 export interface StudentWithPhone {
@@ -126,6 +149,7 @@ export const sendMessagesWithHistory = async ({
   messageType,
   recipients,
   senderPhoneNumber,
+  credentials,
 }: SendMessagesParams): Promise<SendMessagesResult> => {
   const batchId = crypto.randomUUID();
   const historyRecords: MessageHistoryRecord[] = [];
@@ -142,6 +166,7 @@ export const sendMessagesWithHistory = async ({
           to: recipient.phone,
           text: recipient.text,
           from: senderPhoneNumber,
+          credentials,
         }),
       ),
     );

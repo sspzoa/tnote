@@ -74,6 +74,7 @@ export const QUERY_KEYS = {
   messages: {
     templates: (type: string) => ["message-templates", type] as const,
     senderPhone: ["sender-phone"] as const,
+    solapiSettings: ["solapi-settings"] as const,
     history: (type: string, limit: number) => ["message-history", type, limit] as const,
   },
 } as const;

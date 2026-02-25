@@ -1,7 +1,17 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { ChevronDown, ChevronUp, FileText, History, MessageSquare, Phone, RefreshCw, Settings } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  History,
+  Key,
+  MessageSquare,
+  Phone,
+  RefreshCw,
+  Settings,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
@@ -11,8 +21,10 @@ import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
 import RetakeNoticeTab from "./(components)/RetakeNoticeTab";
 import SenderPhoneSettings from "./(components)/SenderPhoneSettings";
+import SolapiSettings from "./(components)/SolapiSettings";
 import { type MessageBatch, useMessageHistory } from "./(hooks)/useMessageHistory";
 import { useSenderPhone } from "./(hooks)/useSenderPhone";
+import { useSolapiSettings } from "./(hooks)/useSolapiSettings";
 
 const TABS: { value: MessageTab; label: string; icon: typeof MessageSquare }[] = [
   { value: "general", label: "일반", icon: MessageSquare },
@@ -149,8 +161,10 @@ export default function MessagesPage() {
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const [showHistoryPanel, setShowHistoryPanel] = useAtom(showHistoryModalAtom);
   const [showSenderPhoneSettings, setShowSenderPhoneSettings] = useState(false);
+  const [showSolapiSettings, setShowSolapiSettings] = useState(false);
   const { history, isLoading, refetch } = useMessageHistory();
   const { senderPhoneNumber, isLoading: isSenderPhoneLoading } = useSenderPhone();
+  const { isConfigured: isSolapiConfigured, isLoading: isSolapiLoading } = useSolapiSettings();
 
   useEffect(() => {
     if (showHistoryPanel) {
@@ -166,6 +180,21 @@ export default function MessagesPage() {
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
           <div className="flex items-center gap-spacing-300">
+            <Button
+              variant="secondary"
+              onClick={() => setShowSolapiSettings(true)}
+              className="flex items-center gap-spacing-200">
+              <Key className="size-4" />
+              <span className="hidden sm:inline">SOLAPI:</span>
+              {isSolapiLoading ? (
+                <Skeleton className="h-5 w-16" />
+              ) : (
+                <span className={isSolapiConfigured ? "text-core-accent" : "text-core-status-negative"}>
+                  {isSolapiConfigured ? "설정됨" : "미설정"}
+                </span>
+              )}
+              <Settings className="size-3 text-content-standard-tertiary" />
+            </Button>
             <Button
               variant="secondary"
               onClick={() => setShowSenderPhoneSettings(true)}
@@ -236,6 +265,7 @@ export default function MessagesPage() {
       </SlidePanel>
 
       <SenderPhoneSettings isOpen={showSenderPhoneSettings} onClose={() => setShowSenderPhoneSettings(false)} />
+      <SolapiSettings isOpen={showSolapiSettings} onClose={() => setShowSolapiSettings(false)} />
     </Container>
   );
 }
