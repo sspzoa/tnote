@@ -158,8 +158,14 @@ export interface ConsultationWithDetails {
   title: string;
   content: string;
   created_at: string;
+  updated_at: string;
+  is_read: boolean;
   student: Pick<Student, "id" | "name" | "phone_number" | "school">;
   creator?: {
+    id: string;
+    name: string;
+  } | null;
+  updater?: {
     id: string;
     name: string;
   } | null;

@@ -32,11 +32,19 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
       title: title.trim(),
       content: content.trim(),
       updated_at: new Date().toISOString(),
+      updated_by: session.userId,
     })
     .eq("id", consultationId)
     .eq("workspace", session.workspace)
     .select()
     .single();
+
+  // 수정 시 수정자 본인 외 다른 사용자들의 읽음 기록 삭제 (안읽음으로 전환)
+  await supabase
+    .from("ConsultationReadReceipts")
+    .delete()
+    .eq("consultation_id", consultationId)
+    .neq("user_id", session.userId);
 
   if (error) {
     throw error;

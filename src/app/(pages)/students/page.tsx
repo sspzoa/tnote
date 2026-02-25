@@ -1,12 +1,12 @@
 "use client";
 
 import { useAtom, useAtomValue } from "jotai";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Pencil } from "lucide-react";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
-import { Button, EmptyState, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
+import { Badge, Button, EmptyState, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
@@ -27,10 +27,17 @@ import { useCourses } from "./(hooks)/useCourses";
 import { useStudents } from "./(hooks)/useStudents";
 import { useTags } from "./(hooks)/useTags";
 
+const isEdited = (consultation: ConsultationWithDetails) => {
+  if (!consultation.updated_at) return false;
+  const created = new Date(consultation.created_at).getTime();
+  const updated = new Date(consultation.updated_at).getTime();
+  return updated - created > 1000;
+};
+
 export default function StudentsPage() {
   const { students, isLoading: studentsLoading, error: studentsError } = useStudents();
   const { courses, isLoading: coursesLoading } = useCourses();
-  const { consultations, isLoading: consultationsLoading } = useAllConsultations();
+  const { consultations, isLoading: consultationsLoading, markAsRead, unreadCount } = useAllConsultations();
   const { tags, isLoading: tagsLoading } = useTags();
   const searchQuery = useAtomValue(searchQueryAtom);
   const selectedTagIds = useAtomValue(selectedTagIdsAtom);
@@ -61,6 +68,13 @@ export default function StudentsPage() {
 
   const isLoading = studentsLoading || coursesLoading || tagsLoading;
 
+  const handleConsultationClick = (consultation: ConsultationWithDetails) => {
+    setSelectedConsultation(consultation);
+    if (!consultation.is_read) {
+      markAsRead(consultation.id);
+    }
+  };
+
   if (studentsError) {
     return <ErrorComponent errorMessage="학생 목록을 불러오는데 실패했습니다." />;
   }
@@ -79,9 +93,9 @@ export default function StudentsPage() {
               className="flex items-center gap-spacing-200">
               <MessageSquare className="size-4" />
               최근 상담
-              {consultations.length > 0 && (
-                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
-                  {consultations.length}
+              {unreadCount > 0 && (
+                <span className="rounded-full bg-core-status-negative px-spacing-200 text-footnote text-solid-white">
+                  {unreadCount}
                 </span>
               )}
             </Button>
@@ -135,7 +149,7 @@ export default function StudentsPage() {
         isOpen={showConsultationPanel}
         onClose={() => setShowConsultationPanel(false)}
         title="최근 상담 내역"
-        subtitle="최근 50건">
+        subtitle={unreadCount > 0 ? `읽지 않은 상담 ${unreadCount}건` : "최근 50건"}>
         {consultationsLoading ? (
           <div className="flex flex-col gap-spacing-300 p-spacing-600">
             {[...Array(5)].map((_, i) => (
@@ -164,23 +178,39 @@ export default function StudentsPage() {
               const createdAt = new Date(consultation.created_at);
               const dateStr = createdAt.toLocaleDateString("ko-KR");
               const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+              const edited = isEdited(consultation);
 
               return (
                 <button
                   key={consultation.id}
-                  onClick={() => {
-                    setSelectedConsultation(consultation);
-                  }}
-                  className="flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
+                  onClick={() => handleConsultationClick(consultation)}
+                  className={`flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50 ${!consultation.is_read ? "bg-core-accent-translucent/30" : ""}`}>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-body text-content-standard-primary">
-                      {consultation.student?.name || "-"}
-                    </span>
-                    <span className="rounded-radius-200 border border-core-accent/20 bg-core-accent-translucent px-spacing-200 py-spacing-50 text-core-accent text-footnote">
-                      {dateStr}
-                    </span>
+                    <div className="flex items-center gap-spacing-200">
+                      {!consultation.is_read && (
+                        <span className="size-2 shrink-0 rounded-full bg-core-status-negative" />
+                      )}
+                      <span
+                        className={`text-body text-content-standard-primary ${!consultation.is_read ? "font-semibold" : "font-medium"}`}>
+                        {consultation.student?.name || "-"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-spacing-100">
+                      {edited && (
+                        <Badge variant="neutral" size="xs" className="gap-spacing-50">
+                          <Pencil className="size-2.5" />
+                          {consultation.updater?.name || "수정됨"}
+                        </Badge>
+                      )}
+                      <span className="rounded-radius-200 border border-core-accent/20 bg-core-accent-translucent px-spacing-200 py-spacing-50 text-core-accent text-footnote">
+                        {dateStr}
+                      </span>
+                    </div>
                   </div>
-                  <div className="truncate text-body text-content-standard-secondary">{consultation.title}</div>
+                  <div
+                    className={`truncate text-body ${!consultation.is_read ? "text-content-standard-primary" : "text-content-standard-secondary"}`}>
+                    {consultation.title}
+                  </div>
                   <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
                     <span>{timeStr}</span>
                     {consultation.creator?.name && (

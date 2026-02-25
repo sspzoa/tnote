@@ -3,6 +3,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import { showEditConsultationModalAtom } from "../(atoms)/useModalStore";
+import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 
 interface ConsultationDetailData {
   id: string;
@@ -11,6 +12,12 @@ interface ConsultationDetailData {
   content: string;
   created_at: string;
   updated_at?: string;
+  student?: {
+    id: string;
+    name: string;
+    phone_number: string;
+    school: string | null;
+  };
   creator?: {
     id?: string;
     name: string;
@@ -27,9 +34,21 @@ export default function ConsultationDetailModal({ consultation, studentName, onC
   const [, setSelectedConsultation] = useAtom(selectedConsultationAtom);
   const [, setConsultationForm] = useAtom(consultationFormAtom);
   const [, setShowEditModal] = useAtom(showEditConsultationModalAtom);
+  const [, setSelectedStudent] = useAtom(selectedStudentAtom);
 
   const handleEdit = () => {
     if (!consultation) return;
+    if (consultation.student) {
+      setSelectedStudent({
+        id: consultation.student.id,
+        name: consultation.student.name,
+        phone_number: consultation.student.phone_number,
+        school: consultation.student.school,
+        parent_phone_number: null,
+        branch: null,
+        birth_year: null,
+      });
+    }
     setSelectedConsultation({
       id: consultation.id,
       student_id: consultation.student_id,
