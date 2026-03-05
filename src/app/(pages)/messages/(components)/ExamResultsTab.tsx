@@ -18,7 +18,7 @@ import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
 import { useSelectionList } from "../(hooks)/useSelectionList";
 import { useSendExamResults } from "../(hooks)/useSendMessage";
 import { useCourses, useExamExport, useExams } from "../(hooks)/useStudents";
-import { EXAM_TEMPLATE_VARIABLES } from "../(utils)/messageUtils";
+import { EXAM_TEMPLATE_VARIABLES, getTodayFormatted } from "../(utils)/messageUtils";
 import { MessageTabLayout } from "./shared";
 
 export default function ExamResultsTab() {
@@ -103,7 +103,8 @@ export default function ExamResultsTab() {
       .replace(/{만점}/g, exportData?.exam?.maxScore?.toString() || "100")
       .replace(/{커트라인}/g, exportData?.exam?.cutline?.toString() || "-")
       .replace(/{석차}/g, previewStudent.rank?.toString() || "-")
-      .replace(/{전체인원}/g, students.length.toString());
+      .replace(/{전체인원}/g, students.length.toString())
+      .replace(/{오늘날짜}/g, getTodayFormatted());
   }, [messageTemplate, previewStudent, selectedExam, selectedCourse, exportData, students.length]);
 
   const handleCourseChange = (courseId: string) => {
@@ -275,6 +276,7 @@ export default function ExamResultsTab() {
             { label: "커트라인", value: exportData?.exam?.cutline },
             { label: "석차", value: previewStudent?.rank },
             { label: "전체", value: `${students.length}명` },
+            { label: "오늘날짜", value: getTodayFormatted() },
           ],
         }}
       />

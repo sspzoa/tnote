@@ -17,7 +17,7 @@ import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
 import { useSelectionList } from "../(hooks)/useSelectionList";
 import { useSendRetakeNotice } from "../(hooks)/useSendMessage";
 import { useRetakes } from "../(hooks)/useStudents";
-import { formatDate, RETAKE_TEMPLATE_VARIABLES } from "../(utils)/messageUtils";
+import { formatDate, getTodayFormatted, RETAKE_TEMPLATE_VARIABLES } from "../(utils)/messageUtils";
 import { MessageTabLayout } from "./shared";
 
 const STATUS_OPTIONS = [
@@ -93,7 +93,8 @@ export default function RetakeNoticeTab() {
       .replace(/{시험명}/g, previewRetake.exam.name)
       .replace(/{회차}/g, previewRetake.exam.exam_number.toString())
       .replace(/{예정일}/g, formatDate(previewRetake.current_scheduled_date))
-      .replace(/{상태}/g, formatStatusLabel(previewRetake.status));
+      .replace(/{상태}/g, formatStatusLabel(previewRetake.status))
+      .replace(/{오늘날짜}/g, getTodayFormatted());
   }, [messageTemplate, previewRetake]);
 
   const handleSend = useCallback(async () => {
@@ -237,6 +238,7 @@ export default function RetakeNoticeTab() {
           { label: "회차", value: previewRetake ? `${previewRetake.exam.exam_number}회` : undefined },
           { label: "예정일", value: previewRetake ? formatDate(previewRetake.current_scheduled_date) : undefined },
           { label: "상태", value: previewRetake ? formatStatusLabel(previewRetake.status) : undefined },
+          { label: "오늘날짜", value: getTodayFormatted() },
         ],
       }}
     />
