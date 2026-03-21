@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { createFormAtom } from "../(atoms)/useFormStore";
@@ -21,10 +22,19 @@ export default function StudentCreateModal() {
         school: form.school || null,
         branch: form.branch || null,
         birthYear: form.birthYear || null,
+        requiredClinicWeekdays: form.requiredClinicWeekdays.length > 0 ? form.requiredClinicWeekdays : null,
       });
       toast.success("학생이 추가되었습니다.");
       setShowModal(false);
-      setForm({ name: "", phoneNumber: "", parentPhoneNumber: "", school: "", branch: "", birthYear: "" });
+      setForm({
+        name: "",
+        phoneNumber: "",
+        parentPhoneNumber: "",
+        school: "",
+        branch: "",
+        birthYear: "",
+        requiredClinicWeekdays: [],
+      });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
     }
@@ -137,6 +147,12 @@ export default function StudentCreateModal() {
             })}
           </div>
         </div>
+
+        <DayOfWeekPicker
+          label="클리닉 필참 요일"
+          selectedDays={form.requiredClinicWeekdays}
+          onChange={(days) => setForm({ ...form, requiredClinicWeekdays: days })}
+        />
       </div>
     </Modal>
   );

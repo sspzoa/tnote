@@ -11,7 +11,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, required_clinic_weekdays")
     .eq("id", id)
     .eq("workspace", session.workspace)
     .single();
@@ -26,7 +26,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     return NextResponse.json({ error: "학생 ID가 필요합니다." }, { status: 400 });
   }
 
-  const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear } = await request.json();
+  const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear, requiredClinicWeekdays } =
+    await request.json();
 
   const updateData: Record<string, unknown> = {};
 
@@ -89,6 +90,18 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     }
   }
 
+  // 클리닉 필참 요일 검증
+  if (requiredClinicWeekdays !== undefined) {
+    if (requiredClinicWeekdays && Array.isArray(requiredClinicWeekdays) && requiredClinicWeekdays.length > 0) {
+      if (!requiredClinicWeekdays.every((d: number) => Number.isInteger(d) && d >= 0 && d <= 6)) {
+        return NextResponse.json({ error: "올바른 요일 형식이 아닙니다." }, { status: 400 });
+      }
+      updateData.required_clinic_weekdays = requiredClinicWeekdays;
+    } else {
+      updateData.required_clinic_weekdays = null;
+    }
+  }
+
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json({ error: "수정할 항목이 없습니다." }, { status: 400 });
   }
@@ -98,7 +111,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .update(updateData)
     .eq("id", id)
     .eq("workspace", session.workspace)
-    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year")
+    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, required_clinic_weekdays")
     .single();
 
   if (error) {

@@ -39,6 +39,7 @@ export interface Student {
   school: string | null;
   branch: string | null;
   birth_year: number | null;
+  required_clinic_weekdays: number[] | null;
   enrolled_at?: string;
   created_at?: string;
   consultation_count?: number;

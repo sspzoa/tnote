@@ -65,7 +65,9 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 
   const { data, error } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, branch, birth_year, created_at")
+    .select(
+      "id, phone_number, name, parent_phone_number, school, branch, birth_year, required_clinic_weekdays, created_at",
+    )
     .eq("role", "student")
     .eq("workspace", session.workspace);
 
@@ -118,7 +120,8 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear } = await request.json();
+  const { name, phoneNumber, parentPhoneNumber, school, branch, birthYear, requiredClinicWeekdays } =
+    await request.json();
 
   if (!name || !phoneNumber || !parentPhoneNumber || !school || !branch || !birthYear) {
     return NextResponse.json({ error: "모든 필드는 필수입니다." }, { status: 400 });
@@ -141,6 +144,15 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const year = Number.parseInt(birthYear);
   if (Number.isNaN(year) || !isValidBirthYear(year)) {
     return NextResponse.json({ error: "올바른 출생연도가 아닙니다." }, { status: 400 });
+  }
+
+  if (requiredClinicWeekdays !== undefined && requiredClinicWeekdays !== null) {
+    if (
+      !Array.isArray(requiredClinicWeekdays) ||
+      !requiredClinicWeekdays.every((d: number) => Number.isInteger(d) && d >= 0 && d <= 6)
+    ) {
+      return NextResponse.json({ error: "올바른 요일 형식이 아닙니다." }, { status: 400 });
+    }
   }
 
   const adminSupabase = createAdminClient();
@@ -174,6 +186,8 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       school: school.trim(),
       branch: branch.trim(),
       birth_year: year,
+      required_clinic_weekdays:
+        requiredClinicWeekdays && requiredClinicWeekdays.length > 0 ? requiredClinicWeekdays : null,
       role: "student",
       workspace: session.workspace,
     })

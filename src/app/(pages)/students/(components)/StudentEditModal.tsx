@@ -1,5 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { editFormAtom } from "../(atoms)/useFormStore";
@@ -26,6 +27,7 @@ export default function StudentEditModal() {
         school: form.school || null,
         branch: form.branch || null,
         birthYear: form.birthYear ? Number.parseInt(form.birthYear) : null,
+        requiredClinicWeekdays: form.requiredClinicWeekdays.length > 0 ? form.requiredClinicWeekdays : null,
       });
       toast.success("학생 정보가 수정되었습니다.");
       setShowModal(false);
@@ -128,6 +130,12 @@ export default function StudentEditModal() {
             })}
           </div>
         </div>
+
+        <DayOfWeekPicker
+          label="클리닉 필참 요일"
+          selectedDays={form.requiredClinicWeekdays}
+          onChange={(days) => setForm({ ...form, requiredClinicWeekdays: days })}
+        />
       </div>
     </Modal>
   );

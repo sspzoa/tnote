@@ -79,6 +79,7 @@ export default function StudentList({ students }: StudentListProps) {
         school: student.school || "",
         branch: student.branch || "",
         birthYear: student.birth_year?.toString() || "",
+        requiredClinicWeekdays: student.required_clinic_weekdays || [],
       });
       setShowEditModal(true);
     },

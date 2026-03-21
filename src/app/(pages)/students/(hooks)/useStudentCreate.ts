@@ -9,6 +9,7 @@ interface CreateStudentData {
   school?: string | null;
   branch?: string | null;
   birthYear?: string | null;
+  requiredClinicWeekdays?: number[] | null;
 }
 
 export const useStudentCreate = () => {

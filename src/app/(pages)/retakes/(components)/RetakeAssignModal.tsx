@@ -185,12 +185,17 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           options={examOptions}
         />
 
-        <FormInput
-          label="예정일 (선택)"
-          type="date"
-          value={scheduledDate}
-          onChange={(e) => setScheduledDate(e.target.value)}
-        />
+        <div className="flex flex-col gap-spacing-100">
+          <FormInput
+            label="예정일 (선택)"
+            type="date"
+            value={scheduledDate}
+            onChange={(e) => setScheduledDate(e.target.value)}
+          />
+          <span className="text-content-standard-tertiary text-footnote">
+            비워두면 학생별 클리닉 필참 요일에 자동 배정됩니다.
+          </span>
+        </div>
 
         <div className="flex flex-col gap-spacing-200">
           <div className="flex items-center justify-between">

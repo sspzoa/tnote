@@ -7,6 +7,7 @@ export const editFormAtom = atom({
   school: "",
   branch: "",
   birthYear: "",
+  requiredClinicWeekdays: [] as number[],
 });
 
 export const createFormAtom = atom({
@@ -16,4 +17,5 @@ export const createFormAtom = atom({
   school: "",
   branch: "",
   birthYear: "",
+  requiredClinicWeekdays: [] as number[],
 });

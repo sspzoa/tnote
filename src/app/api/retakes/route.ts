@@ -1,6 +1,25 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
+const getNextClinicDate = (weekdays: number[]): string | null => {
+  if (!weekdays || weekdays.length === 0) return null;
+
+  const koreaFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" });
+  const koreaToday = new Date(`${koreaFormatter.format(new Date())}T12:00:00`);
+
+  for (let i = 1; i <= 7; i++) {
+    const date = new Date(koreaToday);
+    date.setDate(koreaToday.getDate() + i);
+    if (weekdays.includes(date.getDay())) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+  }
+  return null;
+};
+
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { examId, studentIds, scheduledDate } = await request.json();
 
@@ -21,7 +40,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
 
   const { data: students } = await supabase
     .from("Users")
-    .select("id")
+    .select("id, required_clinic_weekdays")
     .in("id", studentIds)
     .eq("workspace", session.workspace)
     .eq("role", "student");
@@ -37,10 +56,17 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .eq("display_order", 1)
     .single();
 
+  const studentClinicDateMap = new Map<string, string | null>();
+  if (!scheduledDate) {
+    for (const student of students) {
+      studentClinicDateMap.set(student.id, getNextClinicDate(student.required_clinic_weekdays));
+    }
+  }
+
   const assignments = studentIds.map((studentId) => ({
     exam_id: examId,
     student_id: studentId,
-    current_scheduled_date: scheduledDate || null,
+    current_scheduled_date: scheduledDate || studentClinicDateMap.get(studentId) || null,
     management_status: defaultStatus?.name ?? null,
   }));
 
@@ -64,7 +90,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     const historyRecords = data.map((assignment) => ({
       retake_assignment_id: assignment.id,
       action_type: "assign",
-      new_date: scheduledDate || null,
+      new_date: assignment.current_scheduled_date || null,
       performed_by: session.userId,
     }));
 

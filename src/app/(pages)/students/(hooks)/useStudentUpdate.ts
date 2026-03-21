@@ -10,6 +10,7 @@ interface UpdateStudentData {
   school?: string | null;
   branch?: string | null;
   birthYear?: number | null;
+  requiredClinicWeekdays?: number[] | null;
 }
 
 export const useStudentUpdate = () => {
