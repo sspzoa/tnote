@@ -47,6 +47,7 @@ export default function ConsultationDetailModal({ consultation, studentName, onC
         parent_phone_number: null,
         branch: null,
         birth_year: null,
+        required_clinic_weekdays: null,
       });
     }
     setSelectedConsultation({
