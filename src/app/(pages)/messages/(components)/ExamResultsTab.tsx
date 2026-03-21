@@ -7,6 +7,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { StudentListItem } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import type { TagColor } from "@/shared/types";
 import {
   examMessageTemplateAtom,
@@ -62,6 +63,8 @@ export default function ExamResultsTab() {
     }));
   }, [exportData]);
 
+  const visibleStudents = useMemo(() => students.filter((s) => !hasActiveHiddenTag(s)), [students]);
+
   const {
     selectedIds,
     searchQuery,
@@ -74,7 +77,7 @@ export default function ExamResultsTab() {
     resetSelection,
     selectedCount,
   } = useSelectionList({
-    items: students,
+    items: visibleStudents,
     getSearchableText: (student) => student.name,
   });
 

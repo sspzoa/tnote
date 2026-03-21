@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { StudentListItem } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import { messageTextAtom, recipientTypeAtom } from "../(atoms)/useMessageStore";
 import { useMessageTemplates } from "../(hooks)/useMessageTemplates";
 import { useSelectionList } from "../(hooks)/useSelectionList";
@@ -18,6 +19,8 @@ export default function GeneralTab() {
   const { templates, addTemplate, deleteTemplate } = useMessageTemplates("general");
   const toast = useToast();
 
+  const visibleStudents = useMemo(() => students.filter((s) => !hasActiveHiddenTag(s)), [students]);
+
   const {
     selectedIds,
     searchQuery,
@@ -30,7 +33,7 @@ export default function GeneralTab() {
     resetSelection,
     selectedCount,
   } = useSelectionList({
-    items: students,
+    items: visibleStudents,
     getSearchableText: (student) => student.name,
   });
 

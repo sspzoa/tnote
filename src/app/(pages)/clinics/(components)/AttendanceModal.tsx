@@ -13,6 +13,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
 import { attendanceSearchQueryAtom, selectedDateAtom, selectedStudentIdsAtom } from "../(atoms)/useFormStore";
 import { showAttendanceModalAtom } from "../(atoms)/useModalStore";
@@ -40,6 +41,7 @@ export default function AttendanceModal() {
 
   const filteredStudents = useMemo(() => {
     return students
+      .filter((student) => !hasActiveHiddenTag(student))
       .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
       .sort((a, b) => a.name.localeCompare(b.name, "ko"));
   }, [students, searchQuery]);

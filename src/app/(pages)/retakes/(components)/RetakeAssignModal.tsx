@@ -14,6 +14,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
 import { useExamScoresForAssign } from "../(hooks)/useExamScoresForAssign";
@@ -53,17 +54,19 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     return score < (selectedExam.cutline || 4);
   };
 
+  const visibleStudents = useMemo(() => students.filter((s) => !hasActiveHiddenTag(s)), [students]);
+
   const studentsBelowCutline = useMemo(
-    () => students.filter((s) => isBelowCutline(s.id)),
-    [students, examScores, selectedExam],
+    () => visibleStudents.filter((s) => isBelowCutline(s.id)),
+    [visibleStudents, examScores, selectedExam],
   );
 
   const filteredStudents = useMemo(
     () =>
-      students
+      visibleStudents
         .filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name, "ko")),
-    [students, searchQuery],
+    [visibleStudents, searchQuery],
   );
 
   const handleClose = () => {

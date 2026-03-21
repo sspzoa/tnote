@@ -36,7 +36,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       start_date,
       end_date,
       created_at,
-      tag:StudentTags!inner(id, name, color, workspace)
+      tag:StudentTags!inner(id, name, color, workspace, hidden_by_default)
     `)
     .in("student_id", studentIds)
     .eq("tag.workspace", session.workspace);

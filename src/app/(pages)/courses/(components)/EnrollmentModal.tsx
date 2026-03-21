@@ -10,6 +10,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import { enrolledSearchQueryAtom, selectedCourseAtom, unenrolledSearchQueryAtom } from "../(atoms)/useCoursesStore";
 import { showEnrollModalAtom } from "../(atoms)/useModalStore";
 import { useAllStudents } from "../(hooks)/useAllStudents";
@@ -33,7 +34,7 @@ export default function EnrollmentModal() {
   if (!selectedCourse) return null;
 
   const unenrolledStudents = allStudents.filter(
-    (student) => !enrolledStudents.find((enrolled) => enrolled.id === student.id),
+    (student) => !enrolledStudents.find((enrolled) => enrolled.id === student.id) && !hasActiveHiddenTag(student),
   );
 
   const filteredEnrolledStudents = enrolledStudents
