@@ -258,9 +258,35 @@ export default function StudentInfoModal({
                         <span className="truncate text-content-standard-tertiary text-footnote">{history.note}</span>
                       )}
                     </div>
-                    <Badge variant="blue" size="xs">
-                      {new Date(history.attendanceDate).toLocaleDateString("ko-KR")}
-                    </Badge>
+                    <div className="flex shrink-0 flex-wrap items-center gap-spacing-100">
+                      {history.isRequired ? (
+                        <Badge variant="blue" size="xs">
+                          필참
+                        </Badge>
+                      ) : (
+                        <Badge variant="neutral" size="xs">
+                          자율
+                        </Badge>
+                      )}
+                      {history.didRetakeExam && (
+                        <Badge variant="purple" size="xs">
+                          재시험
+                        </Badge>
+                      )}
+                      {history.didHomeworkCheck && (
+                        <Badge variant="green" size="xs">
+                          숙제검사
+                        </Badge>
+                      )}
+                      {history.didQa && (
+                        <Badge variant="orange" size="xs">
+                          질의응답
+                        </Badge>
+                      )}
+                      <Badge variant="blue" size="xs">
+                        {new Date(history.attendanceDate).toLocaleDateString("ko-KR")}
+                      </Badge>
+                    </div>
                   </div>
                 ))}
               </div>

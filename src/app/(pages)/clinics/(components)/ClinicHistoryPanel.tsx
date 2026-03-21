@@ -38,11 +38,35 @@ export default function ClinicHistoryPanel({ isOpen, onClose, attendance, isLoad
                 key={item.id}
                 className="flex flex-col gap-spacing-200 px-spacing-600 py-spacing-400 transition-colors hover:bg-components-fill-standard-secondary">
                 <div className="flex items-center justify-between gap-spacing-200">
-                  <div className="flex items-center gap-spacing-200">
+                  <div className="flex flex-wrap items-center gap-spacing-200">
                     <span className="font-semibold text-body text-content-standard-primary">{item.student.name}</span>
+                    {item.is_required ? (
+                      <Badge variant="blue" size="xs">
+                        필참
+                      </Badge>
+                    ) : (
+                      <Badge variant="neutral" size="xs">
+                        자율
+                      </Badge>
+                    )}
                     <Badge variant="blue" size="xs">
                       출석
                     </Badge>
+                    {item.did_retake_exam && (
+                      <Badge variant="purple" size="xs">
+                        재시험
+                      </Badge>
+                    )}
+                    {item.did_homework_check && (
+                      <Badge variant="green" size="xs">
+                        숙제검사
+                      </Badge>
+                    )}
+                    {item.did_qa && (
+                      <Badge variant="orange" size="xs">
+                        질의응답
+                      </Badge>
+                    )}
                   </div>
                   <span className="shrink-0 text-content-standard-tertiary text-footnote">{dateStr}</span>
                 </div>

@@ -39,6 +39,10 @@ interface ClinicHistoryInfo {
   id: string;
   attendanceDate: string;
   note: string | null;
+  didRetakeExam: boolean;
+  didHomeworkCheck: boolean;
+  didQa: boolean;
+  isRequired: boolean;
   clinic: {
     id: string;
     name: string;

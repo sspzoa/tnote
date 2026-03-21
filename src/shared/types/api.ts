@@ -92,6 +92,10 @@ export interface StudentDetailClinicAttendance {
   id: string;
   attendance_date: string;
   note: string | null;
+  did_retake_exam: boolean;
+  did_homework_check: boolean;
+  did_qa: boolean;
+  is_required: boolean;
   clinic: {
     id: string;
     name: string;

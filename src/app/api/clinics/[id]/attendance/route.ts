@@ -76,11 +76,22 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   return NextResponse.json({ success: true, data });
 };
 
+interface Attendee {
+  studentId: string;
+  retakeExam?: boolean;
+  homeworkCheck?: boolean;
+  qa?: boolean;
+  isRequired?: boolean;
+}
+
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const clinicId = params?.id;
-  const { studentIds, date, note } = await request.json();
+  const body = await request.json();
+  const { date } = body;
 
-  if (!Array.isArray(studentIds) || !date) {
+  const attendees: Attendee[] = body.attendees || (body.studentIds || []).map((id: string) => ({ studentId: id }));
+
+  if (!Array.isArray(attendees) || !date) {
     return NextResponse.json({ error: "학생 목록과 날짜를 제공해주세요." }, { status: 400 });
   }
 
@@ -103,34 +114,52 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
 
   if (fetchError) throw fetchError;
 
-  const existingStudentIds = new Set(existingRecords?.map((r) => r.student_id) || []);
-  const newStudentIds = new Set(studentIds);
+  const existingMap = new Map((existingRecords || []).map((r) => [r.student_id, r.id]));
+  const newStudentIds = new Set(attendees.map((a) => a.studentId));
 
-  const toDelete = existingRecords?.filter((r) => !newStudentIds.has(r.student_id)).map((r) => r.id) || [];
-  const toAdd = studentIds.filter((id: string) => !existingStudentIds.has(id));
+  const toDelete = (existingRecords || []).filter((r) => !newStudentIds.has(r.student_id)).map((r) => r.id);
+  const toAdd = attendees.filter((a) => !existingMap.has(a.studentId));
+  const toUpdate = attendees.filter((a) => existingMap.has(a.studentId));
 
   if (toDelete.length > 0) {
     const { error: deleteError } = await supabase.from("ClinicAttendance").delete().in("id", toDelete);
-
     if (deleteError) throw deleteError;
   }
 
   if (toAdd.length > 0) {
-    const records = toAdd.map((studentId: string) => ({
+    const records = toAdd.map((a) => ({
       clinic_id: clinicId,
-      student_id: studentId,
+      student_id: a.studentId,
       attendance_date: date,
-      note: note || null,
+      did_retake_exam: a.retakeExam ?? false,
+      did_homework_check: a.homeworkCheck ?? false,
+      did_qa: a.qa ?? false,
+      is_required: a.isRequired ?? false,
     }));
-
     const { error: insertError } = await supabase.from("ClinicAttendance").insert(records);
-
     if (insertError) throw insertError;
   }
+
+  for (const a of toUpdate) {
+    const recordId = existingMap.get(a.studentId);
+    if (!recordId) continue;
+    const { error: updateError } = await supabase
+      .from("ClinicAttendance")
+      .update({
+        did_retake_exam: a.retakeExam ?? false,
+        did_homework_check: a.homeworkCheck ?? false,
+        did_qa: a.qa ?? false,
+        is_required: a.isRequired ?? false,
+      })
+      .eq("id", recordId);
+    if (updateError) throw updateError;
+  }
+
   return NextResponse.json({
     success: true,
     deleted: toDelete.length,
     added: toAdd.length,
+    updated: toUpdate.length,
   });
 };
 

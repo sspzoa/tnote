@@ -1,10 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import type { StudentActivity } from "../(atoms)/useFormStore";
+
+interface AttendeeData {
+  studentId: string;
+  retakeExam: boolean;
+  homeworkCheck: boolean;
+  qa: boolean;
+  isRequired: boolean;
+}
 
 interface SaveAttendanceData {
   clinicId: string;
-  studentIds: string[];
+  attendees: AttendeeData[];
   date: string;
 }
 
@@ -12,11 +21,11 @@ export const useAttendanceSave = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ clinicId, studentIds, date }: SaveAttendanceData) => {
+    mutationFn: async ({ clinicId, attendees, date }: SaveAttendanceData) => {
       const response = await fetchWithAuth(`/api/clinics/${clinicId}/attendance`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentIds, date }),
+        body: JSON.stringify({ attendees, date }),
       });
 
       const result = await response.json();
@@ -33,8 +42,25 @@ export const useAttendanceSave = () => {
     },
   });
 
+  const save = (
+    clinicId: string,
+    studentIds: string[],
+    activities: Record<string, StudentActivity>,
+    date: string,
+    requiredStudentIds: Set<string>,
+  ) => {
+    const attendees: AttendeeData[] = studentIds.map((id) => ({
+      studentId: id,
+      retakeExam: activities[id]?.retakeExam ?? false,
+      homeworkCheck: activities[id]?.homeworkCheck ?? false,
+      qa: activities[id]?.qa ?? false,
+      isRequired: requiredStudentIds.has(id),
+    }));
+    return mutateAsync({ clinicId, attendees, date });
+  };
+
   return {
-    saveAttendance: mutateAsync,
+    saveAttendance: save,
     isSaving: isPending,
   };
 };

@@ -8,3 +8,11 @@ export const endDateAtom = atom("");
 export const selectedDateAtom = atom("");
 export const selectedStudentIdsAtom = atom<string[]>([]);
 export const attendanceSearchQueryAtom = atom("");
+
+export interface StudentActivity {
+  retakeExam: boolean;
+  homeworkCheck: boolean;
+  qa: boolean;
+}
+
+export const studentActivitiesAtom = atom<Record<string, StudentActivity>>({});

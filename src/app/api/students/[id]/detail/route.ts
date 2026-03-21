@@ -74,6 +74,10 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
           id,
           attendance_date,
           note,
+          did_retake_exam,
+          did_homework_check,
+          did_qa,
+          is_required,
           clinic:Clinics!inner(id, name, workspace)
         `)
       .eq("student_id", studentId)
@@ -240,6 +244,10 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     id: record.id,
     attendanceDate: record.attendance_date,
     note: record.note,
+    didRetakeExam: record.did_retake_exam,
+    didHomeworkCheck: record.did_homework_check,
+    didQa: record.did_qa,
+    isRequired: record.is_required,
     clinic: {
       id: record.clinic.id,
       name: record.clinic.name,
