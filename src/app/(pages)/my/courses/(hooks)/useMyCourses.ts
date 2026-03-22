@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
-import { filterActiveCourses } from "@/shared/lib/utils/courses";
 
 export interface MyCourse {
   id: string;
@@ -50,7 +49,7 @@ export const useMyCourses = () => {
       const raw = result.data as MyCoursesData;
       return {
         ...raw,
-        courses: filterActiveCourses(raw.courses),
+        courses: raw.courses,
       };
     },
   });

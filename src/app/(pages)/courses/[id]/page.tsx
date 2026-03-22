@@ -72,6 +72,7 @@ export default function CourseDetailPage() {
     try {
       await createExam({ courseId, ...data });
       toast.success("시험이 생성되었습니다.");
+      closeCreateModal();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
     }
@@ -83,6 +84,7 @@ export default function CourseDetailPage() {
     try {
       await updateExam({ examId: selectedExam.id, ...data });
       toast.success("시험이 수정되었습니다.");
+      closeEditModal();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "시험 수정에 실패했습니다.");
     }

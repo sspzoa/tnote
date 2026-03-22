@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 
-interface MyClinicRecord {
+export interface MyClinicRecord {
   id: string;
   attendanceDate: string;
   note: string | null;
