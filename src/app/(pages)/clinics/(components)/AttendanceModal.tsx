@@ -170,6 +170,22 @@ export default function AttendanceModal() {
     });
   };
 
+  const uncheckedRequiredStudents = useMemo(
+    () =>
+      students.filter(
+        (s) =>
+          !hasActiveHiddenTag(s) &&
+          isRequiredDay(s) &&
+          !selectedStudentIds.includes(s.id) &&
+          !absentStudentIds.includes(s.id),
+      ),
+    [students, isRequiredDay, selectedStudentIds, absentStudentIds],
+  );
+
+  const handleBulkAbsent = () => {
+    setAbsentStudentIds((prev) => [...prev, ...uncheckedRequiredStudents.map((s) => s.id)]);
+  };
+
   if (!selectedClinic) return null;
 
   return (
@@ -215,11 +231,18 @@ export default function AttendanceModal() {
             </StudentListContainer>
           ) : (
             <div className="flex flex-col gap-spacing-300">
-              <SearchInput
-                placeholder="학생 검색..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              <div className="flex items-center gap-spacing-300">
+                <SearchInput
+                  placeholder="학생 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {uncheckedRequiredStudents.length > 0 && (
+                  <Button variant="secondary" size="md" className="shrink-0" onClick={handleBulkAbsent}>
+                    필참 미체크 일괄 결석 ({uncheckedRequiredStudents.length}명)
+                  </Button>
+                )}
+              </div>
               <StudentListContainer>
                 {filteredStudents.length === 0 ? (
                   <StudentListEmpty message="검색 결과가 없습니다." />
