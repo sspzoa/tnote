@@ -94,7 +94,7 @@ export default function StudentsPage() {
               <MessageSquare className="size-4" />
               최근 상담
               {unreadCount > 0 && (
-                <span className="rounded-full bg-core-status-negative px-spacing-200 text-footnote text-solid-white">
+                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
                   {unreadCount}
                 </span>
               )}
@@ -187,9 +187,6 @@ export default function StudentsPage() {
                   className={`flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50 ${!consultation.is_read ? "bg-core-accent-translucent/30" : ""}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-spacing-200">
-                      {!consultation.is_read && (
-                        <span className="size-2 shrink-0 rounded-full bg-core-status-negative" />
-                      )}
                       <span
                         className={`text-body text-content-standard-primary ${!consultation.is_read ? "font-semibold" : "font-medium"}`}>
                         {consultation.student?.name || "-"}

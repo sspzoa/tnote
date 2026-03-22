@@ -187,6 +187,9 @@ export default function StudentList({ students }: StudentListProps) {
               onSort={toggleSort}
             />
             <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+              클리닉
+            </th>
+            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
               태그
             </th>
             <SortableHeader
@@ -239,6 +242,19 @@ export default function StudentList({ students }: StudentListProps) {
                 className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
                 <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                   <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+                </td>
+                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                  {student.required_clinic_weekdays && student.required_clinic_weekdays.length > 0 ? (
+                    <div className="flex items-center gap-spacing-100">
+                      {student.required_clinic_weekdays.map((day) => (
+                        <Badge key={day} variant="blue" size="xs">
+                          {["일", "월", "화", "수", "목", "금", "토"][day]}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    "-"
+                  )}
                 </td>
                 <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
                   {activeTags.length > 0 ? (
