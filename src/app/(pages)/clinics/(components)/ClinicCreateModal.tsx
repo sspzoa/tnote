@@ -66,6 +66,7 @@ export default function ClinicCreateModal() {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleCreate}
       title="클리닉 생성"
       size="md"
       footer={

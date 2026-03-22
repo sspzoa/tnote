@@ -39,6 +39,7 @@ export default function ConsultationTemplateSaveModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      onSubmit={handleSave}
       title="템플릿 저장"
       subtitle="현재 상담 내용을 템플릿으로 저장합니다"
       footer={

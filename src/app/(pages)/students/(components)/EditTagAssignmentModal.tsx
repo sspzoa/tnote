@@ -71,6 +71,7 @@ export default function EditTagAssignmentModal() {
     <Modal
       isOpen={showModal}
       onClose={handleClose}
+      onSubmit={handleUpdate}
       title="태그 수정"
       subtitle={editData ? `${editData.studentName} 학생의 태그 기간을 수정합니다.` : "태그를 수정합니다."}
       footer={

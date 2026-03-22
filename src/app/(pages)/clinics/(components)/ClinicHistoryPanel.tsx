@@ -58,24 +58,20 @@ export default function ClinicHistoryPanel({ isOpen, onClose, attendance, isLoad
                         출석
                       </Badge>
                     )}
-                    {item.did_retake_exam && (
-                      <Badge variant="purple" size="xs">
-                        재시험
-                      </Badge>
-                    )}
-                    {item.did_homework_check && (
-                      <Badge variant="green" size="xs">
-                        숙제검사
-                      </Badge>
-                    )}
-                    {item.did_qa && (
-                      <Badge variant="orange" size="xs">
-                        질의응답
-                      </Badge>
-                    )}
                   </div>
                   <span className="shrink-0 text-content-standard-tertiary text-footnote">{dateStr}</span>
                 </div>
+                {(item.did_retake_exam || item.did_homework_check || item.did_qa) && (
+                  <span className="text-content-standard-tertiary text-footnote">
+                    {[
+                      item.did_retake_exam && "재시험",
+                      item.did_homework_check && "숙제검사",
+                      item.did_qa && "질의응답",
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </span>
+                )}
                 <div className="truncate text-content-standard-secondary text-label">{item.clinic.name}</div>
                 {item.student.school && (
                   <span className="text-content-standard-quaternary text-footnote">{item.student.school}</span>

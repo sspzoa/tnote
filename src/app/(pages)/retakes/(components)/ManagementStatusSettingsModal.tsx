@@ -275,6 +275,7 @@ export default function ManagementStatusSettingsModal() {
     <Modal
       isOpen={showModal}
       onClose={handleClose}
+      onSubmit={handleSaveAll}
       title="관리 상태 설정"
       subtitle="관리 상태 목록을 추가, 수정, 삭제하고 순서를 변경할 수 있습니다"
       footer={

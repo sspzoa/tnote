@@ -61,6 +61,7 @@ export default function AddTagModal() {
     <Modal
       isOpen={showModal}
       onClose={handleClose}
+      onSubmit={handleAssign}
       title="태그 추가"
       subtitle={selectedStudent ? `${selectedStudent.name} 학생에게 태그를 추가합니다.` : "태그를 추가합니다."}
       footer={

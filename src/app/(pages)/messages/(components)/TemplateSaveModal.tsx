@@ -32,6 +32,7 @@ export default function TemplateSaveModal({ isOpen, onClose, onSave, content }: 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      onSubmit={handleSave}
       title="템플릿 저장"
       subtitle="현재 메시지를 템플릿으로 저장합니다"
       footer={

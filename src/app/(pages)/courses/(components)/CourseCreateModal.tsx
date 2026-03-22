@@ -51,6 +51,7 @@ export default function CourseCreateModal() {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleCreate}
       title="수업 생성"
       size="md"
       footer={

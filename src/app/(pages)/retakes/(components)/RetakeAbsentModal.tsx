@@ -53,6 +53,7 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleAbsent}
       title="결석 처리"
       subtitle={subtitle}
       footer={

@@ -40,6 +40,7 @@ export default function WorkspaceDeleteModal() {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleDelete}
       title="워크스페이스 삭제"
       subtitle="이 작업은 되돌릴 수 없습니다"
       footer={

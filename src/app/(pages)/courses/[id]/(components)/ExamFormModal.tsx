@@ -86,6 +86,7 @@ export function ExamFormModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleSubmit}
       title={title}
       subtitle={isCreateMode && courseName ? courseName : undefined}
       footer={

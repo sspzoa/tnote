@@ -44,6 +44,7 @@ export default function StudentCreateModal() {
     <Modal
       isOpen={showModal}
       onClose={() => setShowModal(false)}
+      onSubmit={handleCreate}
       title="학생 추가"
       subtitle="새로운 학생을 추가합니다. 비밀번호는 전화번호로 자동 설정됩니다."
       footer={

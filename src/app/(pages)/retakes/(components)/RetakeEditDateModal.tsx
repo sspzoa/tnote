@@ -56,6 +56,7 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleSave}
       title="날짜 수정"
       subtitle={subtitle}
       footer={

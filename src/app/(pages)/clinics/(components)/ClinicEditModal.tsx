@@ -67,6 +67,7 @@ export default function ClinicEditModal() {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleEdit}
       title="클리닉 수정"
       footer={
         <>

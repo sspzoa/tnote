@@ -66,6 +66,7 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handlePasswordChange}
       title="비밀번호 변경"
       subtitle="비밀번호는 8자 이상이어야 합니다."
       footer={

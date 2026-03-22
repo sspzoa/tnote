@@ -40,6 +40,7 @@ export default function StudentEditModal() {
     <Modal
       isOpen={showModal}
       onClose={() => setShowModal(false)}
+      onSubmit={handleSave}
       title="학생 정보 수정"
       subtitle={`${selectedStudent.name} 학생의 정보를 수정합니다`}
       footer={

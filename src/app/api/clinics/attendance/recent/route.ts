@@ -19,6 +19,11 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
     .select(`
       id,
       attendance_date,
+      status,
+      is_required,
+      did_retake_exam,
+      did_homework_check,
+      did_qa,
       note,
       student:Users!ClinicAttendance_student_id_fkey(id, name, school),
       clinic:Clinics!ClinicAttendance_clinic_id_fkey(id, name)

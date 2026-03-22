@@ -155,6 +155,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleAssign}
       title="재시험 배정"
       footer={
         <>

@@ -5,6 +5,7 @@ import { type ReactNode, useCallback, useEffect, useId, useRef } from "react";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit?: () => void;
   title: string;
   subtitle?: string;
   children: ReactNode;
@@ -22,7 +23,7 @@ const sizeStyles = {
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function Modal({ isOpen, onClose, title, subtitle, children, footer, size = "lg" }: ModalProps) {
+export function Modal({ isOpen, onClose, onSubmit, title, subtitle, children, footer, size = "lg" }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -52,6 +53,9 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer, size
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
+  const onSubmitRef = useRef(onSubmit);
+  onSubmitRef.current = onSubmit;
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -60,6 +64,20 @@ export function Modal({ isOpen, onClose, title, subtitle, children, footer, size
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onCloseRef.current();
+        return;
+      }
+      if (e.key === "Enter" && onSubmitRef.current) {
+        if (e.isComposing || e.keyCode === 229) return;
+        const active = document.activeElement;
+        if (
+          active instanceof HTMLTextAreaElement ||
+          active instanceof HTMLButtonElement ||
+          active instanceof HTMLSelectElement
+        ) {
+          return;
+        }
+        e.preventDefault();
+        onSubmitRef.current();
         return;
       }
       trapFocus(e);

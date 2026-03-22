@@ -110,6 +110,7 @@ export default function ConsultationFormModal() {
     <Modal
       isOpen={showModal}
       onClose={handleClose}
+      onSubmit={isEditMode ? handleEdit : handleAdd}
       title={isEditMode ? "상담일지 수정" : "상담일지 추가"}
       subtitle={!isEditMode ? `${selectedStudent.name} 학생의 상담일지를 작성합니다` : undefined}
       footer={

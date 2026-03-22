@@ -53,6 +53,7 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleComplete}
       title="완료 처리"
       subtitle={subtitle}
       footer={

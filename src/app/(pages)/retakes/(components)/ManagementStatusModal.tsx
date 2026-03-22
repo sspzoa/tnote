@@ -70,6 +70,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
     <Modal
       isOpen={showModal}
       onClose={() => setShowModal(false)}
+      onSubmit={handleUpdate}
       title="관리 상태 변경"
       subtitle={`${selectedRetake.student.name} 학생의 재시험 관리 상태를 변경합니다`}
       footer={

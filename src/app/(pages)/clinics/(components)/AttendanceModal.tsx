@@ -131,6 +131,7 @@ export default function AttendanceModal() {
         requiredIds,
       );
       toast.success("출석이 저장되었습니다.");
+      handleClose();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "출석 저장에 실패했습니다.");
     }
@@ -175,6 +176,7 @@ export default function AttendanceModal() {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleSave}
       title="출석 관리"
       subtitle={selectedClinic.name}
       footer={

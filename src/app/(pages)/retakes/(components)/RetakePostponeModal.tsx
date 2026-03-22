@@ -63,6 +63,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handlePostpone}
       title="재시험 연기"
       subtitle={subtitle}
       footer={

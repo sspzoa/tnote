@@ -52,6 +52,7 @@ export default function CourseEditModal() {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleEdit}
       title="수업 수정"
       footer={
         <>

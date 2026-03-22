@@ -150,6 +150,7 @@ export function ScoreInputModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      onSubmit={handleSave}
       title="점수 및 과제 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
