@@ -12,6 +12,7 @@ import { isTagActive } from "@/shared/lib/utils/tags";
 import { StudentInfoSkeleton } from "./StudentInfoSkeleton";
 
 const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
+const WEEKDAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
 const RETAKE_STATUS_LABELS: Record<string, string> = {
   pending: "대기",
@@ -22,6 +23,11 @@ const RETAKE_STATUS_LABELS: Record<string, string> = {
 const formatDaysOfWeek = (days: number[] | null): string => {
   if (!days || days.length === 0) return "-";
   return days.map((d) => DAY_NAMES[d]).join(", ");
+};
+
+const formatClinicWeekdays = (days: number[] | null): string => {
+  if (!days || days.length === 0) return "-";
+  return days.map((d) => WEEKDAY_NAMES[d]).join(", ");
 };
 
 interface StudentInfoModalProps {
@@ -113,6 +119,15 @@ export default function StudentInfoModal({
                   {new Date(studentDetail.student.createdAt).toLocaleDateString("ko-KR")}
                 </span>
               </div>
+              {studentDetail.student.requiredClinicWeekdays &&
+                studentDetail.student.requiredClinicWeekdays.length > 0 && (
+                  <div className="col-span-2 flex flex-col gap-spacing-50">
+                    <span className="text-content-standard-tertiary text-footnote">클리닉 필참요일</span>
+                    <span className="font-medium text-body text-content-standard-primary">
+                      {formatClinicWeekdays(studentDetail.student.requiredClinicWeekdays)}
+                    </span>
+                  </div>
+                )}
               {(() => {
                 const activeTags = (studentDetail.student.tags || []).filter((assignment) =>
                   isTagActive(assignment.start_date, assignment.end_date),
@@ -259,6 +274,15 @@ export default function StudentInfoModal({
                       )}
                     </div>
                     <div className="flex shrink-0 flex-wrap items-center gap-spacing-100">
+                      {history.status === "absent" ? (
+                        <Badge variant="danger" size="xs">
+                          결석
+                        </Badge>
+                      ) : (
+                        <Badge variant="success" size="xs">
+                          출석
+                        </Badge>
+                      )}
                       {history.isRequired ? (
                         <Badge variant="blue" size="xs">
                           필참

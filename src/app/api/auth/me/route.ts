@@ -8,10 +8,21 @@ const handleGet = async ({ session }: PublicApiContext) => {
   }
 
   let workspaceName = null;
+  let requiredClinicWeekdays: number[] | null = null;
+  const supabase = await createClient();
+
   if (session.workspace) {
-    const supabase = await createClient();
     const { data: workspace } = await supabase.from("Workspaces").select("name").eq("id", session.workspace).single();
     workspaceName = workspace?.name || null;
+  }
+
+  if (session.role === "student") {
+    const { data: userData } = await supabase
+      .from("Users")
+      .select("required_clinic_weekdays")
+      .eq("id", session.userId)
+      .single();
+    requiredClinicWeekdays = userData?.required_clinic_weekdays || null;
   }
 
   return NextResponse.json({
@@ -22,6 +33,7 @@ const handleGet = async ({ session }: PublicApiContext) => {
       role: session.role,
       workspace: session.workspace,
       workspaceName,
+      requiredClinicWeekdays,
     },
   });
 };

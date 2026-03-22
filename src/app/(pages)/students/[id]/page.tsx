@@ -429,6 +429,15 @@ export default function StudentDetailPage() {
                       {formatPhoneNumber(studentDetail.student.parentPhoneNumber)}
                     </span>
                   )}
+                  {studentDetail.student.requiredClinicWeekdays &&
+                    studentDetail.student.requiredClinicWeekdays.length > 0 && (
+                      <span className="flex items-center gap-spacing-100">
+                        <span className="text-content-standard-tertiary">클리닉 필참</span>
+                        {studentDetail.student.requiredClinicWeekdays
+                          .map((d) => ["일", "월", "화", "수", "목", "금", "토"][d])
+                          .join(", ")}
+                      </span>
+                    )}
                 </div>
               </div>
 
@@ -546,6 +555,15 @@ export default function StudentDetailPage() {
                   )}
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center gap-spacing-100">
+                  {history.status === "absent" ? (
+                    <Badge variant="danger" size="xs">
+                      결석
+                    </Badge>
+                  ) : (
+                    <Badge variant="success" size="xs">
+                      출석
+                    </Badge>
+                  )}
                   {history.isRequired ? (
                     <Badge variant="blue" size="xs">
                       필참

@@ -18,6 +18,7 @@ import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import type { Student } from "@/shared/types";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
 import {
+  absentStudentIdsAtom,
   attendanceSearchQueryAtom,
   type StudentActivity,
   selectedDateAtom,
@@ -40,6 +41,7 @@ export default function AttendanceModal() {
   const [selectedClinic] = useAtom(selectedClinicAtom);
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
   const [selectedStudentIds, setSelectedStudentIds] = useAtom(selectedStudentIdsAtom);
+  const [absentStudentIds, setAbsentStudentIds] = useAtom(absentStudentIdsAtom);
   const [searchQuery, setSearchQuery] = useAtom(attendanceSearchQueryAtom);
   const [activities, setActivities] = useAtom(studentActivitiesAtom);
   const toast = useToast();
@@ -65,19 +67,29 @@ export default function AttendanceModal() {
     if (!isOpen || loadingAttendance) return;
 
     if (attendance.length > 0) {
-      setSelectedStudentIds(attendance.map((record) => record.student.id));
+      const attendedIds: string[] = [];
+      const absentIds: string[] = [];
       const loaded: Record<string, StudentActivity> = {};
+
       for (const record of attendance) {
+        if (record.status === "absent") {
+          absentIds.push(record.student.id);
+        } else {
+          attendedIds.push(record.student.id);
+        }
         loaded[record.student.id] = {
           retakeExam: record.did_retake_exam,
           homeworkCheck: record.did_homework_check,
           qa: record.did_qa,
         };
       }
+
+      setSelectedStudentIds(attendedIds);
+      setAbsentStudentIds(absentIds);
       setActivities(loaded);
-    } else if (selectedDate) {
-      const requiredIds = students.filter((s) => !hasActiveHiddenTag(s) && isRequiredDay(s)).map((s) => s.id);
-      setSelectedStudentIds(requiredIds);
+    } else {
+      setSelectedStudentIds([]);
+      setAbsentStudentIds([]);
       setActivities({});
     }
   }, [attendance, isOpen, loadingAttendance, selectedDate, students, isRequiredDay]);
@@ -110,7 +122,14 @@ export default function AttendanceModal() {
 
     try {
       const requiredIds = new Set(students.filter((s) => isRequiredDay(s)).map((s) => s.id));
-      await saveAttendance(selectedClinic.id, selectedStudentIds, activities, selectedDate, requiredIds);
+      await saveAttendance(
+        selectedClinic.id,
+        selectedStudentIds,
+        absentStudentIds,
+        activities,
+        selectedDate,
+        requiredIds,
+      );
       toast.success("출석이 저장되었습니다.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "출석 저장에 실패했습니다.");
@@ -118,9 +137,23 @@ export default function AttendanceModal() {
   };
 
   const toggleStudent = (studentId: string) => {
-    setSelectedStudentIds((prev) =>
-      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId],
-    );
+    setSelectedStudentIds((prev) => {
+      if (prev.includes(studentId)) {
+        return prev.filter((id) => id !== studentId);
+      }
+      setAbsentStudentIds((abs) => abs.filter((id) => id !== studentId));
+      return [...prev, studentId];
+    });
+  };
+
+  const toggleAbsent = (studentId: string) => {
+    setAbsentStudentIds((prev) => {
+      if (prev.includes(studentId)) {
+        return prev.filter((id) => id !== studentId);
+      }
+      setSelectedStudentIds((sel) => sel.filter((id) => id !== studentId));
+      return [...prev, studentId];
+    });
   };
 
   const toggleActivity = (studentId: string, key: keyof StudentActivity) => {
@@ -191,6 +224,7 @@ export default function AttendanceModal() {
                 ) : (
                   filteredStudents.map((student) => {
                     const isSelected = selectedStudentIds.includes(student.id);
+                    const isAbsent = absentStudentIds.includes(student.id);
                     const required = isRequiredDay(student);
                     const studentActivity = activities[student.id];
 
@@ -207,14 +241,32 @@ export default function AttendanceModal() {
                                   필참
                                 </Badge>
                               )}
-                              {required && !isSelected && (
+                              {isAbsent && (
                                 <Badge variant="danger" size="xs">
                                   결석
                                 </Badge>
                               )}
                             </>
                           }
-                          highlighted={required && !isSelected}
+                          highlighted={isAbsent}
+                          rightContent={
+                            required && !isSelected ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  toggleAbsent(student.id);
+                                }}
+                                className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-colors ${
+                                  isAbsent
+                                    ? "bg-solid-translucent-red text-solid-red"
+                                    : "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-fill-standard-tertiary"
+                                }`}>
+                                결석
+                              </button>
+                            ) : undefined
+                          }
                         />
                         {isSelected && (
                           <div className="flex items-center gap-spacing-200 bg-components-fill-standard-primary px-spacing-400 py-spacing-200 pl-spacing-900">

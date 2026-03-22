@@ -39,6 +39,7 @@ interface ClinicHistoryInfo {
   id: string;
   attendanceDate: string;
   note: string | null;
+  status: "attended" | "absent";
   didRetakeExam: boolean;
   didHomeworkCheck: boolean;
   didQa: boolean;
@@ -121,6 +122,7 @@ interface StudentInfo {
   school: string | null;
   birthYear: number | null;
   createdAt: string;
+  requiredClinicWeekdays: number[] | null;
   tags: TagAssignmentInfo[];
 }
 

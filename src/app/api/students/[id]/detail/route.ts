@@ -16,7 +16,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: student, error: studentError } = await supabase
     .from("Users")
-    .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at")
+    .select("id, phone_number, name, parent_phone_number, school, birth_year, created_at, required_clinic_weekdays")
     .eq("id", studentId)
     .eq("workspace", session.workspace)
     .single();
@@ -74,6 +74,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
           id,
           attendance_date,
           note,
+          status,
           did_retake_exam,
           did_homework_check,
           did_qa,
@@ -244,6 +245,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     id: record.id,
     attendanceDate: record.attendance_date,
     note: record.note,
+    status: record.status,
     didRetakeExam: record.did_retake_exam,
     didHomeworkCheck: record.did_homework_check,
     didQa: record.did_qa,
@@ -343,6 +345,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         school: student.school,
         birthYear: student.birth_year,
         createdAt: student.created_at,
+        requiredClinicWeekdays: student.required_clinic_weekdays,
         tags,
       },
       courses,

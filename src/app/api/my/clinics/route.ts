@@ -10,6 +10,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
       id,
       attendance_date,
       note,
+      status,
       did_retake_exam,
       did_homework_check,
       did_qa,
@@ -27,6 +28,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
     id: string;
     attendance_date: string;
     note: string | null;
+    status: "attended" | "absent";
     did_retake_exam: boolean;
     did_homework_check: boolean;
     did_qa: boolean;
@@ -38,6 +40,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
     id: record.id,
     attendanceDate: record.attendance_date,
     note: record.note,
+    status: record.status,
     didRetakeExam: record.did_retake_exam,
     didHomeworkCheck: record.did_homework_check,
     didQa: record.did_qa,

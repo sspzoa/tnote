@@ -66,10 +66,13 @@ export interface Clinic {
   updated_at: string;
 }
 
+export type AttendanceStatus = "attended" | "absent";
+
 export interface AttendanceRecord {
   id: string;
   attendance_date: string;
   note?: string;
+  status: AttendanceStatus;
   did_retake_exam: boolean;
   did_homework_check: boolean;
   did_qa: boolean;

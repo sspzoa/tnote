@@ -5,6 +5,7 @@ import type { StudentActivity } from "../(atoms)/useFormStore";
 
 interface AttendeeData {
   studentId: string;
+  status: "attended" | "absent";
   retakeExam: boolean;
   homeworkCheck: boolean;
   qa: boolean;
@@ -44,19 +45,29 @@ export const useAttendanceSave = () => {
 
   const save = (
     clinicId: string,
-    studentIds: string[],
+    attendedIds: string[],
+    absentIds: string[],
     activities: Record<string, StudentActivity>,
     date: string,
     requiredStudentIds: Set<string>,
   ) => {
-    const attendees: AttendeeData[] = studentIds.map((id) => ({
+    const attended: AttendeeData[] = attendedIds.map((id) => ({
       studentId: id,
+      status: "attended",
       retakeExam: activities[id]?.retakeExam ?? false,
       homeworkCheck: activities[id]?.homeworkCheck ?? false,
       qa: activities[id]?.qa ?? false,
       isRequired: requiredStudentIds.has(id),
     }));
-    return mutateAsync({ clinicId, attendees, date });
+    const absent: AttendeeData[] = absentIds.map((id) => ({
+      studentId: id,
+      status: "absent",
+      retakeExam: false,
+      homeworkCheck: false,
+      qa: false,
+      isRequired: true,
+    }));
+    return mutateAsync({ clinicId, attendees: [...attended, ...absent], date });
   };
 
   return {

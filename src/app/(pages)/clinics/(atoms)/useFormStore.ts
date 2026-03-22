@@ -7,6 +7,7 @@ export const endDateAtom = atom("");
 
 export const selectedDateAtom = atom("");
 export const selectedStudentIdsAtom = atom<string[]>([]);
+export const absentStudentIdsAtom = atom<string[]>([]);
 export const attendanceSearchQueryAtom = atom("");
 
 export interface StudentActivity {

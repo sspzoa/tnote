@@ -49,9 +49,15 @@ export default function ClinicHistoryPanel({ isOpen, onClose, attendance, isLoad
                         자율
                       </Badge>
                     )}
-                    <Badge variant="blue" size="xs">
-                      출석
-                    </Badge>
+                    {item.status === "absent" ? (
+                      <Badge variant="danger" size="xs">
+                        결석
+                      </Badge>
+                    ) : (
+                      <Badge variant="blue" size="xs">
+                        출석
+                      </Badge>
+                    )}
                     {item.did_retake_exam && (
                       <Badge variant="purple" size="xs">
                         재시험

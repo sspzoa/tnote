@@ -5,6 +5,7 @@ interface MyClinicRecord {
   id: string;
   attendanceDate: string;
   note: string | null;
+  status: "attended" | "absent";
   didRetakeExam: boolean;
   didHomeworkCheck: boolean;
   didQa: boolean;

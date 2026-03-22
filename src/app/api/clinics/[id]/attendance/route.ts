@@ -78,6 +78,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
 
 interface Attendee {
   studentId: string;
+  status?: "attended" | "absent";
   retakeExam?: boolean;
   homeworkCheck?: boolean;
   qa?: boolean;
@@ -131,6 +132,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
       clinic_id: clinicId,
       student_id: a.studentId,
       attendance_date: date,
+      status: a.status ?? "attended",
       did_retake_exam: a.retakeExam ?? false,
       did_homework_check: a.homeworkCheck ?? false,
       did_qa: a.qa ?? false,
@@ -146,6 +148,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     const { error: updateError } = await supabase
       .from("ClinicAttendance")
       .update({
+        status: a.status ?? "attended",
         did_retake_exam: a.retakeExam ?? false,
         did_homework_check: a.homeworkCheck ?? false,
         did_qa: a.qa ?? false,

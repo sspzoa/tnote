@@ -9,6 +9,7 @@ export interface User {
   role: "owner" | "admin" | "student";
   workspace: string;
   workspaceName: string | null;
+  requiredClinicWeekdays: number[] | null;
 }
 
 export const useUser = () => {

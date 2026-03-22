@@ -16,6 +16,7 @@ import {
   Monitor,
   Moon,
   Settings,
+  Stethoscope,
   Sun,
   UserCog,
   Users,
@@ -222,6 +223,11 @@ export default function Sidebar() {
       icon: ClipboardList,
       label: "재시험 현황",
     },
+    {
+      href: "/my/clinics",
+      icon: Stethoscope,
+      label: "클리닉 출석",
+    },
   ];
   const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems] : studentMenuItems;
 
@@ -401,6 +407,7 @@ export default function Sidebar() {
         { href: "/calendar", icon: Calendar, label: "캘린더" },
         { href: "/my/courses", icon: BookOpen, label: "수업" },
         { href: "/my/retakes", icon: ClipboardList, label: "재시험" },
+        { href: "/my/clinics", icon: Stethoscope, label: "클리닉" },
       ];
 
   return (
