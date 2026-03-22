@@ -235,6 +235,14 @@ export function ScoreInputModal({
                         <Select
                           value={currentAssignment}
                           onChange={(e) => handleAssignmentChange(student.id, e.target.value)}
+                          onKeyDown={(e) => {
+                            const keyMap: Record<string, string> = { "1": "완료", "2": "미흡", "3": "미제출" };
+                            const value = keyMap[e.key];
+                            if (value) {
+                              e.preventDefault();
+                              handleAssignmentChange(student.id, currentAssignment === value ? "" : value);
+                            }
+                          }}
                           placeholder="-"
                           options={[
                             { value: "완료", label: "완료" },
