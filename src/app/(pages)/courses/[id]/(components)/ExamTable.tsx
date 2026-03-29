@@ -167,7 +167,7 @@ export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps)
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <Button variant="primary" size="xs" className="font-medium" onClick={() => onManage(exam)}>
-                  점수 및 과제 입력
+                  점수 입력
                 </Button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
