@@ -1,28 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { createWorkflowList } from "@/shared/lib/workflow";
 import type { Retake } from "../(atoms)/useRetakesStore";
 
+const useWorkflowList = createWorkflowList<Retake>({
+  baseEndpoint: "/api/retakes",
+  queryKeyFn: QUERY_KEYS.retakes.byFilter,
+  errorMessage: "재시험 목록을 불러오는데 실패했습니다.",
+});
+
 export const useRetakes = (filter: "all" | "pending" | "completed" | "absent") => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: QUERY_KEYS.retakes.byFilter(filter),
-    queryFn: async () => {
-      const url = filter !== "all" ? `/api/retakes?status=${filter}` : "/api/retakes";
-      const response = await fetchWithAuth(url);
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "재시험 목록을 불러오는데 실패했습니다.");
-      }
-
-      return result.data as Retake[];
-    },
-  });
-
-  return {
-    retakes: data || [],
-    isLoading,
-    error,
-    refetch,
-  };
+  const { data, isLoading, error, refetch } = useWorkflowList(filter);
+  return { retakes: data, isLoading, error, refetch };
 };

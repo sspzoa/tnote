@@ -1,13 +1,28 @@
 import { atom } from "jotai";
+import { createWorkflowModalAtoms } from "@/shared/lib/workflow";
 
-export const showPostponeModalAtom = atom(false);
+const {
+  showPostponeModalAtom,
+  showCompleteModalAtom,
+  showHistoryModalAtom,
+  showStudentModalAtom,
+  showAssignModalAtom,
+  showManagementStatusModalAtom,
+  showEditDateModalAtom,
+  showManagementStatusSettingsModalAtom,
+  selectedStudentIdAtom,
+} = createWorkflowModalAtoms();
+
+export {
+  showPostponeModalAtom,
+  showCompleteModalAtom,
+  showHistoryModalAtom,
+  showStudentModalAtom,
+  showAssignModalAtom,
+  showManagementStatusModalAtom,
+  showEditDateModalAtom,
+  showManagementStatusSettingsModalAtom,
+  selectedStudentIdAtom,
+};
+
 export const showAbsentModalAtom = atom(false);
-export const showCompleteModalAtom = atom(false);
-export const showHistoryModalAtom = atom(false);
-export const showStudentModalAtom = atom(false);
-export const showAssignModalAtom = atom(false);
-export const showManagementStatusModalAtom = atom(false);
-export const showEditDateModalAtom = atom(false);
-export const showManagementStatusSettingsModalAtom = atom(false);
-
-export const selectedStudentIdAtom = atom<string | null>(null);

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createDeleteHandler, createUpdateHandler, validationError } from "@/shared/lib/api/createCrudRoute";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import type { TagColor } from "@/shared/types";
 
@@ -32,7 +33,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   const { data: assignments, error: assignmentsError } = await supabase
     .from("StudentTagAssignments")
-    .select(`
+    .select(
+      `
       id,
       student_id,
       tag_id,
@@ -40,7 +42,8 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       end_date,
       created_at,
       student:Users!inner(id, name, phone_number, school)
-    `)
+    `,
+    )
     .eq("tag_id", id)
     .eq("student:Users.workspace", session.workspace);
 
@@ -49,87 +52,55 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   return NextResponse.json({ data: { tag, assignments: assignments || [] } });
 };
 
-const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-  const { name, color, hiddenByDefault } = await request.json();
-
-  const { data: existingTag, error: fetchError } = await supabase
-    .from("StudentTags")
-    .select("id")
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .single();
-
-  if (fetchError || !existingTag) {
-    return NextResponse.json({ error: "태그를 찾을 수 없습니다." }, { status: 404 });
-  }
-
-  const updates: { name?: string; color?: TagColor; hidden_by_default?: boolean; updated_at: string } = {
-    updated_at: new Date().toISOString(),
-  };
-
-  if (name !== undefined) {
-    if (typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json({ error: "태그 이름은 필수입니다." }, { status: 400 });
-    }
-    if (name.length > 20) {
-      return NextResponse.json({ error: "태그 이름은 20자 이하여야 합니다." }, { status: 400 });
-    }
-    updates.name = name.trim();
-  }
-
-  if (color !== undefined) {
-    if (!VALID_COLORS.includes(color)) {
-      return NextResponse.json({ error: "유효한 색상을 선택해주세요." }, { status: 400 });
-    }
-    updates.color = color;
-  }
-
-  if (hiddenByDefault !== undefined) {
-    updates.hidden_by_default = hiddenByDefault;
-  }
-
-  const { data, error } = await supabase
-    .from("StudentTags")
-    .update(updates)
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .select()
-    .single();
-
-  if (error) {
-    if (error.code === "23505") {
-      return NextResponse.json({ error: "이미 존재하는 태그 이름입니다." }, { status: 409 });
-    }
-    throw error;
-  }
-  return NextResponse.json({ success: true, data });
-};
-
-const handleDelete = async ({ supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-
-  const { data: existingTag, error: fetchError } = await supabase
-    .from("StudentTags")
-    .select("id")
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .single();
-
-  if (fetchError || !existingTag) {
-    return NextResponse.json({ error: "태그를 찾을 수 없습니다." }, { status: 404 });
-  }
-
-  const { error } = await supabase.from("StudentTags").delete().eq("id", id).eq("workspace", session.workspace);
-
-  if (error) throw error;
-  return NextResponse.json({ success: true });
-};
-
 export const GET = withLogging(handleGet, { resource: "tags", action: "read", allowedRoles: ["owner", "admin"] });
-export const PATCH = withLogging(handlePatch, { resource: "tags", action: "update", allowedRoles: ["owner", "admin"] });
-export const DELETE = withLogging(handleDelete, {
+
+export const PATCH = createUpdateHandler({
+  table: "StudentTags",
   resource: "tags",
-  action: "delete",
   allowedRoles: ["owner", "admin"],
+  idMissingMessage: "태그 ID가 필요합니다.",
+  autoTimestamp: true,
+  validate: async (body, ctx) => {
+    const { name, color } = body;
+    const { data, error } = await ctx.supabase
+      .from("StudentTags")
+      .select("id")
+      .eq("id", ctx.params?.id)
+      .eq("workspace", ctx.session.workspace)
+      .single();
+    if (error || !data) return validationError("태그를 찾을 수 없습니다.", 404);
+    if (name !== undefined) {
+      if (typeof name !== "string" || (name as string).trim().length === 0)
+        return validationError("태그 이름은 필수입니다.");
+      if ((name as string).length > 20) return validationError("태그 이름은 20자 이하여야 합니다.");
+    }
+    if (color !== undefined && !VALID_COLORS.includes(color as TagColor))
+      return validationError("유효한 색상을 선택해주세요.");
+    return null;
+  },
+  buildPayload: ({ name, color, hiddenByDefault }) => {
+    const payload: Record<string, unknown> = {};
+    if (name !== undefined) payload.name = (name as string).trim();
+    if (color !== undefined) payload.color = color as TagColor;
+    if (hiddenByDefault !== undefined) payload.hidden_by_default = hiddenByDefault;
+    return payload;
+  },
+  duplicateErrorMessage: "이미 존재하는 태그 이름입니다.",
+});
+
+export const DELETE = createDeleteHandler({
+  table: "StudentTags",
+  resource: "tags",
+  allowedRoles: ["owner", "admin"],
+  idMissingMessage: "태그 ID가 필요합니다.",
+  preCheck: async (id, ctx) => {
+    const { data, error } = await ctx.supabase
+      .from("StudentTags")
+      .select("id")
+      .eq("id", id)
+      .eq("workspace", ctx.session.workspace)
+      .single();
+    if (error || !data) return validationError("태그를 찾을 수 없습니다.", 404);
+    return null;
+  },
 });

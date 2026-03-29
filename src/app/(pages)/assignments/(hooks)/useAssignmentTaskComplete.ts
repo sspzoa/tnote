@@ -1,41 +1,22 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { createWorkflowComplete } from "@/shared/lib/workflow";
 
-interface CompleteData {
-  note?: string | null;
-}
+const useWorkflowComplete = createWorkflowComplete({
+  baseEndpoint: "/api/assignment-tasks",
+  invalidateKeys: [
+    QUERY_KEYS.assignmentTasks.all,
+    QUERY_KEYS.assignmentTasks.historyAll,
+    QUERY_KEYS.calendar.all,
+    QUERY_KEYS.home.stats,
+    ["students", "detail"],
+  ],
+});
 
 export const useAssignmentTaskComplete = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ taskId, data }: { taskId: string; data: CompleteData }) => {
-      const response = await fetchWithAuth(`/api/assignment-tasks/${taskId}/complete`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "완료 처리에 실패했습니다.");
-      }
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.historyAll });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
-      queryClient.invalidateQueries({ queryKey: ["students", "detail"] });
-    },
-  });
-
+  const { mutate, isPending } = useWorkflowComplete();
   return {
-    completeTask: mutateAsync,
+    completeTask: ({ taskId, data }: { taskId: string; data: { note?: string | null } }) =>
+      mutate({ id: taskId, data }),
     isCompleting: isPending,
   };
 };

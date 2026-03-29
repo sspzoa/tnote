@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface CreateClinicData {
@@ -9,33 +8,13 @@ interface CreateClinicData {
   endDate: string;
 }
 
+const useCreate = createMutation<CreateClinicData>({
+  endpoint: "/api/clinics",
+  method: "POST",
+  invalidateKeys: [QUERY_KEYS.clinics.all, QUERY_KEYS.calendar.all],
+});
+
 export const useClinicCreate = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: CreateClinicData) => {
-      const response = await fetchWithAuth("/api/clinics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create clinic");
-      }
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.clinics.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
-    },
-  });
-
-  return {
-    createClinic: mutateAsync,
-    isCreating: isPending,
-  };
+  const { mutate, isPending } = useCreate();
+  return { createClinic: mutate, isCreating: isPending };
 };

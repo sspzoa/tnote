@@ -1,25 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
+
+const useReset = createMutation<string>({
+  endpoint: (id) => `/api/students/${id}/reset-password`,
+  method: "POST",
+});
 
 export const useStudentPasswordReset = () => {
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (studentId: string) => {
-      const response = await fetchWithAuth(`/api/students/${studentId}/reset-password`, {
-        method: "POST",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to reset password");
-      }
-
-      return result;
-    },
-  });
-
-  return {
-    resetPassword: mutateAsync,
-    isResetting: isPending,
-  };
+  const { mutate, isPending } = useReset();
+  return { resetPassword: mutate, isResetting: isPending };
 };

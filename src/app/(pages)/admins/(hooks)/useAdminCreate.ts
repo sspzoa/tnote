@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface CreateAdminData {
@@ -7,32 +6,13 @@ interface CreateAdminData {
   phoneNumber: string;
 }
 
+const useCreate = createMutation<CreateAdminData>({
+  endpoint: "/api/admins",
+  method: "POST",
+  invalidateKeys: [QUERY_KEYS.admins.all],
+});
+
 export const useAdminCreate = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: CreateAdminData) => {
-      const response = await fetchWithAuth("/api/admins", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create admin");
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.admins.all });
-    },
-  });
-
-  return {
-    createAdmin: mutateAsync,
-    isCreating: isPending,
-  };
+  const { mutate, isPending } = useCreate();
+  return { createAdmin: mutate, isCreating: isPending };
 };

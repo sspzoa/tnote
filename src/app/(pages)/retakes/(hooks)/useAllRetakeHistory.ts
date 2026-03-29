@@ -1,6 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { createWorkflowAllHistory } from "@/shared/lib/workflow";
 
 export interface RetakeHistoryItem {
   id: string;
@@ -26,21 +25,11 @@ export interface RetakeHistoryItem {
   };
 }
 
-export const useAllRetakeHistory = () => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: QUERY_KEYS.retakes.historyAll,
-    queryFn: async () => {
-      const res = await fetchWithAuth("/api/retakes/history");
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
-      return result.data as RetakeHistoryItem[];
-    },
-  });
+const useWorkflowAllHistory = createWorkflowAllHistory<RetakeHistoryItem>({
+  baseEndpoint: "/api/retakes",
+  historyAllQueryKey: QUERY_KEYS.retakes.historyAll,
+});
 
-  return {
-    history: data || [],
-    isLoading,
-    error,
-    refetch,
-  };
+export const useAllRetakeHistory = () => {
+  return useWorkflowAllHistory();
 };

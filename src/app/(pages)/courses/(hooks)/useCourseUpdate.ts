@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface UpdateCourseData {
@@ -10,33 +9,13 @@ interface UpdateCourseData {
   daysOfWeek?: number[] | null;
 }
 
+const useUpdate = createMutation<UpdateCourseData>({
+  endpoint: (data) => `/api/courses/${data.id}`,
+  method: "PATCH",
+  invalidateKeys: [QUERY_KEYS.courses.all, QUERY_KEYS.calendar.all],
+});
+
 export const useCourseUpdate = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ id, name, startDate, endDate, daysOfWeek }: UpdateCourseData) => {
-      const response = await fetchWithAuth(`/api/courses/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, startDate, endDate, daysOfWeek }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to update course");
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
-    },
-  });
-
-  return {
-    updateCourse: mutateAsync,
-    isUpdating: isPending,
-  };
+  const { mutate, isPending } = useUpdate();
+  return { updateCourse: mutate, isUpdating: isPending };
 };

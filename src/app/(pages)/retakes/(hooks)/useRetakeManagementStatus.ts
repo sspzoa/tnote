@@ -1,35 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { createWorkflowManagementStatus } from "@/shared/lib/workflow";
+
+const useWorkflowManagementStatus = createWorkflowManagementStatus({
+  baseEndpoint: "/api/retakes",
+  invalidateKeys: [QUERY_KEYS.retakes.all, QUERY_KEYS.retakes.historyAll, ["students", "detail"]],
+});
 
 export const useRetakeManagementStatus = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ retakeId, status }: { retakeId: string; status: string }) => {
-      const response = await fetchWithAuth(`/api/retakes/${retakeId}/management-status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ management_status: status }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "관리 상태 변경에 실패했습니다.");
-      }
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
-      queryClient.invalidateQueries({ queryKey: ["students", "detail"] });
-    },
-  });
-
+  const { mutate, isPending } = useWorkflowManagementStatus();
   return {
-    updateManagementStatus: mutateAsync,
+    updateManagementStatus: ({ retakeId, status }: { retakeId: string; status: string }) =>
+      mutate({ id: retakeId, status }),
     isUpdating: isPending,
   };
 };

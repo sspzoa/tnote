@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { createWorkflowFilterAtoms } from "@/shared/lib/workflow";
 import type { Retake } from "@/shared/types";
 
 export type { Course, Exam, Retake, RetakeHistory as History } from "@/shared/types";
@@ -11,17 +12,33 @@ export interface AssignStudent {
   tags?: import("@/shared/types").StudentTagAssignment[];
 }
 
+const {
+  selectedCourseAtom,
+  selectedManagementStatusAtom,
+  openMenuIdAtom,
+  searchQueryAtom,
+  showCompletedAtom,
+  selectedDateAtom,
+  minIncompleteCountAtom,
+  minPostponeCountAtom,
+  minAbsentCountAtom,
+  minPostponeAbsentCountAtom,
+} = createWorkflowFilterAtoms();
+
+export {
+  selectedCourseAtom,
+  selectedManagementStatusAtom,
+  openMenuIdAtom,
+  searchQueryAtom,
+  showCompletedAtom,
+  selectedDateAtom,
+  minIncompleteCountAtom,
+  minPostponeCountAtom,
+  minAbsentCountAtom,
+  minPostponeAbsentCountAtom,
+};
+
 export const filterAtom = atom<"all" | "pending" | "completed" | "absent">("all");
-export const selectedCourseAtom = atom<string>("all");
 export const selectedExamAtom = atom<string>("all");
-export const selectedManagementStatusAtom = atom<string>("all");
 export const selectedRetakeAtom = atom<Retake | null>(null);
-export const openMenuIdAtom = atom<string | null>(null);
-export const searchQueryAtom = atom("");
-export const showCompletedAtom = atom<boolean>(false);
-export const selectedDateAtom = atom<string>("all");
-export const minIncompleteCountAtom = atom<number>(0);
 export const minTotalRetakeCountAtom = atom<number>(0);
-export const minPostponeCountAtom = atom<number>(0);
-export const minAbsentCountAtom = atom<number>(0);
-export const minPostponeAbsentCountAtom = atom<number>(0);

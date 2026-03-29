@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface UpdateStudentData {
@@ -13,32 +12,13 @@ interface UpdateStudentData {
   requiredClinicWeekdays?: number[] | null;
 }
 
+const useUpdate = createMutation<UpdateStudentData>({
+  endpoint: (data) => `/api/students/${data.id}`,
+  method: "PATCH",
+  invalidateKeys: [QUERY_KEYS.students.all],
+});
+
 export const useStudentUpdate = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ id, ...data }: UpdateStudentData) => {
-      const response = await fetchWithAuth(`/api/students/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to update student");
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.students.all });
-    },
-  });
-
-  return {
-    updateStudent: mutateAsync,
-    isUpdating: isPending,
-  };
+  const { mutate, isPending } = useUpdate();
+  return { updateStudent: mutate, isUpdating: isPending };
 };

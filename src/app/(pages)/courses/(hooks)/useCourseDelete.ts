@@ -1,33 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
+const useDelete = createMutation<string>({
+  endpoint: (id) => `/api/courses/${id}`,
+  method: "DELETE",
+  invalidateKeys: [QUERY_KEYS.courses.all, QUERY_KEYS.calendar.all, QUERY_KEYS.home.stats],
+});
+
 export const useCourseDelete = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (courseId: string) => {
-      const response = await fetchWithAuth(`/api/courses/${courseId}`, {
-        method: "DELETE",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to delete course");
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
-    },
-  });
-
-  return {
-    deleteCourse: mutateAsync,
-    isDeleting: isPending,
-  };
+  const { mutate, isPending } = useDelete();
+  return { deleteCourse: mutate, isDeleting: isPending };
 };

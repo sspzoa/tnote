@@ -1,6 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { createWorkflowAllHistory } from "@/shared/lib/workflow";
 
 export interface AssignmentTaskHistoryItem {
   id: string;
@@ -25,21 +24,11 @@ export interface AssignmentTaskHistoryItem {
   };
 }
 
-export const useAllAssignmentTaskHistory = () => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: QUERY_KEYS.assignmentTasks.historyAll,
-    queryFn: async () => {
-      const res = await fetchWithAuth("/api/assignment-tasks/history");
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error);
-      return result.data as AssignmentTaskHistoryItem[];
-    },
-  });
+const useWorkflowAllHistory = createWorkflowAllHistory<AssignmentTaskHistoryItem>({
+  baseEndpoint: "/api/assignment-tasks",
+  historyAllQueryKey: QUERY_KEYS.assignmentTasks.historyAll,
+});
 
-  return {
-    history: data || [],
-    isLoading,
-    error,
-    refetch,
-  };
+export const useAllAssignmentTaskHistory = () => {
+  return useWorkflowAllHistory();
 };

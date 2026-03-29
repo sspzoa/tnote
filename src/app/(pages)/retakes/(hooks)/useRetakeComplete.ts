@@ -1,41 +1,22 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { createWorkflowComplete } from "@/shared/lib/workflow";
 
-interface CompleteData {
-  note?: string | null;
-}
+const useWorkflowComplete = createWorkflowComplete({
+  baseEndpoint: "/api/retakes",
+  invalidateKeys: [
+    QUERY_KEYS.retakes.all,
+    QUERY_KEYS.retakes.historyAll,
+    QUERY_KEYS.calendar.all,
+    QUERY_KEYS.home.stats,
+    ["students", "detail"],
+  ],
+});
 
 export const useRetakeComplete = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async ({ retakeId, data }: { retakeId: string; data: CompleteData }) => {
-      const response = await fetchWithAuth(`/api/retakes/${retakeId}/complete`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to mark as complete");
-      }
-
-      return result.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
-      queryClient.invalidateQueries({ queryKey: ["students", "detail"] });
-    },
-  });
-
+  const { mutate, isPending } = useWorkflowComplete();
   return {
-    completeRetake: mutateAsync,
+    completeRetake: ({ retakeId, data }: { retakeId: string; data: { note?: string | null } }) =>
+      mutate({ id: retakeId, data }),
     isCompleting: isPending,
   };
 };

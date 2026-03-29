@@ -1,86 +1,44 @@
-import { NextResponse } from "next/server";
-import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { createDeleteHandler, createUpdateHandler, validationError } from "@/shared/lib/api/createCrudRoute";
 
-const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-  if (!id) {
-    return NextResponse.json({ error: "클리닉 ID가 필요합니다." }, { status: 400 });
-  }
-
-  const { name, operatingDays, startDate, endDate } = await request.json();
-
-  const updateData: Record<string, unknown> = {};
-
-  // 이름 검증
-  if (name !== undefined) {
-    if (typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json({ error: "클리닉 이름을 입력해주세요." }, { status: 400 });
-    }
-    if (name.length > 100) {
-      return NextResponse.json({ error: "클리닉 이름은 100자 이하여야 합니다." }, { status: 400 });
-    }
-    updateData.name = name.trim();
-  }
-
-  // 요일 검증
-  if (operatingDays !== undefined) {
-    if (
-      operatingDays !== null &&
-      (!Array.isArray(operatingDays) || !operatingDays.every((d: number) => Number.isInteger(d) && d >= 0 && d <= 6))
-    ) {
-      return NextResponse.json({ error: "올바른 요일을 선택해주세요." }, { status: 400 });
-    }
-    updateData.operating_days = operatingDays;
-  }
-
-  // 날짜 검증
-  if (startDate !== undefined) updateData.start_date = startDate || null;
-  if (endDate !== undefined) updateData.end_date = endDate || null;
-
-  const effectiveStartDate = startDate !== undefined ? startDate : null;
-  const effectiveEndDate = endDate !== undefined ? endDate : null;
-
-  if (effectiveStartDate && effectiveEndDate && new Date(effectiveStartDate) > new Date(effectiveEndDate)) {
-    return NextResponse.json({ error: "시작 날짜는 종료 날짜보다 이전이어야 합니다." }, { status: 400 });
-  }
-
-  if (Object.keys(updateData).length === 0) {
-    return NextResponse.json({ error: "수정할 항목이 없습니다." }, { status: 400 });
-  }
-
-  updateData.updated_at = new Date().toISOString();
-
-  const { data, error } = await supabase
-    .from("Clinics")
-    .update(updateData)
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return NextResponse.json({ success: true, data });
-};
-
-const handleDelete = async ({ supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-  if (!id) {
-    return NextResponse.json({ error: "클리닉 ID가 필요합니다." }, { status: 400 });
-  }
-
-  const { error } = await supabase.from("Clinics").delete().eq("id", id).eq("workspace", session.workspace);
-
-  if (error) throw error;
-  return NextResponse.json({ success: true });
-};
-
-export const PATCH = withLogging(handlePatch, {
+export const PATCH = createUpdateHandler({
+  table: "Clinics",
   resource: "clinics",
-  action: "update",
   allowedRoles: ["owner", "admin"],
+  idMissingMessage: "클리닉 ID가 필요합니다.",
+  autoTimestamp: true,
+  validate: (body) => {
+    const { name, operatingDays, startDate, endDate } = body;
+    if (name !== undefined) {
+      if (typeof name !== "string" || (name as string).trim().length === 0)
+        return validationError("클리닉 이름을 입력해주세요.");
+      if ((name as string).length > 100) return validationError("클리닉 이름은 100자 이하여야 합니다.");
+    }
+    if (operatingDays !== undefined && operatingDays !== null) {
+      if (
+        !Array.isArray(operatingDays) ||
+        !(operatingDays as number[]).every((d) => Number.isInteger(d) && d >= 0 && d <= 6)
+      )
+        return validationError("올바른 요일을 선택해주세요.");
+    }
+    const effectiveStart = startDate !== undefined ? startDate : null;
+    const effectiveEnd = endDate !== undefined ? endDate : null;
+    if (effectiveStart && effectiveEnd && new Date(effectiveStart as string) > new Date(effectiveEnd as string))
+      return validationError("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
+    return null;
+  },
+  buildPayload: ({ name, operatingDays, startDate, endDate }) => {
+    const payload: Record<string, unknown> = {};
+    if (name !== undefined) payload.name = (name as string).trim();
+    if (operatingDays !== undefined) payload.operating_days = operatingDays;
+    if (startDate !== undefined) payload.start_date = (startDate as string) || null;
+    if (endDate !== undefined) payload.end_date = (endDate as string) || null;
+    return payload;
+  },
 });
-export const DELETE = withLogging(handleDelete, {
+
+export const DELETE = createDeleteHandler({
+  table: "Clinics",
   resource: "clinics",
-  action: "delete",
   allowedRoles: ["owner", "admin"],
+  idMissingMessage: "클리닉 ID가 필요합니다.",
 });

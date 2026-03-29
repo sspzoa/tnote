@@ -1,105 +1,60 @@
-import { NextResponse } from "next/server";
-import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import {
+  createDeleteHandler,
+  createDetailHandler,
+  createUpdateHandler,
+  validationError,
+} from "@/shared/lib/api/createCrudRoute";
 
-const handleGet = async ({ supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-  if (!id) {
-    return NextResponse.json({ error: "수업 ID가 필요합니다." }, { status: 400 });
-  }
-
-  const { data, error } = await supabase
-    .from("Courses")
-    .select(`
-      *,
-      student_count:CourseEnrollments(count)
-    `)
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .single();
-
-  if (error) throw error;
-
-  const courseData = {
-    ...data,
-    student_count: data.student_count?.[0]?.count || 0,
-  };
-  return NextResponse.json({ data: courseData });
-};
-
-const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-  if (!id) {
-    return NextResponse.json({ error: "수업 ID가 필요합니다." }, { status: 400 });
-  }
-
-  const { name, startDate, endDate, daysOfWeek } = await request.json();
-
-  // 이름 검증
-  if (name !== undefined) {
-    if (typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json({ error: "수업 이름을 입력해주세요." }, { status: 400 });
-    }
-    if (name.length > 100) {
-      return NextResponse.json({ error: "수업 이름은 100자 이하여야 합니다." }, { status: 400 });
-    }
-  }
-
-  // 날짜 검증
-  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-    return NextResponse.json({ error: "시작일은 종료일보다 앞서야 합니다." }, { status: 400 });
-  }
-
-  // 요일 검증
-  if (
-    daysOfWeek !== undefined &&
-    daysOfWeek !== null &&
-    (!Array.isArray(daysOfWeek) || !daysOfWeek.every((d: number) => Number.isInteger(d) && d >= 0 && d <= 6))
-  ) {
-    return NextResponse.json({ error: "올바른 요일을 선택해주세요." }, { status: 400 });
-  }
-
-  const updateData: Record<string, unknown> = {};
-  if (name !== undefined) updateData.name = name.trim();
-  if (startDate !== undefined) updateData.start_date = startDate || null;
-  if (endDate !== undefined) updateData.end_date = endDate || null;
-  if (daysOfWeek !== undefined) updateData.days_of_week = daysOfWeek || null;
-
-  if (Object.keys(updateData).length === 0) {
-    return NextResponse.json({ error: "수정할 항목이 없습니다." }, { status: 400 });
-  }
-
-  const { data, error } = await supabase
-    .from("Courses")
-    .update(updateData)
-    .eq("id", id)
-    .eq("workspace", session.workspace)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return NextResponse.json({ success: true, data });
-};
-
-const handleDelete = async ({ supabase, session, params }: ApiContext) => {
-  const id = params?.id;
-  if (!id) {
-    return NextResponse.json({ error: "수업 ID가 필요합니다." }, { status: 400 });
-  }
-
-  const { error } = await supabase.from("Courses").delete().eq("id", id).eq("workspace", session.workspace);
-
-  if (error) throw error;
-  return NextResponse.json({ success: true });
-};
-
-export const GET = withLogging(handleGet, { resource: "courses", action: "read", allowedRoles: ["owner", "admin"] });
-export const PATCH = withLogging(handlePatch, {
+export const GET = createDetailHandler({
+  table: "Courses",
   resource: "courses",
-  action: "update",
   allowedRoles: ["owner", "admin"],
+  select: "*, student_count:CourseEnrollments(count)",
+  idMissingMessage: "수업 ID가 필요합니다.",
+  transformResult: (data) => {
+    const course = data as Record<string, unknown>;
+    return {
+      ...course,
+      student_count: (course.student_count as Array<{ count: number }>)?.[0]?.count || 0,
+    };
+  },
 });
-export const DELETE = withLogging(handleDelete, {
+
+export const PATCH = createUpdateHandler({
+  table: "Courses",
   resource: "courses",
-  action: "delete",
   allowedRoles: ["owner", "admin"],
+  idMissingMessage: "수업 ID가 필요합니다.",
+  validate: (body) => {
+    const { name, startDate, endDate, daysOfWeek } = body;
+    if (name !== undefined) {
+      if (typeof name !== "string" || (name as string).trim().length === 0)
+        return validationError("수업 이름을 입력해주세요.");
+      if ((name as string).length > 100) return validationError("수업 이름은 100자 이하여야 합니다.");
+    }
+    if (startDate && endDate && new Date(startDate as string) > new Date(endDate as string))
+      return validationError("시작일은 종료일보다 앞서야 합니다.");
+    if (
+      daysOfWeek !== undefined &&
+      daysOfWeek !== null &&
+      (!Array.isArray(daysOfWeek) || !(daysOfWeek as number[]).every((d) => Number.isInteger(d) && d >= 0 && d <= 6))
+    )
+      return validationError("올바른 요일을 선택해주세요.");
+    return null;
+  },
+  buildPayload: ({ name, startDate, endDate, daysOfWeek }) => {
+    const payload: Record<string, unknown> = {};
+    if (name !== undefined) payload.name = (name as string).trim();
+    if (startDate !== undefined) payload.start_date = (startDate as string) || null;
+    if (endDate !== undefined) payload.end_date = (endDate as string) || null;
+    if (daysOfWeek !== undefined) payload.days_of_week = (daysOfWeek as number[]) || null;
+    return payload;
+  },
+});
+
+export const DELETE = createDeleteHandler({
+  table: "Courses",
+  resource: "courses",
+  allowedRoles: ["owner", "admin"],
+  idMissingMessage: "수업 ID가 필요합니다.",
 });

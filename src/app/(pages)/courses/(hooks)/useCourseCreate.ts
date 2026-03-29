@@ -1,5 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createMutation } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 interface CreateCourseData {
@@ -9,34 +8,13 @@ interface CreateCourseData {
   daysOfWeek?: number[] | null;
 }
 
+const useCreate = createMutation<CreateCourseData>({
+  endpoint: "/api/courses",
+  method: "POST",
+  invalidateKeys: [QUERY_KEYS.courses.all, QUERY_KEYS.calendar.all, QUERY_KEYS.home.stats],
+});
+
 export const useCourseCreate = () => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: CreateCourseData) => {
-      const response = await fetchWithAuth("/api/courses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create course");
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
-    },
-  });
-
-  return {
-    createCourse: mutateAsync,
-    isCreating: isPending,
-  };
+  const { mutate, isPending } = useCreate();
+  return { createCourse: mutate, isCreating: isPending };
 };

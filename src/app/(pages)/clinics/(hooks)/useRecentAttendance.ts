@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { createQuery } from "@/shared/lib/hooks";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export interface RecentAttendanceItem {
@@ -15,21 +14,12 @@ export interface RecentAttendanceItem {
   clinic: { id: string; name: string };
 }
 
-export const useRecentAttendance = () => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: QUERY_KEYS.clinics.recentAttendance,
-    queryFn: async () => {
-      const response = await fetchWithAuth("/api/clinics/attendance/recent");
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "최근 출석 기록을 불러오는데 실패했습니다.");
-      return result.data as RecentAttendanceItem[];
-    },
-  });
+const useRecentAttendanceQuery = createQuery<RecentAttendanceItem[]>({
+  queryKey: QUERY_KEYS.clinics.recentAttendance,
+  endpoint: "/api/clinics/attendance/recent",
+});
 
-  return {
-    recentAttendance: data || [],
-    isLoading,
-    error,
-    refetch,
-  };
+export const useRecentAttendance = () => {
+  const { data, isLoading, error, refetch } = useRecentAttendanceQuery();
+  return { recentAttendance: data, isLoading, error, refetch };
 };
