@@ -36,7 +36,6 @@ export interface MyExamScore {
 interface MyCoursesData {
   courses: MyCourse[];
   examScores: MyExamScore[];
-  assignmentMap: Record<string, string>;
 }
 
 export const useMyCourses = () => {
@@ -57,7 +56,6 @@ export const useMyCourses = () => {
   return {
     courses: data?.courses || [],
     examScores: data?.examScores || [],
-    assignmentMap: data?.assignmentMap || {},
     isLoading,
     error,
   };

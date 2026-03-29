@@ -83,6 +83,8 @@ export const QUERY_KEYS = {
   my: {
     retakes: ["my", "retakes"] as const,
     courses: ["my", "courses"] as const,
+    assignments: ["my-assignments"] as const,
+    assignmentTasks: ["my-assignment-tasks"] as const,
   },
   messages: {
     templates: (type: string) => ["message-templates", type] as const,

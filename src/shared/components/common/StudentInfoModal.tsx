@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+
 import type { AssignmentTaskHistoryInfo, StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -45,18 +45,8 @@ export default function StudentInfoModal({
   studentDetail,
   isLoading,
 }: StudentInfoModalProps) {
-  const examWithAssignments = useMemo(() => {
-    if (!studentDetail) return [];
-
-    const assignmentMap = new Map(
-      studentDetail.assignmentHistory.map((a) => [`${a.assignment.course.id}:${a.assignment.name}`, a]),
-    );
-
-    return studentDetail.examScores.map((score) => ({
-      examScore: score,
-      assignment: assignmentMap.get(`${score.exam.course.id}:${score.exam.name}`),
-    }));
-  }, [studentDetail]);
+  const examScores = studentDetail?.examScores || [];
+  const assignmentHistory = studentDetail?.assignmentHistory || [];
 
   return (
     <Modal
@@ -182,40 +172,38 @@ export default function StudentInfoModal({
 
           <section className="flex flex-col gap-spacing-300">
             <h3 className="font-semibold text-body text-content-standard-primary">
-              시험 성적 & 과제
-              {examWithAssignments.length > 0 && (
+              시험 성적
+              {examScores.length > 0 && (
                 <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
-                  ({Math.min(5, examWithAssignments.length)}/{examWithAssignments.length}개)
+                  ({Math.min(5, examScores.length)}/{examScores.length}개)
                 </span>
               )}
             </h3>
-            {examWithAssignments.length === 0 ? (
+            {examScores.length === 0 ? (
               <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
                 시험 기록이 없습니다.
               </div>
             ) : (
               <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
-                {examWithAssignments.slice(0, 5).map(({ examScore, assignment }) => {
-                  const isPassed = examScore.cutline !== null && examScore.score >= examScore.cutline;
-                  const isFailed = examScore.cutline !== null && examScore.score < examScore.cutline;
-
+                {examScores.slice(0, 5).map((score) => {
+                  const isPassed = score.cutline !== null && score.score >= score.cutline;
+                  const isFailed = score.cutline !== null && score.score < score.cutline;
                   return (
                     <div
-                      key={examScore.id}
-                      className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                      key={score.id}
+                      className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300">
                       <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
                         <span className="truncate font-medium text-body text-content-standard-primary">
-                          {examScore.exam.course.name} - {examScore.exam.name}
+                          {score.exam.course.name} - {score.exam.name}
                         </span>
                         <span className="text-content-standard-tertiary text-footnote">
-                          {examScore.score}
-                          {examScore.maxScore !== null && `/${examScore.maxScore}`}점 · {examScore.rank}/
-                          {examScore.totalStudents}등
+                          {score.score}
+                          {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
                         </span>
                       </div>
                       <div className="flex shrink-0 items-center gap-spacing-200">
                         <Badge variant="blue" size="xs">
-                          {examScore.exam.examNumber}회차
+                          {score.exam.examNumber}회차
                         </Badge>
                         {isPassed && (
                           <Badge variant="success" size="xs">
@@ -227,15 +215,45 @@ export default function StudentInfoModal({
                             재시험
                           </Badge>
                         )}
-                        {assignment && (
-                          <Badge variant={assignment.status === "완료" ? "success" : "warning"} size="xs">
-                            과제 {assignment.status}
-                          </Badge>
-                        )}
                       </div>
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-spacing-300">
+            <h3 className="font-semibold text-body text-content-standard-primary">
+              과제 현황
+              {assignmentHistory.length > 0 && (
+                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                  ({Math.min(5, assignmentHistory.length)}/{assignmentHistory.length}개)
+                </span>
+              )}
+            </h3>
+            {assignmentHistory.length === 0 ? (
+              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+                과제 기록이 없습니다.
+              </div>
+            ) : (
+              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+                {assignmentHistory.slice(0, 5).map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300">
+                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                      <span className="truncate font-medium text-body text-content-standard-primary">
+                        {item.assignment.course.name} - {item.assignment.name}
+                      </span>
+                    </div>
+                    <Badge
+                      variant={item.status === "완료" ? "success" : item.status === "미흡" ? "warning" : "danger"}
+                      size="xs">
+                      {item.status}
+                    </Badge>
+                  </div>
+                ))}
               </div>
             )}
           </section>
@@ -347,7 +365,7 @@ export default function StudentInfoModal({
           {studentDetail.assignmentTaskHistory && studentDetail.assignmentTaskHistory.length > 0 && (
             <section className="flex flex-col gap-spacing-300">
               <h3 className="font-semibold text-body text-content-standard-primary">
-                최근 과제
+                미완료 과제 관리
                 <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
                   ({Math.min(5, studentDetail.assignmentTaskHistory.length)}/
                   {studentDetail.assignmentTaskHistory.length}개)

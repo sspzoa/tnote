@@ -50,7 +50,7 @@ interface ClinicHistoryInfo {
   };
 }
 
-interface AssignmentHistoryInfo {
+export interface AssignmentHistoryInfo {
   id: string;
   status: "완료" | "미흡" | "미제출";
   assignment: {

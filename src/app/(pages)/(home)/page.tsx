@@ -144,10 +144,17 @@ export default function Home() {
       )}
 
       {isStudent && (
-        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { href: "/my/courses", icon: BookOpen, label: "시험/과제", description: "시험 및 과제 현황" },
-            { href: "/my/retakes", icon: ClipboardList, label: "재시험", description: "재시험 현황" },
+            { href: "/my/courses", icon: BookOpen, label: "시험 현황", description: "시험 성적 확인" },
+            { href: "/my/assignments", icon: FileCheck, label: "과제 현황", description: "과제 제출 현황 확인" },
+            {
+              href: "/my/assignment-tasks",
+              icon: FileCheck,
+              label: "미완료 과제 현황",
+              description: "미완료 과제 관리 현황",
+            },
+            { href: "/my/retakes", icon: ClipboardList, label: "재시험 현황", description: "재시험 현황 확인" },
             { href: "/my/clinics", icon: Stethoscope, label: "클리닉", description: "클리닉 출석 현황" },
             { href: "/calendar", icon: Calendar, label: "캘린더", description: "일정 확인" },
           ].map((item) => (

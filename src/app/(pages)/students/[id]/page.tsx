@@ -1,6 +1,15 @@
 "use client";
 
-import { BookOpen, FileText, MessageSquare, Printer, RefreshCw, Stethoscope, TrendingUp } from "lucide-react";
+import {
+  BookOpen,
+  FileCheck,
+  FileText,
+  MessageSquare,
+  Printer,
+  RefreshCw,
+  Stethoscope,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,7 +22,12 @@ import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import type { AssignmentTaskHistoryInfo, ExamScoreInfo, RetakeHistoryInfo } from "../(hooks)/useStudentDetail";
+import type {
+  AssignmentHistoryInfo,
+  AssignmentTaskHistoryInfo,
+  ExamScoreInfo,
+  RetakeHistoryInfo,
+} from "../(hooks)/useStudentDetail";
 import { useStudentDetail } from "../(hooks)/useStudentDetail";
 import {
   ConsultationCard,
@@ -24,9 +38,10 @@ import {
   StatCard,
 } from "./(components)";
 
-const assignmentStatusConfig: Record<string, { variant: "success" | "warning"; label: string }> = {
+const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
   완료: { variant: "success", label: "완료" },
-  미완료: { variant: "warning", label: "미완료" },
+  미흡: { variant: "warning", label: "미흡" },
+  미제출: { variant: "danger", label: "미제출" },
 };
 
 const retakeStatusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {
@@ -46,15 +61,7 @@ type ScoreSortKey = "exam" | "score" | "rank" | "average" | "median" | "highest"
 type RetakeSortKey = "exam" | "scheduledDate" | "status";
 type AssignmentTaskSortKey = "assignment" | "scheduledDate" | "status";
 
-const ExamScoreTable = ({
-  examScores,
-  assignmentMap,
-  printHidden,
-}: {
-  examScores: ExamScoreInfo[];
-  assignmentMap: Record<string, string>;
-  printHidden: boolean;
-}) => {
+const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo[]; printHidden: boolean }) => {
   const comparators = useMemo(
     () => ({
       exam: (a: ExamScoreInfo, b: ExamScoreInfo) => a.exam.examNumber - b.exam.examNumber,
@@ -76,7 +83,7 @@ const ExamScoreTable = ({
   return (
     <section className={printHidden ? "print:hidden" : ""}>
       <DashboardCard
-        title="시험 성적 & 과제"
+        title="시험 성적"
         icon={TrendingUp}
         isEmpty={examScores.length === 0}
         emptyMessage="시험 기록이 없습니다."
@@ -133,17 +140,12 @@ const ExamScoreTable = ({
                 <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
                   결과
                 </th>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  과제
-                </th>
               </tr>
             </thead>
             <tbody>
               {sortedData.map((score) => {
                 const passed = score.cutline != null && score.score >= score.cutline;
                 const failed = score.cutline != null && score.score < score.cutline;
-                const aStatus = assignmentMap[`${score.exam.course.id}:${score.exam.name}`];
-                const assignment = aStatus ? assignmentStatusConfig[aStatus] : null;
                 return (
                   <tr
                     key={score.id}
@@ -190,14 +192,67 @@ const ExamScoreTable = ({
                       )}
                       {score.cutline == null && <span className="text-content-standard-tertiary text-footnote">-</span>}
                     </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </DashboardCard>
+    </section>
+  );
+};
+
+const AssignmentHistoryTable = ({
+  assignments,
+  printHidden,
+}: {
+  assignments: AssignmentHistoryInfo[];
+  printHidden: boolean;
+}) => {
+  return (
+    <section className={printHidden ? "print:hidden" : ""}>
+      <DashboardCard
+        title="과제 현황"
+        icon={FileCheck}
+        isEmpty={assignments.length === 0}
+        emptyMessage="과제 기록이 없습니다."
+        noPadding>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-components-fill-standard-secondary">
+              <tr>
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  과제명
+                </th>
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  수업
+                </th>
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  상태
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {assignments.map((item) => {
+                const status = assignmentStatusConfig[item.status] || {
+                  variant: "warning" as const,
+                  label: item.status,
+                };
+                return (
+                  <tr
+                    key={item.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
+                      {item.assignment.name}
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                      {item.assignment.course.name}
+                    </td>
                     <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      {assignment ? (
-                        <Badge variant={assignment.variant} size="sm">
-                          {assignment.label}
-                        </Badge>
-                      ) : (
-                        <span className="text-content-standard-tertiary text-footnote">-</span>
-                      )}
+                      <Badge variant={status.variant} size="sm">
+                        {status.label}
+                      </Badge>
                     </td>
                   </tr>
                 );
@@ -340,7 +395,7 @@ const AssignmentTaskTable = ({ tasks, printHidden }: { tasks: AssignmentTaskHist
   return (
     <section className={printHidden ? "print:hidden" : ""}>
       <DashboardCard
-        title="과제 이력"
+        title="미완료 과제 이력"
         icon={FileText}
         isEmpty={tasks.length === 0}
         emptyMessage="과제 기록이 없습니다."
@@ -457,16 +512,6 @@ export default function StudentDetailPage() {
     }
   }, [error, router, toast]);
 
-  const assignmentMap = useMemo(() => {
-    if (!studentDetail) return {};
-    const map: Record<string, string> = {};
-    for (const a of studentDetail.assignmentHistory) {
-      const key = `${a.assignment.course.id}:${a.assignment.name}`;
-      map[key] = a.status;
-    }
-    return map;
-  }, [studentDetail]);
-
   if (isLoading || !studentDetail) {
     return (
       <Container>
@@ -497,6 +542,10 @@ export default function StudentDetailPage() {
     (r) => r.status === "pending" || r.status === "absent",
   ).length;
   const totalRetakes = studentDetail.retakeHistory.length;
+  const pendingAssignmentTasks = (studentDetail.assignmentTaskHistory || []).filter(
+    (t) => t.status === "pending",
+  ).length;
+  const totalAssignmentTasks = (studentDetail.assignmentTaskHistory || []).length;
   const consultationCount = studentDetail.consultationHistory.length;
 
   return (
@@ -568,7 +617,7 @@ export default function StudentDetailPage() {
         </section>
 
         <section
-          className={`grid grid-cols-2 gap-spacing-400 print:gap-spacing-200 lg:grid-cols-4 ${
+          className={`grid grid-cols-2 gap-spacing-400 print:gap-spacing-200 lg:grid-cols-5 ${
             {
               1: "print:grid-cols-1",
               2: "print:grid-cols-2",
@@ -602,6 +651,14 @@ export default function StudentDetailPage() {
               label="재시험 대기"
               value={`${pendingRetakes}건`}
               subValue={`전체 ${totalRetakes}건 중`}
+            />
+          </div>
+          <div className={printOptions.retakes ? "" : "print:hidden"}>
+            <StatCard
+              icon={FileCheck}
+              label="미완료 과제"
+              value={`${pendingAssignmentTasks}건`}
+              subValue={`전체 ${totalAssignmentTasks}건 중`}
             />
           </div>
           <div className={printOptions.consultations ? "" : "print:hidden"}>
@@ -640,11 +697,8 @@ export default function StudentDetailPage() {
           </div>
         </DashboardCard>
       </section>
-      <ExamScoreTable
-        examScores={studentDetail.examScores}
-        assignmentMap={assignmentMap}
-        printHidden={!printOptions.exams}
-      />
+      <ExamScoreTable examScores={studentDetail.examScores} printHidden={!printOptions.exams} />
+      <AssignmentHistoryTable assignments={studentDetail.assignmentHistory} printHidden={!printOptions.exams} />
 
       <RetakeTable retakes={studentDetail.retakeHistory} printHidden={!printOptions.retakes} />
       <AssignmentTaskTable tasks={studentDetail.assignmentTaskHistory} printHidden={!printOptions.retakes} />

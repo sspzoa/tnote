@@ -27,19 +27,8 @@ interface ExamScoreRow {
   };
 }
 
-interface AssignmentRow {
-  id: string;
-  status: string;
-  exam: {
-    id: string;
-    name: string;
-    exam_number: number;
-    course: { id: string; name: string; workspace: string };
-  };
-}
-
 const handleGet = async ({ supabase, session }: ApiContext) => {
-  const [enrollmentResult, examScoreResult, assignmentResult] = await Promise.all([
+  const [enrollmentResult, examScoreResult] = await Promise.all([
     supabase
       .from("CourseEnrollments")
       .select(`
@@ -65,25 +54,10 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
       `)
       .eq("student_id", session.userId)
       .eq("exam.course.workspace", session.workspace),
-    supabase
-      .from("CourseAssignments")
-      .select(`
-        id,
-        status,
-        exam:Exams!inner(
-          id,
-          name,
-          exam_number,
-          course:Courses!inner(id, name, workspace)
-        )
-      `)
-      .eq("student_id", session.userId)
-      .eq("exam.course.workspace", session.workspace),
   ]);
 
   if (enrollmentResult.error) throw enrollmentResult.error;
   if (examScoreResult.error) throw examScoreResult.error;
-  if (assignmentResult.error) throw assignmentResult.error;
 
   const courses = ((enrollmentResult.data as unknown as EnrollmentRow[]) || []).map((e) => ({
     ...e.course,
@@ -152,12 +126,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
     };
   });
 
-  const assignmentMap = new Map<string, string>();
-  for (const a of (assignmentResult.data as unknown as AssignmentRow[]) || []) {
-    assignmentMap.set(a.exam.id, a.status);
-  }
-
-  return NextResponse.json({ data: { courses, examScores, assignmentMap: Object.fromEntries(assignmentMap) } });
+  return NextResponse.json({ data: { courses, examScores } });
 };
 
 export const GET = withLogging(handleGet, {

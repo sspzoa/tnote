@@ -103,7 +103,7 @@ export interface Assignment {
   updated_at: string;
 }
 
-export type AssignmentSubmissionStatus = "완료" | "미완료";
+export type AssignmentSubmissionStatus = "완료" | "미흡" | "미제출";
 
 export interface Exam {
   id: string;

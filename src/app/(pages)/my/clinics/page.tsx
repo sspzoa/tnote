@@ -54,15 +54,7 @@ export default function MyClinicPage() {
       />
 
       {isLoading ? (
-        <SkeletonTable
-          rows={5}
-          columns={[
-            "w-32",
-            "w-24",
-            { width: "w-20", badges: ["w-8", "w-8"] },
-            { width: "w-24", badges: ["w-8", "w-8", "w-8"] },
-          ]}
-        />
+        <SkeletonTable rows={5} columns={["w-32", "w-24", { width: "w-20", badges: ["w-8"] }, "w-24"]} />
       ) : records.length === 0 ? (
         <EmptyState message="클리닉 출석 기록이 없습니다." />
       ) : (
@@ -102,6 +94,11 @@ export default function MyClinicPage() {
                   weekday: "short",
                 });
 
+                const activities: string[] = [];
+                if (record.didRetakeExam) activities.push("재시험");
+                if (record.didHomeworkCheck) activities.push("숙제검사");
+                if (record.didQa) activities.push("질의응답");
+
                 return (
                   <tr
                     key={record.id}
@@ -109,52 +106,17 @@ export default function MyClinicPage() {
                     <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
                       {dateStr}
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
-                      {record.clinic.name}
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <span className="text-body text-content-standard-primary">{record.clinic.name}</span>
+                      {record.isRequired && <span className="ml-spacing-100 text-core-accent text-footnote">필참</span>}
                     </td>
                     <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="flex items-center gap-spacing-100">
-                        {record.status === "absent" ? (
-                          <Badge variant="danger" size="xs">
-                            결석
-                          </Badge>
-                        ) : (
-                          <Badge variant="success" size="xs">
-                            출석
-                          </Badge>
-                        )}
-                        {record.isRequired ? (
-                          <Badge variant="blue" size="xs">
-                            필참
-                          </Badge>
-                        ) : (
-                          <Badge variant="neutral" size="xs">
-                            자율
-                          </Badge>
-                        )}
-                      </div>
+                      <Badge variant={record.status === "absent" ? "danger" : "success"} size="sm">
+                        {record.status === "absent" ? "결석" : "출석"}
+                      </Badge>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="flex items-center gap-spacing-100">
-                        {record.didRetakeExam && (
-                          <Badge variant="purple" size="xs">
-                            재시험
-                          </Badge>
-                        )}
-                        {record.didHomeworkCheck && (
-                          <Badge variant="green" size="xs">
-                            숙제검사
-                          </Badge>
-                        )}
-                        {record.didQa && (
-                          <Badge variant="orange" size="xs">
-                            질의응답
-                          </Badge>
-                        )}
-                        {!record.didRetakeExam && !record.didHomeworkCheck && !record.didQa && (
-                          <span className="text-content-standard-quaternary text-footnote">-</span>
-                        )}
-                      </div>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-content-standard-secondary text-footnote">
+                      {activities.length > 0 ? activities.join(", ") : "-"}
                     </td>
                   </tr>
                 );

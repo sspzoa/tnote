@@ -14,12 +14,6 @@ import { useTableSort } from "@/shared/hooks/useTableSort";
 import type { MyExamScore } from "./(hooks)/useMyCourses";
 import { useMyCourses } from "./(hooks)/useMyCourses";
 
-const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
-  완료: { variant: "success", label: "완료" },
-  미흡: { variant: "warning", label: "미흡" },
-  미제출: { variant: "danger", label: "미제출" },
-};
-
 const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
   const chartData = useMemo(
     () =>
@@ -97,7 +91,7 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
 type ScoreSortKey = "exam" | "score" | "rank" | "average" | "median" | "highest";
 
 export default function MyCoursesPage() {
-  const { courses, examScores, assignmentMap, isLoading, error } = useMyCourses();
+  const { courses, examScores, isLoading, error } = useMyCourses();
   const [selectedCourseId, setSelectedCourseId] = useState<string>("all");
 
   const filteredScores = useMemo(
@@ -127,8 +121,8 @@ export default function MyCoursesPage() {
     return (
       <Container>
         <Header
-          title="시험 및 과제 현황"
-          subtitle="나의 수업과 과제 현황을 확인합니다"
+          title="시험 현황"
+          subtitle="나의 수업과 시험 현황을 확인합니다"
           backLink={{ href: "/", label: "홈으로 돌아가기" }}
         />
         <ErrorComponent errorMessage={error.message} />
@@ -139,7 +133,7 @@ export default function MyCoursesPage() {
   return (
     <Container>
       <Header
-        title="시험 및 과제 현황"
+        title="시험 현황"
         subtitle={`수강 중인 수업 ${courses.length}개`}
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
       />
@@ -147,7 +141,7 @@ export default function MyCoursesPage() {
       {isLoading ? (
         <div className="flex flex-col gap-spacing-400">
           <Skeleton className="h-52 w-full rounded-radius-400" />
-          <SkeletonTable rows={5} columns={["w-24", "w-14", "w-14", "w-14", "w-14", "w-14", "w-14", "w-14"]} />
+          <SkeletonTable rows={5} columns={["w-24", "w-14", "w-14", "w-14", "w-14", "w-14", "w-14"]} />
         </div>
       ) : courses.length === 0 ? (
         <EmptyState message="수강 중인 수업이 없습니다." />
@@ -173,7 +167,7 @@ export default function MyCoursesPage() {
           <PercentileChart scores={filteredScores} />
 
           {sortedData.length === 0 ? (
-            <EmptyState message="시험 및 과제 기록이 없습니다." />
+            <EmptyState message="시험 기록이 없습니다." />
           ) : (
             <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
               <table className="w-full">
@@ -224,17 +218,12 @@ export default function MyCoursesPage() {
                     <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
                       결과
                     </th>
-                    <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                      과제
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {sortedData.map((score) => {
                     const passed = score.cutline != null && score.score >= score.cutline;
                     const failed = score.cutline != null && score.score < score.cutline;
-                    const assignmentStatus = assignmentMap[score.exam.id];
-                    const assignment = assignmentStatus ? assignmentStatusConfig[assignmentStatus] : null;
                     return (
                       <tr
                         key={score.id}
@@ -280,15 +269,6 @@ export default function MyCoursesPage() {
                             </Badge>
                           )}
                           {score.cutline == null && (
-                            <span className="text-content-standard-tertiary text-footnote">-</span>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          {assignment ? (
-                            <Badge variant={assignment.variant} size="sm">
-                              {assignment.label}
-                            </Badge>
-                          ) : (
                             <span className="text-content-standard-tertiary text-footnote">-</span>
                           )}
                         </td>
