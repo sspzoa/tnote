@@ -15,6 +15,8 @@ interface Workspace {
   name: string;
 }
 
+const heroFeatures = ["성적 분석", "재시험 관리", "상담 기록", "수업 관리"];
+
 export default function LoginPage() {
   const router = useRouter();
   const toast = useToast();
@@ -150,38 +152,52 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
-      <div className="relative flex min-h-[280px] flex-col justify-between overflow-hidden bg-core-accent p-spacing-600 lg:min-h-dvh lg:w-1/2 lg:p-spacing-800">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="-right-32 -top-32 absolute size-96 rounded-full bg-solid-white/10 blur-3xl" />
-          <div className="-bottom-48 -left-48 absolute size-[500px] rounded-full bg-solid-indigo/20 blur-3xl" />
-          <div className="absolute top-1/2 right-1/4 size-64 rounded-full bg-solid-white/5 blur-2xl" />
-        </div>
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-core-accent p-spacing-800 lg:flex lg:min-h-dvh lg:w-[480px]">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }}
+        />
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-spacing-300">
-            <div className="flex size-12 items-center justify-center rounded-radius-300 bg-solid-white/20 backdrop-blur-sm lg:size-14">
-              <span className="font-bold text-solid-white text-xl lg:text-2xl">T</span>
-            </div>
-            <span className="font-bold text-solid-white text-xl lg:text-2xl">Tnote</span>
+        <div className="relative z-10 flex items-center gap-spacing-200">
+          <div className="flex size-10 items-center justify-center rounded-radius-200 bg-core-accent">
+            <span className="font-bold text-solid-white text-label">T</span>
           </div>
+          <span className="font-bold text-solid-white text-label">Tnote</span>
         </div>
 
-        <div className="relative z-10 flex flex-col gap-spacing-400">
-          <h1 className="font-bold text-3xl text-solid-white leading-tight lg:text-5xl">
+        <div className="relative z-10 flex flex-col gap-spacing-600">
+          <h1 className="font-bold text-4xl text-solid-white leading-[1.2] tracking-tight">
             학생 관리,
             <br />더 스마트하게
           </h1>
-          <p className="max-w-md text-body text-solid-white/80 lg:text-lg">
-            출결, 성적, 상담까지. 선생님의 모든 학생 관리를 한 곳에서.
+          <p className="text-body text-solid-white/50 leading-relaxed">
+            시험, 과제, 상담까지.
+            <br />
+            선생님의 모든 학생 관리를 한 곳에서.
           </p>
+          <div className="flex flex-wrap gap-spacing-200">
+            {heroFeatures.map((label) => (
+              <span
+                key={label}
+                className="rounded-radius-full bg-solid-white/8 px-spacing-300 py-spacing-100 text-caption text-solid-white/40">
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
+
+        <p className="relative z-10 text-caption text-solid-white/20">© {new Date().getFullYear()} Tnote</p>
       </div>
 
       <div className="flex flex-1 flex-col justify-center bg-background-standard-primary p-spacing-600 lg:p-spacing-800">
-        <div className="mx-auto w-full max-w-md">
-          <div className="mb-spacing-800 flex flex-col gap-spacing-200">
-            <h2 className="font-bold text-2xl text-content-standard-primary lg:text-3xl">로그인</h2>
-            <p className="text-body text-content-standard-secondary">계정에 로그인하여 시작하세요</p>
+        <div className="mx-auto w-full max-w-[400px]">
+          <div className="mb-spacing-700 flex flex-col gap-spacing-100">
+            <h2 className="font-bold text-content-standard-primary text-title">로그인</h2>
+            <p className="text-content-standard-tertiary text-label">계정에 로그인하여 시작하세요</p>
           </div>
 
           <SegmentedControl
@@ -238,20 +254,28 @@ export default function LoginPage() {
             </Button>
 
             {tab === "teacher" && (
-              <div className="text-center text-body text-content-standard-secondary">
-                계정이 없으신가요?{" "}
-                <button
-                  type="button"
-                  onClick={() => setShowRegisterModal(true)}
-                  className="font-medium text-core-accent transition-all duration-150 hover:brightness-110">
-                  회원가입
-                </button>
-              </div>
+              <>
+                <div className="flex items-center gap-spacing-400">
+                  <div className="h-px flex-1 bg-line-divider" />
+                  <span className="text-caption text-content-standard-quaternary">또는</span>
+                  <div className="h-px flex-1 bg-line-divider" />
+                </div>
+
+                <div className="text-center text-body text-content-standard-secondary">
+                  계정이 없으신가요?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterModal(true)}
+                    className="font-semibold text-core-accent transition-all duration-150 hover:brightness-110">
+                    회원가입
+                  </button>
+                </div>
+              </>
             )}
           </form>
 
-          <p className="mt-spacing-800 text-center text-content-standard-tertiary text-footnote">
-            © {new Date().getFullYear()} Tnote. All rights reserved.
+          <p className="mt-spacing-800 text-center text-caption text-content-standard-quaternary lg:hidden">
+            © {new Date().getFullYear()} Tnote
           </p>
         </div>
       </div>
