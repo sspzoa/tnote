@@ -125,6 +125,21 @@ export default function EventDetailModal({ event, onClose }: Props) {
           </div>
         )}
 
+        {event.type === "clinic" && Array.isArray(event.metadata?.requiredStudents) && (
+          <div className="flex flex-col gap-spacing-200">
+            <label className="block font-semibold text-content-standard-secondary text-label">
+              필참 학생 ({(event.metadata?.requiredStudents as string[]).length}명)
+            </label>
+            <div className="flex flex-wrap gap-spacing-100">
+              {(event.metadata?.requiredStudents as string[]).map((name) => (
+                <Badge key={name} variant="info" size="sm">
+                  {name}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
         {event.type === "retake" && getMetadataStatus(event) && (
           <div className="flex flex-col gap-spacing-100">
             <label className="block font-semibold text-content-standard-secondary text-label">상태</label>

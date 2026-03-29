@@ -4,33 +4,18 @@ import {
   type CalendarEvent,
   createAssignmentTaskEvent,
   createRetakeEvent,
-  generateClinicSessions,
+  generateAdminClinicSessions,
   generateCourseSessions,
 } from "@/shared/lib/utils/calendar";
 
 import type {
   CalendarAssignmentTaskData,
-  CalendarAttendanceRecord,
   CalendarClinicData,
   CalendarCourseData,
   CalendarRetakeData,
 } from "@/shared/types/api";
 
-const fetchCourses = async (
-  supabase: ApiContext["supabase"],
-  workspace: string,
-  studentId?: string,
-): Promise<CalendarCourseData[]> => {
-  if (studentId) {
-    const { data: enrollments, error } = await supabase
-      .from("CourseEnrollments")
-      .select(`course:Courses!inner(id, name, start_date, end_date, days_of_week)`)
-      .eq("student_id", studentId);
-
-    if (error) throw error;
-    return (enrollments || []).map((e) => e.course as unknown as CalendarCourseData);
-  }
-
+const fetchCourses = async (supabase: ApiContext["supabase"], workspace: string): Promise<CalendarCourseData[]> => {
   const { data: courses, error } = await supabase
     .from("Courses")
     .select("id, name, start_date, end_date, days_of_week")
@@ -42,28 +27,7 @@ const fetchCourses = async (
   return (courses as CalendarCourseData[]) || [];
 };
 
-const fetchRetakes = async (
-  supabase: ApiContext["supabase"],
-  workspace: string,
-  studentId?: string,
-): Promise<CalendarRetakeData[]> => {
-  if (studentId) {
-    const { data, error } = await supabase
-      .from("RetakeAssignments")
-      .select(
-        `id, current_scheduled_date, status, exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name))`,
-      )
-      .eq("student_id", studentId);
-
-    if (error) throw error;
-    return (data || []).map((r) => ({
-      id: r.id,
-      current_scheduled_date: r.current_scheduled_date,
-      status: r.status,
-      exam: r.exam as unknown as { name: string; course: { name: string } },
-    }));
-  }
-
+const fetchRetakes = async (supabase: ApiContext["supabase"], workspace: string): Promise<CalendarRetakeData[]> => {
   const { data, error } = await supabase
     .from("RetakeAssignments")
     .select(`
@@ -86,25 +50,7 @@ const fetchRetakes = async (
 const fetchAssignmentTasks = async (
   supabase: ApiContext["supabase"],
   workspace: string,
-  studentId?: string,
 ): Promise<CalendarAssignmentTaskData[]> => {
-  if (studentId) {
-    const { data, error } = await supabase
-      .from("AssignmentTasks")
-      .select(
-        `id, current_scheduled_date, status, assignment:Assignments!inner(id, name, course:Courses!inner(id, name))`,
-      )
-      .eq("student_id", studentId);
-
-    if (error) throw error;
-    return (data || []).map((r) => ({
-      id: r.id,
-      current_scheduled_date: r.current_scheduled_date,
-      status: r.status,
-      assignment: r.assignment as unknown as { name: string; course: { name: string } },
-    }));
-  }
-
   const { data, error } = await supabase
     .from("AssignmentTasks")
     .select(`
@@ -124,36 +70,16 @@ const fetchAssignmentTasks = async (
   }));
 };
 
-const fetchClinicsWithAttendance = async (
-  supabase: ApiContext["supabase"],
-  workspace: string,
-): Promise<{ clinics: CalendarClinicData[]; attendance: CalendarAttendanceRecord[] }> => {
-  const clinicsResult = await supabase
+const fetchClinics = async (supabase: ApiContext["supabase"], workspace: string): Promise<CalendarClinicData[]> => {
+  const { data, error } = await supabase
     .from("Clinics")
     .select("id, name, start_date, end_date, operating_days")
     .eq("workspace", workspace)
     .not("start_date", "is", null)
     .not("end_date", "is", null);
 
-  if (clinicsResult.error) throw clinicsResult.error;
-
-  const clinics = (clinicsResult.data as CalendarClinicData[]) || [];
-  const clinicIds = clinics.map((c) => c.id);
-
-  if (clinicIds.length === 0) {
-    return { clinics, attendance: [] };
-  }
-
-  const attendanceResult = await supabase
-    .from("ClinicAttendance")
-    .select("attendance_date, student_id, clinic_id")
-    .in("clinic_id", clinicIds);
-
-  if (attendanceResult.error) throw attendanceResult.error;
-
-  const attendance = (attendanceResult.data as CalendarAttendanceRecord[]) || [];
-
-  return { clinics, attendance };
+  if (error) throw error;
+  return (data as CalendarClinicData[]) || [];
 };
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
@@ -162,15 +88,26 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const endDate = searchParams.get("end");
 
   const events: CalendarEvent[] = [];
-  const isStudent = session.role === "student";
-  const studentId = isStudent ? session.userId : undefined;
 
-  const [courses, retakes, assignmentTasks, { clinics, attendance }] = await Promise.all([
-    fetchCourses(supabase, session.workspace, studentId),
-    fetchRetakes(supabase, session.workspace, studentId),
-    fetchAssignmentTasks(supabase, session.workspace, studentId),
-    fetchClinicsWithAttendance(supabase, session.workspace),
+  const [courses, retakes, assignmentTasks, clinics, requiredStudentsResult] = await Promise.all([
+    fetchCourses(supabase, session.workspace),
+    fetchRetakes(supabase, session.workspace),
+    fetchAssignmentTasks(supabase, session.workspace),
+    fetchClinics(supabase, session.workspace),
+    supabase
+      .from("Users")
+      .select("id, name, required_clinic_weekdays")
+      .eq("workspace", session.workspace)
+      .eq("role", "student")
+      .not("required_clinic_weekdays", "is", null),
   ]);
+
+  if (requiredStudentsResult.error) throw requiredStudentsResult.error;
+  const requiredStudents = (requiredStudentsResult.data || []) as {
+    id: string;
+    name: string;
+    required_clinic_weekdays: number[];
+  }[];
 
   for (const course of courses) {
     if (course.start_date && course.end_date && course.days_of_week) {
@@ -188,21 +125,20 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
 
   for (const retake of retakes) {
     if (retake.current_scheduled_date) {
-      events.push(createRetakeEvent(retake, !isStudent));
+      events.push(createRetakeEvent(retake, true));
     }
   }
 
   for (const task of assignmentTasks) {
     if (task.current_scheduled_date) {
-      events.push(createAssignmentTaskEvent(task, !isStudent));
+      events.push(createAssignmentTaskEvent(task, true));
     }
   }
 
   for (const clinic of clinics) {
     if (clinic.start_date && clinic.end_date && clinic.operating_days) {
-      const clinicAttendance = attendance.filter((a) => a.clinic_id === clinic.id);
       events.push(
-        ...generateClinicSessions(
+        ...generateAdminClinicSessions(
           {
             id: clinic.id,
             name: clinic.name,
@@ -210,8 +146,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
             end_date: clinic.end_date,
             operating_days: clinic.operating_days,
           },
-          clinicAttendance,
-          studentId,
+          requiredStudents,
         ),
       );
     }
@@ -225,4 +160,4 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   return NextResponse.json({ data: filteredEvents });
 };
 
-export const GET = withLogging(handleGet, { resource: "calendar", action: "read" });
+export const GET = withLogging(handleGet, { resource: "calendar", action: "read", allowedRoles: ["owner", "admin"] });

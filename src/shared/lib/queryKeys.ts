@@ -85,6 +85,7 @@ export const QUERY_KEYS = {
     courses: ["my", "courses"] as const,
     assignments: ["my-assignments"] as const,
     assignmentTasks: ["my-assignment-tasks"] as const,
+    calendarEvents: (startDate: string, endDate: string) => ["my", "calendarEvents", startDate, endDate] as const,
   },
   messages: {
     templates: (type: string) => ["message-templates", type] as const,

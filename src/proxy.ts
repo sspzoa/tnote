@@ -15,7 +15,7 @@ const PUBLIC_APIS: PublicRoute[] = [
 
 const PUBLIC_PAGES = ["/login", "/terms", "/privacy"];
 
-const STUDENT_ALLOWED_PAGES = ["/", "/calendar", "/my"];
+const STUDENT_ALLOWED_PAGES = ["/", "/my"];
 
 const STUDENT_ALLOWED_API_PREFIXES = ["/api/auth/", "/api/my/"];
 

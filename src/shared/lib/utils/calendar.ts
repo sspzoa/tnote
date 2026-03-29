@@ -131,6 +131,47 @@ export const generateClinicSessions = (
   return events;
 };
 
+interface RequiredStudent {
+  id: string;
+  name: string;
+  required_clinic_weekdays: number[];
+}
+
+export const generateAdminClinicSessions = (
+  clinic: ClinicSessionParams,
+  requiredStudents: RequiredStudent[],
+): CalendarEvent[] => {
+  const events: CalendarEvent[] = [];
+  const start = new Date(clinic.start_date);
+  const end = new Date(clinic.end_date);
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const dayOfWeek = d.getDay();
+    if (clinic.operating_days.includes(dayOfWeek)) {
+      const dateStr = d.toISOString().split("T")[0];
+      const students = requiredStudents.filter((s) => s.required_clinic_weekdays.includes(dayOfWeek));
+
+      if (students.length > 0) {
+        events.push({
+          id: `clinic-${clinic.id}-${dateStr}`,
+          type: "clinic",
+          title: `${clinic.name} (필참 ${students.length}명)`,
+          date: dateStr,
+          allDay: true,
+          metadata: {
+            clinicId: clinic.id,
+            clinicName: clinic.name,
+            requiredStudents: students.map((s) => s.name),
+            requiredCount: students.length,
+          },
+        });
+      }
+    }
+  }
+
+  return events;
+};
+
 export const createRetakeEvent = (retake: RetakeData, includeStudentName: boolean): CalendarEvent => {
   const studentName = includeStudentName && retake.student ? `${retake.student.name} - ` : "";
   const examName = retake.exam.name;

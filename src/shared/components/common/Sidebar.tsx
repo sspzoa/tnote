@@ -215,9 +215,9 @@ export default function Sidebar() {
   const isAdmin = userInfo?.role === "admin" || userInfo?.role === "owner";
   const studentMenuItems = [
     {
-      href: "/calendar",
+      href: "/my/calendar",
       icon: Calendar,
-      label: "캘린더",
+      label: "내 캘린더",
     },
     {
       href: "/my/courses",
@@ -420,10 +420,9 @@ export default function Sidebar() {
       ]
     : [
         { href: "/", icon: Home, label: "홈" },
+        { href: "/my/calendar", icon: Calendar, label: "캘린더" },
         { href: "/my/courses", icon: BookOpen, label: "시험" },
         { href: "/my/assignments", icon: FileCheck, label: "과제" },
-        { href: "/my/clinics", icon: Stethoscope, label: "클리닉" },
-        { href: "/my/retakes", icon: ClipboardList, label: "재시험" },
       ];
 
   return (
