@@ -48,8 +48,8 @@ export default function AssignmentsPage() {
     return (
       <Container>
         <Header
-          title="과제 관리"
-          subtitle="학생들의 과제를 관리합니다"
+          title="미완료 과제 관리"
+          subtitle="학생들의 미완료 과제를 관리합니다"
           backLink={{ href: "/", label: "홈으로 돌아가기" }}
         />
         <ErrorComponent errorMessage={error.message} />
@@ -60,8 +60,8 @@ export default function AssignmentsPage() {
   return (
     <Container>
       <Header
-        title="과제 관리"
-        subtitle="학생들의 과제를 관리합니다"
+        title="미완료 과제 관리"
+        subtitle="학생들의 미완료 과제를 관리합니다"
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
           <div className="flex items-center gap-spacing-300">
@@ -84,7 +84,7 @@ export default function AssignmentsPage() {
               <Settings className="size-4" />
               관리 상태 설정
             </Button>
-            <Button onClick={handleAssignClick}>+ 과제 할당</Button>
+            <Button onClick={handleAssignClick}>+ 미완료 과제 할당</Button>
           </div>
         }
       />

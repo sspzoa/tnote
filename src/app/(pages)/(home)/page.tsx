@@ -1,7 +1,7 @@
 "use client";
 
 import { createTypeStream } from "hangul-typing-animation";
-import { BookOpen, Calendar, ClipboardList, Sparkles, Stethoscope, Users } from "lucide-react";
+import { BookOpen, Calendar, ClipboardList, FileCheck, Sparkles, Stethoscope, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Container from "@/shared/components/common/Container";
@@ -46,8 +46,8 @@ export default function Home() {
           <div className="h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
           <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
         </div>
-        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-5">
+          {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
               className="animate-pulse rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
@@ -90,6 +90,20 @@ export default function Home() {
       label: "재시험",
       description: "대기 중인 재시험",
     },
+    {
+      href: "/assignments",
+      icon: FileCheck,
+      value: stats?.pendingAssignmentTaskCount || 0,
+      label: "미완료 과제",
+      description: "대기 중인 미완료 과제",
+    },
+    {
+      href: "/clinics",
+      icon: Stethoscope,
+      value: stats?.activeClinicCount || 0,
+      label: "클리닉",
+      description: "운영 중인 클리닉",
+    },
   ];
 
   return (
@@ -108,7 +122,7 @@ export default function Home() {
       </div>
 
       {!isStudent && stats && (
-        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-5">
           {statItems.map((item) => (
             <Link
               key={item.href}

@@ -59,7 +59,7 @@ const adminMenuItems = [
   {
     href: "/assignments",
     icon: FileCheck,
-    label: "과제 관리",
+    label: "미완료 과제 관리",
   },
   {
     href: "/students",

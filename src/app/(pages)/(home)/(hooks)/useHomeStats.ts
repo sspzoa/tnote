@@ -6,6 +6,8 @@ export interface HomeStats {
   courseCount: number;
   studentCount: number;
   pendingRetakeCount: number;
+  pendingAssignmentTaskCount: number;
+  activeClinicCount: number;
 }
 
 export const useHomeStats = (enabled: boolean) => {
@@ -19,6 +21,8 @@ export const useHomeStats = (enabled: boolean) => {
         courseCount: result.data?.courseCount || 0,
         studentCount: result.data?.studentCount || 0,
         pendingRetakeCount: result.data?.pendingRetakeCount || 0,
+        pendingAssignmentTaskCount: result.data?.pendingAssignmentTaskCount || 0,
+        activeClinicCount: result.data?.activeClinicCount || 0,
       };
     },
     enabled,
