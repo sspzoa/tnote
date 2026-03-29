@@ -230,9 +230,9 @@ export default function Sidebar() {
       label: "과제 현황",
     },
     {
-      href: "/my/assignment-tasks",
-      icon: FileCheck,
-      label: "미완료 과제 현황",
+      href: "/my/clinics",
+      icon: Stethoscope,
+      label: "클리닉 출석",
     },
     {
       href: "/my/retakes",
@@ -240,9 +240,9 @@ export default function Sidebar() {
       label: "재시험 현황",
     },
     {
-      href: "/my/clinics",
-      icon: Stethoscope,
-      label: "클리닉 출석",
+      href: "/my/assignment-tasks",
+      icon: FileCheck,
+      label: "미완료 과제 현황",
     },
   ];
   const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems] : studentMenuItems;
@@ -422,8 +422,8 @@ export default function Sidebar() {
         { href: "/", icon: Home, label: "홈" },
         { href: "/my/courses", icon: BookOpen, label: "시험" },
         { href: "/my/assignments", icon: FileCheck, label: "과제" },
-        { href: "/my/retakes", icon: ClipboardList, label: "재시험" },
         { href: "/my/clinics", icon: Stethoscope, label: "클리닉" },
+        { href: "/my/retakes", icon: ClipboardList, label: "재시험" },
       ];
 
   return (
