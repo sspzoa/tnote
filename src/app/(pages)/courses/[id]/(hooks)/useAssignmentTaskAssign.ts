@@ -1,7 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export const useAssignmentTaskAssign = () => {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ assignmentId, studentIds }: { assignmentId: string; studentIds: string[] }) => {
       const response = await fetchWithAuth("/api/assignment-tasks", {
@@ -17,6 +20,10 @@ export const useAssignmentTaskAssign = () => {
         throw new Error(result.error || "과제 할당에 실패했습니다.");
       }
       return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.historyAll });
     },
   });
   return { assignTasks: mutateAsync, isPending };

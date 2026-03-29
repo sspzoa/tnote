@@ -655,59 +655,60 @@ export default function StudentDetailPage() {
           isEmpty={studentDetail.clinicHistory.length === 0}
           emptyMessage="클리닉 출석 기록이 없습니다."
           noPadding>
-          <div className="grid gap-spacing-300 p-spacing-400 sm:grid-cols-2 lg:grid-cols-3 print:gap-spacing-200 print:px-0 print:py-spacing-200">
-            {studentDetail.clinicHistory.map((history) => (
-              <div
-                key={history.id}
-                className="print-break-inside-avoid flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
-                <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                  <span className="truncate font-medium text-body text-content-standard-primary">
-                    {history.clinic.name}
-                  </span>
-                  {history.note && (
-                    <span className="truncate text-content-standard-tertiary text-footnote">{history.note}</span>
-                  )}
-                </div>
-                <div className="flex shrink-0 flex-wrap items-center gap-spacing-100">
-                  {history.status === "absent" ? (
-                    <Badge variant="danger" size="xs">
-                      결석
-                    </Badge>
-                  ) : (
-                    <Badge variant="success" size="xs">
-                      출석
-                    </Badge>
-                  )}
-                  {history.isRequired ? (
-                    <Badge variant="blue" size="xs">
-                      필참
-                    </Badge>
-                  ) : (
-                    <Badge variant="neutral" size="xs">
-                      자율
-                    </Badge>
-                  )}
-                  {history.didRetakeExam && (
-                    <Badge variant="purple" size="xs">
-                      재시험
-                    </Badge>
-                  )}
-                  {history.didHomeworkCheck && (
-                    <Badge variant="green" size="xs">
-                      숙제검사
-                    </Badge>
-                  )}
-                  {history.didQa && (
-                    <Badge variant="orange" size="xs">
-                      질의응답
-                    </Badge>
-                  )}
-                  <Badge variant="blue" size="xs">
-                    {new Date(history.attendanceDate).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}
-                  </Badge>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-components-fill-standard-secondary">
+                <tr>
+                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    날짜
+                  </th>
+                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    클리닉
+                  </th>
+                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    출석
+                  </th>
+                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    활동
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {studentDetail.clinicHistory.map((history) => {
+                  const activities = [
+                    history.didRetakeExam && "재시험",
+                    history.didHomeworkCheck && "숙제검사",
+                    history.didQa && "질의응답",
+                  ].filter(Boolean);
+                  return (
+                    <tr
+                      key={history.id}
+                      className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                        {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                        <span className="text-body text-content-standard-primary">{history.clinic.name}</span>
+                        {history.isRequired && (
+                          <span className="ml-spacing-100 text-core-accent text-footnote">필참</span>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                        <Badge variant={history.status === "absent" ? "danger" : "success"} size="sm">
+                          {history.status === "absent" ? "결석" : "출석"}
+                        </Badge>
+                      </td>
+                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-content-standard-secondary text-footnote">
+                        {activities.length > 0 ? activities.join(", ") : "-"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </DashboardCard>
       </section>

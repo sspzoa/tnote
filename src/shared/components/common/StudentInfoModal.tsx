@@ -255,58 +255,37 @@ export default function StudentInfoModal({
               </div>
             ) : (
               <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
-                {studentDetail.clinicHistory.slice(0, 5).map((history) => (
-                  <div
-                    key={history.id}
-                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                      <span className="truncate font-medium text-body text-content-standard-primary">
-                        {history.clinic.name}
-                      </span>
-                      {history.note && (
-                        <span className="truncate text-content-standard-tertiary text-footnote">{history.note}</span>
-                      )}
+                {studentDetail.clinicHistory.slice(0, 5).map((history) => {
+                  const activities = [
+                    history.didRetakeExam && "재시험",
+                    history.didHomeworkCheck && "숙제검사",
+                    history.didQa && "질의응답",
+                  ].filter(Boolean);
+                  return (
+                    <div
+                      key={history.id}
+                      className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300">
+                      <div className="flex min-w-0 flex-1 items-center gap-spacing-300">
+                        <span className="shrink-0 text-content-standard-tertiary text-footnote">
+                          {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                        <span className="truncate text-body text-content-standard-primary">{history.clinic.name}</span>
+                        {history.isRequired && <span className="shrink-0 text-core-accent text-footnote">필참</span>}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-spacing-200">
+                        <Badge variant={history.status === "absent" ? "danger" : "success"} size="xs">
+                          {history.status === "absent" ? "결석" : "출석"}
+                        </Badge>
+                        {activities.length > 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">{activities.join(", ")}</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex shrink-0 flex-wrap items-center gap-spacing-100">
-                      {history.status === "absent" ? (
-                        <Badge variant="danger" size="xs">
-                          결석
-                        </Badge>
-                      ) : (
-                        <Badge variant="success" size="xs">
-                          출석
-                        </Badge>
-                      )}
-                      {history.isRequired ? (
-                        <Badge variant="blue" size="xs">
-                          필참
-                        </Badge>
-                      ) : (
-                        <Badge variant="neutral" size="xs">
-                          자율
-                        </Badge>
-                      )}
-                      {history.didRetakeExam && (
-                        <Badge variant="purple" size="xs">
-                          재시험
-                        </Badge>
-                      )}
-                      {history.didHomeworkCheck && (
-                        <Badge variant="green" size="xs">
-                          숙제검사
-                        </Badge>
-                      )}
-                      {history.didQa && (
-                        <Badge variant="orange" size="xs">
-                          질의응답
-                        </Badge>
-                      )}
-                      <Badge variant="blue" size="xs">
-                        {new Date(history.attendanceDate).toLocaleDateString("ko-KR")}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>

@@ -1,7 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
+import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 
 export const useRetakeAssignFromExam = () => {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({ examId, studentIds }: { examId: string; studentIds: string[] }) => {
       const response = await fetchWithAuth("/api/retakes", {
@@ -17,6 +20,10 @@ export const useRetakeAssignFromExam = () => {
         throw new Error(result.error || "재시험 할당에 실패했습니다.");
       }
       return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.retakes.historyAll });
     },
   });
   return { assignRetakes: mutateAsync, isPending };

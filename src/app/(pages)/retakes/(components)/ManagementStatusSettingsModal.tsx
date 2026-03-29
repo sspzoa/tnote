@@ -264,6 +264,8 @@ export default function ManagementStatusSettingsModal() {
       }
 
       setDeletedIds([]);
+      toast.success("관리 상태가 저장되었습니다.");
+      setShowModal(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "저장에 실패했습니다.");
     } finally {
