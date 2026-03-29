@@ -31,6 +31,14 @@ interface RetakeData {
   student?: { name: string };
 }
 
+interface AssignmentTaskData {
+  id: string;
+  current_scheduled_date: string | null;
+  status: string;
+  assignment: { name: string; course: { name: string } };
+  student?: { name: string };
+}
+
 export const generateCourseSessions = (course: CourseSessionParams): CalendarEvent[] => {
   const events: CalendarEvent[] = [];
   const start = new Date(course.start_date);
@@ -125,18 +133,40 @@ export const generateClinicSessions = (
 
 export const createRetakeEvent = (retake: RetakeData, includeStudentName: boolean): CalendarEvent => {
   const studentName = includeStudentName && retake.student ? `${retake.student.name} - ` : "";
+  const examName = retake.exam.name;
+  const courseName = retake.exam.course.name;
   return {
     id: `retake-${retake.id}`,
     type: "retake",
-    title: `재시험: ${studentName}${retake.exam.course.name} ${retake.exam.name}`,
+    title: `재시험: ${studentName}${courseName} ${examName}`,
     date: retake.current_scheduled_date as string,
     allDay: true,
     metadata: {
       retakeId: retake.id,
       status: retake.status,
       ...(retake.student && { studentName: retake.student.name }),
-      examName: retake.exam.name,
-      courseName: retake.exam.course.name,
+      examName,
+      courseName,
+    },
+  };
+};
+
+export const createAssignmentTaskEvent = (task: AssignmentTaskData, includeStudentName: boolean): CalendarEvent => {
+  const studentName = includeStudentName && task.student ? `${task.student.name} - ` : "";
+  const assignmentName = task.assignment.name;
+  const courseName = task.assignment.course.name;
+  return {
+    id: `assignment-task-${task.id}`,
+    type: "assignment",
+    title: `과제: ${studentName}${courseName} ${assignmentName}`,
+    date: task.current_scheduled_date as string,
+    allDay: true,
+    metadata: {
+      assignmentTaskId: task.id,
+      status: task.status,
+      ...(task.student && { studentName: task.student.name }),
+      assignmentName,
+      courseName,
     },
   };
 };

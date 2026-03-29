@@ -36,6 +36,17 @@ export interface ExamAssignment {
   status: string;
 }
 
+export interface AssignmentSubmission {
+  student_id: string;
+  status: string;
+  student?: {
+    id: string;
+    name: string;
+    phone_number: string;
+    school: string | null;
+  };
+}
+
 // --- Calendar-related query results ---
 
 export interface CalendarCourseData {
@@ -65,6 +76,14 @@ export interface CalendarRetakeData {
   current_scheduled_date: string | null;
   status: string;
   exam: { name: string; course: { name: string } };
+  student?: { name: string };
+}
+
+export interface CalendarAssignmentTaskData {
+  id: string;
+  current_scheduled_date: string | null;
+  status: string;
+  assignment: { name: string; course: { name: string } };
   student?: { name: string };
 }
 
@@ -118,11 +137,10 @@ export interface StudentDetailEnrollment {
 export interface StudentDetailAssignment {
   id: string;
   status: string;
-  note: string | null;
-  exam: {
+  updated_at: string;
+  assignment: {
     id: string;
     name: string;
-    exam_number: number;
     course: {
       id: string;
       name: string;
@@ -142,6 +160,24 @@ export interface StudentDetailRetake {
     id: string;
     name: string;
     exam_number: number;
+    course: {
+      id: string;
+      name: string;
+      workspace: string;
+    };
+  };
+}
+
+export interface StudentDetailAssignmentTask {
+  id: string;
+  status: string;
+  management_status: string;
+  current_scheduled_date: string | null;
+  postpone_count: number;
+  absent_count: number;
+  assignment: {
+    id: string;
+    name: string;
     course: {
       id: string;
       name: string;

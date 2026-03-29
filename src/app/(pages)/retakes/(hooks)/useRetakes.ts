@@ -7,7 +7,7 @@ export const useRetakes = (filter: "all" | "pending" | "completed" | "absent") =
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.retakes.byFilter(filter),
     queryFn: async () => {
-      const url = filter === "all" ? "/api/retakes" : `/api/retakes?status=${filter}`;
+      const url = filter !== "all" ? `/api/retakes?status=${filter}` : "/api/retakes";
       const response = await fetchWithAuth(url);
       const result = await response.json();
 

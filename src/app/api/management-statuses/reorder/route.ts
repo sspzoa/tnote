@@ -1,17 +1,24 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
+const VALID_CATEGORIES = ["retake", "assignment"] as const;
+
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const { orderedIds } = await request.json();
+  const { orderedIds, category = "retake" } = await request.json();
 
   if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
     return NextResponse.json({ error: "순서 정보가 필요합니다." }, { status: 400 });
   }
 
+  if (!VALID_CATEGORIES.includes(category)) {
+    return NextResponse.json({ error: "유효하지 않은 카테고리입니다." }, { status: 400 });
+  }
+
   const { data: existing, error: fetchError } = await supabase
     .from("ManagementStatuses")
     .select("id")
-    .eq("workspace", session.workspace);
+    .eq("workspace", session.workspace)
+    .eq("category", category);
 
   if (fetchError) throw fetchError;
 

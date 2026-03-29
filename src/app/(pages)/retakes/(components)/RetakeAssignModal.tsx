@@ -129,7 +129,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       handleClose();
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "재시험 배정에 실패했습니다.");
+      toast.error(error instanceof Error ? error.message : "배정에 실패했습니다.");
     }
   };
 

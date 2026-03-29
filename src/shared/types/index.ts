@@ -93,6 +93,18 @@ export interface ManagementStatusItem {
 
 export type ManagementStatus = string;
 
+export interface Assignment {
+  id: string;
+  workspace: string;
+  course_id: string;
+  name: string;
+  course?: Pick<Course, "id" | "name">;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AssignmentSubmissionStatus = "완료" | "미완료";
+
 export interface Exam {
   id: string;
   name: string;
@@ -121,6 +133,20 @@ export interface Retake {
   absent_count: number;
   note: string | null;
   exam: Pick<Exam, "id" | "name" | "exam_number"> & { course: Pick<Course, "id" | "name"> };
+  student: RetakeStudent;
+}
+
+export interface AssignmentTask {
+  id: string;
+  assignment_id: string;
+  student_id: string;
+  current_scheduled_date: string | null;
+  status: "pending" | "completed";
+  management_status: ManagementStatus;
+  postpone_count: number;
+  absent_count: number;
+  note: string | null;
+  assignment: Pick<Assignment, "id" | "name"> & { course: Pick<Course, "id" | "name"> };
   student: RetakeStudent;
 }
 
@@ -191,7 +217,7 @@ export interface CalendarEvent {
   id: string;
   title: string;
   date: string;
-  type: "course" | "retake" | "clinic";
+  type: "course" | "retake" | "clinic" | "assignment";
   allDay?: boolean;
   start?: Date;
   end?: Date;

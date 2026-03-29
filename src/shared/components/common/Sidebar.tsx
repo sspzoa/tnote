@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ClipboardList,
   ExternalLink,
+  FileCheck,
   Home,
   Hospital,
   LogOut,
@@ -54,6 +55,11 @@ const adminMenuItems = [
     href: "/retakes",
     icon: ClipboardList,
     label: "재시험 관리",
+  },
+  {
+    href: "/assignments",
+    icon: FileCheck,
+    label: "과제 관리",
   },
   {
     href: "/students",

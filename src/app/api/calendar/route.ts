@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import {
   type CalendarEvent,
+  createAssignmentTaskEvent,
   createRetakeEvent,
   generateClinicSessions,
   generateCourseSessions,
 } from "@/shared/lib/utils/calendar";
 
 import type {
+  CalendarAssignmentTaskData,
   CalendarAttendanceRecord,
   CalendarClinicData,
   CalendarCourseData,
@@ -81,6 +83,47 @@ const fetchRetakes = async (
   }));
 };
 
+const fetchAssignmentTasks = async (
+  supabase: ApiContext["supabase"],
+  workspace: string,
+  studentId?: string,
+): Promise<CalendarAssignmentTaskData[]> => {
+  if (studentId) {
+    const { data, error } = await supabase
+      .from("AssignmentTasks")
+      .select(
+        `id, current_scheduled_date, status, assignment:Assignments!inner(id, name, course:Courses!inner(id, name))`,
+      )
+      .eq("student_id", studentId);
+
+    if (error) throw error;
+    return (data || []).map((r) => ({
+      id: r.id,
+      current_scheduled_date: r.current_scheduled_date,
+      status: r.status,
+      assignment: r.assignment as unknown as { name: string; course: { name: string } },
+    }));
+  }
+
+  const { data, error } = await supabase
+    .from("AssignmentTasks")
+    .select(`
+      id, current_scheduled_date, status,
+      student:Users!AssignmentTasks_student_id_fkey!inner(name, workspace),
+      assignment:Assignments!inner(id, name, course:Courses!inner(id, name))
+    `)
+    .eq("student.workspace", workspace);
+
+  if (error) throw error;
+  return (data || []).map((r) => ({
+    id: r.id,
+    current_scheduled_date: r.current_scheduled_date,
+    status: r.status,
+    assignment: r.assignment as unknown as { name: string; course: { name: string } },
+    student: r.student as unknown as { name: string },
+  }));
+};
+
 const fetchClinicsWithAttendance = async (
   supabase: ApiContext["supabase"],
   workspace: string,
@@ -122,9 +165,10 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const isStudent = session.role === "student";
   const studentId = isStudent ? session.userId : undefined;
 
-  const [courses, retakes, { clinics, attendance }] = await Promise.all([
+  const [courses, retakes, assignmentTasks, { clinics, attendance }] = await Promise.all([
     fetchCourses(supabase, session.workspace, studentId),
     fetchRetakes(supabase, session.workspace, studentId),
+    fetchAssignmentTasks(supabase, session.workspace, studentId),
     fetchClinicsWithAttendance(supabase, session.workspace),
   ]);
 
@@ -145,6 +189,12 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   for (const retake of retakes) {
     if (retake.current_scheduled_date) {
       events.push(createRetakeEvent(retake, !isStudent));
+    }
+  }
+
+  for (const task of assignmentTasks) {
+    if (task.current_scheduled_date) {
+      events.push(createAssignmentTaskEvent(task, !isStudent));
     }
   }
 

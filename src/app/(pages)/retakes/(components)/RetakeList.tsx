@@ -75,7 +75,8 @@ export default function RetakeList({
   const comparators = useMemo(
     () => ({
       student: (a: Retake, b: Retake) => a.student.name.localeCompare(b.student.name, "ko"),
-      exam: (a: Retake, b: Retake) => a.exam.name.localeCompare(b.exam.name, "ko"),
+      exam: (a: Retake, b: Retake) =>
+        `${a.exam.name} (${a.exam.exam_number}회차)`.localeCompare(`${b.exam.name} (${b.exam.exam_number}회차)`, "ko"),
       scheduledDate: (a: Retake, b: Retake) =>
         (a.current_scheduled_date || "").localeCompare(b.current_scheduled_date || ""),
       status: (a: Retake, b: Retake) => a.status.localeCompare(b.status),
@@ -188,10 +189,10 @@ export default function RetakeList({
                 </button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="text-body text-content-standard-primary">{retake.exam.name}</div>
-                <div className="text-content-standard-secondary text-footnote">
-                  {retake.exam.course.name} {retake.exam.exam_number}회차
-                </div>
+                <span className="text-body text-content-standard-primary">
+                  {retake.exam.name} ({retake.exam.exam_number}회차)
+                </span>
+                <div className="text-content-standard-secondary text-footnote">{retake.exam.course.name}</div>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <div className="flex flex-col gap-spacing-100">

@@ -13,7 +13,7 @@ import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
-import type { ExamScoreInfo, RetakeHistoryInfo } from "../(hooks)/useStudentDetail";
+import type { AssignmentTaskHistoryInfo, ExamScoreInfo, RetakeHistoryInfo } from "../(hooks)/useStudentDetail";
 import { useStudentDetail } from "../(hooks)/useStudentDetail";
 import {
   ConsultationCard,
@@ -24,10 +24,9 @@ import {
   StatCard,
 } from "./(components)";
 
-const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
+const assignmentStatusConfig: Record<string, { variant: "success" | "warning"; label: string }> = {
   완료: { variant: "success", label: "완료" },
-  미흡: { variant: "warning", label: "미흡" },
-  미제출: { variant: "danger", label: "미제출" },
+  미완료: { variant: "warning", label: "미완료" },
 };
 
 const retakeStatusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {
@@ -36,10 +35,16 @@ const retakeStatusConfig: Record<string, { variant: "warning" | "success" | "dan
   absent: { variant: "danger", label: "결석" },
 };
 
-const STATUS_ORDER: Record<string, number> = { pending: 0, absent: 1, completed: 2 };
+const assignmentTaskStatusConfig: Record<string, { variant: "warning" | "success"; label: string }> = {
+  pending: { variant: "warning", label: "미완료" },
+  completed: { variant: "success", label: "완료" },
+};
+
+const STATUS_ORDER: Record<string, number> = { pending: 0, completed: 1 };
 
 type ScoreSortKey = "exam" | "score" | "rank" | "average" | "median" | "highest";
 type RetakeSortKey = "exam" | "scheduledDate" | "status";
+type AssignmentTaskSortKey = "assignment" | "scheduledDate" | "status";
 
 const ExamScoreTable = ({
   examScores,
@@ -137,7 +142,7 @@ const ExamScoreTable = ({
               {sortedData.map((score) => {
                 const passed = score.cutline != null && score.score >= score.cutline;
                 const failed = score.cutline != null && score.score < score.cutline;
-                const aStatus = assignmentMap[score.exam.id];
+                const aStatus = assignmentMap[`${score.exam.course.id}:${score.exam.name}`];
                 const assignment = aStatus ? assignmentStatusConfig[aStatus] : null;
                 return (
                   <tr
@@ -313,6 +318,113 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
   );
 };
 
+const AssignmentTaskTable = ({ tasks, printHidden }: { tasks: AssignmentTaskHistoryInfo[]; printHidden: boolean }) => {
+  const comparators = useMemo(
+    () => ({
+      assignment: (a: AssignmentTaskHistoryInfo, b: AssignmentTaskHistoryInfo) =>
+        a.assignment.name.localeCompare(b.assignment.name, "ko"),
+      scheduledDate: (a: AssignmentTaskHistoryInfo, b: AssignmentTaskHistoryInfo) =>
+        (a.scheduledDate || "").localeCompare(b.scheduledDate || ""),
+      status: (a: AssignmentTaskHistoryInfo, b: AssignmentTaskHistoryInfo) =>
+        (STATUS_ORDER[a.status] ?? 1) - (STATUS_ORDER[b.status] ?? 1),
+    }),
+    [],
+  );
+
+  const { sortedData, sortState, toggleSort } = useTableSort<AssignmentTaskHistoryInfo, AssignmentTaskSortKey>({
+    data: tasks,
+    comparators,
+    defaultSort: { key: "scheduledDate", direction: "desc" },
+  });
+
+  return (
+    <section className={printHidden ? "print:hidden" : ""}>
+      <DashboardCard
+        title="과제 이력"
+        icon={FileText}
+        isEmpty={tasks.length === 0}
+        emptyMessage="과제 기록이 없습니다."
+        noPadding>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-components-fill-standard-secondary">
+              <tr>
+                <SortableHeader
+                  label="과제"
+                  sortKey="assignment"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="예정일"
+                  sortKey="scheduledDate"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <SortableHeader
+                  label="상태"
+                  sortKey="status"
+                  currentSortKey={sortState.key}
+                  currentDirection={sortState.direction}
+                  onSort={toggleSort}
+                />
+                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  비고
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((task) => {
+                const status = assignmentTaskStatusConfig[task.status] || {
+                  variant: "neutral" as const,
+                  label: task.status,
+                };
+                return (
+                  <tr
+                    key={task.id}
+                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <div className="text-body text-content-standard-primary">{task.assignment.name}</div>
+                      <div className="text-content-standard-secondary text-footnote">{task.assignment.course.name}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <span className="text-body text-content-standard-primary">{task.scheduledDate || "-"}</span>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <Badge variant={status.variant} size="sm">
+                        {status.label}
+                      </Badge>
+                    </td>
+                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <div className="flex gap-spacing-200">
+                        {task.postponeCount > 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">
+                            연기 {task.postponeCount}회
+                          </span>
+                        )}
+                        {task.absentCount > 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">
+                            미제출 {task.absentCount}회
+                          </span>
+                        )}
+                        {task.postponeCount === 0 && task.absentCount === 0 && (
+                          <span className="text-content-standard-tertiary text-footnote">-</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </DashboardCard>
+    </section>
+  );
+};
+
 export default function StudentDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -349,7 +461,8 @@ export default function StudentDetailPage() {
     if (!studentDetail) return {};
     const map: Record<string, string> = {};
     for (const a of studentDetail.assignmentHistory) {
-      map[a.exam.id] = a.status;
+      const key = `${a.assignment.course.id}:${a.assignment.name}`;
+      map[key] = a.status;
     }
     return map;
   }, [studentDetail]);
@@ -534,6 +647,7 @@ export default function StudentDetailPage() {
       />
 
       <RetakeTable retakes={studentDetail.retakeHistory} printHidden={!printOptions.retakes} />
+      <AssignmentTaskTable tasks={studentDetail.assignmentTaskHistory} printHidden={!printOptions.retakes} />
       <section className={printOptions.clinics ? "" : "print:hidden"}>
         <DashboardCard
           title="클리닉 출석"

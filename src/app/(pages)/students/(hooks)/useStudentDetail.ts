@@ -53,10 +53,9 @@ interface ClinicHistoryInfo {
 interface AssignmentHistoryInfo {
   id: string;
   status: "완료" | "미흡" | "미제출";
-  exam: {
+  assignment: {
     id: string;
     name: string;
-    examNumber: number;
     course: {
       id: string;
       name: string;
@@ -75,6 +74,23 @@ interface RetakeHistoryInfo {
     id: string;
     name: string;
     examNumber: number;
+    course: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
+interface AssignmentTaskHistoryInfo {
+  id: string;
+  status: "pending" | "completed" | "absent";
+  managementStatus: string;
+  scheduledDate: string | null;
+  postponeCount: number;
+  absentCount: number;
+  assignment: {
+    id: string;
+    name: string;
     course: {
       id: string;
       name: string;
@@ -126,7 +142,7 @@ interface StudentInfo {
   tags: TagAssignmentInfo[];
 }
 
-export type { ExamScoreInfo, RetakeHistoryInfo };
+export type { ExamScoreInfo, RetakeHistoryInfo, AssignmentTaskHistoryInfo };
 
 export interface StudentDetail {
   student: StudentInfo;
@@ -135,6 +151,7 @@ export interface StudentDetail {
   clinicHistory: ClinicHistoryInfo[];
   assignmentHistory: AssignmentHistoryInfo[];
   retakeHistory: RetakeHistoryInfo[];
+  assignmentTaskHistory: AssignmentTaskHistoryInfo[];
   consultationHistory: ConsultationHistoryInfo[];
   messageHistory: MessageHistoryInfo[];
 }
@@ -152,6 +169,7 @@ export const useStudentDetail = (studentId: string | null) => {
       return {
         ...detail,
         courses: filterActiveCourses(detail.courses),
+        assignmentTaskHistory: detail.assignmentTaskHistory || [],
       };
     },
     enabled: !!studentId,

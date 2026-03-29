@@ -80,15 +80,26 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "발송할 점수 데이터가 없습니다." }, { status: 400 });
   }
 
-  const { data: assignments, error: assignmentsError } = await supabase
-    .from("CourseAssignments")
-    .select("student_id, status")
-    .eq("exam_id", examId);
+  const { data: matchingAssignment } = await supabase
+    .from("Assignments")
+    .select("id")
+    .eq("course_id", typedExam.course.id)
+    .eq("name", typedExam.name)
+    .single();
 
-  if (assignmentsError) throw assignmentsError;
+  let assignmentData: ExamAssignment[] = [];
+  if (matchingAssignment) {
+    const { data: submissionData, error: assignmentsError } = await supabase
+      .from("CourseAssignments")
+      .select("student_id, status")
+      .eq("assignment_id", matchingAssignment.id);
+
+    if (assignmentsError) throw assignmentsError;
+    assignmentData = (submissionData || []) as unknown as ExamAssignment[];
+  }
 
   const typedScores = scores as unknown as ExamScoreWithStudent[];
-  const typedAssignments = (assignments || []) as unknown as ExamAssignment[];
+  const typedAssignments = assignmentData;
 
   const sortedScores = [...typedScores].sort((a, b) => b.score - a.score);
   const rankMap = new Map<string, number>();

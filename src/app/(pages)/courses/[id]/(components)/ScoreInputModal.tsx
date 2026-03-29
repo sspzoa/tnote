@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Modal, SearchInput, Select } from "@/shared/components/ui";
+import { Button, Modal, SearchInput } from "@/shared/components/ui";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -11,15 +11,11 @@ import {
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
 import type { Exam } from "../(hooks)/useExams";
+import { useRetakeAssignFromExam } from "../(hooks)/useRetakeAssign";
 
 interface ScoreData {
   student_id: string;
   score: number;
-}
-
-interface ExistingAssignment {
-  student: { id: string };
-  status: string;
 }
 
 interface ScoreInputModalProps {
@@ -29,12 +25,7 @@ interface ScoreInputModalProps {
   students: StudentListStudent[];
   isLoading: boolean;
   existingScores: ScoreData[];
-  existingAssignments: ExistingAssignment[];
-  onSave: (
-    scores: Array<{ studentId: string; score: number }>,
-    toDeleteScores: string[],
-    assignments: Array<{ studentId: string; status: string }>,
-  ) => Promise<void>;
+  onSave: (scores: Array<{ studentId: string; score: number }>, toDeleteScores: string[]) => Promise<void>;
   isSaving: boolean;
 }
 
@@ -45,15 +36,14 @@ export function ScoreInputModal({
   students,
   isLoading,
   existingScores,
-  existingAssignments,
   onSave,
   isSaving,
 }: ScoreInputModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [scoreInputs, setScoreInputs] = useState<Record<string, string>>({});
-  const [assignmentInputs, setAssignmentInputs] = useState<Record<string, string>>({});
   const [existingScoreStudentIds, setExistingScoreStudentIds] = useState<string[]>([]);
   const toast = useToast();
+  const { assignRetakes, isPending: isAssigning } = useRetakeAssignFromExam();
 
   useEffect(() => {
     if (isOpen) {
@@ -68,40 +58,18 @@ export function ScoreInputModal({
         setExistingScoreStudentIds([]);
         setScoreInputs({});
       }
-
-      if (existingAssignments.length > 0) {
-        const initialAssignments: Record<string, string> = {};
-        for (const assignment of existingAssignments) {
-          initialAssignments[assignment.student.id] = assignment.status;
-        }
-        setAssignmentInputs(initialAssignments);
-      } else {
-        setAssignmentInputs({});
-      }
     }
-  }, [isOpen, existingScores, existingAssignments]);
+  }, [isOpen, existingScores]);
 
   const handleClose = () => {
     setSearchQuery("");
     setScoreInputs({});
-    setAssignmentInputs({});
     setExistingScoreStudentIds([]);
     onClose();
   };
 
   const handleScoreChange = (studentId: string, value: string) => {
     setScoreInputs((prev) => ({ ...prev, [studentId]: value }));
-  };
-
-  const handleAssignmentChange = (studentId: string, status: string) => {
-    setAssignmentInputs((prev) => {
-      if (status === "") {
-        const newInputs = { ...prev };
-        delete newInputs[studentId];
-        return newInputs;
-      }
-      return { ...prev, [studentId]: status };
-    });
   };
 
   const handleSave = async () => {
@@ -117,10 +85,6 @@ export function ScoreInputModal({
     const scoreStudentIds = scores.map((s) => s.studentId);
     const toDeleteScores = existingScoreStudentIds.filter((id) => !scoreStudentIds.includes(id));
 
-    const assignments = Object.entries(assignmentInputs)
-      .filter(([, status]) => status !== "")
-      .map(([studentId, status]) => ({ studentId, status }));
-
     const maxScoreValue = exam.max_score || 8;
     const invalidScores = scores.filter((s) => s.score > maxScoreValue);
     if (invalidScores.length > 0) {
@@ -128,7 +92,31 @@ export function ScoreInputModal({
       return;
     }
 
-    await onSave(scores, toDeleteScores, assignments);
+    await onSave(scores, toDeleteScores);
+  };
+
+  const handleRetakeAssign = async () => {
+    if (!exam) return;
+
+    const belowCutlineStudentIds = Object.entries(scoreInputs)
+      .filter(([, value]) => {
+        const score = Number.parseInt(value);
+        return !Number.isNaN(score) && score < (exam.cutline || 4);
+      })
+      .map(([studentId]) => studentId);
+
+    if (belowCutlineStudentIds.length === 0) return;
+
+    try {
+      await assignRetakes({ examId: exam.id, studentIds: belowCutlineStudentIds });
+      toast.success(`${belowCutlineStudentIds.length}명의 학생에게 재시험을 할당했습니다.`);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("이미")) {
+        toast.info("이미 재시험이 할당된 학생이 있습니다.");
+      } else {
+        toast.error(error instanceof Error ? error.message : "재시험 할당에 실패했습니다.");
+      }
+    }
   };
 
   if (!exam) return null;
@@ -144,21 +132,17 @@ export function ScoreInputModal({
     return !Number.isNaN(score) && score < cutlineValue;
   }).length;
 
-  const assignmentCount = Object.values(assignmentInputs).filter((v) => v !== "").length;
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
       onSubmit={handleSave}
-      title="점수 및 과제 입력"
+      title="점수 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
         <div className="flex w-full flex-col gap-spacing-300">
           <div className="flex flex-wrap items-center justify-between gap-spacing-200 text-body">
-            <span className="text-content-standard-secondary">
-              점수: {scoreCount}명 / 과제: {assignmentCount}명
-            </span>
+            <span className="text-content-standard-secondary">점수: {scoreCount}명</span>
             {belowCutlineCount > 0 && (
               <span className="text-core-status-negative">커트라인 미달: {belowCutlineCount}명</span>
             )}
@@ -175,6 +159,15 @@ export function ScoreInputModal({
               loadingText="저장 중..."
               className="flex-1">
               저장
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleRetakeAssign}
+              disabled={belowCutlineCount === 0 || isSaving || isAssigning}
+              isLoading={isAssigning}
+              loadingText="할당 중..."
+              className="flex-1">
+              재시험자 할당 {belowCutlineCount > 0 && `(${belowCutlineCount}명)`}
             </Button>
           </div>
         </div>
@@ -206,7 +199,6 @@ export function ScoreInputModal({
                 const scoreValue = scoreInputs[student.id] || "";
                 const score = Number.parseInt(scoreValue);
                 const isBelowCutline = !Number.isNaN(score) && score < (exam.cutline || 4);
-                const currentAssignment = assignmentInputs[student.id] || "";
 
                 return (
                   <StudentListItem
@@ -214,43 +206,21 @@ export function ScoreInputModal({
                     student={student}
                     highlighted={isBelowCutline}
                     rightContent={
-                      <div className="flex flex-wrap items-center gap-spacing-300">
-                        <div className="flex items-center gap-spacing-200">
-                          <input
-                            type="number"
-                            value={scoreValue}
-                            onChange={(e) => handleScoreChange(student.id, e.target.value)}
-                            placeholder="-"
-                            min="0"
-                            max={exam.max_score || 8}
-                            className={`w-16 rounded-radius-300 border px-spacing-200 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
-                              isBelowCutline
-                                ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
-                                : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
-                            }`}
-                          />
-                          <span className="text-content-standard-tertiary text-footnote">/ {exam.max_score || 8}</span>
-                        </div>
-                        <div className="h-6 w-px bg-line-divider" />
-                        <Select
-                          value={currentAssignment}
-                          onChange={(e) => handleAssignmentChange(student.id, e.target.value)}
-                          onKeyDown={(e) => {
-                            const keyMap: Record<string, string> = { "1": "완료", "2": "미흡", "3": "미제출" };
-                            const value = keyMap[e.key];
-                            if (value) {
-                              e.preventDefault();
-                              handleAssignmentChange(student.id, currentAssignment === value ? "" : value);
-                            }
-                          }}
+                      <div className="flex items-center gap-spacing-200">
+                        <input
+                          type="number"
+                          value={scoreValue}
+                          onChange={(e) => handleScoreChange(student.id, e.target.value)}
                           placeholder="-"
-                          options={[
-                            { value: "완료", label: "완료" },
-                            { value: "미흡", label: "미흡" },
-                            { value: "미제출", label: "미제출" },
-                          ]}
-                          className="w-20 bg-components-fill-standard-primary text-center"
+                          min="0"
+                          max={exam.max_score || 8}
+                          className={`w-16 rounded-radius-300 border px-spacing-200 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
+                            isBelowCutline
+                              ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
+                              : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
+                          }`}
                         />
+                        <span className="text-content-standard-tertiary text-footnote">/ {exam.max_score || 8}</span>
                       </div>
                     }
                   />

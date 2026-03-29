@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
+import type { AssignmentTaskHistoryInfo, StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
@@ -48,11 +48,13 @@ export default function StudentInfoModal({
   const examWithAssignments = useMemo(() => {
     if (!studentDetail) return [];
 
-    const assignmentMap = new Map(studentDetail.assignmentHistory.map((a) => [a.exam.id, a]));
+    const assignmentMap = new Map(
+      studentDetail.assignmentHistory.map((a) => [`${a.assignment.course.id}:${a.assignment.name}`, a]),
+    );
 
     return studentDetail.examScores.map((score) => ({
       examScore: score,
-      assignment: assignmentMap.get(score.exam.id),
+      assignment: assignmentMap.get(`${score.exam.course.id}:${score.exam.name}`),
     }));
   }, [studentDetail]);
 
@@ -226,15 +228,7 @@ export default function StudentInfoModal({
                           </Badge>
                         )}
                         {assignment && (
-                          <Badge
-                            variant={
-                              assignment.status === "완료"
-                                ? "success"
-                                : assignment.status === "미흡"
-                                  ? "warning"
-                                  : "danger"
-                            }
-                            size="xs">
+                          <Badge variant={assignment.status === "완료" ? "success" : "warning"} size="xs">
                             과제 {assignment.status}
                           </Badge>
                         )}
@@ -370,6 +364,51 @@ export default function StudentInfoModal({
               </div>
             )}
           </section>
+
+          {studentDetail.assignmentTaskHistory && studentDetail.assignmentTaskHistory.length > 0 && (
+            <section className="flex flex-col gap-spacing-300">
+              <h3 className="font-semibold text-body text-content-standard-primary">
+                최근 과제
+                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                  ({Math.min(5, studentDetail.assignmentTaskHistory.length)}/
+                  {studentDetail.assignmentTaskHistory.length}개)
+                </span>
+              </h3>
+              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+                {(studentDetail.assignmentTaskHistory as AssignmentTaskHistoryInfo[]).slice(0, 5).map((task) => (
+                  <div
+                    key={task.id}
+                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
+                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
+                      <span className="truncate font-medium text-body text-content-standard-primary">
+                        {task.assignment.course.name} - {task.assignment.name}
+                      </span>
+                      <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                        <span>
+                          {task.scheduledDate
+                            ? new Date(task.scheduledDate).toLocaleDateString("ko-KR", {
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : "날짜 미정"}
+                        </span>
+                        {(task.postponeCount > 0 || task.absentCount > 0) && (
+                          <span className="text-content-standard-quaternary">
+                            {task.postponeCount > 0 && `연기 ${task.postponeCount}회`}
+                            {task.postponeCount > 0 && task.absentCount > 0 && " / "}
+                            {task.absentCount > 0 && `결석 ${task.absentCount}회`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Badge variant={task.status === "completed" ? "success" : "warning"} size="xs">
+                      {task.status === "completed" ? "완료" : "미완료"}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </Modal>

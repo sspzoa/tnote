@@ -1,0 +1,66 @@
+import { NextResponse } from "next/server";
+import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+
+const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
+  const id = params?.id;
+  const { newDate } = await request.json();
+
+  if (!newDate) {
+    return NextResponse.json({ error: "새로운 날짜를 입력해주세요." }, { status: 400 });
+  }
+
+  const { data: current, error: fetchError } = await supabase
+    .from("AssignmentTasks")
+    .select(`
+      current_scheduled_date,
+      assignment:Assignments!inner(course:Courses!inner(workspace)),
+      student:Users!AssignmentTasks_student_id_fkey!inner(workspace)
+    `)
+    .eq("id", id)
+    .eq("assignment.course.workspace", session.workspace)
+    .eq("student.workspace", session.workspace)
+    .single();
+
+  if (fetchError || !current) {
+    return NextResponse.json({ error: "과제를 찾을 수 없습니다." }, { status: 404 });
+  }
+
+  const previousDate = current.current_scheduled_date;
+
+  if (previousDate === newDate) {
+    return NextResponse.json({ error: "날짜가 변경되지 않았습니다." }, { status: 400 });
+  }
+
+  const { data: updated, error: updateError } = await supabase
+    .from("AssignmentTasks")
+    .update({
+      current_scheduled_date: newDate,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (updateError) {
+    throw new Error(`과제 업데이트 실패: ${updateError.message}`);
+  }
+
+  const { error: historyError } = await supabase.from("AssignmentTaskHistory").insert({
+    assignment_task_id: id,
+    action_type: "date_edit",
+    previous_date: previousDate,
+    new_date: newDate,
+    note: null,
+    performed_by: session.userId,
+  });
+
+  if (historyError) {
+    throw new Error(`이력 저장 실패: ${historyError.message}`);
+  }
+  return NextResponse.json({ success: true, data: updated });
+};
+
+export const PATCH = withLogging(handlePatch, {
+  resource: "assignment-task-edit-date",
+  action: "update",
+  allowedRoles: ["owner", "admin"],
+});

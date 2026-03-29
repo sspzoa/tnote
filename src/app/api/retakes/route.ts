@@ -23,7 +23,11 @@ const getNextClinicDate = (weekdays: number[]): string | null => {
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const { examId, studentIds, scheduledDate } = await request.json();
 
-  if (!examId || !studentIds || !Array.isArray(studentIds)) {
+  if (!examId) {
+    return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
+  }
+
+  if (!studentIds || !Array.isArray(studentIds)) {
     return NextResponse.json({ error: "필수 정보를 입력해주세요." }, { status: 400 });
   }
 
@@ -53,6 +57,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .from("ManagementStatuses")
     .select("name")
     .eq("workspace", session.workspace)
+    .eq("category", "retake")
     .eq("display_order", 1)
     .single();
 
@@ -63,7 +68,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     }
   }
 
-  const assignments = studentIds.map((studentId) => ({
+  const assignments = studentIds.map((studentId: string) => ({
     exam_id: examId,
     student_id: studentId,
     current_scheduled_date: scheduledDate || studentClinicDateMap.get(studentId) || null,
@@ -75,8 +80,8 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .insert(assignments)
     .select(`
       *,
-      exam:Exams(id, name, exam_number, course:Courses(id, name)),
-      student:Users!RetakeAssignments_student_id_fkey(id, phone_number, name)
+      exam:Exams!inner(id, name, exam_number, course:Courses!inner(id, name)),
+      student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name)
     `);
 
   if (error) {
@@ -141,6 +146,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   if (error) {
     throw error;
   }
+
   return NextResponse.json({ data });
 };
 

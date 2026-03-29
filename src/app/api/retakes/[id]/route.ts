@@ -12,7 +12,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       student:Users!RetakeAssignments_student_id_fkey!inner(id, phone_number, name, school, workspace)
     `)
     .eq("id", id)
-    .eq("exam.course.workspace", session.workspace)
     .eq("student.workspace", session.workspace);
 
   if (session.role === "student") {
@@ -32,11 +31,9 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
     .from("RetakeAssignments")
     .select(`
       id,
-      exam:Exams!inner(course:Courses!inner(workspace)),
       student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
     `)
     .eq("id", id)
-    .eq("exam.course.workspace", session.workspace)
     .eq("student.workspace", session.workspace)
     .single();
 

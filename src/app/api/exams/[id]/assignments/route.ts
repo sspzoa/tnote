@@ -1,19 +1,43 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
-import type { ExamWorkspaceOnly } from "@/shared/types/api";
+
+interface ExamWithNameCourse {
+  id: string;
+  name: string;
+  course_id: string;
+  course: {
+    workspace: string;
+  };
+}
+
+interface AssignmentInput {
+  studentId: string;
+  status: string;
+}
 
 const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const examId = params?.id;
 
   const { data: exam } = await supabase
     .from("Exams")
-    .select("id, course:Courses!inner(workspace)")
+    .select("id, name, course_id, course:Courses!inner(workspace)")
     .eq("id", examId)
     .single();
 
-  const typedExam = exam as unknown as ExamWorkspaceOnly | null;
+  const typedExam = exam as unknown as ExamWithNameCourse | null;
   if (!typedExam || typedExam.course.workspace !== session.workspace) {
     return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
+  }
+
+  const { data: assignment } = await supabase
+    .from("Assignments")
+    .select("id")
+    .eq("course_id", typedExam.course_id)
+    .eq("name", typedExam.name)
+    .single();
+
+  if (!assignment) {
+    return NextResponse.json({ data: [] });
   }
 
   const { data, error } = await supabase
@@ -23,16 +47,11 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       status,
       student:Users!CourseAssignments_student_id_fkey(id, name, phone_number, school)
     `)
-    .eq("exam_id", examId);
+    .eq("assignment_id", assignment.id);
 
   if (error) throw error;
   return NextResponse.json({ data });
 };
-
-interface AssignmentInput {
-  studentId: string;
-  status: string;
-}
 
 const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
   const examId = params?.id;
@@ -44,11 +63,11 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
 
   const { data: exam } = await supabase
     .from("Exams")
-    .select("id, course:Courses!inner(workspace)")
+    .select("id, name, course_id, course:Courses!inner(workspace)")
     .eq("id", examId)
     .single();
 
-  const typedExam = exam as unknown as ExamWorkspaceOnly | null;
+  const typedExam = exam as unknown as ExamWithNameCourse | null;
   if (!typedExam || typedExam.course.workspace !== session.workspace) {
     return NextResponse.json({ error: "시험을 찾을 수 없습니다." }, { status: 404 });
   }
@@ -60,10 +79,34 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     }
   }
 
+  let { data: matchingAssignment } = await supabase
+    .from("Assignments")
+    .select("id")
+    .eq("course_id", typedExam.course_id)
+    .eq("name", typedExam.name)
+    .single();
+
+  if (!matchingAssignment) {
+    const { data: newAssignment, error: createError } = await supabase
+      .from("Assignments")
+      .insert({
+        course_id: typedExam.course_id,
+        name: typedExam.name,
+        workspace: session.workspace,
+      })
+      .select("id")
+      .single();
+
+    if (createError) throw createError;
+    matchingAssignment = newAssignment;
+  }
+
+  const assignmentId = matchingAssignment.id;
+
   const { data: existingRecords, error: fetchError } = await supabase
     .from("CourseAssignments")
     .select("id, student_id")
-    .eq("exam_id", examId);
+    .eq("assignment_id", assignmentId);
 
   if (fetchError) throw fetchError;
 
@@ -77,16 +120,19 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
 
   if (assignments.length > 0) {
     const records = assignments.map((a) => ({
-      exam_id: examId,
+      assignment_id: assignmentId,
       student_id: a.studentId,
       status: a.status,
       updated_at: new Date().toISOString(),
     }));
 
-    const { error } = await supabase.from("CourseAssignments").upsert(records, { onConflict: "exam_id,student_id" });
+    const { error } = await supabase
+      .from("CourseAssignments")
+      .upsert(records, { onConflict: "assignment_id,student_id" });
 
     if (error) throw error;
   }
+
   return NextResponse.json({ success: true, removed: toDelete.length, total: assignments.length });
 };
 

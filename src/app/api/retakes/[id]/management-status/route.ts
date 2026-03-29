@@ -12,7 +12,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   const { data: validStatuses } = await supabase
     .from("ManagementStatuses")
     .select("name")
-    .eq("workspace", session.workspace);
+    .eq("workspace", session.workspace)
+    .eq("category", "retake");
 
   const validNames = validStatuses?.map((s) => s.name) ?? [];
 
@@ -22,16 +23,18 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
 
   const { data: retake, error: fetchError } = await supabase
     .from("RetakeAssignments")
-    .select("*, student:Users!RetakeAssignments_student_id_fkey(workspace)")
+    .select(`
+      *,
+      exam:Exams!inner(course:Courses!inner(workspace)),
+      student:Users!RetakeAssignments_student_id_fkey!inner(workspace)
+    `)
     .eq("id", id)
+    .eq("exam.course.workspace", session.workspace)
+    .eq("student.workspace", session.workspace)
     .single();
 
   if (fetchError || !retake) {
     return NextResponse.json({ error: "재시험을 찾을 수 없습니다." }, { status: 404 });
-  }
-
-  if (retake.student.workspace !== session.workspace) {
-    return NextResponse.json({ error: "접근 권한이 없습니다." }, { status: 403 });
   }
 
   const { error: updateError } = await supabase.from("RetakeAssignments").update({ management_status }).eq("id", id);

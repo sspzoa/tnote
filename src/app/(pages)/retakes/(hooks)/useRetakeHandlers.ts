@@ -79,7 +79,7 @@ export const useRetakeHandlers = (refetch: () => void) => {
   const handleDelete = useCallback(
     async (retake: Retake) => {
       setOpenMenuId(null);
-      if (!confirm(`${retake.student.name} 학생의 ${retake.exam.course.name} 재시험을 삭제하시겠습니까?`)) {
+      if (!confirm(`${retake.student.name} 학생의 ${retake.exam.course.name} 재시험 항목을 삭제하시겠습니까?`)) {
         return;
       }
 
@@ -90,7 +90,7 @@ export const useRetakeHandlers = (refetch: () => void) => {
         toast.error(err instanceof Error ? err.message : "재시험 삭제에 실패했습니다.");
       }
     },
-    [deleteRetake, setOpenMenuId],
+    [deleteRetake, setOpenMenuId, toast],
   );
 
   const handleViewStudent = useCallback(

@@ -44,6 +44,19 @@ export const QUERY_KEYS = {
     forMessages: (status: string, managementStatus: string) =>
       ["retakes-for-messages", status, managementStatus] as const,
   },
+  assignments: {
+    all: ["assignments"] as const,
+    byCourse: (courseId: string) => ["assignments", "byCourse", courseId] as const,
+    detail: (id: string) => ["assignments", "detail", id] as const,
+    submissions: (assignmentId: string) => ["assignments", "submissions", assignmentId] as const,
+    forAssign: (courseId: string) => ["assignments-for-assign", courseId] as const,
+  },
+  assignmentTasks: {
+    all: ["assignment-tasks"] as const,
+    byFilter: (filter: string) => ["assignment-tasks", filter] as const,
+    history: (taskId: string) => ["assignment-task-history", taskId] as const,
+    historyAll: ["assignment-task-history-all"] as const,
+  },
   exams: {
     all: ["exams"] as const,
     byCourse: (courseId: string) => ["exams", courseId] as const,

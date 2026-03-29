@@ -16,8 +16,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
       )
     `,
     )
-    .eq("student.workspace", session.workspace)
-    .eq("exam.course.workspace", session.workspace);
+    .eq("student.workspace", session.workspace);
 
   if (!retakeIds || retakeIds.length === 0) {
     return NextResponse.json({ data: [] });

@@ -2,12 +2,21 @@ import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
 const VALID_COLORS = ["success", "warning", "danger", "info", "neutral"] as const;
+const VALID_CATEGORIES = ["retake", "assignment"] as const;
 
-const handleGet = async ({ supabase, session }: ApiContext) => {
+const handleGet = async ({ request, supabase, session }: ApiContext) => {
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get("category") ?? "retake";
+
+  if (!VALID_CATEGORIES.includes(category as (typeof VALID_CATEGORIES)[number])) {
+    return NextResponse.json({ error: "유효하지 않은 카테고리입니다." }, { status: 400 });
+  }
+
   const { data, error } = await supabase
     .from("ManagementStatuses")
-    .select("id, name, display_order, color, created_at")
+    .select("id, name, display_order, color, category, created_at")
     .eq("workspace", session.workspace)
+    .eq("category", category)
     .order("display_order", { ascending: true });
 
   if (error) throw error;
@@ -15,7 +24,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
-  const { name, color } = await request.json();
+  const { name, color, category = "retake" } = await request.json();
 
   if (!name || typeof name !== "string" || name.trim().length === 0) {
     return NextResponse.json({ error: "상태 이름은 필수입니다." }, { status: 400 });
@@ -29,10 +38,15 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     return NextResponse.json({ error: "유효한 색상을 선택해주세요." }, { status: 400 });
   }
 
+  if (!VALID_CATEGORIES.includes(category)) {
+    return NextResponse.json({ error: "유효하지 않은 카테고리입니다." }, { status: 400 });
+  }
+
   const { data: maxOrderData } = await supabase
     .from("ManagementStatuses")
     .select("display_order")
     .eq("workspace", session.workspace)
+    .eq("category", category)
     .order("display_order", { ascending: false })
     .limit(1)
     .single();
@@ -45,6 +59,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       workspace: session.workspace,
       name: name.trim(),
       color,
+      category,
       display_order: nextOrder,
     })
     .select()

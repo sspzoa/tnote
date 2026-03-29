@@ -55,6 +55,10 @@ const getActionBadgeVariant = (actionType: string): BadgeVariant => {
   return "neutral";
 };
 
+const getRetakeItemDescription = (retake: HistoryItem["retake"]): string => {
+  return `${retake.exam.course.name} · ${retake.exam.name} ${retake.exam.exam_number}회차`;
+};
+
 export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading }: RetakeHistoryPanelProps) {
   return (
     <SlidePanel isOpen={isOpen} onClose={onClose} title="최근 이력" subtitle="최근 50건">
@@ -96,7 +100,7 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
                   </span>
                 </div>
                 <div className="truncate text-content-standard-secondary text-label">
-                  {item.retake.exam.course.name} · {item.retake.exam.name} {item.retake.exam.exam_number}회차
+                  {getRetakeItemDescription(item.retake)}
                 </div>
 
                 {item.action_type === "assign" && (
