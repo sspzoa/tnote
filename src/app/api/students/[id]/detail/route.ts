@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import type {
   StudentDetailAssignment,
   StudentDetailAssignmentTask,
@@ -260,7 +261,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
         },
       };
     })
-    .sort((a, b) => b.exam.examNumber - a.exam.examNumber);
+    .sort((a, b) => parseDatePrefix(b.exam.name) - parseDatePrefix(a.exam.name));
 
   const clinicHistory = ((clinicResult.data as unknown as StudentDetailClinicAttendance[]) || []).map((record) => ({
     id: record.id,
@@ -277,18 +278,20 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
     },
   }));
 
-  const assignmentHistory = ((assignmentResult.data as unknown as StudentDetailAssignment[]) || []).map((record) => ({
-    id: record.id,
-    status: record.status,
-    assignment: {
-      id: record.assignment.id,
-      name: record.assignment.name,
-      course: {
-        id: record.assignment.course.id,
-        name: record.assignment.course.name,
+  const assignmentHistory = ((assignmentResult.data as unknown as StudentDetailAssignment[]) || [])
+    .map((record) => ({
+      id: record.id,
+      status: record.status,
+      assignment: {
+        id: record.assignment.id,
+        name: record.assignment.name,
+        course: {
+          id: record.assignment.course.id,
+          name: record.assignment.course.name,
+        },
       },
-    },
-  }));
+    }))
+    .sort((a, b) => parseDatePrefix(a.assignment.name) - parseDatePrefix(b.assignment.name));
 
   const retakeHistory = ((retakeResult.data as unknown as StudentDetailRetake[]) || [])
     .map((record) => ({

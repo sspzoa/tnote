@@ -11,6 +11,7 @@ import { FilterButton } from "@/shared/components/ui/filterButton";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
+import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import type { MyExamScore } from "./(hooks)/useMyCourses";
 import { useMyCourses } from "./(hooks)/useMyCourses";
 
@@ -18,7 +19,7 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
   const chartData = useMemo(
     () =>
       [...scores]
-        .sort((a, b) => a.exam.examNumber - b.exam.examNumber)
+        .sort((a, b) => parseDatePrefix(a.exam.name) - parseDatePrefix(b.exam.name))
         .map((s) => ({
           name: `${s.exam.course.name} ${s.exam.examNumber}회`,
           label: `${s.exam.examNumber}회`,
@@ -101,7 +102,7 @@ export default function MyCoursesPage() {
 
   const comparators = useMemo(
     () => ({
-      exam: (a: MyExamScore, b: MyExamScore) => a.exam.examNumber - b.exam.examNumber,
+      exam: (a: MyExamScore, b: MyExamScore) => parseDatePrefix(a.exam.name) - parseDatePrefix(b.exam.name),
       score: (a: MyExamScore, b: MyExamScore) => a.score - b.score,
       rank: (a: MyExamScore, b: MyExamScore) => a.rank - b.rank,
       average: (a: MyExamScore, b: MyExamScore) => a.average - b.average,

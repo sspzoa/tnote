@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { compareByDatePrefix } from "@/shared/lib/utils/sort";
 
 const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { searchParams } = new URL(request.url);
@@ -20,7 +21,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
   const { data, error } = await query;
 
   if (error) throw error;
-  return NextResponse.json({ data });
+  return NextResponse.json({ data: [...(data || [])].sort(compareByDatePrefix) });
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { compareByDatePrefix } from "@/shared/lib/utils/sort";
 
 interface ScoreData {
   score: number;
@@ -73,13 +74,11 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       query = query.eq("course_id", courseId);
     }
 
-    query = query.order("exam_number", { ascending: true });
-
     const { data, error } = await query;
 
     if (error) throw error;
 
-    const examsWithStats = (data as ExamWithScores[]).map((exam) => {
+    const examsWithStats = (data as ExamWithScores[]).sort(compareByDatePrefix).map((exam) => {
       const { scores, ...examData } = exam;
       const stats = calculateStats(scores, exam.cutline || 4);
       return { ...examData, ...stats };
@@ -102,12 +101,10 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     query = query.eq("course_id", courseId);
   }
 
-  query = query.order("exam_number", { ascending: true });
-
   const { data, error } = await query;
 
   if (error) throw error;
-  return NextResponse.json({ data });
+  return NextResponse.json({ data: [...(data || [])].sort(compareByDatePrefix) });
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
