@@ -96,7 +96,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     fetchClinics(supabase, session.workspace),
     supabase
       .from("Users")
-      .select("id, name, required_clinic_weekdays")
+      .select("id, name, required_clinic_weekdays, birth_year")
       .eq("workspace", session.workspace)
       .eq("role", "student")
       .not("required_clinic_weekdays", "is", null),
@@ -107,6 +107,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     id: string;
     name: string;
     required_clinic_weekdays: number[];
+    birth_year: number | null;
   }[];
 
   for (const course of courses) {

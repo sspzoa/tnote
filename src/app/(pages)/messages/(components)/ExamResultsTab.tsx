@@ -236,7 +236,9 @@ export default function ExamResultsTab() {
                           ? "success"
                           : student.assignmentStatus === "미흡"
                             ? "warning"
-                            : "danger"
+                            : student.assignmentStatus === "검사예정"
+                              ? "info"
+                              : "danger"
                       }
                       size="xs">
                       {student.assignmentStatus}

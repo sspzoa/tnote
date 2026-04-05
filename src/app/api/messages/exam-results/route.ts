@@ -18,6 +18,8 @@ const getAssignmentStatusText = (status: string): string => {
       return "미흡";
     case "미제출":
       return "미제출";
+    case "검사예정":
+      return "검사예정";
     default:
       return "-";
   }

@@ -59,7 +59,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     return NextResponse.json({ error: "과제를 찾을 수 없습니다." }, { status: 404 });
   }
 
-  const validStatuses = ["완료", "미흡", "미제출"];
+  const validStatuses = ["완료", "미흡", "미제출", "검사예정"];
   for (const submission of submissions) {
     if (!submission.studentId || !validStatuses.includes(submission.status)) {
       return NextResponse.json({ error: "잘못된 과제 데이터 형식입니다." }, { status: 400 });

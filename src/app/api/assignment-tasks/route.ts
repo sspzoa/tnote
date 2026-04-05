@@ -1,16 +1,38 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 
-const getNextClinicDate = (weekdays: number[]): string | null => {
-  if (!weekdays || weekdays.length === 0) return null;
-
+const parseClassDate = (assignmentName: string): Date => {
   const koreaFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" });
   const koreaToday = new Date(`${koreaFormatter.format(new Date())}T12:00:00`);
 
+  const match = assignmentName.match(/^(\d{1,2})\/(\d{1,2})/);
+  if (!match) return koreaToday;
+
+  const month = Number.parseInt(match[1], 10);
+  const day = Number.parseInt(match[2], 10);
+  const classDate = new Date(koreaToday.getFullYear(), month - 1, day, 12, 0, 0);
+
+  const threeMonthsLater = new Date(koreaToday);
+  threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+  if (classDate > threeMonthsLater) {
+    classDate.setFullYear(classDate.getFullYear() - 1);
+  }
+
+  return classDate;
+};
+
+// 수업날 기준 일주일 뒤 수업이 지나고 가장 가까운 필참 클리닉 요일
+const getNextClinicDate = (clinicWeekdays: number[], assignmentName: string): string | null => {
+  if (!clinicWeekdays || clinicWeekdays.length === 0) return null;
+
+  const classDay = parseClassDate(assignmentName);
+  const oneWeekLater = new Date(classDay);
+  oneWeekLater.setDate(classDay.getDate() + 7);
+
   for (let i = 1; i <= 7; i++) {
-    const date = new Date(koreaToday);
-    date.setDate(koreaToday.getDate() + i);
-    if (weekdays.includes(date.getDay())) {
+    const date = new Date(oneWeekLater);
+    date.setDate(oneWeekLater.getDate() + i);
+    if (clinicWeekdays.includes(date.getDay())) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const day = String(date.getDate()).padStart(2, "0");
@@ -33,7 +55,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
 
   const { data: assignment } = await supabase
     .from("Assignments")
-    .select("id, course:Courses!inner(workspace)")
+    .select("id, name, course:Courses!inner(workspace)")
     .eq("id", assignmentId)
     .eq("course.workspace", session.workspace)
     .single();
@@ -61,10 +83,11 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
     .eq("display_order", 1)
     .single();
 
+  const assignmentName = (assignment as unknown as { name: string }).name;
   const studentClinicDateMap = new Map<string, string | null>();
   if (!scheduledDate) {
     for (const student of students) {
-      studentClinicDateMap.set(student.id, getNextClinicDate(student.required_clinic_weekdays));
+      studentClinicDateMap.set(student.id, getNextClinicDate(student.required_clinic_weekdays, assignmentName));
     }
   }
 

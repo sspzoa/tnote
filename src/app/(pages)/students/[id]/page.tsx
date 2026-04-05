@@ -38,10 +38,11 @@ import {
   StatCard,
 } from "./(components)";
 
-const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
+const assignmentStatusConfig: Record<string, { variant: "success" | "warning" | "danger" | "info"; label: string }> = {
   완료: { variant: "success", label: "완료" },
   미흡: { variant: "warning", label: "미흡" },
   미제출: { variant: "danger", label: "미제출" },
+  검사예정: { variant: "info", label: "검사예정" },
 };
 
 const retakeStatusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {

@@ -12,10 +12,11 @@ import { useTableSort } from "@/shared/hooks/useTableSort";
 import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import { type MyAssignment, useMyAssignments } from "./(hooks)/useMyAssignments";
 
-const submissionStatusConfig: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
+const submissionStatusConfig: Record<string, { variant: "success" | "warning" | "danger" | "info"; label: string }> = {
   완료: { variant: "success", label: "완료" },
   미흡: { variant: "warning", label: "미흡" },
   미제출: { variant: "danger", label: "미제출" },
+  검사예정: { variant: "info", label: "검사예정" },
 };
 
 type SortKey = "assignment" | "course" | "status";

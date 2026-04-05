@@ -1,3 +1,4 @@
+import { getGrade } from "@/shared/lib/utils/student";
 import type { CalendarEvent } from "@/shared/types";
 
 export type { CalendarEvent } from "@/shared/types";
@@ -135,6 +136,7 @@ interface RequiredStudent {
   id: string;
   name: string;
   required_clinic_weekdays: number[];
+  birth_year: number | null;
 }
 
 export const generateAdminClinicSessions = (
@@ -161,7 +163,10 @@ export const generateAdminClinicSessions = (
           metadata: {
             clinicId: clinic.id,
             clinicName: clinic.name,
-            requiredStudents: students.map((s) => s.name),
+            requiredStudents: students.map((s) => {
+              const grade = getGrade(s.birth_year);
+              return grade ? `${s.name} (${grade})` : s.name;
+            }),
             requiredCount: students.length,
           },
         });

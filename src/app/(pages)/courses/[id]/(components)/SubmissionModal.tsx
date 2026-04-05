@@ -89,11 +89,11 @@ export function SubmissionModal({
     if (!assignment) return;
 
     const incompleteStudentIds = Object.entries(submissionInputs)
-      .filter(([, status]) => status === "미흡" || status === "미제출")
+      .filter(([, status]) => status === "검사예정")
       .map(([studentId]) => studentId);
 
     if (incompleteStudentIds.length === 0) {
-      toast.info("미흡/미제출 학생이 없습니다.");
+      toast.info("검사예정 학생이 없습니다.");
       return;
     }
 
@@ -189,7 +189,12 @@ export function SubmissionModal({
                         value={currentStatus}
                         onChange={(e) => handleStatusChange(student.id, e.target.value)}
                         onKeyDown={(e) => {
-                          const keyMap: Record<string, string> = { "1": "완료", "2": "미흡", "3": "미제출" };
+                          const keyMap: Record<string, string> = {
+                            "1": "완료",
+                            "2": "미흡",
+                            "3": "미제출",
+                            "4": "검사예정",
+                          };
                           const value = keyMap[e.key];
                           if (value) {
                             e.preventDefault();
@@ -201,6 +206,7 @@ export function SubmissionModal({
                           { value: "완료", label: "완료" },
                           { value: "미흡", label: "미흡" },
                           { value: "미제출", label: "미제출" },
+                          { value: "검사예정", label: "검사예정" },
                         ]}
                         className="w-20 bg-components-fill-standard-primary text-center"
                       />
