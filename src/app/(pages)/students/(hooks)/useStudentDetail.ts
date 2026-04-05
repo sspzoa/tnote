@@ -166,10 +166,18 @@ export const useStudentDetail = (studentId: string | null) => {
       if (!res.ok) throw new Error(result.error);
 
       const detail = result.data as StudentDetail;
+      const activeCourses = filterActiveCourses(detail.courses);
+      const activeCourseIds = new Set(activeCourses.map((c) => c.id));
+
       return {
         ...detail,
-        courses: filterActiveCourses(detail.courses),
-        assignmentTaskHistory: detail.assignmentTaskHistory || [],
+        courses: activeCourses,
+        examScores: detail.examScores.filter((s) => activeCourseIds.has(s.exam.course.id)),
+        assignmentHistory: detail.assignmentHistory.filter((a) => activeCourseIds.has(a.assignment.course.id)),
+        retakeHistory: detail.retakeHistory.filter((r) => activeCourseIds.has(r.exam.course.id)),
+        assignmentTaskHistory: (detail.assignmentTaskHistory || []).filter((t) =>
+          activeCourseIds.has(t.assignment.course.id),
+        ),
       };
     },
     enabled: !!studentId,
