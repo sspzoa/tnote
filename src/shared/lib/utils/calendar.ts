@@ -139,35 +139,67 @@ interface RequiredStudent {
   birth_year: number | null;
 }
 
+interface ClinicAttendanceDetails {
+  clinic_id: string;
+  student_id: string;
+  attendance_date: string;
+  status: "attended" | "absent" | null;
+  did_retake_exam: boolean | null;
+  did_homework_check: boolean | null;
+  did_qa: boolean | null;
+}
+
 export const generateAdminClinicSessions = (
   clinic: ClinicSessionParams,
   requiredStudents: RequiredStudent[],
+  attendanceRecords: ClinicAttendanceDetails[] = [],
 ): CalendarEvent[] => {
   const events: CalendarEvent[] = [];
   const start = new Date(clinic.start_date);
   const end = new Date(clinic.end_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const attendanceByKey = new Map(
+    attendanceRecords.map((record) => [`${record.clinic_id}-${record.student_id}-${record.attendance_date}`, record]),
+  );
 
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dayOfWeek = d.getDay();
     if (clinic.operating_days.includes(dayOfWeek)) {
       const dateStr = d.toISOString().split("T")[0];
       const students = requiredStudents.filter((s) => s.required_clinic_weekdays.includes(dayOfWeek));
+      const dateObj = new Date(dateStr);
 
-      if (students.length > 0) {
+      for (const student of students) {
+        const grade = getGrade(student.birth_year);
+        const studentDisplayLabel = grade ? `${student.name} (${grade})` : student.name;
+        const attendanceKey = `${clinic.id}-${student.id}-${dateStr}`;
+        const attendanceRecord = attendanceByKey.get(attendanceKey);
+
+        let status: "attended" | "absent" | "scheduled" = "scheduled";
+        if (attendanceRecord) {
+          status = attendanceRecord.status === "absent" ? "absent" : "attended";
+        } else if (dateObj < today) {
+          status = "absent";
+        }
+
         events.push({
-          id: `clinic-${clinic.id}-${dateStr}`,
+          id: `clinic-${clinic.id}-${dateStr}-${student.id}`,
           type: "clinic",
-          title: `${clinic.name} (필참 ${students.length}명)`,
+          title: `${studentDisplayLabel} · ${clinic.name}`,
           date: dateStr,
           allDay: true,
           metadata: {
             clinicId: clinic.id,
             clinicName: clinic.name,
-            requiredStudents: students.map((s) => {
-              const grade = getGrade(s.birth_year);
-              return grade ? `${s.name} (${grade})` : s.name;
-            }),
-            requiredCount: students.length,
+            studentId: student.id,
+            studentName: student.name,
+            studentDisplayLabel,
+            status,
+            didRetakeExam: attendanceRecord?.did_retake_exam ?? undefined,
+            didHomeworkCheck: attendanceRecord?.did_homework_check ?? undefined,
+            didQa: attendanceRecord?.did_qa ?? undefined,
           },
         });
       }

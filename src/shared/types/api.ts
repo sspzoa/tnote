@@ -71,6 +71,16 @@ export interface CalendarAttendanceRecord {
   clinic_id?: string;
 }
 
+export interface CalendarClinicAttendanceData {
+  attendance_date: string;
+  student_id: string;
+  clinic_id: string;
+  status: "attended" | "absent" | null;
+  did_retake_exam: boolean | null;
+  did_homework_check: boolean | null;
+  did_qa: boolean | null;
+}
+
 export interface CalendarRetakeData {
   id: string;
   current_scheduled_date: string | null;

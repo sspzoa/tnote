@@ -10,6 +10,7 @@ import {
 
 import type {
   CalendarAssignmentTaskData,
+  CalendarClinicAttendanceData,
   CalendarClinicData,
   CalendarCourseData,
   CalendarRetakeData,
@@ -110,6 +111,32 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
     birth_year: number | null;
   }[];
 
+  let clinicAttendance: CalendarClinicAttendanceData[] = [];
+  if (clinics.length > 0 && requiredStudents.length > 0) {
+    let clinicAttendanceQuery = supabase
+      .from("ClinicAttendance")
+      .select("attendance_date, student_id, clinic_id, status, did_retake_exam, did_homework_check, did_qa")
+      .in(
+        "clinic_id",
+        clinics.map((clinic) => clinic.id),
+      )
+      .in(
+        "student_id",
+        requiredStudents.map((student) => student.id),
+      );
+
+    if (startDate) {
+      clinicAttendanceQuery = clinicAttendanceQuery.gte("attendance_date", startDate);
+    }
+    if (endDate) {
+      clinicAttendanceQuery = clinicAttendanceQuery.lte("attendance_date", endDate);
+    }
+
+    const clinicAttendanceResult = await clinicAttendanceQuery;
+    if (clinicAttendanceResult.error) throw clinicAttendanceResult.error;
+    clinicAttendance = (clinicAttendanceResult.data as CalendarClinicAttendanceData[]) || [];
+  }
+
   for (const course of courses) {
     if (course.start_date && course.end_date && course.days_of_week) {
       events.push(
@@ -148,6 +175,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
             operating_days: clinic.operating_days,
           },
           requiredStudents,
+          clinicAttendance.filter((attendance) => attendance.clinic_id === clinic.id),
         ),
       );
     }

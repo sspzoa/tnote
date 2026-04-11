@@ -123,14 +123,32 @@ const getMetadataStringArray = (event: CalendarEvent, key: string): string[] | u
   return value;
 };
 
+const getMetadataBoolean = (event: CalendarEvent, key: string): boolean | undefined => {
+  const value = event.metadata?.[key];
+  return typeof value === "boolean" ? value : undefined;
+};
+
 export default function EventDetailModal({ event, onClose }: Props) {
   const clinicStatus = event.type === "clinic" ? getMetadataStatus(event) : undefined;
   const retakeStatus = event.type === "retake" ? getMetadataStatus(event) : undefined;
   const assignmentStatus = event.type === "assignment" ? getMetadataStatus(event) : undefined;
   const requiredStudents = event.type === "clinic" ? getMetadataStringArray(event, "requiredStudents") : undefined;
+  const clinicName = event.type === "clinic" ? getMetadataString(event, "clinicName") : undefined;
+  const clinicStudentName = event.type === "clinic" ? getMetadataString(event, "studentName") : undefined;
+  const clinicStudentDisplayLabel =
+    event.type === "clinic" ? getMetadataString(event, "studentDisplayLabel") : undefined;
+  const didRetakeExam = event.type === "clinic" ? getMetadataBoolean(event, "didRetakeExam") : undefined;
+  const didHomeworkCheck = event.type === "clinic" ? getMetadataBoolean(event, "didHomeworkCheck") : undefined;
+  const didQa = event.type === "clinic" ? getMetadataBoolean(event, "didQa") : undefined;
   const assignmentName = event.type === "assignment" ? getMetadataString(event, "assignmentName") : undefined;
   const courseName = event.type === "assignment" ? getMetadataString(event, "courseName") : undefined;
   const studentName = event.type === "assignment" ? getMetadataString(event, "studentName") : undefined;
+  const clinicActivities =
+    event.type === "clinic"
+      ? [didRetakeExam && "재시험", didHomeworkCheck && "숙제검사", didQa && "질의응답"].filter(
+          (activity): activity is string => Boolean(activity),
+        )
+      : [];
 
   return (
     <Modal
@@ -170,6 +188,33 @@ export default function EventDetailModal({ event, onClose }: Props) {
             <Badge variant={getClinicStatusVariant(clinicStatus)} size="sm" className="w-fit">
               {getClinicStatusLabel(clinicStatus)}
             </Badge>
+          </div>
+        )}
+
+        {event.type === "clinic" && clinicName && clinicStudentName && (
+          <div className="flex flex-col gap-spacing-100">
+            <label className="block font-semibold text-content-standard-secondary text-label">클리닉</label>
+            <p className="text-body text-content-standard-primary">{clinicName}</p>
+          </div>
+        )}
+
+        {event.type === "clinic" && clinicStudentName && (
+          <div className="flex flex-col gap-spacing-100">
+            <label className="block font-semibold text-content-standard-secondary text-label">학생</label>
+            <p className="text-body text-content-standard-primary">{clinicStudentDisplayLabel ?? clinicStudentName}</p>
+          </div>
+        )}
+
+        {event.type === "clinic" && clinicActivities.length > 0 && (
+          <div className="flex flex-col gap-spacing-200">
+            <label className="block font-semibold text-content-standard-secondary text-label">진행 내용</label>
+            <div className="flex flex-wrap gap-spacing-100">
+              {clinicActivities.map((activity) => (
+                <Badge key={activity} variant="info" size="sm">
+                  {activity}
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
 
