@@ -10,6 +10,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .from("AssignmentTasks")
     .select(`
       current_scheduled_date,
+      assignment_id,
+      student_id,
       assignment:Assignments!inner(course:Courses!inner(workspace)),
       student:Users!AssignmentTasks_student_id_fkey!inner(workspace)
     `)
@@ -33,6 +35,15 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .single();
 
   if (updateError) throw updateError;
+
+  const { error: submissionUpdateError } = await supabase
+    .from("CourseAssignments")
+    .update({ status: "완료", updated_at: new Date().toISOString() })
+    .eq("assignment_id", current.assignment_id)
+    .eq("student_id", current.student_id)
+    .eq("status", "검사예정");
+
+  if (submissionUpdateError) throw submissionUpdateError;
 
   const { error: historyError } = await supabase.from("AssignmentTaskHistory").insert({
     assignment_task_id: id,
