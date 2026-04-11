@@ -525,9 +525,13 @@ export default function StudentDetailPage() {
     isTagActive(assignment.start_date, assignment.end_date),
   );
   const courseCount = studentDetail.courses.length;
-  const avgScore =
-    studentDetail.examScores.length > 0
-      ? Math.round(studentDetail.examScores.reduce((sum, s) => sum + s.score, 0) / studentDetail.examScores.length)
+  const percentileScores = studentDetail.examScores.filter((s) => s.maxScore && s.maxScore > 0);
+  const avgPercentile =
+    percentileScores.length > 0
+      ? Math.round(
+          percentileScores.reduce((sum, s) => sum + (s.score / (s.maxScore as number)) * 100, 0) /
+            percentileScores.length,
+        )
       : 0;
   const avgRank =
     studentDetail.examScores.length > 0
@@ -642,7 +646,7 @@ export default function StudentDetailPage() {
             <StatCard
               icon={TrendingUp}
               label="시험 평균"
-              value={studentDetail.examScores.length > 0 ? `${avgScore}점` : "-"}
+              value={percentileScores.length > 0 ? `${avgPercentile}%` : "-"}
               subValue={studentDetail.examScores.length > 0 ? `평균 순위 ${avgRank}/${avgTotal}` : "응시 기록 없음"}
             />
           </div>
