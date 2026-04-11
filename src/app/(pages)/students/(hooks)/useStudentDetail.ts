@@ -83,7 +83,7 @@ interface RetakeHistoryInfo {
 
 interface AssignmentTaskHistoryInfo {
   id: string;
-  status: "pending" | "completed" | "absent";
+  status: "pending" | "completed" | "absent" | "insufficient" | "not_submitted";
   managementStatus: string;
   scheduledDate: string | null;
   postponeCount: number;

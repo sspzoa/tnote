@@ -398,8 +398,24 @@ export default function StudentInfoModal({
                         )}
                       </div>
                     </div>
-                    <Badge variant={task.status === "completed" ? "success" : "warning"} size="xs">
-                      {task.status === "completed" ? "완료" : "미완료"}
+                    <Badge
+                      variant={
+                        task.status === "completed"
+                          ? "success"
+                          : task.status === "pending"
+                            ? "warning"
+                            : "danger"
+                      }
+                      size="xs">
+                      {(
+                        {
+                          completed: "완료",
+                          pending: "검사예정",
+                          insufficient: "미흡",
+                          not_submitted: "미제출",
+                          absent: "결석",
+                        } as Record<string, string>
+                      )[task.status] ?? task.status}
                     </Badge>
                   </div>
                 ))}

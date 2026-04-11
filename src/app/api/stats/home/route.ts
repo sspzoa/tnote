@@ -20,7 +20,7 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
       .from("AssignmentTasks")
       .select("id, assignment:Assignments!inner(course:Courses!inner(workspace))", { count: "exact", head: true })
       .eq("assignment.course.workspace", session.workspace)
-      .eq("status", "pending"),
+      .in("status", ["pending", "absent"]),
     supabase
       .from("Clinics")
       .select("id", { count: "exact", head: true })

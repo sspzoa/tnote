@@ -11,9 +11,12 @@ import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { type MyAssignmentTask, useMyAssignmentTasks } from "./(hooks)/useMyAssignmentTasks";
 
-const statusConfig: Record<string, { variant: "warning" | "success"; label: string }> = {
-  pending: { variant: "warning", label: "미완료" },
+const statusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {
+  pending: { variant: "warning", label: "검사예정" },
   completed: { variant: "success", label: "완료" },
+  insufficient: { variant: "danger", label: "미흡" },
+  not_submitted: { variant: "danger", label: "미제출" },
+  absent: { variant: "danger", label: "결석" },
 };
 
 type SortKey = "assignment" | "scheduledDate" | "status";
@@ -28,7 +31,13 @@ export default function MyAssignmentTasksPage() {
       scheduledDate: (a: MyAssignmentTask, b: MyAssignmentTask) =>
         (a.scheduledDate || "").localeCompare(b.scheduledDate || ""),
       status: (a: MyAssignmentTask, b: MyAssignmentTask) => {
-        const order: Record<string, number> = { pending: 0, completed: 1 };
+        const order: Record<string, number> = {
+          pending: 0,
+          absent: 1,
+          insufficient: 2,
+          not_submitted: 3,
+          completed: 4,
+        };
         return (order[a.status] ?? 0) - (order[b.status] ?? 0);
       },
     }),

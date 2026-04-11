@@ -35,6 +35,9 @@ export default function AssignmentsPage() {
   const {
     handlePostpone,
     handleComplete,
+    handleMarkInsufficient,
+    handleMarkNotSubmitted,
+    handleMarkAbsent,
     handleViewHistory,
     handleDelete,
     handleViewStudent,
@@ -113,6 +116,9 @@ export default function AssignmentsPage() {
           onViewStudent={handleViewStudent}
           onPostpone={handlePostpone}
           onComplete={handleComplete}
+          onMarkInsufficient={handleMarkInsufficient}
+          onMarkNotSubmitted={handleMarkNotSubmitted}
+          onMarkAbsent={handleMarkAbsent}
           onViewHistory={handleViewHistory}
           onDelete={handleDelete}
           onManagementStatusChange={handleManagementStatusChange}

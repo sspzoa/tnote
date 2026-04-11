@@ -21,11 +21,16 @@ interface AssignmentTaskListProps {
   onViewStudent: (studentId: string) => void;
   onPostpone: (task: AssignmentTask) => void;
   onComplete: (task: AssignmentTask) => void;
+  onMarkInsufficient: (task: AssignmentTask) => void;
+  onMarkNotSubmitted: (task: AssignmentTask) => void;
+  onMarkAbsent: (task: AssignmentTask) => void;
   onViewHistory: (task: AssignmentTask) => void;
   onDelete: (task: AssignmentTask) => void;
   onManagementStatusChange: (task: AssignmentTask) => void;
   onEditDate: (task: AssignmentTask) => void;
 }
+
+const OPEN_STATUSES: ReadonlyArray<AssignmentTask["status"]> = ["pending", "absent"];
 
 type TaskSortKey = "student" | "assignment" | "scheduledDate" | "status" | "managementStatus";
 
@@ -34,6 +39,9 @@ export default function AssignmentTaskList({
   onViewStudent,
   onPostpone,
   onComplete,
+  onMarkInsufficient,
+  onMarkNotSubmitted,
+  onMarkAbsent,
   onViewHistory,
   onDelete,
   onManagementStatusChange,
@@ -46,15 +54,21 @@ export default function AssignmentTaskList({
   const getMenuItems = useCallback(
     (task: AssignmentTask): DropdownMenuItem[] => {
       const items: DropdownMenuItem[] = [];
+      const isOpen = (OPEN_STATUSES as readonly string[]).includes(task.status);
 
-      if (task.status !== "completed") {
-        items.push({ label: "연기", onClick: () => onPostpone(task) });
-        items.push({ label: "완료", onClick: () => onComplete(task), dividerAfter: true });
+      if (isOpen) {
+        items.push({ label: "완료", onClick: () => onComplete(task) });
+        items.push({ label: "미흡", onClick: () => onMarkInsufficient(task) });
+        items.push({ label: "미제출", onClick: () => onMarkNotSubmitted(task) });
+        if (task.status !== "absent") {
+          items.push({ label: "결석", onClick: () => onMarkAbsent(task) });
+        }
+        items.push({ label: "연기", onClick: () => onPostpone(task), dividerAfter: true });
       }
 
       items.push({ label: "이력 보기", onClick: () => onViewHistory(task) });
 
-      if (task.status !== "completed") {
+      if (isOpen) {
         items.push({ label: "수정", onClick: () => onEditDate(task), dividerAfter: true });
       } else {
         items[items.length - 1].dividerAfter = true;
@@ -64,7 +78,16 @@ export default function AssignmentTaskList({
 
       return items;
     },
-    [onPostpone, onComplete, onViewHistory, onEditDate, onDelete],
+    [
+      onPostpone,
+      onComplete,
+      onMarkInsufficient,
+      onMarkNotSubmitted,
+      onMarkAbsent,
+      onViewHistory,
+      onEditDate,
+      onDelete,
+    ],
   );
 
   const comparators = useMemo(
@@ -87,13 +110,19 @@ export default function AssignmentTaskList({
   });
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "warning" | "success"> = {
+    const variants: Record<string, "warning" | "success" | "danger" | "neutral"> = {
       pending: "warning",
       completed: "success",
+      insufficient: "danger",
+      not_submitted: "danger",
+      absent: "danger",
     };
     const labels: Record<string, string> = {
-      pending: "미완료",
+      pending: "검사예정",
       completed: "완료",
+      insufficient: "미흡",
+      not_submitted: "미제출",
+      absent: "결석",
     };
     return (
       <Badge variant={variants[status] ?? "neutral"} size="sm">

@@ -88,9 +88,15 @@ const getAssignmentStatusLabel = (status: string) => {
     case "completed":
       return "완료";
     case "pending":
-      return "미완료";
+      return "검사예정";
+    case "insufficient":
+      return "미흡";
+    case "not_submitted":
+      return "미제출";
+    case "absent":
+      return "결석";
     default:
-      return "미완료";
+      return "검사예정";
   }
 };
 
@@ -100,6 +106,10 @@ const getAssignmentStatusVariant = (status: string): BadgeVariant => {
       return "success";
     case "pending":
       return "warning";
+    case "insufficient":
+    case "not_submitted":
+    case "absent":
+      return "danger";
     default:
       return "warning";
   }

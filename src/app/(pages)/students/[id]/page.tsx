@@ -51,12 +51,21 @@ const retakeStatusConfig: Record<string, { variant: "warning" | "success" | "dan
   absent: { variant: "danger", label: "결석" },
 };
 
-const assignmentTaskStatusConfig: Record<string, { variant: "warning" | "success"; label: string }> = {
-  pending: { variant: "warning", label: "미완료" },
+const assignmentTaskStatusConfig: Record<string, { variant: "warning" | "success" | "danger"; label: string }> = {
+  pending: { variant: "warning", label: "검사예정" },
   completed: { variant: "success", label: "완료" },
+  insufficient: { variant: "danger", label: "미흡" },
+  not_submitted: { variant: "danger", label: "미제출" },
+  absent: { variant: "danger", label: "결석" },
 };
 
-const STATUS_ORDER: Record<string, number> = { pending: 0, completed: 1 };
+const STATUS_ORDER: Record<string, number> = {
+  pending: 0,
+  absent: 1,
+  insufficient: 2,
+  not_submitted: 3,
+  completed: 4,
+};
 
 type ScoreSortKey = "exam" | "score" | "rank" | "average" | "median" | "highest";
 type RetakeSortKey = "exam" | "scheduledDate" | "status";
@@ -548,7 +557,7 @@ export default function StudentDetailPage() {
   ).length;
   const totalRetakes = studentDetail.retakeHistory.length;
   const pendingAssignmentTasks = (studentDetail.assignmentTaskHistory || []).filter(
-    (t) => t.status === "pending",
+    (t) => t.status === "pending" || t.status === "absent",
   ).length;
   const totalAssignmentTasks = (studentDetail.assignmentTaskHistory || []).length;
   const consultationCount = studentDetail.consultationHistory.length;

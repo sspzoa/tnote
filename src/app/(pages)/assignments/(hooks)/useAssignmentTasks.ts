@@ -8,7 +8,9 @@ const useWorkflowList = createWorkflowList<AssignmentTask>({
   errorMessage: "과제 목록을 불러오는데 실패했습니다.",
 });
 
-export const useAssignmentTasks = (filter: "all" | "pending" | "completed" | "absent") => {
-  const { data, isLoading, error, refetch } = useWorkflowList(filter);
+export const useAssignmentTasks = () => {
+  // Always fetch all; filtering is done client-side to support the
+  // 검사예정/결석/미흡/미제출/완료 status model.
+  const { data, isLoading, error, refetch } = useWorkflowList("all");
   return { tasks: data, isLoading, error, refetch };
 };

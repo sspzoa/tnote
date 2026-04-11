@@ -17,6 +17,7 @@ import {
   showStudentModalAtom,
 } from "../(atoms)/useModalStore";
 import { useAssignmentTaskDelete } from "./useAssignmentTaskDelete";
+import { useAssignmentTaskSetStatus } from "./useAssignmentTaskSetStatus";
 
 export const useAssignmentTaskHandlers = (refetch: () => void) => {
   const setSelectedTask = useSetAtom(selectedTaskAtom);
@@ -35,6 +36,7 @@ export const useAssignmentTaskHandlers = (refetch: () => void) => {
   const toast = useToast();
 
   const { deleteTask } = useAssignmentTaskDelete();
+  const { setStatus } = useAssignmentTaskSetStatus();
 
   const handlePostpone = useCallback(
     (task: AssignmentTask) => {
@@ -54,6 +56,57 @@ export const useAssignmentTaskHandlers = (refetch: () => void) => {
       setOpenMenuId(null);
     },
     [setSelectedTask, setShowCompleteModal, setOpenMenuId],
+  );
+
+  const handleMarkInsufficient = useCallback(
+    async (task: AssignmentTask) => {
+      setOpenMenuId(null);
+      if (!confirm(`${task.student.name} 학생의 ${task.assignment.name} 과제를 '미흡'으로 처리하시겠습니까?`)) {
+        return;
+      }
+      try {
+        await setStatus({ taskId: task.id, endpoint: "insufficient" });
+        toast.success("미흡 처리되었습니다.");
+        refetch();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "미흡 처리에 실패했습니다.");
+      }
+    },
+    [setStatus, setOpenMenuId, toast, refetch],
+  );
+
+  const handleMarkNotSubmitted = useCallback(
+    async (task: AssignmentTask) => {
+      setOpenMenuId(null);
+      if (!confirm(`${task.student.name} 학생의 ${task.assignment.name} 과제를 '미제출'로 처리하시겠습니까?`)) {
+        return;
+      }
+      try {
+        await setStatus({ taskId: task.id, endpoint: "not-submitted" });
+        toast.success("미제출 처리되었습니다.");
+        refetch();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "미제출 처리에 실패했습니다.");
+      }
+    },
+    [setStatus, setOpenMenuId, toast, refetch],
+  );
+
+  const handleMarkAbsent = useCallback(
+    async (task: AssignmentTask) => {
+      setOpenMenuId(null);
+      if (!confirm(`${task.student.name} 학생의 ${task.assignment.name} 과제를 '결석'으로 처리하시겠습니까?`)) {
+        return;
+      }
+      try {
+        await setStatus({ taskId: task.id, endpoint: "absent" });
+        toast.success("결석 처리되었습니다.");
+        refetch();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "결석 처리에 실패했습니다.");
+      }
+    },
+    [setStatus, setOpenMenuId, toast, refetch],
   );
 
   const handleViewHistory = useCallback(
@@ -124,6 +177,9 @@ export const useAssignmentTaskHandlers = (refetch: () => void) => {
   return {
     handlePostpone,
     handleComplete,
+    handleMarkInsufficient,
+    handleMarkNotSubmitted,
+    handleMarkAbsent,
     handleViewHistory,
     handleDelete,
     handleViewStudent,

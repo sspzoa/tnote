@@ -32,13 +32,18 @@ export const useAssignmentTaskFilters = () => {
   const minAbsentCount = useAtomValue(minAbsentCountAtom);
   const minPostponeAbsentCount = useAtomValue(minPostponeAbsentCountAtom);
 
-  const { tasks: fetchedTasks, isLoading, error, refetch } = useAssignmentTasks(filter);
+  const { tasks: fetchedTasks, isLoading, error, refetch } = useAssignmentTasks();
+
+  // States that are considered "done" and hidden from the default list
+  const HIDDEN_STATUSES = ["completed", "insufficient", "not_submitted"] as const;
+  const isHiddenStatus = (status: string) =>
+    (HIDDEN_STATUSES as readonly string[]).includes(status);
 
   const incompleteCountByStudent = useMemo(
     () =>
       fetchedTasks.reduce(
         (acc, task) => {
-          if (task.status !== "completed") {
+          if (!isHiddenStatus(task.status)) {
             acc[task.student.id] = (acc[task.student.id] || 0) + 1;
           }
           return acc;
@@ -99,7 +104,8 @@ export const useAssignmentTaskFilters = () => {
   const filteredTasks = useMemo(
     () =>
       fetchedTasks
-        .filter((task) => showCompleted || task.status !== "completed")
+        .filter((task) => showCompleted || !isHiddenStatus(task.status))
+        .filter((task) => filter === "all" || task.status === filter)
         .filter((task) => selectedCourse === "all" || task.assignment.course.id === selectedCourse)
         .filter((task) => selectedAssignmentId === "all" || task.assignment.id === selectedAssignmentId)
         .filter((task) => selectedManagementStatus === "all" || task.management_status === selectedManagementStatus)
@@ -118,6 +124,7 @@ export const useAssignmentTaskFilters = () => {
         ),
     [
       fetchedTasks,
+      filter,
       showCompleted,
       selectedCourse,
       selectedAssignmentId,

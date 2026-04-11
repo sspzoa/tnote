@@ -136,12 +136,14 @@ export interface Retake {
   student: RetakeStudent;
 }
 
+export type AssignmentTaskStatus = "pending" | "completed" | "insufficient" | "not_submitted" | "absent";
+
 export interface AssignmentTask {
   id: string;
   assignment_id: string;
   student_id: string;
   current_scheduled_date: string | null;
-  status: "pending" | "completed";
+  status: AssignmentTaskStatus;
   management_status: ManagementStatus;
   postpone_count: number;
   absent_count: number;

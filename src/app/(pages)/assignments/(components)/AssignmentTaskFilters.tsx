@@ -94,7 +94,10 @@ export default function AssignmentTaskFilters() {
 
             <FilterSelect value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
               <option value="all">전체 상태</option>
-              <option value="pending">미완료</option>
+              <option value="pending">검사예정</option>
+              <option value="absent">결석</option>
+              <option value="insufficient">미흡</option>
+              <option value="not_submitted">미제출</option>
               <option value="completed">완료</option>
             </FilterSelect>
 

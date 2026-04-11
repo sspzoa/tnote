@@ -36,7 +36,9 @@ export default function CalendarPage() {
     if (event.type === "retake" && !filters.retake) return false;
     if (event.type === "clinic" && !filters.clinic) return false;
     if (event.type === "assignment") {
-      return filters.assignment && event.metadata?.status !== "completed";
+      const status = event.metadata?.status;
+      const isDone = status === "completed" || status === "insufficient" || status === "not_submitted";
+      return filters.assignment && !isDone;
     }
     return true;
   });

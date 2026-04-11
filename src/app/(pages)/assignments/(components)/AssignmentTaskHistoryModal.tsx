@@ -36,6 +36,9 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
       assign: "할당",
       postpone: "연기",
       complete: "완료",
+      insufficient: "미흡",
+      not_submitted: "미제출",
+      absent: "결석",
       status_change: "상태 변경",
       management_status_change: "관리 상태 변경",
       note_update: "메모 수정",
@@ -48,6 +51,9 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
     if (actionType === "assign") return "purple";
     if (actionType === "postpone") return "blue";
     if (actionType === "complete") return "green";
+    if (actionType === "insufficient") return "red";
+    if (actionType === "not_submitted") return "red";
+    if (actionType === "absent") return "red";
     if (actionType === "status_change") return "purple";
     if (actionType === "management_status_change") return "yellow";
     if (actionType === "date_edit") return "blue";
