@@ -47,7 +47,7 @@ export function SubmissionModal({
     if (isOpen && students.length > 0) {
       const initialSubmissions: Record<string, string> = {};
       for (const student of students) {
-        initialSubmissions[student.id] = "미제출";
+        initialSubmissions[student.id] = "검사예정";
       }
       for (const submission of existingSubmissions) {
         initialSubmissions[submission.student.id] = submission.status;
