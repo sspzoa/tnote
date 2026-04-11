@@ -45,8 +45,8 @@ export default function MyAssignmentTasksPage() {
     return (
       <Container>
         <Header
-          title="미완료 과제 현황"
-          subtitle="나의 미완료 과제 현황을 확인합니다"
+          title="재과제 현황"
+          subtitle="나의 재과제 현황을 확인합니다"
           backLink={{ href: "/", label: "홈으로 돌아가기" }}
         />
         <ErrorComponent errorMessage={(error as Error).message} />
@@ -59,7 +59,7 @@ export default function MyAssignmentTasksPage() {
   return (
     <Container>
       <Header
-        title="미완료 과제 현황"
+        title="재과제 현황"
         subtitle={`전체 ${tasks.length}건 (미완료 ${pendingCount}건)`}
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
       />
@@ -75,7 +75,7 @@ export default function MyAssignmentTasksPage() {
           ]}
         />
       ) : sortedData.length === 0 ? (
-        <EmptyState message="미완료 과제가 없습니다." />
+        <EmptyState message="재과제가 없습니다." />
       ) : (
         <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
           <table className="w-full rounded-radius-400">

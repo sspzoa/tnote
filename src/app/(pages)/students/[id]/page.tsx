@@ -396,7 +396,7 @@ const AssignmentTaskTable = ({ tasks, printHidden }: { tasks: AssignmentTaskHist
   return (
     <section className={printHidden ? "print:hidden" : ""}>
       <DashboardCard
-        title="미완료 과제 이력"
+        title="재과제 이력"
         icon={FileText}
         isEmpty={tasks.length === 0}
         emptyMessage="과제 기록이 없습니다."
@@ -657,7 +657,7 @@ export default function StudentDetailPage() {
           <div className={printOptions.retakes ? "" : "print:hidden"}>
             <StatCard
               icon={FileCheck}
-              label="미완료 과제"
+              label="재과제"
               value={`${pendingAssignmentTasks}건`}
               subValue={`전체 ${totalAssignmentTasks}건 중`}
             />

@@ -5,6 +5,7 @@ interface FilterState {
   course: boolean;
   retake: boolean;
   clinic: boolean;
+  assignment: boolean;
 }
 
 interface Props {
@@ -90,6 +91,17 @@ export default function CalendarToolbar({
           }`}>
           <div className="h-3 w-3 rounded-radius-100 bg-[#8B5CF6]" />
           <span className="text-content-standard-secondary text-footnote">클리닉</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onFilterChange({ ...filters, assignment: !filters.assignment })}
+          className={`flex items-center gap-spacing-200 rounded-radius-300 px-spacing-300 py-spacing-100 transition-all ${
+            filters.assignment
+              ? "bg-[#F59E0B]/20 ring-1 ring-[#F59E0B]"
+              : "bg-components-fill-standard-secondary opacity-50"
+          }`}>
+          <div className="h-3 w-3 rounded-radius-100 bg-[#F59E0B]" />
+          <span className="text-content-standard-secondary text-footnote">재과제</span>
         </button>
       </div>
     </div>

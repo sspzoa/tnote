@@ -94,8 +94,8 @@ export default function Home() {
       href: "/assignments",
       icon: FileCheck,
       value: stats?.pendingAssignmentTaskCount || 0,
-      label: "미완료 과제",
-      description: "대기 중인 미완료 과제",
+      label: "재과제",
+      description: "대기 중인 재과제",
     },
     {
       href: "/clinics",
@@ -151,8 +151,8 @@ export default function Home() {
             {
               href: "/my/assignment-tasks",
               icon: FileCheck,
-              label: "미완료 과제 현황",
-              description: "미완료 과제 관리 현황",
+              label: "재과제 현황",
+              description: "재과제 관리 현황",
             },
             { href: "/my/retakes", icon: ClipboardList, label: "재시험 현황", description: "재시험 현황 확인" },
             { href: "/my/clinics", icon: Stethoscope, label: "클리닉", description: "클리닉 출석 현황" },

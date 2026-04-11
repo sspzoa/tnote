@@ -15,6 +15,7 @@ interface FilterState {
   course: boolean;
   retake: boolean;
   clinic: boolean;
+  assignment: boolean;
 }
 
 export default function MyCalendarPage() {
@@ -25,6 +26,7 @@ export default function MyCalendarPage() {
     course: true,
     retake: true,
     clinic: true,
+    assignment: true,
   });
 
   const { events, isLoading } = useMyCalendarEvents(currentDate);
@@ -33,6 +35,9 @@ export default function MyCalendarPage() {
     if (event.type === "course" && !filters.course) return false;
     if (event.type === "retake" && !filters.retake) return false;
     if (event.type === "clinic" && !filters.clinic) return false;
+    if (event.type === "assignment") {
+      return filters.assignment && event.metadata?.status !== "completed";
+    }
     return true;
   });
 

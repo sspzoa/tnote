@@ -25,6 +25,11 @@ const getEventStyle = (event: CalendarEvent) => {
         return { color: "#4B5563", backgroundColor: "rgba(107, 114, 128, 0.12)" };
       }
       return { color: "#7C3AED", backgroundColor: "rgba(139, 92, 246, 0.12)" };
+    case "assignment":
+      if (event.metadata?.status === "completed") {
+        return { color: "#059669", backgroundColor: "rgba(16, 185, 129, 0.12)" };
+      }
+      return { color: "#D97706", backgroundColor: "rgba(245, 158, 11, 0.16)" };
     default:
       return { color: "#6B7280", backgroundColor: "rgba(107, 114, 128, 0.12)" };
   }

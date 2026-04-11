@@ -99,7 +99,7 @@ export function SubmissionModal({
 
     try {
       await assignTasks({ assignmentId: assignment.id, studentIds: incompleteStudentIds });
-      toast.success(`${incompleteStudentIds.length}명의 학생에게 미완료 과제를 할당했습니다.`);
+      toast.success(`${incompleteStudentIds.length}명의 학생에게 재과제를 할당했습니다.`);
     } catch (error) {
       if (error instanceof Error && error.message === "CONFLICT") {
         toast.error("이미 할당된 학생이 있습니다.");
@@ -149,7 +149,7 @@ export function SubmissionModal({
               isLoading={isAssigning}
               loadingText="할당 중..."
               className="flex-1">
-              미완료 과제 할당
+              재과제 할당
             </Button>
           </div>
         </div>

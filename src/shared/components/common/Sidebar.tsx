@@ -59,7 +59,7 @@ const adminMenuItems = [
   {
     href: "/assignments",
     icon: FileCheck,
-    label: "미완료 과제 관리",
+    label: "재과제 관리",
   },
   {
     href: "/students",
@@ -242,7 +242,7 @@ export default function Sidebar() {
     {
       href: "/my/assignment-tasks",
       icon: FileCheck,
-      label: "미완료 과제 현황",
+      label: "재과제 현황",
     },
   ];
   const allMenuItems = isAdmin ? [...menuItems, ...adminMenuItems] : studentMenuItems;

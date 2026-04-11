@@ -121,7 +121,7 @@ export default function AssignmentTaskFilters() {
             <FilterSelect
               value={minIncompleteCount.toString()}
               onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
-              <option value="0">미완료 과제</option>
+              <option value="0">재과제</option>
               <option value="2">2개 이상</option>
               <option value="3">3개 이상</option>
               <option value="4">4개 이상</option>
