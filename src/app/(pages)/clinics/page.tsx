@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtomValue, useSetAtom } from "jotai";
-import { History } from "lucide-react";
+import { History, UserX } from "lucide-react";
 import { useMemo } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
@@ -24,6 +24,7 @@ import {
   showCreateModalAtom,
   showEditModalAtom,
   showHistoryPanelAtom,
+  showRequiredAbsentPanelAtom,
 } from "./(atoms)/useModalStore";
 import AttendanceModal from "./(components)/AttendanceModal";
 import ClinicCreateModal from "./(components)/ClinicCreateModal";
@@ -31,14 +32,17 @@ import ClinicEditModal from "./(components)/ClinicEditModal";
 import ClinicFilters from "./(components)/ClinicFilters";
 import ClinicHistoryPanel from "./(components)/ClinicHistoryPanel";
 import ClinicList from "./(components)/ClinicList";
+import RequiredAbsentPanel from "./(components)/RequiredAbsentPanel";
 import { useClinicDelete } from "./(hooks)/useClinicDelete";
 import { useClinics } from "./(hooks)/useClinics";
 import { useRecentAttendance } from "./(hooks)/useRecentAttendance";
+import { useRequiredAbsent } from "./(hooks)/useRequiredAbsent";
 
 export default function ClinicsPage() {
   const { clinics, isLoading, error } = useClinics();
   const { deleteClinic } = useClinicDelete();
   const { recentAttendance, isLoading: historyLoading } = useRecentAttendance();
+  const { requiredAbsent, isLoading: requiredAbsentLoading } = useRequiredAbsent();
   const showEndedClinics = useAtomValue(showEndedClinicsAtom);
   const toast = useToast();
 
@@ -47,6 +51,8 @@ export default function ClinicsPage() {
   const setShowAttendanceModal = useSetAtom(showAttendanceModalAtom);
   const setShowHistoryPanel = useSetAtom(showHistoryPanelAtom);
   const showHistoryPanel = useAtomValue(showHistoryPanelAtom);
+  const setShowRequiredAbsentPanel = useSetAtom(showRequiredAbsentPanelAtom);
+  const showRequiredAbsentPanel = useAtomValue(showRequiredAbsentPanelAtom);
   const setSelectedClinic = useSetAtom(selectedClinicAtom);
   const setClinicName = useSetAtom(clinicNameAtom);
   const setOperatingDays = useSetAtom(operatingDaysAtom);
@@ -114,6 +120,18 @@ export default function ClinicsPage() {
           <div className="flex items-center gap-spacing-300">
             <Button
               variant="secondary"
+              onClick={() => setShowRequiredAbsentPanel(true)}
+              className="flex items-center gap-spacing-200">
+              <UserX className="size-4" />
+              필참 결석
+              {requiredAbsent.length > 0 && (
+                <span className="rounded-full bg-solid-red px-spacing-200 text-footnote text-solid-white">
+                  {requiredAbsent.length}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => setShowHistoryPanel(true)}
               className="flex items-center gap-spacing-200">
               <History className="size-4" />
@@ -166,6 +184,13 @@ export default function ClinicsPage() {
         onClose={() => setShowHistoryPanel(false)}
         attendance={recentAttendance}
         isLoading={historyLoading}
+      />
+
+      <RequiredAbsentPanel
+        isOpen={showRequiredAbsentPanel}
+        onClose={() => setShowRequiredAbsentPanel(false)}
+        data={requiredAbsent}
+        isLoading={requiredAbsentLoading}
       />
     </Container>
   );

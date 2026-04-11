@@ -4,3 +4,4 @@ export const showCreateModalAtom = atom(false);
 export const showEditModalAtom = atom(false);
 export const showAttendanceModalAtom = atom(false);
 export const showHistoryPanelAtom = atom(false);
+export const showRequiredAbsentPanelAtom = atom(false);
