@@ -37,8 +37,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .from("CourseAssignments")
     .update({ status: "미제출", updated_at: new Date().toISOString() })
     .eq("assignment_id", current.assignment_id)
-    .eq("student_id", current.student_id)
-    .eq("status", "검사예정");
+    .eq("student_id", current.student_id);
 
   if (submissionUpdateError) throw submissionUpdateError;
 

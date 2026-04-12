@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Modal, SearchInput, Select } from "@/shared/components/ui";
+import { Badge, Button, Modal, SearchInput } from "@/shared/components/ui";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -24,9 +24,14 @@ interface SubmissionModalProps {
   students: StudentListStudent[];
   isLoading: boolean;
   existingSubmissions: ExistingSubmission[];
-  onSave: (submissions: Array<{ studentId: string; status: string }>) => Promise<void>;
-  isSaving: boolean;
 }
+
+const SUBMISSION_STATUS_META = {
+  완료: { variant: "success", label: "완료" },
+  미흡: { variant: "warning", label: "미흡" },
+  미제출: { variant: "danger", label: "미제출" },
+  검사예정: { variant: "info", label: "검사예정" },
+} as const;
 
 export function SubmissionModal({
   isOpen,
@@ -35,11 +40,9 @@ export function SubmissionModal({
   students,
   isLoading,
   existingSubmissions,
-  onSave,
-  isSaving,
 }: SubmissionModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [submissionInputs, setSubmissionInputs] = useState<Record<string, string>>({});
+  const [submissionStatuses, setSubmissionStatuses] = useState<Record<string, string>>({});
   const toast = useToast();
   const { assignTasks, isPending: isAssigning } = useAssignmentTaskAssign();
 
@@ -52,43 +55,22 @@ export function SubmissionModal({
       for (const submission of existingSubmissions) {
         initialSubmissions[submission.student.id] = submission.status;
       }
-      setSubmissionInputs(initialSubmissions);
+      setSubmissionStatuses(initialSubmissions);
     } else if (isOpen) {
-      setSubmissionInputs({});
+      setSubmissionStatuses({});
     }
   }, [isOpen, existingSubmissions, students]);
 
   const handleClose = () => {
     setSearchQuery("");
-    setSubmissionInputs({});
+    setSubmissionStatuses({});
     onClose();
-  };
-
-  const handleStatusChange = (studentId: string, status: string) => {
-    setSubmissionInputs((prev) => {
-      if (status === "") {
-        const newInputs = { ...prev };
-        delete newInputs[studentId];
-        return newInputs;
-      }
-      return { ...prev, [studentId]: status };
-    });
-  };
-
-  const handleSave = async () => {
-    if (!assignment) return;
-
-    const submissions = Object.entries(submissionInputs)
-      .filter(([, status]) => status !== "")
-      .map(([studentId, status]) => ({ studentId, status }));
-
-    await onSave(submissions);
   };
 
   const handleAssign = async () => {
     if (!assignment) return;
 
-    const incompleteStudentIds = Object.entries(submissionInputs)
+    const incompleteStudentIds = Object.entries(submissionStatuses)
       .filter(([, status]) => status === "검사예정")
       .map(([studentId]) => studentId);
 
@@ -115,37 +97,30 @@ export function SubmissionModal({
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
-  const submissionCount = Object.values(submissionInputs).filter((v) => v !== "").length;
+  const submissionCount = Object.values(submissionStatuses).filter((v) => v !== "").length;
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      onSubmit={handleSave}
-      title="제출 현황 입력"
+      title="제출 현황 확인"
       subtitle={assignment.name}
       footer={
         <div className="flex w-full flex-col gap-spacing-300">
-          <div className="flex items-center justify-between text-body">
+          <div className="flex flex-col gap-spacing-100 text-body">
             <span className="text-content-standard-secondary">입력: {submissionCount}명</span>
+            <span className="text-content-standard-tertiary text-footnote">
+              제출 상태 변경은 재과제 관리 페이지에서만 가능합니다.
+            </span>
           </div>
           <div className="flex gap-spacing-300">
             <Button variant="secondary" onClick={handleClose} className="flex-1">
               취소
             </Button>
             <Button
-              variant="primary"
-              onClick={handleSave}
-              disabled={isLoading || students.length === 0}
-              isLoading={isSaving}
-              loadingText="저장 중..."
-              className="flex-1">
-              저장
-            </Button>
-            <Button
               variant="secondary"
               onClick={handleAssign}
-              disabled={isSaving || isAssigning}
+              disabled={isAssigning}
               isLoading={isAssigning}
               loadingText="할당 중..."
               className="flex-1">
@@ -178,38 +153,19 @@ export function SubmissionModal({
               <StudentListEmpty message="검색 결과가 없습니다." />
             ) : (
               filteredStudents.map((student) => {
-                const currentStatus = submissionInputs[student.id] || "";
+                const currentStatus = submissionStatuses[student.id] || "검사예정";
+                const statusMeta =
+                  SUBMISSION_STATUS_META[currentStatus as keyof typeof SUBMISSION_STATUS_META] ??
+                  SUBMISSION_STATUS_META["검사예정"];
 
                 return (
                   <StudentListItem
                     key={student.id}
                     student={student}
                     rightContent={
-                      <Select
-                        value={currentStatus}
-                        onChange={(e) => handleStatusChange(student.id, e.target.value)}
-                        onKeyDown={(e) => {
-                          const keyMap: Record<string, string> = {
-                            "1": "완료",
-                            "2": "미흡",
-                            "3": "미제출",
-                            "4": "검사예정",
-                          };
-                          const value = keyMap[e.key];
-                          if (value) {
-                            e.preventDefault();
-                            handleStatusChange(student.id, currentStatus === value ? "" : value);
-                          }
-                        }}
-                        placeholder="-"
-                        options={[
-                          { value: "완료", label: "완료" },
-                          { value: "미흡", label: "미흡" },
-                          { value: "미제출", label: "미제출" },
-                          { value: "검사예정", label: "검사예정" },
-                        ]}
-                        className="w-20 bg-components-fill-standard-primary text-center"
-                      />
+                      <Badge variant={statusMeta.variant} size="sm">
+                        {statusMeta.label}
+                      </Badge>
                     }
                   />
                 );

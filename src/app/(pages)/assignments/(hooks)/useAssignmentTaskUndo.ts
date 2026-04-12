@@ -3,7 +3,16 @@ import { createWorkflowUndo } from "@/shared/lib/workflow";
 
 const useWorkflowUndo = createWorkflowUndo({
   baseEndpoint: "/api/assignment-tasks",
-  invalidateKeys: [QUERY_KEYS.assignmentTasks.all, QUERY_KEYS.assignmentTasks.historyAll, ["students", "detail"]],
+  invalidateKeys: [
+    QUERY_KEYS.assignmentTasks.all,
+    QUERY_KEYS.assignmentTasks.historyAll,
+    QUERY_KEYS.calendar.all,
+    QUERY_KEYS.home.stats,
+    QUERY_KEYS.my.assignments,
+    QUERY_KEYS.my.assignmentTasks,
+    ["my", "calendarEvents"],
+    ["students", "detail"],
+  ],
 });
 
 export const useAssignmentTaskUndo = () => {

@@ -31,7 +31,7 @@ import { ScoreInputModal } from "./(components)/ScoreInputModal";
 import { SubmissionModal } from "./(components)/SubmissionModal";
 import { useAssignmentCreate } from "./(hooks)/useAssignmentCreate";
 import { useAssignmentDelete } from "./(hooks)/useAssignmentDelete";
-import { useAssignmentSubmissions, useAssignmentSubmissionsSave } from "./(hooks)/useAssignmentSubmissions";
+import { useAssignmentSubmissions } from "./(hooks)/useAssignmentSubmissions";
 import { type Assignment, useAssignments } from "./(hooks)/useAssignments";
 import { useAssignmentUpdate } from "./(hooks)/useAssignmentUpdate";
 import { useCourseDetail } from "./(hooks)/useCourseDetail";
@@ -78,7 +78,6 @@ export default function CourseDetailPage() {
   const { createAssignment, isPending: isCreatingAssignment } = useAssignmentCreate(courseId);
   const { updateAssignment, isPending: isUpdatingAssignment } = useAssignmentUpdate(courseId);
   const { deleteAssignment } = useAssignmentDelete(courseId);
-  const { saveSubmissions, isPending: isSavingSubmissions } = useAssignmentSubmissionsSave();
 
   const [showAssignmentCreateModal, setShowAssignmentCreateModal] = useAtom(showAssignmentCreateModalAtom);
   const [showAssignmentEditModal, setShowAssignmentEditModal] = useAtom(showAssignmentEditModalAtom);
@@ -217,18 +216,6 @@ export default function CourseDetailPage() {
     setSubmissionAssignment(null);
   };
 
-  const handleSaveSubmissions = async (submissionsData: Array<{ studentId: string; status: string }>) => {
-    if (!submissionAssignment) return;
-
-    try {
-      await saveSubmissions({ assignmentId: submissionAssignment.id, submissions: submissionsData });
-      toast.success("저장되었습니다.");
-      handleCloseSubmissionModal();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "저장에 실패했습니다.");
-    }
-  };
-
   const loadingScores = loadingScoreStudents || loadingExistingScores;
   const loadingSubmissions = loadingSubmissionStudents || loadingExistingSubmissions;
 
@@ -285,7 +272,7 @@ export default function CourseDetailPage() {
         <button
           type="button"
           onClick={() => setActiveTab("exams")}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 text-label font-medium transition-colors ${
+          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
             activeTab === "exams"
               ? "bg-core-accent text-solid-white"
               : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-fill-standard-tertiary"
@@ -295,7 +282,7 @@ export default function CourseDetailPage() {
         <button
           type="button"
           onClick={() => setActiveTab("assignments")}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 text-label font-medium transition-colors ${
+          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
             activeTab === "assignments"
               ? "bg-core-accent text-solid-white"
               : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-fill-standard-tertiary"
@@ -384,8 +371,6 @@ export default function CourseDetailPage() {
         students={submissionStudents}
         isLoading={loadingSubmissions}
         existingSubmissions={existingSubmissions}
-        onSave={handleSaveSubmissions}
-        isSaving={isSavingSubmissions}
       />
     </Container>
   );

@@ -9,6 +9,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   const { data: current, error: fetchError } = await supabase
     .from("AssignmentTasks")
     .select(`
+      status,
       current_scheduled_date,
       assignment_id,
       student_id,
@@ -40,8 +41,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     .from("CourseAssignments")
     .update({ status: "완료", updated_at: new Date().toISOString() })
     .eq("assignment_id", current.assignment_id)
-    .eq("student_id", current.student_id)
-    .eq("status", "검사예정");
+    .eq("student_id", current.student_id);
 
   if (submissionUpdateError) throw submissionUpdateError;
 
@@ -50,6 +50,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     action_type: "complete",
     previous_date: previousDate,
     new_date: today,
+    previous_status: current.status,
+    new_status: "completed",
     note: note || null,
     performed_by: session.userId,
   });

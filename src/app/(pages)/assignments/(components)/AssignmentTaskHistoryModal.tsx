@@ -64,6 +64,7 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
   const canUndo = (item: RetakeHistory, index: number) => {
     if (index !== 0) return false;
     if (item.action_type === "note_update") return false;
+    if (item.action_type === "assign") return false;
     return true;
   };
 

@@ -82,7 +82,7 @@ export function AssignmentTable({ assignments, onManage, onEdit, onDelete }: Ass
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <Button variant="primary" size="xs" className="font-medium" onClick={() => onManage(assignment)}>
-                  제출 현황 입력
+                  제출 현황 확인
                 </Button>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

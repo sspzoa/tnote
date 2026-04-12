@@ -157,6 +157,8 @@ export type RetakeActionType =
   | "postpone"
   | "absent"
   | "complete"
+  | "insufficient"
+  | "not_submitted"
   | "status_change"
   | "management_status_change"
   | "note_update"
