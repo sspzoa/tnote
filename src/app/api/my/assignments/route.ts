@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 const handleGet = async ({ supabase, session }: ApiContext) => {
   const { data, error } = await supabase
-    .from("CourseAssignments")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select(`
       id,
       status,

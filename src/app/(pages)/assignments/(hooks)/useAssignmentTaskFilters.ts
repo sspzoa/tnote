@@ -13,7 +13,6 @@ import {
   selectedAssignmentIdAtom,
   selectedCourseAtom,
   selectedDateAtom,
-  selectedManagementStatusAtom,
   showCompletedAtom,
 } from "../(atoms)/useAssignmentTaskStore";
 import { useAssignmentTasks } from "./useAssignmentTasks";
@@ -22,7 +21,6 @@ export const useAssignmentTaskFilters = () => {
   const filter = useAtomValue(filterAtom);
   const selectedCourse = useAtomValue(selectedCourseAtom);
   const selectedAssignmentId = useAtomValue(selectedAssignmentIdAtom);
-  const selectedManagementStatus = useAtomValue(selectedManagementStatusAtom);
   const searchQuery = useAtomValue(searchQueryAtom);
   const showCompleted = useAtomValue(showCompletedAtom);
   const selectedDate = useAtomValue(selectedDateAtom);
@@ -36,8 +34,7 @@ export const useAssignmentTaskFilters = () => {
 
   // States that are considered "done" and hidden from the default list
   const HIDDEN_STATUSES = ["completed", "insufficient", "not_submitted"] as const;
-  const isHiddenStatus = (status: string) =>
-    (HIDDEN_STATUSES as readonly string[]).includes(status);
+  const isHiddenStatus = (status: string) => (HIDDEN_STATUSES as readonly string[]).includes(status);
 
   const incompleteCountByStudent = useMemo(
     () =>
@@ -108,7 +105,6 @@ export const useAssignmentTaskFilters = () => {
         .filter((task) => filter === "all" || task.status === filter)
         .filter((task) => selectedCourse === "all" || task.assignment.course.id === selectedCourse)
         .filter((task) => selectedAssignmentId === "all" || task.assignment.id === selectedAssignmentId)
-        .filter((task) => selectedManagementStatus === "all" || task.management_status === selectedManagementStatus)
         .filter((task) => selectedDate === "all" || task.current_scheduled_date === selectedDate)
         .filter((task) => task.student.name.toLowerCase().includes(searchQuery.toLowerCase()))
         .filter(
@@ -128,7 +124,6 @@ export const useAssignmentTaskFilters = () => {
       showCompleted,
       selectedCourse,
       selectedAssignmentId,
-      selectedManagementStatus,
       selectedDate,
       searchQuery,
       minIncompleteCount,

@@ -7,6 +7,7 @@ import {
   generateAdminClinicSessions,
   generateCourseSessions,
 } from "@/shared/lib/utils/calendar";
+import { STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 import type {
   CalendarAssignmentTaskData,
@@ -53,10 +54,10 @@ const fetchAssignmentTasks = async (
   workspace: string,
 ): Promise<CalendarAssignmentTaskData[]> => {
   const { data, error } = await supabase
-    .from("AssignmentTasks")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select(`
       id, current_scheduled_date, status,
-      student:Users!AssignmentTasks_student_id_fkey!inner(name, workspace),
+      student:Users!StudentAssignments_student_id_fkey!inner(name, workspace),
       assignment:Assignments!inner(id, name, course:Courses!inner(id, name))
     `)
     .eq("student.workspace", workspace);

@@ -1,18 +1,8 @@
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 import { createWorkflowAllHistory } from "@/shared/lib/workflow";
+import type { AssignmentTaskHistory } from "@/shared/types";
 
-export interface AssignmentTaskHistoryItem {
-  id: string;
-  action_type: string;
-  previous_date: string | null;
-  new_date: string | null;
-  previous_status: string | null;
-  new_status: string | null;
-  previous_management_status: string | null;
-  new_management_status: string | null;
-  note: string | null;
-  created_at: string;
-  performed_by: { id: string; name: string } | null;
+export interface AssignmentTaskHistoryItem extends AssignmentTaskHistory {
   task: {
     id: string;
     student: { id: string; name: string };

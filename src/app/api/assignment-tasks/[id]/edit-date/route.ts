@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_HISTORY_TABLE, STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
@@ -10,11 +11,11 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   }
 
   const { data: current, error: fetchError } = await supabase
-    .from("AssignmentTasks")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select(`
       current_scheduled_date,
       assignment:Assignments!inner(course:Courses!inner(workspace)),
-      student:Users!AssignmentTasks_student_id_fkey!inner(workspace)
+      student:Users!StudentAssignments_student_id_fkey!inner(workspace)
     `)
     .eq("id", id)
     .eq("assignment.course.workspace", session.workspace)
@@ -32,7 +33,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   }
 
   const { data: updated, error: updateError } = await supabase
-    .from("AssignmentTasks")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .update({
       current_scheduled_date: newDate,
     })
@@ -44,8 +45,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     throw new Error(`과제 업데이트 실패: ${updateError.message}`);
   }
 
-  const { error: historyError } = await supabase.from("AssignmentTaskHistory").insert({
-    assignment_task_id: id,
+  const { error: historyError } = await supabase.from(STUDENT_ASSIGNMENT_HISTORY_TABLE).insert({
+    student_assignment_id: id,
     action_type: "date_edit",
     previous_date: previousDate,
     new_date: newDate,

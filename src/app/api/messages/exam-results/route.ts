@@ -7,22 +7,12 @@ import {
   validateRecipientType,
 } from "@/shared/lib/services/messageSender";
 import { getTodayKorean } from "@/shared/lib/utils/date";
+import { STUDENT_ASSIGNMENT_TABLE, toAssignmentSubmissionStatus } from "@/shared/lib/utils/studentAssignments";
 
 import type { ExamAssignment, ExamScoreWithStudent, ExamWithCourseWorkspace } from "@/shared/types/api";
 
 const getAssignmentStatusText = (status: string): string => {
-  switch (status) {
-    case "완료":
-      return "완료";
-    case "미흡":
-      return "미흡";
-    case "미제출":
-      return "미제출";
-    case "검사예정":
-      return "검사예정";
-    default:
-      return "-";
-  }
+  return status ? toAssignmentSubmissionStatus(status) : "-";
 };
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
@@ -92,7 +82,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
   let assignmentData: ExamAssignment[] = [];
   if (matchingAssignment) {
     const { data: submissionData, error: assignmentsError } = await supabase
-      .from("CourseAssignments")
+      .from(STUDENT_ASSIGNMENT_TABLE)
       .select("student_id, status")
       .eq("assignment_id", matchingAssignment.id);
 

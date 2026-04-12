@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_TABLE, toAssignmentSubmissionStatus } from "@/shared/lib/utils/studentAssignments";
 
 interface AssignmentWorkspaceOnly {
   id: string;
@@ -23,21 +24,26 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   }
 
   const { data, error } = await supabase
-    .from("CourseAssignments")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select(`
       id,
       status,
-      student:Users!CourseAssignments_student_id_fkey(id, name, phone_number, school)
+      student:Users!StudentAssignments_student_id_fkey(id, name, phone_number, school)
     `)
     .eq("assignment_id", assignmentId);
 
   if (error) throw error;
-  return NextResponse.json({ data });
+  return NextResponse.json({
+    data: (data || []).map((record) => ({
+      ...record,
+      status: toAssignmentSubmissionStatus(record.status),
+    })),
+  });
 };
 
 const handlePost = async (_context: ApiContext) => {
   return NextResponse.json(
-    { error: "이 페이지에서는 제출 현황을 변경할 수 없습니다. 재과제 관리 페이지에서 변경해주세요." },
+    { error: "이 페이지에서는 제출 현황을 변경할 수 없습니다. 과제 관리 페이지에서 변경해주세요." },
     { status: 403 },
   );
 };

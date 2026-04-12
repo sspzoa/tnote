@@ -15,10 +15,8 @@ import {
   selectedAssignmentIdAtom,
   selectedCourseAtom,
   selectedDateAtom,
-  selectedManagementStatusAtom,
   showCompletedAtom,
 } from "../(atoms)/useAssignmentTaskStore";
-import { useAssignmentManagementStatuses } from "../(hooks)/useAssignmentManagementStatuses";
 import { useAssignmentsForFilter } from "../(hooks)/useAssignmentsForFilter";
 import { useCourses } from "../(hooks)/useCourses";
 
@@ -26,7 +24,6 @@ export default function AssignmentTaskFilters() {
   const [filter, setFilter] = useAtom(filterAtom);
   const [selectedCourse, setSelectedCourse] = useAtom(selectedCourseAtom);
   const [selectedAssignmentId, setSelectedAssignmentId] = useAtom(selectedAssignmentIdAtom);
-  const [selectedManagementStatus, setSelectedManagementStatus] = useAtom(selectedManagementStatusAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [showCompleted, setShowCompleted] = useAtom(showCompletedAtom);
   const [selectedDate, setSelectedDate] = useAtom(selectedDateAtom);
@@ -38,7 +35,6 @@ export default function AssignmentTaskFilters() {
 
   const { courses } = useCourses();
   const { assignments } = useAssignmentsForFilter(selectedCourse === "all" ? null : selectedCourse);
-  const { statuses: managementStatuses } = useAssignmentManagementStatuses();
 
   const handleCourseChange = (courseId: string) => {
     setSelectedCourse(courseId);
@@ -49,7 +45,6 @@ export default function AssignmentTaskFilters() {
     setFilter("all");
     setSelectedCourse("all");
     setSelectedAssignmentId("all");
-    setSelectedManagementStatus("all");
     setSearchQuery("");
     setSelectedDate("all");
     setMinIncompleteCount(0);
@@ -63,7 +58,6 @@ export default function AssignmentTaskFilters() {
     filter !== "all" ||
     selectedCourse !== "all" ||
     selectedAssignmentId !== "all" ||
-    selectedManagementStatus !== "all" ||
     searchQuery !== "" ||
     selectedDate !== "all" ||
     minIncompleteCount > 0 ||
@@ -101,17 +95,6 @@ export default function AssignmentTaskFilters() {
               <option value="completed">완료</option>
             </FilterSelect>
 
-            <FilterSelect
-              value={selectedManagementStatus}
-              onChange={(e) => setSelectedManagementStatus(e.target.value)}>
-              <option value="all">전체 관리 상태</option>
-              {managementStatuses.map((status) => (
-                <option key={status.id} value={status.name}>
-                  {status.name}
-                </option>
-              ))}
-            </FilterSelect>
-
             <input
               type="date"
               value={selectedDate === "all" ? "" : selectedDate}
@@ -124,7 +107,7 @@ export default function AssignmentTaskFilters() {
             <FilterSelect
               value={minIncompleteCount.toString()}
               onChange={(e) => setMinIncompleteCount(Number(e.target.value))}>
-              <option value="0">재과제</option>
+              <option value="0">미완료</option>
               <option value="2">2개 이상</option>
               <option value="3">3개 이상</option>
               <option value="4">4개 이상</option>

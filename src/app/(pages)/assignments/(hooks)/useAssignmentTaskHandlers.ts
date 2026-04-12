@@ -12,7 +12,6 @@ import {
   showCompleteModalAtom,
   showEditDateModalAtom,
   showHistoryModalAtom,
-  showManagementStatusModalAtom,
   showPostponeModalAtom,
   showStudentModalAtom,
 } from "../(atoms)/useModalStore";
@@ -27,7 +26,6 @@ export const useAssignmentTaskHandlers = (refetch: () => void) => {
   const setShowHistoryModal = useSetAtom(showHistoryModalAtom);
   const setShowAssignModal = useSetAtom(showAssignModalAtom);
   const setShowStudentModal = useSetAtom(showStudentModalAtom);
-  const setShowManagementStatusModal = useSetAtom(showManagementStatusModalAtom);
   const setShowEditDateModal = useSetAtom(showEditDateModalAtom);
   const setSelectedStudentId = useSetAtom(selectedStudentIdAtom);
   const setPostponeDate = useSetAtom(postponeDateAtom);
@@ -151,15 +149,6 @@ export const useAssignmentTaskHandlers = (refetch: () => void) => {
     setShowAssignModal(true);
   }, [setShowAssignModal]);
 
-  const handleManagementStatusChange = useCallback(
-    (task: AssignmentTask) => {
-      setSelectedTask(task);
-      setShowManagementStatusModal(true);
-      setOpenMenuId(null);
-    },
-    [setSelectedTask, setShowManagementStatusModal, setOpenMenuId],
-  );
-
   const handleEditDate = useCallback(
     (task: AssignmentTask) => {
       setSelectedTask(task);
@@ -184,7 +173,6 @@ export const useAssignmentTaskHandlers = (refetch: () => void) => {
     handleDelete,
     handleViewStudent,
     handleAssignClick,
-    handleManagementStatusChange,
     handleEditDate,
     handleActionSuccess,
   };

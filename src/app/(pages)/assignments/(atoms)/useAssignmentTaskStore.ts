@@ -14,7 +14,6 @@ export interface AssignStudent {
 
 const {
   selectedCourseAtom,
-  selectedManagementStatusAtom,
   openMenuIdAtom,
   searchQueryAtom,
   showCompletedAtom,
@@ -27,7 +26,6 @@ const {
 
 export {
   selectedCourseAtom,
-  selectedManagementStatusAtom,
   openMenuIdAtom,
   searchQueryAtom,
   showCompletedAtom,
@@ -38,13 +36,7 @@ export {
   minPostponeAbsentCountAtom,
 };
 
-export type AssignmentTaskFilterValue =
-  | "all"
-  | "pending"
-  | "completed"
-  | "insufficient"
-  | "not_submitted"
-  | "absent";
+export type AssignmentTaskFilterValue = "all" | "pending" | "completed" | "insufficient" | "not_submitted" | "absent";
 
 export const filterAtom = atom<AssignmentTaskFilterValue>("all");
 export const selectedAssignmentIdAtom = atom<string>("all");

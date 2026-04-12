@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_HISTORY_TABLE, STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 const VALID_STATUSES = ["pending", "completed"] as const;
 
@@ -12,8 +13,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   }
 
   const { data: task, error: fetchError } = await supabase
-    .from("AssignmentTasks")
-    .select(`*, student:Users!AssignmentTasks_student_id_fkey(workspace)`)
+    .from(STUDENT_ASSIGNMENT_TABLE)
+    .select(`*, student:Users!StudentAssignments_student_id_fkey(workspace)`)
     .eq("id", id)
     .single();
 
@@ -30,14 +31,14 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
     updateData.note = note;
   }
 
-  const { error: updateError } = await supabase.from("AssignmentTasks").update(updateData).eq("id", id);
+  const { error: updateError } = await supabase.from(STUDENT_ASSIGNMENT_TABLE).update(updateData).eq("id", id);
 
   if (updateError) {
     throw updateError;
   }
 
-  await supabase.from("AssignmentTaskHistory").insert({
-    assignment_task_id: id,
+  await supabase.from(STUDENT_ASSIGNMENT_HISTORY_TABLE).insert({
+    student_assignment_id: id,
     action_type: "status_change",
     previous_status: task.status,
     new_status: status,

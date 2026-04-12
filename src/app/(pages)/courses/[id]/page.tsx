@@ -172,8 +172,13 @@ export default function CourseDetailPage() {
 
   const handleAssignmentCreate = async (data: { name: string }) => {
     try {
-      await createAssignment({ courseId, name: data.name });
-      toast.success("과제가 생성되었습니다.");
+      const result = await createAssignment({ courseId, name: data.name });
+      const autoAssignedCount = typeof result?.autoAssignedCount === "number" ? result.autoAssignedCount : undefined;
+      toast.success(
+        autoAssignedCount != null
+          ? `과제가 생성되고 ${autoAssignedCount}명에게 자동 배정되었습니다.`
+          : "과제가 생성되었습니다.",
+      );
       setShowAssignmentCreateModal(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "과제 생성에 실패했습니다.");

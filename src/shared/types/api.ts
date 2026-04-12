@@ -178,24 +178,6 @@ export interface StudentDetailRetake {
   };
 }
 
-export interface StudentDetailAssignmentTask {
-  id: string;
-  status: string;
-  management_status: string;
-  current_scheduled_date: string | null;
-  postpone_count: number;
-  absent_count: number;
-  assignment: {
-    id: string;
-    name: string;
-    course: {
-      id: string;
-      name: string;
-      workspace: string;
-    };
-  };
-}
-
 // --- Message History query results ---
 
 export interface MessageHistoryQueryResult {

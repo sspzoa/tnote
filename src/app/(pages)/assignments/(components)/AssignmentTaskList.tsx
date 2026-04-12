@@ -12,9 +12,8 @@ import {
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { isTagActive } from "@/shared/lib/utils/tags";
-import type { AssignmentTask, StatusColor } from "@/shared/types";
+import type { AssignmentTask } from "@/shared/types";
 import { openMenuIdAtom } from "../(atoms)/useAssignmentTaskStore";
-import { useAssignmentManagementStatuses } from "../(hooks)/useAssignmentManagementStatuses";
 
 interface AssignmentTaskListProps {
   tasks: AssignmentTask[];
@@ -26,13 +25,12 @@ interface AssignmentTaskListProps {
   onMarkAbsent: (task: AssignmentTask) => void;
   onViewHistory: (task: AssignmentTask) => void;
   onDelete: (task: AssignmentTask) => void;
-  onManagementStatusChange: (task: AssignmentTask) => void;
   onEditDate: (task: AssignmentTask) => void;
 }
 
 const OPEN_STATUSES: ReadonlyArray<AssignmentTask["status"]> = ["pending", "absent"];
 
-type TaskSortKey = "student" | "assignment" | "scheduledDate" | "status" | "managementStatus";
+type TaskSortKey = "student" | "assignment" | "scheduledDate" | "status";
 
 export default function AssignmentTaskList({
   tasks,
@@ -44,12 +42,10 @@ export default function AssignmentTaskList({
   onMarkAbsent,
   onViewHistory,
   onDelete,
-  onManagementStatusChange,
   onEditDate,
 }: AssignmentTaskListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
-  const { statuses: managementStatuses } = useAssignmentManagementStatuses();
 
   const getMenuItems = useCallback(
     (task: AssignmentTask): DropdownMenuItem[] => {
@@ -78,16 +74,7 @@ export default function AssignmentTaskList({
 
       return items;
     },
-    [
-      onPostpone,
-      onComplete,
-      onMarkInsufficient,
-      onMarkNotSubmitted,
-      onMarkAbsent,
-      onViewHistory,
-      onEditDate,
-      onDelete,
-    ],
+    [onPostpone, onComplete, onMarkInsufficient, onMarkNotSubmitted, onMarkAbsent, onViewHistory, onEditDate, onDelete],
   );
 
   const comparators = useMemo(
@@ -97,8 +84,6 @@ export default function AssignmentTaskList({
       scheduledDate: (a: AssignmentTask, b: AssignmentTask) =>
         (a.current_scheduled_date || "").localeCompare(b.current_scheduled_date || ""),
       status: (a: AssignmentTask, b: AssignmentTask) => a.status.localeCompare(b.status),
-      managementStatus: (a: AssignmentTask, b: AssignmentTask) =>
-        a.management_status.localeCompare(b.management_status),
     }),
     [],
   );
@@ -131,12 +116,6 @@ export default function AssignmentTaskList({
     );
   };
 
-  const getManagementStatusBadge = (status: string) => {
-    const statusItem = managementStatuses.find((s) => s.name === status);
-    const color = (statusItem?.color ?? "neutral") as StatusColor;
-    return <Badge variant={color}>{status}</Badge>;
-  };
-
   return (
     <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
       <table className="w-full rounded-radius-400">
@@ -166,13 +145,6 @@ export default function AssignmentTaskList({
             <SortableHeader
               label="상태"
               sortKey="status"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="관리 상태"
-              sortKey="managementStatus"
               currentSortKey={sortState.key}
               currentDirection={sortState.direction}
               onSort={toggleSort}
@@ -225,11 +197,6 @@ export default function AssignmentTaskList({
                 </div>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">{getStatusBadge(task.status)}</td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <button onClick={() => onManagementStatusChange(task)} className="transition-opacity hover:opacity-70">
-                  {getManagementStatusBadge(task.management_status)}
-                </button>
-              </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <MoreOptionsButton
                   onClick={(pos) => {

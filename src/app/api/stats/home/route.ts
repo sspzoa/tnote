@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_OPEN_STATUSES, STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 const handleGet = async ({ supabase, session }: ApiContext) => {
   const today = new Date().toISOString().split("T")[0];
@@ -17,10 +18,10 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
       .eq("student.workspace", session.workspace)
       .eq("status", "pending"),
     supabase
-      .from("AssignmentTasks")
+      .from(STUDENT_ASSIGNMENT_TABLE)
       .select("id, assignment:Assignments!inner(course:Courses!inner(workspace))", { count: "exact", head: true })
       .eq("assignment.course.workspace", session.workspace)
-      .in("status", ["pending", "absent"]),
+      .in("status", [...STUDENT_ASSIGNMENT_OPEN_STATUSES]),
     supabase
       .from("Clinics")
       .select("id", { count: "exact", head: true })

@@ -31,7 +31,7 @@ const getEventTypeLabel = (type: CalendarEvent["type"]) => {
     case "clinic":
       return "클리닉";
     case "assignment":
-      return "재과제";
+      return "과제";
   }
 };
 

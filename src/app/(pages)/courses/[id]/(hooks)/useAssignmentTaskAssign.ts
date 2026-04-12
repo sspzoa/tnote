@@ -21,9 +21,12 @@ export const useAssignmentTaskAssign = () => {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignments.submissions(variables.assignmentId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.all });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.historyAll });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
     },
   });
   return { assignTasks: mutateAsync, isPending };

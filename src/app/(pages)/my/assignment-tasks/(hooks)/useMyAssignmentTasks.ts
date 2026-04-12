@@ -5,7 +5,6 @@ import { QUERY_KEYS } from "@/shared/lib/queryKeys";
 export interface MyAssignmentTask {
   id: string;
   status: string;
-  managementStatus: string;
   scheduledDate: string | null;
   postponeCount: number;
   assignment: {
@@ -18,7 +17,6 @@ export interface MyAssignmentTask {
 interface RawAssignmentTask {
   id: string;
   status: string;
-  management_status: string;
   current_scheduled_date: string | null;
   postpone_count: number;
   assignment: {
@@ -38,7 +36,6 @@ export const useMyAssignmentTasks = () => {
       return ((result.data as RawAssignmentTask[]) || []).map((t) => ({
         id: t.id,
         status: t.status,
-        managementStatus: t.management_status,
         scheduledDate: t.current_scheduled_date,
         postponeCount: t.postpone_count,
         assignment: {

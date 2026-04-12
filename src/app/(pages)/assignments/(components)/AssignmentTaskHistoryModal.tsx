@@ -7,7 +7,7 @@ import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
-import type { RetakeHistory } from "@/shared/types";
+import type { AssignmentTaskHistory } from "@/shared/types";
 import { selectedTaskAtom } from "../(atoms)/useAssignmentTaskStore";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
 import { useAssignmentTaskHistory } from "../(hooks)/useAssignmentTaskHistory";
@@ -40,7 +40,6 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
       not_submitted: "미제출",
       absent: "결석",
       status_change: "상태 변경",
-      management_status_change: "관리 상태 변경",
       note_update: "메모 수정",
       date_edit: "날짜 수정",
     };
@@ -55,20 +54,19 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
     if (actionType === "not_submitted") return "red";
     if (actionType === "absent") return "red";
     if (actionType === "status_change") return "purple";
-    if (actionType === "management_status_change") return "yellow";
     if (actionType === "date_edit") return "blue";
     if (actionType === "note_update") return "neutral";
     return "neutral";
   };
 
-  const canUndo = (item: RetakeHistory, index: number) => {
+  const canUndo = (item: AssignmentTaskHistory, index: number) => {
     if (index !== 0) return false;
     if (item.action_type === "note_update") return false;
     if (item.action_type === "assign") return false;
     return true;
   };
 
-  const handleUndo = async (item: RetakeHistory) => {
+  const handleUndo = async (item: AssignmentTaskHistory) => {
     if (!selectedTask) return;
 
     if (!confirm(`"${getActionLabel(item.action_type)}" 작업을 되돌리시겠습니까?`)) {
@@ -140,13 +138,6 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
                       {item.new_status === "completed" ? "완료" : "미완료"}
                     </span>
                   )}
-                  {item.action_type === "management_status_change" &&
-                    item.previous_management_status &&
-                    item.new_management_status && (
-                      <span className="truncate text-body text-content-standard-primary">
-                        {item.previous_management_status} → {item.new_management_status}
-                      </span>
-                    )}
                 </div>
                 <div className="flex shrink-0 items-center gap-spacing-300">
                   <div className="flex shrink-0 flex-col items-end gap-spacing-50">

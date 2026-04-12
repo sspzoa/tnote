@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_HISTORY_TABLE, STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 const handlePatch = async ({ request, supabase, session, params }: ApiContext) => {
   const id = params?.id;
   const { note } = await request.json();
 
   const { data: current, error: fetchError } = await supabase
-    .from("AssignmentTasks")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select(`
       status,
-      current_scheduled_date,
-      assignment_id,
-      student_id,
       assignment:Assignments!inner(course:Courses!inner(workspace)),
-      student:Users!AssignmentTasks_student_id_fkey!inner(workspace)
+      student:Users!StudentAssignments_student_id_fkey!inner(workspace)
     `)
     .eq("id", id)
     .eq("assignment.course.workspace", session.workspace)
@@ -25,7 +23,7 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
   }
 
   const { data: updated, error: updateError } = await supabase
-    .from("AssignmentTasks")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .update({ status: "not_submitted" })
     .eq("id", id)
     .select()
@@ -33,16 +31,8 @@ const handlePatch = async ({ request, supabase, session, params }: ApiContext) =
 
   if (updateError) throw updateError;
 
-  const { error: submissionUpdateError } = await supabase
-    .from("CourseAssignments")
-    .update({ status: "미제출", updated_at: new Date().toISOString() })
-    .eq("assignment_id", current.assignment_id)
-    .eq("student_id", current.student_id);
-
-  if (submissionUpdateError) throw submissionUpdateError;
-
-  const { error: historyError } = await supabase.from("AssignmentTaskHistory").insert({
-    assignment_task_id: id,
+  const { error: historyError } = await supabase.from(STUDENT_ASSIGNMENT_HISTORY_TABLE).insert({
+    student_assignment_id: id,
     action_type: "not_submitted",
     previous_status: current.status,
     new_status: "not_submitted",

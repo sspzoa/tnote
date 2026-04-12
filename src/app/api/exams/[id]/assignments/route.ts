@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import {
+  STUDENT_ASSIGNMENT_TABLE,
+  toAssignmentSubmissionStatus,
+  toStudentAssignmentStatus,
+} from "@/shared/lib/utils/studentAssignments";
 
 interface ExamWithNameCourse {
   id: string;
@@ -41,16 +46,21 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   }
 
   const { data, error } = await supabase
-    .from("CourseAssignments")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select(`
       id,
       status,
-      student:Users!CourseAssignments_student_id_fkey(id, name, phone_number, school)
+      student:Users!StudentAssignments_student_id_fkey(id, name, phone_number, school)
     `)
     .eq("assignment_id", assignment.id);
 
   if (error) throw error;
-  return NextResponse.json({ data });
+  return NextResponse.json({
+    data: (data || []).map((record) => ({
+      ...record,
+      status: toAssignmentSubmissionStatus(record.status),
+    })),
+  });
 };
 
 const handlePost = async ({ request, supabase, session, params }: ApiContext) => {
@@ -104,7 +114,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   const assignmentId = matchingAssignment.id;
 
   const { data: existingRecords, error: fetchError } = await supabase
-    .from("CourseAssignments")
+    .from(STUDENT_ASSIGNMENT_TABLE)
     .select("id, student_id")
     .eq("assignment_id", assignmentId);
 
@@ -114,7 +124,7 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
   const toDelete = existingRecords?.filter((r) => !newStudentIds.has(r.student_id)).map((r) => r.id) || [];
 
   if (toDelete.length > 0) {
-    const { error: deleteError } = await supabase.from("CourseAssignments").delete().in("id", toDelete);
+    const { error: deleteError } = await supabase.from(STUDENT_ASSIGNMENT_TABLE).delete().in("id", toDelete);
     if (deleteError) throw deleteError;
   }
 
@@ -122,12 +132,12 @@ const handlePost = async ({ request, supabase, session, params }: ApiContext) =>
     const records = assignments.map((a) => ({
       assignment_id: assignmentId,
       student_id: a.studentId,
-      status: a.status,
+      status: toStudentAssignmentStatus(a.status),
       updated_at: new Date().toISOString(),
     }));
 
     const { error } = await supabase
-      .from("CourseAssignments")
+      .from(STUDENT_ASSIGNMENT_TABLE)
       .upsert(records, { onConflict: "assignment_id,student_id" });
 
     if (error) throw error;

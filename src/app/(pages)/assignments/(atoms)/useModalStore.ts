@@ -6,9 +6,7 @@ const {
   showHistoryModalAtom,
   showStudentModalAtom,
   showAssignModalAtom,
-  showManagementStatusModalAtom,
   showEditDateModalAtom,
-  showManagementStatusSettingsModalAtom,
   selectedStudentIdAtom,
 } = createWorkflowModalAtoms();
 
@@ -18,8 +16,6 @@ export {
   showHistoryModalAtom,
   showStudentModalAtom,
   showAssignModalAtom,
-  showManagementStatusModalAtom,
   showEditDateModalAtom,
-  showManagementStatusSettingsModalAtom,
   selectedStudentIdAtom,
 };

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchWithAuth } from "@/shared/lib/api/fetchWithAuth";
 import { QUERY_KEYS } from "@/shared/lib/queryKeys";
+import { toAssignmentSubmissionStatus } from "@/shared/lib/utils/studentAssignments";
 
 export interface MyAssignment {
   id: string;
@@ -36,7 +37,7 @@ export const useMyAssignments = () => {
       if (!res.ok) throw new Error(result.error);
       return ((result.data as RawAssignment[]) || []).map((a) => ({
         id: a.id,
-        status: a.status,
+        status: toAssignmentSubmissionStatus(a.status),
         updatedAt: a.updated_at,
         assignment: {
           id: a.assignment.id,

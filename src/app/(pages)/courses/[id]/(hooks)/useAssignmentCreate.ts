@@ -27,6 +27,10 @@ export const useAssignmentCreate = (courseId: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignments.byCourse(courseId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.assignmentTasks.historyAll });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.home.stats });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar.all });
     },
   });
 

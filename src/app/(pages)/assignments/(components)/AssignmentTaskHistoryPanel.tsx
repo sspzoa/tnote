@@ -20,7 +20,6 @@ const getActionLabel = (actionType: string) => {
     not_submitted: "미제출",
     absent: "결석",
     status_change: "상태 변경",
-    management_status_change: "관리 상태 변경",
     note_update: "메모 수정",
     date_edit: "날짜 수정",
   };
@@ -35,7 +34,6 @@ const getActionBadgeVariant = (actionType: string): BadgeVariant => {
   if (actionType === "not_submitted") return "red";
   if (actionType === "absent") return "red";
   if (actionType === "status_change") return "purple";
-  if (actionType === "management_status_change") return "yellow";
   if (actionType === "date_edit") return "blue";
   return "neutral";
 };
@@ -109,14 +107,6 @@ export default function AssignmentTaskHistoryPanel({
                       <span className="font-medium text-content-standard-primary text-footnote">{item.new_date}</span>
                     </div>
                   )}
-
-                {item.action_type === "management_status_change" && item.new_management_status && (
-                  <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-yellow px-spacing-300 py-spacing-200">
-                    <span className="text-footnote text-solid-yellow">
-                      {item.previous_management_status} → {item.new_management_status}
-                    </span>
-                  </div>
-                )}
 
                 {item.note && (
                   <div className="truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
 import { parseDatePrefix } from "@/shared/lib/utils/sort";
+import { STUDENT_ASSIGNMENT_TABLE, toAssignmentSubmissionStatus } from "@/shared/lib/utils/studentAssignments";
 import type {
   StudentDetailAssignment,
-  StudentDetailAssignmentTask,
   StudentDetailClinicAttendance,
   StudentDetailEnrollment,
   StudentDetailExamScore,
@@ -87,7 +87,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       .eq("clinic.workspace", session.workspace)
       .order("attendance_date", { ascending: false }),
     supabase
-      .from("CourseAssignments")
+      .from(STUDENT_ASSIGNMENT_TABLE)
       .select(`
           id,
           status,
@@ -119,11 +119,10 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       .eq("student_id", studentId)
       .eq("exam.course.workspace", session.workspace),
     supabase
-      .from("AssignmentTasks")
+      .from(STUDENT_ASSIGNMENT_TABLE)
       .select(`
           id,
           status,
-          management_status,
           current_scheduled_date,
           postpone_count,
           absent_count,
@@ -281,7 +280,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   const assignmentHistory = ((assignmentResult.data as unknown as StudentDetailAssignment[]) || [])
     .map((record) => ({
       id: record.id,
-      status: record.status,
+      status: toAssignmentSubmissionStatus(record.status),
       assignment: {
         id: record.assignment.id,
         name: record.assignment.name,
@@ -318,29 +317,7 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
       return new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime();
     });
 
-  const assignmentTaskHistory = ((assignmentTaskResult.data as unknown as StudentDetailAssignmentTask[]) || [])
-    .map((record) => ({
-      id: record.id,
-      status: record.status,
-      managementStatus: record.management_status,
-      scheduledDate: record.current_scheduled_date,
-      postponeCount: record.postpone_count,
-      absentCount: record.absent_count,
-      assignment: {
-        id: record.assignment.id,
-        name: record.assignment.name,
-        course: {
-          id: record.assignment.course.id,
-          name: record.assignment.course.name,
-        },
-      },
-    }))
-    .sort((a, b) => {
-      if (!a.scheduledDate && !b.scheduledDate) return 0;
-      if (!a.scheduledDate) return 1;
-      if (!b.scheduledDate) return -1;
-      return new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime();
-    });
+  const assignmentTaskHistory: [] = [];
 
   interface ConsultationRow {
     id: string;

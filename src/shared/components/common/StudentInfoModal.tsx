@@ -365,7 +365,7 @@ export default function StudentInfoModal({
           {studentDetail.assignmentTaskHistory && studentDetail.assignmentTaskHistory.length > 0 && (
             <section className="flex flex-col gap-spacing-300">
               <h3 className="font-semibold text-body text-content-standard-primary">
-                재과제 관리
+                과제 관리
                 <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
                   ({Math.min(5, studentDetail.assignmentTaskHistory.length)}/
                   {studentDetail.assignmentTaskHistory.length}개)
@@ -400,11 +400,7 @@ export default function StudentInfoModal({
                     </div>
                     <Badge
                       variant={
-                        task.status === "completed"
-                          ? "success"
-                          : task.status === "pending"
-                            ? "warning"
-                            : "danger"
+                        task.status === "completed" ? "success" : task.status === "pending" ? "warning" : "danger"
                       }
                       size="xs">
                       {(

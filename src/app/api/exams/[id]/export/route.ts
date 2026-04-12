@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type ApiContext, withLogging } from "@/shared/lib/api/withLogging";
+import { STUDENT_ASSIGNMENT_TABLE, toAssignmentSubmissionStatus } from "@/shared/lib/utils/studentAssignments";
 
 interface ExamScore {
   student_id: string;
@@ -65,15 +66,31 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
 
   if (scoresError) throw scoresError;
 
-  const { data: assignments, error: assignmentsError } = await supabase
-    .from("CourseAssignments")
-    .select("student_id, status")
-    .eq("exam_id", examId);
+  const course = exam.course as unknown as { id: string; name: string; workspace: string };
 
-  if (assignmentsError) throw assignmentsError;
+  const { data: matchingAssignment } = await supabase
+    .from("Assignments")
+    .select("id")
+    .eq("course_id", course.id)
+    .eq("name", exam.name)
+    .single();
+
+  let assignments: CourseAssignment[] = [];
+  if (matchingAssignment) {
+    const { data: assignmentRows, error: assignmentsError } = await supabase
+      .from(STUDENT_ASSIGNMENT_TABLE)
+      .select("student_id, status")
+      .eq("assignment_id", matchingAssignment.id);
+
+    if (assignmentsError) throw assignmentsError;
+    assignments = ((assignmentRows || []) as CourseAssignment[]).map((row) => ({
+      ...row,
+      status: toAssignmentSubmissionStatus(row.status),
+    }));
+  }
 
   const typedScores = (scores || []) as unknown as ExamScore[];
-  const typedAssignments = (assignments || []) as unknown as CourseAssignment[];
+  const typedAssignments = assignments;
 
   const studentIds = typedScores.map((s) => s.student_id);
 
@@ -123,8 +140,6 @@ const handleGet = async ({ supabase, session, params }: ApiContext) => {
   for (const assignment of typedAssignments) {
     assignmentMap.set(assignment.student_id, assignment.status);
   }
-
-  const course = exam.course as unknown as { id: string; name: string; workspace: string };
 
   const rows = typedScores.map((scoreData) => ({
     studentId: scoreData.student.id,

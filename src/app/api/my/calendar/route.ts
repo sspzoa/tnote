@@ -7,6 +7,7 @@ import {
   generateClinicSessions,
   generateCourseSessions,
 } from "@/shared/lib/utils/calendar";
+import { STUDENT_ASSIGNMENT_TABLE } from "@/shared/lib/utils/studentAssignments";
 
 import type {
   CalendarAssignmentTaskData,
@@ -36,7 +37,7 @@ const handleGet = async ({ request, supabase, session }: ApiContext) => {
       .eq("student_id", studentId),
 
     supabase
-      .from("AssignmentTasks")
+      .from(STUDENT_ASSIGNMENT_TABLE)
       .select(
         "id, current_scheduled_date, status, assignment:Assignments!inner(id, name, course:Courses!inner(id, name))",
       )

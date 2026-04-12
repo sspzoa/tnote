@@ -383,7 +383,7 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
   );
 };
 
-const AssignmentTaskTable = ({ tasks, printHidden }: { tasks: AssignmentTaskHistoryInfo[]; printHidden: boolean }) => {
+const _AssignmentTaskTable = ({ tasks, printHidden }: { tasks: AssignmentTaskHistoryInfo[]; printHidden: boolean }) => {
   const comparators = useMemo(
     () => ({
       assignment: (a: AssignmentTaskHistoryInfo, b: AssignmentTaskHistoryInfo) =>
@@ -405,7 +405,7 @@ const AssignmentTaskTable = ({ tasks, printHidden }: { tasks: AssignmentTaskHist
   return (
     <section className={printHidden ? "print:hidden" : ""}>
       <DashboardCard
-        title="재과제 이력"
+        title="과제 이력"
         icon={FileText}
         isEmpty={tasks.length === 0}
         emptyMessage="과제 기록이 없습니다."
@@ -556,10 +556,10 @@ export default function StudentDetailPage() {
     (r) => r.status === "pending" || r.status === "absent",
   ).length;
   const totalRetakes = studentDetail.retakeHistory.length;
-  const pendingAssignmentTasks = (studentDetail.assignmentTaskHistory || []).filter(
-    (t) => t.status === "pending" || t.status === "absent",
+  const pendingAssignmentTasks = (studentDetail.assignmentHistory || []).filter(
+    (assignment) => assignment.status !== "완료",
   ).length;
-  const totalAssignmentTasks = (studentDetail.assignmentTaskHistory || []).length;
+  const totalAssignmentTasks = (studentDetail.assignmentHistory || []).length;
   const consultationCount = studentDetail.consultationHistory.length;
 
   return (
@@ -631,7 +631,7 @@ export default function StudentDetailPage() {
         </section>
 
         <section
-          className={`grid grid-cols-2 gap-spacing-400 print:gap-spacing-200 lg:grid-cols-5 ${
+          className={`grid grid-cols-2 gap-spacing-400 lg:grid-cols-5 print:gap-spacing-200 ${
             {
               1: "print:grid-cols-1",
               2: "print:grid-cols-2",
@@ -670,7 +670,7 @@ export default function StudentDetailPage() {
           <div className={printOptions.retakes ? "" : "print:hidden"}>
             <StatCard
               icon={FileCheck}
-              label="재과제"
+              label="과제 미완료"
               value={`${pendingAssignmentTasks}건`}
               subValue={`전체 ${totalAssignmentTasks}건 중`}
             />
@@ -715,7 +715,6 @@ export default function StudentDetailPage() {
       <AssignmentHistoryTable assignments={studentDetail.assignmentHistory} printHidden={!printOptions.exams} />
 
       <RetakeTable retakes={studentDetail.retakeHistory} printHidden={!printOptions.retakes} />
-      <AssignmentTaskTable tasks={studentDetail.assignmentTaskHistory} printHidden={!printOptions.retakes} />
       <section className={printOptions.clinics ? "" : "print:hidden"}>
         <DashboardCard
           title="클리닉 출석"

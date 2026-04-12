@@ -31,6 +31,7 @@ const SUBMISSION_STATUS_META = {
   미흡: { variant: "warning", label: "미흡" },
   미제출: { variant: "danger", label: "미제출" },
   검사예정: { variant: "info", label: "검사예정" },
+  미배정: { variant: "neutral", label: "미배정" },
 } as const;
 
 export function SubmissionModal({
@@ -50,7 +51,7 @@ export function SubmissionModal({
     if (isOpen && students.length > 0) {
       const initialSubmissions: Record<string, string> = {};
       for (const student of students) {
-        initialSubmissions[student.id] = "검사예정";
+        initialSubmissions[student.id] = "미배정";
       }
       for (const submission of existingSubmissions) {
         initialSubmissions[submission.student.id] = submission.status;
@@ -70,21 +71,22 @@ export function SubmissionModal({
   const handleAssign = async () => {
     if (!assignment) return;
 
-    const incompleteStudentIds = Object.entries(submissionStatuses)
-      .filter(([, status]) => status === "검사예정")
-      .map(([studentId]) => studentId);
+    const assignedStudentIds = new Set(existingSubmissions.map((submission) => submission.student.id));
+    const unassignedStudentIds = students
+      .filter((student) => !assignedStudentIds.has(student.id))
+      .map((student) => student.id);
 
-    if (incompleteStudentIds.length === 0) {
-      toast.info("검사예정 학생이 없습니다.");
+    if (unassignedStudentIds.length === 0) {
+      toast.info("미배정 학생이 없습니다.");
       return;
     }
 
     try {
-      await assignTasks({ assignmentId: assignment.id, studentIds: incompleteStudentIds });
-      toast.success(`${incompleteStudentIds.length}명의 학생에게 재과제를 할당했습니다.`);
+      await assignTasks({ assignmentId: assignment.id, studentIds: unassignedStudentIds });
+      toast.success(`${unassignedStudentIds.length}명의 학생을 추가 배정했습니다.`);
     } catch (error) {
       if (error instanceof Error && error.message === "CONFLICT") {
-        toast.error("이미 할당된 학생이 있습니다.");
+        toast.error("이미 배정된 학생이 포함되어 있습니다.");
       } else {
         toast.error(error instanceof Error ? error.message : "과제 할당에 실패했습니다.");
       }
@@ -110,7 +112,7 @@ export function SubmissionModal({
           <div className="flex flex-col gap-spacing-100 text-body">
             <span className="text-content-standard-secondary">입력: {submissionCount}명</span>
             <span className="text-content-standard-tertiary text-footnote">
-              제출 상태 변경은 재과제 관리 페이지에서만 가능합니다.
+              상태 변경은 과제 관리 페이지에서만 가능합니다.
             </span>
           </div>
           <div className="flex gap-spacing-300">
@@ -124,7 +126,7 @@ export function SubmissionModal({
               isLoading={isAssigning}
               loadingText="할당 중..."
               className="flex-1">
-              재과제 할당
+              미배정 학생 배정
             </Button>
           </div>
         </div>
@@ -153,10 +155,10 @@ export function SubmissionModal({
               <StudentListEmpty message="검색 결과가 없습니다." />
             ) : (
               filteredStudents.map((student) => {
-                const currentStatus = submissionStatuses[student.id] || "검사예정";
+                const currentStatus = submissionStatuses[student.id] || "미배정";
                 const statusMeta =
                   SUBMISSION_STATUS_META[currentStatus as keyof typeof SUBMISSION_STATUS_META] ??
-                  SUBMISSION_STATUS_META["검사예정"];
+                  SUBMISSION_STATUS_META["미배정"];
 
                 return (
                   <StudentListItem

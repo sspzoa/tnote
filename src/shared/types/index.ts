@@ -144,7 +144,6 @@ export interface AssignmentTask {
   student_id: string;
   current_scheduled_date: string | null;
   status: AssignmentTaskStatus;
-  management_status: ManagementStatus;
   postpone_count: number;
   absent_count: number;
   note: string | null;
@@ -164,6 +163,17 @@ export type RetakeActionType =
   | "note_update"
   | "date_edit";
 
+export type AssignmentTaskActionType =
+  | "assign"
+  | "postpone"
+  | "absent"
+  | "complete"
+  | "insufficient"
+  | "not_submitted"
+  | "status_change"
+  | "note_update"
+  | "date_edit";
+
 export interface RetakeHistory {
   id: string;
   action_type: RetakeActionType;
@@ -173,6 +183,21 @@ export interface RetakeHistory {
   new_status: string | null;
   previous_management_status: string | null;
   new_management_status: string | null;
+  note: string | null;
+  created_at: string;
+  performed_by: {
+    id: string;
+    name: string;
+  } | null;
+}
+
+export interface AssignmentTaskHistory {
+  id: string;
+  action_type: AssignmentTaskActionType;
+  previous_date: string | null;
+  new_date: string | null;
+  previous_status: string | null;
+  new_status: string | null;
   note: string | null;
   created_at: string;
   performed_by: {

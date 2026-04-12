@@ -101,7 +101,7 @@ export default function CalendarToolbar({
               : "bg-components-fill-standard-secondary opacity-50"
           }`}>
           <div className="h-3 w-3 rounded-radius-100 bg-[#F59E0B]" />
-          <span className="text-content-standard-secondary text-footnote">재과제</span>
+          <span className="text-content-standard-secondary text-footnote">과제</span>
         </button>
       </div>
     </div>
