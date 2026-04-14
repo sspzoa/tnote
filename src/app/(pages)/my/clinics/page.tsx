@@ -10,14 +10,8 @@ import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useUser } from "@/shared/hooks/useUser";
+import { formatClinicWeekdays } from "@/shared/lib/utils/date";
 import { type MyClinicRecord, useMyClinicAttendance } from "./(hooks)/useMyClinicAttendance";
-
-const WEEKDAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-
-const formatClinicWeekdays = (days: number[] | null): string => {
-  if (!days || days.length === 0) return "";
-  return days.map((d) => WEEKDAY_NAMES[d]).join(", ");
-};
 
 type ClinicSortKey = "date" | "clinic";
 
@@ -47,7 +41,7 @@ export default function MyClinicPage() {
         title="클리닉 출석"
         subtitle={
           user?.requiredClinicWeekdays && user.requiredClinicWeekdays.length > 0
-            ? `필참요일: ${formatClinicWeekdays(user.requiredClinicWeekdays)}`
+            ? `필참요일: ${formatClinicWeekdays(user.requiredClinicWeekdays, "")}`
             : undefined
         }
         backLink={{ href: "/", label: "홈으로 돌아가기" }}

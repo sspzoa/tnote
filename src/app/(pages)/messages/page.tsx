@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
 import { Button, SegmentedControl, Skeleton, SlidePanel } from "@/shared/components/ui";
+import { formatLocaleDateKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { activeTabAtom, type MessageTab, showHistoryModalAtom } from "./(atoms)/useMessageStore";
 import ExamResultsTab from "./(components)/ExamResultsTab";
 import GeneralTab from "./(components)/GeneralTab";
@@ -48,21 +50,11 @@ const getMessageTypeBadgeStyle = (type: string) => {
   return "bg-components-fill-standard-secondary text-content-standard-secondary";
 };
 
-const formatPhoneNumber = (phone: string) => {
-  if (phone.length === 11) {
-    return `${phone.slice(0, 3)}-${phone.slice(3, 7)}-${phone.slice(7)}`;
-  }
-  if (phone.length === 10) {
-    return `${phone.slice(0, 3)}-${phone.slice(3, 6)}-${phone.slice(6)}`;
-  }
-  return phone;
-};
-
 const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const createdAt = new Date(batch.created_at);
-  const dateStr = createdAt.toLocaleDateString("ko-KR");
-  const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+  const dateStr = formatLocaleDateKorean(createdAt);
+  const timeStr = formatLocaleTimeKorean(createdAt);
 
   const title =
     batch.recipients.length === 1
@@ -145,18 +137,6 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
   );
 };
 
-const formatPhoneNumberDisplay = (phone: string | null): string => {
-  if (!phone) return "미설정";
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.length === 11) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
-  }
-  if (cleaned.length === 10) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-  return phone;
-};
-
 export default function MessagesPage() {
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const [showHistoryPanel, setShowHistoryPanel] = useAtom(showHistoryModalAtom);
@@ -205,7 +185,7 @@ export default function MessagesPage() {
                 <Skeleton className="h-5 w-28" />
               ) : (
                 <span className={senderPhoneNumber ? "text-core-accent" : "text-core-status-negative"}>
-                  {formatPhoneNumberDisplay(senderPhoneNumber)}
+                  {senderPhoneNumber ? formatPhoneNumber(senderPhoneNumber) : "미설정"}
                 </span>
               )}
               <Settings className="size-3 text-content-standard-tertiary" />

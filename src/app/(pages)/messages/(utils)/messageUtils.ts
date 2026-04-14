@@ -1,3 +1,4 @@
+import { formatDateMD, getTodayKorean } from "@/shared/lib/utils/date";
 import type { RecipientType } from "@/shared/types";
 
 export const RECIPIENT_OPTIONS: { value: RecipientType; label: string }[] = [
@@ -30,17 +31,9 @@ export const getMessageType = (byteLength: number): { isLMS: boolean; maxBytes: 
   };
 };
 
-export const getTodayFormatted = (): string => {
-  const today = new Date();
-  const days = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${today.getMonth() + 1}/${today.getDate()}(${days[today.getDay()]})`;
-};
+export const getTodayFormatted = getTodayKorean;
 
-export const formatDate = (dateString: string | null): string => {
-  if (!dateString) return "미정";
-  const date = new Date(dateString);
-  return `${date.getMonth() + 1}/${date.getDate()}`;
-};
+export const formatDate = formatDateMD;
 
 export interface TemplateVariable {
   key: string;

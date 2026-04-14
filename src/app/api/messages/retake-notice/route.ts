@@ -6,7 +6,7 @@ import {
   sendMessagesWithHistory,
   validateRecipientType,
 } from "@/shared/lib/services/messageSender";
-import { getTodayKorean } from "@/shared/lib/utils/date";
+import { formatDateLongKorean, getTodayKorean } from "@/shared/lib/utils/date";
 
 interface RetakeWithDetails {
   id: string;
@@ -28,12 +28,6 @@ interface RetakeWithDetails {
     parent_phone_number: string | null;
   };
 }
-
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return "미정";
-  const date = new Date(dateString);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 const handlePost = async ({ request, supabase, session }: ApiContext) => {
   const smsConfig = await getWorkspaceSMSConfig(supabase, session.workspace);
@@ -98,7 +92,7 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
       .replace(/{수업명}/g, s._retake.exam.course.name)
       .replace(/{시험명}/g, s._retake.exam.name)
       .replace(/{회차}/g, String(s._retake.exam.exam_number))
-      .replace(/{예정일}/g, formatDate(s._retake.current_scheduled_date))
+      .replace(/{예정일}/g, formatDateLongKorean(s._retake.current_scheduled_date))
       .replace(/{상태}/g, s._retake.status === "pending" ? "예정" : s._retake.status === "completed" ? "완료" : "불참")
       .replace(/{오늘날짜}/g, todayStr);
   });

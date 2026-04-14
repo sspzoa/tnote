@@ -7,6 +7,7 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Badge, Button, EmptyState, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
+import { formatLocaleDateKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { ConsultationWithDetails } from "@/shared/types";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
@@ -176,8 +177,8 @@ export default function StudentsPage() {
           <div className="divide-y divide-line-divider">
             {consultations.map((consultation) => {
               const createdAt = new Date(consultation.created_at);
-              const dateStr = createdAt.toLocaleDateString("ko-KR");
-              const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+              const dateStr = formatLocaleDateKorean(createdAt);
+              const timeStr = formatLocaleTimeKorean(createdAt);
               const edited = isEdited(consultation);
 
               return (

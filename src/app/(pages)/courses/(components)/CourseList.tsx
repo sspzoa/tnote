@@ -11,6 +11,7 @@ import {
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
+import { formatDateDotYMD } from "@/shared/lib/utils/date";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
@@ -21,12 +22,6 @@ interface CourseListProps {
 }
 
 type CourseSortKey = "name" | "studentCount";
-
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
-};
 
 export default function CourseList({ courses }: CourseListProps) {
   const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
@@ -134,7 +129,7 @@ export default function CourseList({ courses }: CourseListProps) {
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span className="text-body text-content-standard-secondary">
-                  {formatDate(course.start_date)} ~ {formatDate(course.end_date)}
+                  {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
                 </span>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

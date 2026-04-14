@@ -6,19 +6,8 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
+import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { useSenderPhone } from "../(hooks)/useSenderPhone";
-
-const formatPhoneForDisplay = (phone: string | null): string => {
-  if (!phone) return "";
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.length === 11) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
-  }
-  if (cleaned.length === 10) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-  return phone;
-};
 
 interface SenderPhoneSettingsProps {
   isOpen: boolean;
@@ -32,7 +21,7 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
 
   useEffect(() => {
     if (isOpen) {
-      setPhoneInput(formatPhoneForDisplay(senderPhoneNumber));
+      setPhoneInput(senderPhoneNumber ? formatPhoneNumber(senderPhoneNumber) : "");
       setError(null);
     }
   }, [isOpen, senderPhoneNumber]);

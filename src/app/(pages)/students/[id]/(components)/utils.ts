@@ -1,8 +1,7 @@
 import type { BadgeVariant } from "@/shared/components/ui/badge";
+import { formatCourseDaysOfWeek } from "@/shared/lib/utils/date";
 
 export { isTagActive } from "@/shared/lib/utils/tags";
-
-export const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
 
 export const RETAKE_STATUS_LABELS: Record<string, string> = {
   pending: "대기중",
@@ -10,10 +9,7 @@ export const RETAKE_STATUS_LABELS: Record<string, string> = {
   absent: "결석",
 };
 
-export const formatDaysOfWeek = (days: number[] | null): string => {
-  if (!days || days.length === 0) return "-";
-  return days.map((d) => DAY_NAMES[d]).join(", ");
-};
+export const formatDaysOfWeek = formatCourseDaysOfWeek;
 
 export const getActionLabel = (actionType: string) => {
   const labels: Record<string, string> = {

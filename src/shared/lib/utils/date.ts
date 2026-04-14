@@ -8,6 +8,59 @@ export const getTodayKorean = (): string => {
   return `${today.getMonth() + 1}/${today.getDate()}(${days[today.getDay()]})`;
 };
 
+const toDate = (value: Date | string): Date => {
+  return value instanceof Date ? value : new Date(value);
+};
+
+const COURSE_DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
+const WEEKDAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
+
+export const formatDateDotYMD = (dateString: string | null | undefined, emptyFallback = "-"): string => {
+  if (!dateString) return emptyFallback;
+
+  const date = new Date(dateString);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+};
+
+export const formatDateMD = (dateString: string | null): string => {
+  if (!dateString) return "미정";
+
+  const date = new Date(dateString);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+};
+
+export const formatDateLongKorean = (dateString: string | null): string => {
+  if (!dateString) return "미정";
+
+  const date = new Date(dateString);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
+
+export const formatLocaleDateKorean = (value: Date | string): string => {
+  return toDate(value).toLocaleDateString("ko-KR");
+};
+
+export const formatLocaleMonthDayKorean = (value: Date | string): string => {
+  return toDate(value).toLocaleDateString("ko-KR", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
+export const formatLocaleTimeKorean = (value: Date | string): string => {
+  return toDate(value).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+};
+
+export const formatCourseDaysOfWeek = (days: number[] | null): string => {
+  if (!days || days.length === 0) return "-";
+  return days.map((day) => COURSE_DAY_NAMES[day]).join(", ");
+};
+
+export const formatClinicWeekdays = (days: number[] | null, emptyFallback = "-"): string => {
+  if (!days || days.length === 0) return emptyFallback;
+  return days.map((day) => WEEKDAY_NAMES[day]).join(", ");
+};
+
 export const getGreetingByTime = (): string => {
   const now = new Date();
   const time = now.getHours() * 60 + now.getMinutes();

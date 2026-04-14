@@ -11,6 +11,7 @@ import {
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
+import { formatDateDotYMD } from "@/shared/lib/utils/date";
 import { type Clinic, openMenuIdAtom } from "../(atoms)/useClinicsStore";
 
 interface ClinicListProps {
@@ -21,12 +22,6 @@ interface ClinicListProps {
 }
 
 const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-
-const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
-};
 
 type ClinicSortKey = "name" | "operatingDays";
 
@@ -100,7 +95,7 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span className="text-body text-content-standard-secondary">
-                  {formatDate(clinic.start_date)} ~ {formatDate(clinic.end_date)}
+                  {formatDateDotYMD(clinic.start_date)} ~ {formatDateDotYMD(clinic.end_date)}
                 </span>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

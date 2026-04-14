@@ -2,6 +2,7 @@
 
 import { History } from "lucide-react";
 import { Badge, type BadgeVariant, SkeletonSpinner, SlidePanel } from "@/shared/components/ui";
+import { formatLocaleMonthDayKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
 import type { AssignmentTaskHistoryItem } from "../(hooks)/useAllAssignmentTaskHistory";
 
 interface AssignmentTaskHistoryPanelProps {
@@ -59,11 +60,8 @@ export default function AssignmentTaskHistoryPanel({
         <div className="divide-y divide-line-divider">
           {history.map((item) => {
             const createdAt = new Date(item.created_at);
-            const dateStr = createdAt.toLocaleDateString("ko-KR", {
-              month: "short",
-              day: "numeric",
-            });
-            const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+            const dateStr = formatLocaleMonthDayKorean(createdAt);
+            const timeStr = formatLocaleTimeKorean(createdAt);
 
             return (
               <div

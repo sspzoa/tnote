@@ -6,28 +6,16 @@ import type { AssignmentTaskHistoryInfo, StudentDetail } from "@/app/(pages)/stu
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { formatClinicWeekdays, formatCourseDaysOfWeek, formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import { StudentInfoSkeleton } from "./StudentInfoSkeleton";
 
-const DAY_NAMES = ["월", "화", "수", "목", "금", "토", "일"];
-const WEEKDAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-
 const RETAKE_STATUS_LABELS: Record<string, string> = {
   pending: "대기",
   completed: "완료",
   absent: "결석",
-};
-
-const formatDaysOfWeek = (days: number[] | null): string => {
-  if (!days || days.length === 0) return "-";
-  return days.map((d) => DAY_NAMES[d]).join(", ");
-};
-
-const formatClinicWeekdays = (days: number[] | null): string => {
-  if (!days || days.length === 0) return "-";
-  return days.map((d) => WEEKDAY_NAMES[d]).join(", ");
 };
 
 interface StudentInfoModalProps {
@@ -108,7 +96,7 @@ export default function StudentInfoModal({
               <div className="flex flex-col gap-spacing-50">
                 <span className="text-content-standard-tertiary text-footnote">등록일</span>
                 <span className="font-medium text-body text-content-standard-primary">
-                  {new Date(studentDetail.student.createdAt).toLocaleDateString("ko-KR")}
+                  {formatLocaleDateKorean(studentDetail.student.createdAt)}
                 </span>
               </div>
               {studentDetail.student.requiredClinicWeekdays &&
@@ -158,11 +146,11 @@ export default function StudentInfoModal({
                         {course.name}
                       </span>
                       <span className="text-content-standard-tertiary text-footnote">
-                        등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
+                        등록: {formatLocaleDateKorean(course.enrolled_at)}
                       </span>
                     </div>
                     <Badge variant="blue" size="xs">
-                      {formatDaysOfWeek(course.days_of_week)}
+                      {formatCourseDaysOfWeek(course.days_of_week)}
                     </Badge>
                   </div>
                 ))}

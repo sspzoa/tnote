@@ -3,6 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 
 interface ConsultationInfo {
   id: string;
@@ -33,7 +34,7 @@ export const ConsultationCard = ({ consultation }: ConsultationCardProps) => {
             <span className="text-content-standard-secondary text-footnote">{consultation.creator.name}</span>
           )}
           <Badge variant="blue" size="xs">
-            {new Date(consultation.createdAt).toLocaleDateString("ko-KR")}
+            {formatLocaleDateKorean(consultation.createdAt)}
           </Badge>
           <ChevronDown
             className={`h-4 w-4 text-content-standard-tertiary transition-transform duration-200 print:hidden ${isExpanded ? "rotate-180" : ""}`}

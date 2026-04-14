@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { ScoreProgress } from "./ScoreProgress";
 
 interface ExamScore {
@@ -135,9 +136,7 @@ export const ExamResultCard = ({ examScore, assignment }: ExamResultCardProps) =
 
             <div className="flex items-center justify-between text-label">
               <span className="text-content-standard-secondary">응시일</span>
-              <span className="text-content-standard-primary">
-                {new Date(examScore.createdAt).toLocaleDateString("ko-KR")}
-              </span>
+              <span className="text-content-standard-primary">{formatLocaleDateKorean(examScore.createdAt)}</span>
             </div>
           </div>
         </div>

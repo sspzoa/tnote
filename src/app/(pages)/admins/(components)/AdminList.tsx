@@ -10,6 +10,7 @@ import {
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
+import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
@@ -136,7 +137,7 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
                 </Badge>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                {new Date(admin.created_at).toLocaleDateString("ko-KR")}
+                {formatLocaleDateKorean(admin.created_at)}
               </td>
               {isOwner && (
                 <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

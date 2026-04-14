@@ -2,6 +2,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { formatLocaleDateKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
 import type { ConsultationLog } from "@/shared/types";
 import { consultationFormAtom } from "../(atoms)/useConsultationStore";
 import { showAddConsultationModalAtom, showConsultationModalAtom } from "../(atoms)/useModalStore";
@@ -66,8 +67,8 @@ export default function ConsultationListModal() {
           <div className="max-h-96 divide-y divide-line-divider overflow-y-auto rounded-radius-300 border border-line-outline">
             {(consultations as ConsultationWithCreator[]).map((log) => {
               const createdAt = new Date(log.created_at);
-              const dateStr = createdAt.toLocaleDateString("ko-KR");
-              const timeStr = createdAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+              const dateStr = formatLocaleDateKorean(createdAt);
+              const timeStr = formatLocaleTimeKorean(createdAt);
 
               return (
                 <button

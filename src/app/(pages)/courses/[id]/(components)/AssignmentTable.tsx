@@ -10,6 +10,7 @@ import {
 } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
+import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import type { Assignment } from "../(hooks)/useAssignments";
 
 interface AssignmentTableProps {
@@ -77,7 +78,7 @@ export function AssignmentTable({ assignments, onManage, onEdit, onDelete }: Ass
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
                 <span className="text-body text-content-standard-secondary">
-                  {new Date(assignment.created_at).toLocaleDateString("ko-KR")}
+                  {formatLocaleDateKorean(assignment.created_at)}
                 </span>
               </td>
               <td className="whitespace-nowrap px-spacing-500 py-spacing-400">

@@ -9,7 +9,6 @@ const useWorkflowUndo = createWorkflowUndo({
     QUERY_KEYS.calendar.all,
     QUERY_KEYS.home.stats,
     QUERY_KEYS.my.assignments,
-    QUERY_KEYS.my.assignmentTasks,
     ["my", "calendarEvents"],
     ["students", "detail"],
   ],

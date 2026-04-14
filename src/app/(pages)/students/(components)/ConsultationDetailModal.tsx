@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import { showEditConsultationModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
@@ -71,7 +72,7 @@ export default function ConsultationDetailModal({ consultation, studentName, onC
       isOpen={!!consultation}
       onClose={onClose}
       title={consultation?.title || ""}
-      subtitle={`${studentName} - ${consultation?.created_at ? new Date(consultation.created_at).toLocaleDateString("ko-KR") : ""}${consultation?.creator?.name ? ` (작성자: ${consultation.creator.name})` : ""}`}
+      subtitle={`${studentName} - ${consultation?.created_at ? formatLocaleDateKorean(consultation.created_at) : ""}${consultation?.creator?.name ? ` (작성자: ${consultation.creator.name})` : ""}`}
       footer={
         <>
           <Button variant="secondary" onClick={onClose} className="flex-1">
