@@ -44,7 +44,7 @@ export default function ClinicsPage() {
   const { clinics, isLoading, error } = useClinics();
   const { deleteClinic } = useClinicDelete();
   const { recentAttendance, isLoading: historyLoading } = useRecentAttendance();
-  const { requiredAbsent, isLoading: requiredAbsentLoading } = useRequiredAbsent();
+  const { requiredAbsent, voluntaryAttendance, isLoading: requiredAbsentLoading } = useRequiredAbsent();
   const showEndedClinics = useAtomValue(showEndedClinicsAtom);
   const toast = useToast();
   const confirm = useConfirm();
@@ -198,6 +198,7 @@ export default function ClinicsPage() {
         isOpen={showRequiredAbsentPanel}
         onClose={() => setShowRequiredAbsentPanel(false)}
         data={requiredAbsent}
+        voluntaryAttendance={voluntaryAttendance}
         isLoading={requiredAbsentLoading}
       />
     </Container>
