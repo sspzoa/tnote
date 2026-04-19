@@ -10,11 +10,14 @@ const handleGet = async ({ supabase, session }: ApiContext) => {
 
   if (error) throw error;
 
+  const apiKey = workspace?.solapi_api_key || null;
+  const apiSecret = workspace?.solapi_api_secret || null;
+
   return NextResponse.json({
     data: {
-      apiKey: workspace?.solapi_api_key || null,
-      apiSecret: workspace?.solapi_api_secret || null,
-      isConfigured: !!(workspace?.solapi_api_key && workspace?.solapi_api_secret),
+      apiKey: apiKey ? `${apiKey.slice(0, 4)}${"*".repeat(Math.max(0, apiKey.length - 4))}` : null,
+      apiSecret: apiSecret ? `${"*".repeat(Math.max(0, apiSecret.length - 4))}${apiSecret.slice(-4)}` : null,
+      isConfigured: !!(apiKey && apiSecret),
     },
   });
 };

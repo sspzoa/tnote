@@ -21,11 +21,11 @@ export default function SolapiSettings({ isOpen, onClose }: SolapiSettingsProps)
 
   useEffect(() => {
     if (isOpen) {
-      setKeyInput(apiKey || "");
-      setSecretInput(apiSecret || "");
+      setKeyInput("");
+      setSecretInput("");
       setError(null);
     }
-  }, [isOpen, apiKey, apiSecret]);
+  }, [isOpen]);
 
   const handleSave = async () => {
     setError(null);
@@ -82,7 +82,7 @@ export default function SolapiSettings({ isOpen, onClose }: SolapiSettingsProps)
               setKeyInput(e.target.value);
               setError(null);
             }}
-            placeholder="SOLAPI API Key를 입력하세요"
+            placeholder={apiKey ? `현재: ${apiKey}` : "SOLAPI API Key를 입력하세요"}
             error={error && !keyInput.trim() && secretInput.trim() ? error : undefined}
           />
           <FormInput
@@ -93,7 +93,7 @@ export default function SolapiSettings({ isOpen, onClose }: SolapiSettingsProps)
               setSecretInput(e.target.value);
               setError(null);
             }}
-            placeholder="SOLAPI API Secret를 입력하세요"
+            placeholder={apiSecret ? `현재: ${apiSecret}` : "SOLAPI API Secret를 입력하세요"}
             error={error && keyInput.trim() && !secretInput.trim() ? error : undefined}
           />
           {error && <p className="text-core-status-negative text-footnote">{error}</p>}
