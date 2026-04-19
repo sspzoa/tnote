@@ -28,8 +28,6 @@ interface AssignmentTaskListProps {
   onEditDate: (task: AssignmentTask) => void;
 }
 
-const OPEN_STATUSES: ReadonlyArray<AssignmentTask["status"]> = ["pending", "absent"];
-
 type TaskSortKey = "student" | "assignment" | "scheduledDate" | "status";
 
 export default function AssignmentTaskList({
@@ -50,25 +48,23 @@ export default function AssignmentTaskList({
   const getMenuItems = useCallback(
     (task: AssignmentTask): DropdownMenuItem[] => {
       const items: DropdownMenuItem[] = [];
-      const isOpen = (OPEN_STATUSES as readonly string[]).includes(task.status);
 
-      if (isOpen) {
+      if (task.status !== "completed") {
         items.push({ label: "완료", onClick: () => onComplete(task) });
-        items.push({ label: "미흡", onClick: () => onMarkInsufficient(task) });
-        items.push({ label: "미제출", onClick: () => onMarkNotSubmitted(task) });
-        if (task.status !== "absent") {
-          items.push({ label: "결석", onClick: () => onMarkAbsent(task) });
-        }
-        items.push({ label: "연기", onClick: () => onPostpone(task), dividerAfter: true });
       }
+      if (task.status !== "insufficient") {
+        items.push({ label: "미흡", onClick: () => onMarkInsufficient(task) });
+      }
+      if (task.status !== "not_submitted") {
+        items.push({ label: "미제출", onClick: () => onMarkNotSubmitted(task) });
+      }
+      if (task.status !== "absent") {
+        items.push({ label: "결석", onClick: () => onMarkAbsent(task) });
+      }
+      items.push({ label: "연기", onClick: () => onPostpone(task), dividerAfter: true });
 
       items.push({ label: "이력 보기", onClick: () => onViewHistory(task) });
-
-      if (isOpen) {
-        items.push({ label: "수정", onClick: () => onEditDate(task), dividerAfter: true });
-      } else {
-        items[items.length - 1].dividerAfter = true;
-      }
+      items.push({ label: "수정", onClick: () => onEditDate(task), dividerAfter: true });
 
       items.push({ label: "삭제", onClick: () => onDelete(task), variant: "danger" });
 
