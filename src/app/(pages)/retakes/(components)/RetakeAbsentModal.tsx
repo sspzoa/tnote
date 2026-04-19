@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { absentNoteAtom } from "../(atoms)/useFormStore";
 import { showAbsentModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -41,7 +42,7 @@ export default function RetakeAbsentModal({ onSuccess }: RetakeAbsentModalProps)
       handleClose();
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "결석 처리에 실패했습니다.");
+      toast.error(getErrorMessage(error, "결석 처리에 실패했습니다."));
     }
   };
 

@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
 import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
 import { createFormAtom } from "../(atoms)/useFormStore";
 import { showCreateModalAtom } from "../(atoms)/useModalStore";
@@ -36,7 +37,7 @@ export default function StudentCreateModal() {
         requiredClinicWeekdays: [],
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "학생 추가에 실패했습니다.");
+      toast.error(getErrorMessage(error, "학생 추가에 실패했습니다."));
     }
   };
 

@@ -10,6 +10,7 @@ import {
   type StudentListStudent,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import type { Exam } from "../(hooks)/useExams";
 import { useRetakeAssignFromExam } from "../(hooks)/useRetakeAssign";
 
@@ -114,7 +115,7 @@ export function ScoreInputModal({
       if (error instanceof Error && error.message.includes("이미")) {
         toast.info("이미 재시험이 할당된 학생이 있습니다.");
       } else {
-        toast.error(error instanceof Error ? error.message : "재시험 할당에 실패했습니다.");
+        toast.error(getErrorMessage(error, "재시험 할당에 실패했습니다."));
       }
     }
   };

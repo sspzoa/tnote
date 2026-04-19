@@ -7,6 +7,7 @@ import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
 import { useUser } from "@/shared/hooks/useUser";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { showWorkspaceDeleteModalAtom } from "../(atoms)/useModalStore";
 import { useWorkspaceDelete } from "../(hooks)/useWorkspaceDelete";
 
@@ -32,7 +33,7 @@ export default function WorkspaceDeleteModal() {
     try {
       await deleteWorkspace(user.workspace);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "워크스페이스 삭제에 실패했습니다.");
+      toast.error(getErrorMessage(error, "워크스페이스 삭제에 실패했습니다."));
     }
   };
 

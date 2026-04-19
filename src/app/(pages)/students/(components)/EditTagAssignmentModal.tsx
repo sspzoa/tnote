@@ -3,7 +3,9 @@
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Badge, Button, FormCheckbox, FormInput, Modal } from "@/shared/components/ui";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { editTagAssignmentDataAtom, showEditTagAssignmentModalAtom } from "../(atoms)/useModalStore";
 import { useRemoveTag, useUpdateTagAssignment } from "../(hooks)/useStudentTags";
 
@@ -13,6 +15,7 @@ export default function EditTagAssignmentModal() {
   const { mutateAsync: updateTagAssignment, isPending: isUpdating } = useUpdateTagAssignment();
   const { mutateAsync: removeTag, isPending: isRemoving } = useRemoveTag();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -44,13 +47,19 @@ export default function EditTagAssignmentModal() {
       toast.success("태그 날짜가 수정되었습니다.");
       handleClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "태그 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "태그 수정에 실패했습니다."));
     }
   };
 
   const handleRemove = async () => {
     if (!editData) return;
-    if (!confirm(`"${editData.assignment.tag?.name}" 태그를 제거하시겠습니까?`)) return;
+    const ok = await confirm({
+      title: "태그 제거",
+      message: `"${editData.assignment.tag?.name}" 태그를 제거하시겠습니까?`,
+      variant: "danger",
+      confirmLabel: "제거",
+    });
+    if (!ok) return;
 
     try {
       await removeTag({

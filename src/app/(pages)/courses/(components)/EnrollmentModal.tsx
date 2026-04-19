@@ -10,6 +10,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import { enrolledSearchQueryAtom, selectedCourseAtom, unenrolledSearchQueryAtom } from "../(atoms)/useCoursesStore";
 import { showEnrollModalAtom } from "../(atoms)/useModalStore";
@@ -50,7 +51,7 @@ export default function EnrollmentModal() {
     try {
       await enrollStudent({ courseId: selectedCourse.id, studentId });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "학생 등록에 실패했습니다.");
+      toast.error(getErrorMessage(error, "학생 등록에 실패했습니다."));
     } finally {
       setLoadingStudentId(null);
     }

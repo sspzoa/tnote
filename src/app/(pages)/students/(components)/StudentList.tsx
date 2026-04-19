@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -10,6 +11,7 @@ import {
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { isTagActive } from "@/shared/lib/utils/tags";
@@ -50,6 +52,7 @@ export default function StudentList({ students }: StudentListProps) {
   const { deleteStudent } = useStudentDelete();
   const { resetPassword } = useStudentPasswordReset();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const comparators = useMemo(
     () => ({
@@ -88,13 +91,11 @@ export default function StudentList({ students }: StudentListProps) {
 
   const handleResetPassword = useCallback(
     async (student: Student) => {
-      if (
-        !confirm(
-          `${student.name} 학생의 비밀번호를 전화번호(${formatPhoneNumber(student.phone_number)})로 초기화하시겠습니까?`,
-        )
-      ) {
-        return;
-      }
+      const ok = await confirm({
+        title: "비밀번호 초기화",
+        message: `${student.name} 학생의 비밀번호를 전화번호(${formatPhoneNumber(student.phone_number)})로 초기화하시겠습니까?`,
+      });
+      if (!ok) return;
 
       try {
         await resetPassword(student.id);
@@ -103,27 +104,28 @@ export default function StudentList({ students }: StudentListProps) {
         toast.error("비밀번호 초기화에 실패했습니다.");
       }
     },
-    [resetPassword, toast],
+    [resetPassword, toast, confirm],
   );
 
   const handleDelete = useCallback(
     async (student: Student) => {
-      if (
-        !confirm(
-          `${student.name} 학생을 삭제하시겠습니까?\n관련된 모든 데이터(수강 정보, 재시험 등)가 함께 삭제됩니다.`,
-        )
-      ) {
-        return;
-      }
+      const ok = await confirm({
+        title: "학생 삭제",
+        message: `${student.name} 학생을 삭제하시겠습니까?`,
+        description: "관련된 모든 데이터(수강 정보, 재시험 등)가 함께 삭제됩니다.",
+        variant: "danger",
+        confirmLabel: "삭제",
+      });
+      if (!ok) return;
 
       try {
         await deleteStudent(student.id);
         toast.success("학생이 삭제되었습니다.");
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "학생 삭제에 실패했습니다.");
+        toast.error(getErrorMessage(error, "학생 삭제에 실패했습니다."));
       }
     },
-    [deleteStudent, toast],
+    [deleteStudent, toast, confirm],
   );
 
   const openConsultationModal = useCallback(

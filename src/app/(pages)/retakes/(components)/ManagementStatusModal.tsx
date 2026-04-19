@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, IconButton, Modal, StatusBadge } from "@/shared/components/ui";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import type { StatusColor } from "@/shared/types";
 import { showManagementStatusModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -58,7 +59,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
       setShowModal(false);
       onSuccess();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "관리 상태 변경에 실패했습니다.");
+      toast.error(getErrorMessage(error, "관리 상태 변경에 실패했습니다."));
     }
   };
 

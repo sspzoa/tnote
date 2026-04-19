@@ -14,6 +14,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import { showAssignModalAtom } from "../(atoms)/useModalStore";
 import { useCoursesForAssign } from "../(hooks)/useCoursesForAssign";
@@ -129,7 +130,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
       handleClose();
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "배정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "배정에 실패했습니다."));
     }
   };
 

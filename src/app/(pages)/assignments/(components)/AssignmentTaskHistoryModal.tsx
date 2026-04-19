@@ -5,8 +5,10 @@ import { Undo2 } from "lucide-react";
 import { useEffect } from "react";
 import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import type { AssignmentTaskHistory } from "@/shared/types";
 import { selectedTaskAtom } from "../(atoms)/useAssignmentTaskStore";
 import { showHistoryModalAtom } from "../(atoms)/useModalStore";
@@ -24,6 +26,7 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
   const { history, isLoading, refetch } = useAssignmentTaskHistory(selectedTask?.id || null);
   const { undoAction, isUndoing } = useAssignmentTaskUndo();
   const toast = useToast();
+  const confirm = useConfirm();
 
   useEffect(() => {
     if (isOpen && selectedTask?.id) {
@@ -69,9 +72,11 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
   const handleUndo = async (item: AssignmentTaskHistory) => {
     if (!selectedTask) return;
 
-    if (!confirm(`"${getActionLabel(item.action_type)}" 작업을 되돌리시겠습니까?`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: "작업 되돌리기",
+      message: `"${getActionLabel(item.action_type)}" 작업을 되돌리시겠습니까?`,
+    });
+    if (!ok) return;
 
     try {
       await undoAction({
@@ -82,7 +87,7 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
       await refetch();
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "되돌리기에 실패했습니다.");
+      toast.error(getErrorMessage(error, "되돌리기에 실패했습니다."));
     }
   };
 

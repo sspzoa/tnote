@@ -3,7 +3,9 @@
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { Button, FormInput, Modal } from "@/shared/components/ui";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { TAG_COLOR_STYLES, TAG_COLORS, TAG_SOLID_COLORS } from "@/shared/lib/utils/tagColors";
 import type { StudentTag, TagColor } from "@/shared/types";
 import { showTagManageModalAtom } from "../(atoms)/useModalStore";
@@ -29,6 +31,7 @@ export default function TagManageModal() {
   const { mutateAsync: updateTag, isPending: isUpdating } = useUpdateTag();
   const { mutateAsync: deleteTag, isPending: isDeleting } = useDeleteTag();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [form, setForm] = useState<TagFormState>(initialFormState);
   const [editingTag, setEditingTag] = useState<StudentTag | null>(null);
@@ -43,7 +46,7 @@ export default function TagManageModal() {
       toast.success("태그가 추가되었습니다.");
       setForm(initialFormState);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "태그 추가에 실패했습니다.");
+      toast.error(getErrorMessage(error, "태그 추가에 실패했습니다."));
     }
   };
 
@@ -71,14 +74,19 @@ export default function TagManageModal() {
       setEditingTag(null);
       setForm(initialFormState);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "태그 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "태그 수정에 실패했습니다."));
     }
   };
 
   const handleDelete = async (tag: StudentTag) => {
-    if (!confirm(`"${tag.name}" 태그를 삭제하시겠습니까?\n이 태그가 지정된 학생들에서도 제거됩니다.`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: "태그 삭제",
+      message: `"${tag.name}" 태그를 삭제하시겠습니까?`,
+      description: "이 태그가 지정된 학생들에서도 제거됩니다.",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     try {
       await deleteTag(tag.id);
@@ -88,7 +96,7 @@ export default function TagManageModal() {
         setForm(initialFormState);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "태그 삭제에 실패했습니다.");
+      toast.error(getErrorMessage(error, "태그 삭제에 실패했습니다."));
     }
   };
 

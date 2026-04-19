@@ -28,6 +28,7 @@ import {
   useManagementStatusUpdate,
 } from "@/shared/hooks/useManagementStatuses";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import type { ManagementStatusItem, StatusColor } from "@/shared/types";
 import { showManagementStatusSettingsModalAtom } from "../(atoms)/useModalStore";
 
@@ -215,7 +216,7 @@ export default function ManagementStatusSettingsModal() {
       setNewName("");
       setNewColor("neutral");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "추가에 실패했습니다.");
+      toast.error(getErrorMessage(error, "추가에 실패했습니다."));
     }
   };
 
@@ -267,7 +268,7 @@ export default function ManagementStatusSettingsModal() {
       toast.success("관리 상태가 저장되었습니다.");
       setShowModal(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "저장에 실패했습니다.");
+      toast.error(getErrorMessage(error, "저장에 실패했습니다."));
     } finally {
       setIsSaving(false);
     }

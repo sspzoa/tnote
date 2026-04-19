@@ -42,7 +42,7 @@ export default function Home() {
   if (isLoading) {
     return (
       <Container>
-        <div className="flex animate-pulse flex-col gap-spacing-400 rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+        <div className="flex animate-pulse flex-col gap-spacing-400 rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
           <div className="h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
           <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
         </div>
@@ -108,7 +108,7 @@ export default function Home() {
 
   return (
     <Container>
-      <div className="rounded-radius-700 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
+      <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
         <div className="flex flex-col gap-spacing-400">
           <h1 className="font-bold text-content-standard-primary text-display">
             안녕하세요,

@@ -2,7 +2,9 @@
 
 import { useSetAtom } from "jotai";
 import { useCallback } from "react";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import type { Retake } from "@/shared/types";
 import { editDateAtom, postponeDateAtom, postponeNoteAtom } from "../(atoms)/useFormStore";
 import {
@@ -35,6 +37,7 @@ export const useRetakeHandlers = (refetch: () => void) => {
   const setPostponeNote = useSetAtom(postponeNoteAtom);
   const setEditDate = useSetAtom(editDateAtom);
   const toast = useToast();
+  const confirm = useConfirm();
 
   const { deleteRetake } = useRetakeDelete();
 
@@ -79,18 +82,22 @@ export const useRetakeHandlers = (refetch: () => void) => {
   const handleDelete = useCallback(
     async (retake: Retake) => {
       setOpenMenuId(null);
-      if (!confirm(`${retake.student.name} 학생의 ${retake.exam.course.name} 재시험 항목을 삭제하시겠습니까?`)) {
-        return;
-      }
+      const ok = await confirm({
+        title: "재시험 삭제",
+        message: `${retake.student.name} 학생의 ${retake.exam.course.name} 재시험 항목을 삭제하시겠습니까?`,
+        variant: "danger",
+        confirmLabel: "삭제",
+      });
+      if (!ok) return;
 
       try {
         await deleteRetake(retake.id);
         toast.success("재시험이 삭제되었습니다.");
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "재시험 삭제에 실패했습니다.");
+        toast.error(getErrorMessage(err, "재시험 삭제에 실패했습니다."));
       }
     },
-    [deleteRetake, setOpenMenuId, toast],
+    [deleteRetake, setOpenMenuId, toast, confirm],
   );
 
   const handleViewStudent = useCallback(

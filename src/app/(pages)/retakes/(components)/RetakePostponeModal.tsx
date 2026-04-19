@@ -6,6 +6,7 @@ import { FormInput } from "@/shared/components/ui/formInput";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { postponeDateAtom, postponeNoteAtom } from "../(atoms)/useFormStore";
 import { showPostponeModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
@@ -51,7 +52,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
       handleClose();
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "연기 처리에 실패했습니다.");
+      toast.error(getErrorMessage(error, "연기 처리에 실패했습니다."));
     }
   };
 

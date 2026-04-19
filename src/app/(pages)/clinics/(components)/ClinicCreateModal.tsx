@@ -6,6 +6,7 @@ import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { clinicNameAtom, endDateAtom, operatingDaysAtom, startDateAtom } from "../(atoms)/useFormStore";
 import { showCreateModalAtom } from "../(atoms)/useModalStore";
 import { useClinicCreate } from "../(hooks)/useClinicCreate";
@@ -58,7 +59,7 @@ export default function ClinicCreateModal() {
       toast.success("클리닉이 생성되었습니다.");
       handleClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "클리닉 생성에 실패했습니다.");
+      toast.error(getErrorMessage(error, "클리닉 생성에 실패했습니다."));
     }
   };
 

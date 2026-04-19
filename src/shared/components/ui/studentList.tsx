@@ -1,8 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { Badge } from "@/shared/components/ui/badge";
-import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import type { StudentTagAssignment } from "@/shared/types";
 
@@ -38,7 +37,7 @@ interface StudentListItemProps {
   extraInfo?: ReactNode;
 }
 
-export function StudentListItem({
+export const StudentListItem = memo(function StudentListItem({
   student,
   selected,
   onToggle,
@@ -108,7 +107,7 @@ export function StudentListItem({
   }
 
   return <div className={baseClassName}>{content}</div>;
-}
+});
 
 interface StudentListEmptyProps {
   message?: string;
@@ -116,14 +115,6 @@ interface StudentListEmptyProps {
 
 export function StudentListEmpty({ message = "학생이 없습니다." }: StudentListEmptyProps) {
   return <div className="py-spacing-600 text-center text-content-standard-tertiary">{message}</div>;
-}
-
-interface StudentListLoadingProps {
-  message?: string;
-}
-
-export function StudentListLoading(_props: StudentListLoadingProps) {
-  return <SkeletonSpinner className="py-spacing-600" size="md" />;
 }
 
 interface StudentListSkeletonProps {

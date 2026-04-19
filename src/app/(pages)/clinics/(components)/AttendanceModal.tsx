@@ -14,6 +14,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import type { Student } from "@/shared/types";
 import { selectedClinicAtom } from "../(atoms)/useClinicsStore";
@@ -133,7 +134,7 @@ export default function AttendanceModal() {
       toast.success("출석이 저장되었습니다.");
       handleClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "출석 저장에 실패했습니다.");
+      toast.error(getErrorMessage(error, "출석 저장에 실패했습니다."));
     }
   };
 

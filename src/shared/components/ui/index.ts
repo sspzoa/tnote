@@ -1,6 +1,7 @@
 export type { BadgeProps, BadgeVariant } from "./badge";
 export { Badge, StatusBadge } from "./badge";
 export { Button } from "./button";
+export { ConfirmDialogProvider, useConfirm } from "./confirmDialog";
 export { EmptyState } from "./emptyState";
 export { FormCheckbox, FormCheckboxGroup } from "./formCheckbox";
 export { FormInput } from "./formInput";

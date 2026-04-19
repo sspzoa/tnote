@@ -2,6 +2,7 @@ import { useAtom, useSetAtom } from "jotai";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Badge, Button } from "@/shared/components/ui";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import {
   DropdownMenu,
   type DropdownMenuItem,
@@ -35,6 +36,7 @@ export default function CourseList({ courses }: CourseListProps) {
   const setDaysOfWeek = useSetAtom(courseDaysOfWeekAtom);
   const { deleteCourse } = useCourseDelete();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const comparators = useMemo(
     () => ({
@@ -65,9 +67,14 @@ export default function CourseList({ courses }: CourseListProps) {
   };
 
   const handleDelete = async (course: Course) => {
-    if (!confirm(`"${course.name}" 수업을 삭제하시겠습니까?\n등록된 학생 정보는 유지되지만 수강 기록이 삭제됩니다.`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: "수업 삭제",
+      message: `"${course.name}" 수업을 삭제하시겠습니까?`,
+      description: "등록된 학생 정보는 유지되지만 수강 기록이 삭제됩니다.",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     try {
       await deleteCourse(course.id);

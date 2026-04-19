@@ -26,7 +26,7 @@ export default function Header({ title, subtitle, action, backLink }: HeaderProp
           <h1 className="font-bold text-content-standard-primary text-title">{title}</h1>
           {subtitle && <p className="text-body text-content-standard-secondary">{subtitle}</p>}
         </div>
-        {action && <div className="flex flex-wrap gap-spacing-200">{action}</div>}
+        {action && <div className="flex flex-wrap gap-spacing-300">{action}</div>}
       </div>
     </div>
   );

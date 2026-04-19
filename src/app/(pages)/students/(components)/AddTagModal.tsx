@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Badge, Button, FormCheckbox, FormInput, FormSelect, Modal } from "@/shared/components/ui";
 import { useToast } from "@/shared/hooks/useToast";
 import { getTodayKST } from "@/shared/lib/utils/date";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { showAddTagModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useAssignTag } from "../(hooks)/useStudentTags";
@@ -47,7 +48,7 @@ export default function AddTagModal() {
       toast.success("태그가 추가되었습니다.");
       handleClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "태그 추가에 실패했습니다.");
+      toast.error(getErrorMessage(error, "태그 추가에 실패했습니다."));
     }
   };
 

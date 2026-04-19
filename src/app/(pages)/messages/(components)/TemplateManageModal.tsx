@@ -2,6 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { Modal } from "@/shared/components/ui/modal";
 import type { MessageTemplate } from "../(hooks)/useMessageTemplates";
 
@@ -13,8 +14,16 @@ interface TemplateManageModalProps {
 }
 
 export default function TemplateManageModal({ isOpen, onClose, templates, onDelete }: TemplateManageModalProps) {
-  const handleDelete = (id: string, name: string) => {
-    if (confirm(`"${name}" 템플릿을 삭제하시겠습니까?`)) {
+  const confirm = useConfirm();
+
+  const handleDelete = async (id: string, name: string) => {
+    const ok = await confirm({
+      title: "템플릿 삭제",
+      message: `"${name}" 템플릿을 삭제하시겠습니까?`,
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (ok) {
       onDelete(id);
     }
   };

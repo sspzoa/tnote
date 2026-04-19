@@ -6,6 +6,7 @@ import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
 import { showEditModalAtom } from "../(atoms)/useModalStore";
@@ -42,7 +43,7 @@ export default function CourseEditModal() {
       toast.success("수업이 수정되었습니다.");
       handleClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "수업 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "수업 수정에 실패했습니다."));
     }
   };
 

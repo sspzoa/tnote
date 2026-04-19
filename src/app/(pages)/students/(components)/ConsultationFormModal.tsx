@@ -1,9 +1,11 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Button } from "@/shared/components/ui/button";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { consultationFormAtom, selectedConsultationAtom } from "../(atoms)/useConsultationStore";
 import { showAddConsultationModalAtom, showEditConsultationModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
@@ -24,6 +26,7 @@ export default function ConsultationFormModal() {
   const { deleteConsultation, isDeleting } = useConsultationDelete();
   const { templates, addTemplate, deleteTemplate } = useConsultationTemplates();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const isEditMode = showEditModal;
   const showModal = showAddModal || showEditModal;
@@ -63,7 +66,7 @@ export default function ConsultationFormModal() {
       setShowAddModal(false);
       setForm({ title: "", content: "" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "상담일지 추가에 실패했습니다.");
+      toast.error(getErrorMessage(error, "상담일지 추가에 실패했습니다."));
     }
   };
 
@@ -83,16 +86,20 @@ export default function ConsultationFormModal() {
       toast.success("상담일지가 수정되었습니다.");
       setShowEditModal(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "상담일지 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "상담일지 수정에 실패했습니다."));
     }
   };
 
   const handleDelete = async () => {
     if (!selectedConsultation) return;
 
-    if (!confirm("이 상담일지를 삭제하시겠습니까?")) {
-      return;
-    }
+    const ok = await confirm({
+      title: "상담일지 삭제",
+      message: "이 상담일지를 삭제하시겠습니까?",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     try {
       await deleteConsultation({

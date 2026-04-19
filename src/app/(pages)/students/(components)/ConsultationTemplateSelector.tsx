@@ -3,6 +3,7 @@
 import { Save, Settings, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button, Select } from "@/shared/components/ui";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import type { ConsultationTemplate } from "@/shared/types";
 import ConsultationTemplateManageModal from "./ConsultationTemplateManageModal";
 import ConsultationTemplateSaveModal from "./ConsultationTemplateSaveModal";
@@ -24,6 +25,7 @@ export default function ConsultationTemplateSelector({
   onSave,
   onDelete,
 }: ConsultationTemplateSelectorProps) {
+  const confirm = useConfirm();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
@@ -33,10 +35,15 @@ export default function ConsultationTemplateSelector({
 
   const matchingTemplate = templates.find((t) => t.content === currentContent);
 
-  const handleDeleteMatching = () => {
-    if (matchingTemplate && confirm(`"${matchingTemplate.name}" 템플릿을 삭제하시겠습니까?`)) {
-      onDelete(matchingTemplate.id);
-    }
+  const handleDeleteMatching = async () => {
+    if (!matchingTemplate) return;
+    const ok = await confirm({
+      title: "템플릿 삭제",
+      message: `"${matchingTemplate.name}" 템플릿을 삭제하시겠습니까?`,
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (ok) onDelete(matchingTemplate.id);
   };
 
   return (

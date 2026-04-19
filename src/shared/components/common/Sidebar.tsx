@@ -26,6 +26,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Modal, SegmentedControl, Skeleton } from "@/shared/components/ui";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useToast } from "@/shared/hooks/useToast";
 import { sidebarCollapsedAtom, sidebarOpenAtom } from "./(atoms)/useSidebarStore";
@@ -151,6 +152,7 @@ export default function Sidebar() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const confirm = useConfirm();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -197,7 +199,8 @@ export default function Sidebar() {
   }, [isOpen]);
 
   const handleLogout = async () => {
-    if (!confirm("로그아웃 하시겠습니까?")) return;
+    const ok = await confirm({ title: "로그아웃", message: "로그아웃 하시겠습니까?" });
+    if (!ok) return;
 
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });

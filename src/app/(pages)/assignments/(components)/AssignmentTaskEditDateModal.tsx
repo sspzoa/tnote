@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { selectedTaskAtom } from "../(atoms)/useAssignmentTaskStore";
 import { editDateAtom } from "../(atoms)/useFormStore";
 import { showEditDateModalAtom } from "../(atoms)/useModalStore";
@@ -44,7 +45,7 @@ export default function AssignmentTaskEditDateModal({ onSuccess }: AssignmentTas
       handleClose();
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "날짜 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "날짜 수정에 실패했습니다."));
     }
   };
 

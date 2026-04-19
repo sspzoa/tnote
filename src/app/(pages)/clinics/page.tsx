@@ -7,10 +7,12 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useToast } from "@/shared/hooks/useToast";
 import { getTodayKST } from "@/shared/lib/utils/date";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { type Clinic, selectedClinicAtom, showEndedClinicsAtom } from "./(atoms)/useClinicsStore";
 import {
   clinicNameAtom,
@@ -45,6 +47,7 @@ export default function ClinicsPage() {
   const { requiredAbsent, isLoading: requiredAbsentLoading } = useRequiredAbsent();
   const showEndedClinics = useAtomValue(showEndedClinicsAtom);
   const toast = useToast();
+  const confirm = useConfirm();
 
   const setShowCreateModal = useSetAtom(showCreateModalAtom);
   const setShowEditModal = useSetAtom(showEditModalAtom);
@@ -92,15 +95,20 @@ export default function ClinicsPage() {
   };
 
   const handleDelete = async (clinic: Clinic) => {
-    if (!confirm(`"${clinic.name}" 클리닉을 삭제하시겠습니까?\n출석 기록도 함께 삭제됩니다.`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: "클리닉 삭제",
+      message: `"${clinic.name}" 클리닉을 삭제하시겠습니까?`,
+      description: "출석 기록도 함께 삭제됩니다.",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     try {
       await deleteClinic(clinic.id);
       toast.success("클리닉이 삭제되었습니다.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "클리닉 삭제에 실패했습니다.");
+      toast.error(getErrorMessage(error, "클리닉 삭제에 실패했습니다."));
     }
   };
 

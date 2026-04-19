@@ -10,6 +10,7 @@ import {
   type StudentListStudent,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import { useAssignmentTaskAssign } from "../(hooks)/useAssignmentTaskAssign";
 
 interface ExistingSubmission {
@@ -88,7 +89,7 @@ export function SubmissionModal({
       if (error instanceof Error && error.message === "CONFLICT") {
         toast.error("이미 배정된 학생이 포함되어 있습니다.");
       } else {
-        toast.error(error instanceof Error ? error.message : "과제 할당에 실패했습니다.");
+        toast.error(getErrorMessage(error, "과제 할당에 실패했습니다."));
       }
     }
   };

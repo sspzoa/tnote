@@ -6,8 +6,11 @@ import { useEffect } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
+import { useConfirm } from "@/shared/components/ui/confirmDialog";
+import { EmptyState } from "@/shared/components/ui/emptyState";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/lib/utils/error";
 import {
   activeTabAtom,
   selectedAssignmentAtom,
@@ -48,6 +51,7 @@ export default function CourseDetailPage() {
   const params = useParams();
   const courseId = params.id as string;
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
 
@@ -107,7 +111,7 @@ export default function CourseDetailPage() {
       toast.success("시험이 생성되었습니다.");
       closeCreateModal();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "시험 생성에 실패했습니다.");
+      toast.error(getErrorMessage(error, "시험 생성에 실패했습니다."));
     }
   };
 
@@ -119,22 +123,25 @@ export default function CourseDetailPage() {
       toast.success("시험이 수정되었습니다.");
       closeEditModal();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "시험 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "시험 수정에 실패했습니다."));
     }
   };
 
   const handleDelete = async (exam: Exam) => {
-    if (
-      !confirm(`"${exam.name}" (${exam.exam_number}회차)를 삭제하시겠습니까?\n관련된 재시험 정보도 함께 삭제됩니다.`)
-    ) {
-      return;
-    }
+    const ok = await confirm({
+      title: "시험 삭제",
+      message: `"${exam.name}" (${exam.exam_number}회차)를 삭제하시겠습니까?`,
+      description: "관련된 재시험 정보도 함께 삭제됩니다.",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     try {
       await deleteExam(exam.id);
       toast.success("시험이 삭제되었습니다.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "시험 삭제에 실패했습니다.");
+      toast.error(getErrorMessage(error, "시험 삭제에 실패했습니다."));
     }
   };
 
@@ -146,7 +153,7 @@ export default function CourseDetailPage() {
       toast.success("저장되었습니다.");
       closeScoreModal();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "저장에 실패했습니다.");
+      toast.error(getErrorMessage(error, "저장에 실패했습니다."));
     }
   };
 
@@ -181,7 +188,7 @@ export default function CourseDetailPage() {
       );
       setShowAssignmentCreateModal(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "과제 생성에 실패했습니다.");
+      toast.error(getErrorMessage(error, "과제 생성에 실패했습니다."));
     }
   };
 
@@ -194,20 +201,25 @@ export default function CourseDetailPage() {
       setShowAssignmentEditModal(false);
       setSelectedAssignment(null);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "과제 수정에 실패했습니다.");
+      toast.error(getErrorMessage(error, "과제 수정에 실패했습니다."));
     }
   };
 
   const handleAssignmentDelete = async (assignment: Assignment) => {
-    if (!confirm(`"${assignment.name}"을(를) 삭제하시겠습니까?\n관련된 제출 정보도 함께 삭제됩니다.`)) {
-      return;
-    }
+    const ok = await confirm({
+      title: "과제 삭제",
+      message: `"${assignment.name}"을(를) 삭제하시겠습니까?`,
+      description: "관련된 제출 정보도 함께 삭제됩니다.",
+      variant: "danger",
+      confirmLabel: "삭제",
+    });
+    if (!ok) return;
 
     try {
       await deleteAssignment(assignment.id);
       toast.success("과제가 삭제되었습니다.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "과제 삭제에 실패했습니다.");
+      toast.error(getErrorMessage(error, "과제 삭제에 실패했습니다."));
     }
   };
 
@@ -298,18 +310,16 @@ export default function CourseDetailPage() {
 
       {activeTab === "exams" ? (
         exams.length === 0 ? (
-          <div className="flex flex-col items-center gap-spacing-500 py-spacing-900 text-center">
-            <p className="text-body text-content-standard-tertiary">시험이 없습니다.</p>
-            <Button onClick={openCreateModal}>첫 시험 만들기</Button>
-          </div>
+          <EmptyState message="시험이 없습니다." actionLabel="첫 시험 만들기" onAction={openCreateModal} />
         ) : (
           <ExamTable exams={exams} onManage={openScoreModal} onEdit={openEditModal} onDelete={handleDelete} />
         )
       ) : assignments.length === 0 ? (
-        <div className="flex flex-col items-center gap-spacing-500 py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">과제가 없습니다.</p>
-          <Button onClick={() => setShowAssignmentCreateModal(true)}>첫 과제 만들기</Button>
-        </div>
+        <EmptyState
+          message="과제가 없습니다."
+          actionLabel="첫 과제 만들기"
+          onAction={() => setShowAssignmentCreateModal(true)}
+        />
       ) : (
         <AssignmentTable
           assignments={assignments}
