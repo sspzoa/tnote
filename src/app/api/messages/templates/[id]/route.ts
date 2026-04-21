@@ -29,4 +29,5 @@ const handleDelete = async ({ supabase, session, params }: ApiContext) => {
 export const DELETE = withLogging(handleDelete, {
   resource: "message-templates",
   action: "delete",
+  allowedRoles: ["owner", "admin"],
 });

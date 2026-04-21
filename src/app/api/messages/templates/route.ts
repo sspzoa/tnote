@@ -61,9 +61,11 @@ const handlePost = async ({ request, supabase, session }: ApiContext) => {
 export const GET = withLogging(handleGet, {
   resource: "message-templates",
   action: "read",
+  allowedRoles: ["owner", "admin"],
 });
 
 export const POST = withLogging(handlePost, {
   resource: "message-templates",
   action: "create",
+  allowedRoles: ["owner", "admin"],
 });
