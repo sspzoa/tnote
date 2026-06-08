@@ -103,13 +103,13 @@ export default function RequiredAbsentPanel({
       title="필참 결석 학생"
       subtitle={totalStudents > 0 ? `${totalStudents}명 · ${data.length}건` : undefined}>
       {isLoading ? (
-        <SkeletonSpinner className="py-spacing-900" size="md" />
+        <SkeletonSpinner className="py-16" size="md" />
       ) : weekGroups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
-          <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
-            <UserX className="size-6 text-core-accent" />
+        <div className="flex flex-col items-center justify-center gap-3 py-16">
+          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+            <UserX className="size-6 text-primary" />
           </div>
-          <span className="text-content-standard-tertiary text-label">필참 결석 기록이 없습니다.</span>
+          <span className="text-muted-foreground text-sm">필참 결석 기록이 없습니다.</span>
         </div>
       ) : (
         <div className="flex flex-col">
@@ -117,54 +117,50 @@ export default function RequiredAbsentPanel({
             const uniqueStudents = new Set(group.items.map((i) => i.student.id)).size;
             return (
               <div key={group.weekStart} className="flex flex-col">
-                <div className="sticky top-0 z-10 flex items-center justify-between gap-spacing-200 border-line-divider border-b bg-components-fill-standard-secondary px-spacing-600 py-spacing-300">
-                  <span className="font-semibold text-content-standard-primary text-label">
+                <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-border border-b bg-muted px-7 py-3">
+                  <span className="font-semibold text-foreground text-sm">
                     {formatWeekLabel(group.weekStart, group.weekEnd)}
                   </span>
                   <Badge variant="danger" size="xs">
                     {uniqueStudents}명 · {group.items.length}건
                   </Badge>
                 </div>
-                <div className="divide-y divide-line-divider">
+                <div className="divide-y divide-border">
                   {group.items.map((item) => {
                     const volKey = `${item.student.id}_${group.weekStart}`;
                     const volRecords = voluntaryByStudentWeek.get(volKey);
                     return (
-                      <div
-                        key={item.id}
-                        className="flex flex-col gap-spacing-100 px-spacing-600 py-spacing-300 transition-colors hover:bg-components-fill-standard-secondary">
-                        <div className="flex items-center justify-between gap-spacing-200">
-                          <div className="flex min-w-0 flex-wrap items-center gap-spacing-200">
-                            <span className="font-semibold text-body text-content-standard-primary">
-                              {item.student.name}
-                            </span>
+                      <div key={item.id} className="flex flex-col gap-1 px-7 py-3 transition-colors hover:bg-muted">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-2">
+                            <span className="font-semibold text-base text-foreground">{item.student.name}</span>
                             <Badge variant="danger" size="xs">
                               결석
                             </Badge>
                           </div>
-                          <span className="shrink-0 text-content-standard-tertiary text-footnote">
+                          <span className="shrink-0 text-muted-foreground text-xs">
                             {formatDayLabel(item.attendance_date)}
                           </span>
                         </div>
-                        <div className="truncate text-content-standard-secondary text-footnote">{item.clinic.name}</div>
+                        <div className="truncate text-muted-foreground text-xs">{item.clinic.name}</div>
                         {item.student.school && (
-                          <span className="text-content-standard-quaternary text-footnote">{item.student.school}</span>
+                          <span className="text-muted-foreground/60 text-xs">{item.student.school}</span>
                         )}
                         {item.note && (
-                          <div className="truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
+                          <div className="truncate rounded-sm bg-muted px-3 py-2 text-muted-foreground text-xs italic">
                             "{item.note}"
                           </div>
                         )}
                         {volRecords && volRecords.length > 0 && (
-                          <div className="mt-spacing-50 flex flex-wrap items-center gap-spacing-200">
-                            <div className="flex items-center gap-spacing-100 rounded-radius-200 bg-solid-translucent-green px-spacing-200 py-spacing-100">
-                              <Check className="size-3 text-core-status-positive" />
-                              <span className="text-caption text-core-status-positive">자율 참석</span>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                            <div className="flex items-center gap-1 rounded-sm bg-solid-translucent-green px-2 py-1">
+                              <Check className="size-3 text-success" />
+                              <span className="text-[10px] leading-4 text-success">자율 참석</span>
                             </div>
                             {volRecords.map((vol) => (
                               <span
                                 key={vol.id}
-                                className="rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-200 py-spacing-100 text-caption text-content-standard-secondary">
+                                className="rounded-sm bg-muted px-2 py-1 text-[10px] leading-4 text-muted-foreground">
                                 {formatDayLabel(vol.attendance_date)} · {vol.clinic.name}
                               </span>
                             ))}

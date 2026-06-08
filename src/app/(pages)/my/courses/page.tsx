@@ -35,31 +35,31 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
   if (chartData.length < 2) return null;
 
   return (
-    <div className="flex flex-col gap-spacing-300 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-body text-content-standard-primary">백분위 추이</span>
-        <span className="text-content-standard-tertiary text-footnote">높을수록 좋음</span>
+        <span className="font-semibold text-base text-foreground">백분위 추이</span>
+        <span className="text-muted-foreground text-xs">높을수록 좋음</span>
       </div>
       <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--line-divider)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 12, fill: "var(--content-standard-tertiary)" }}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
               tickLine={false}
               tickFormatter={(_v: any, i: number) => chartData[i]?.label ?? _v}
             />
             <YAxis
               domain={[0, 100]}
-              tick={{ fontSize: 12, fill: "var(--content-standard-tertiary)" }}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
               tickLine={false}
               tickFormatter={(v: number) => `${v}%`}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "var(--components-fill-standard-primary)",
-                border: "1px solid var(--line-outline)",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
                 borderRadius: 8,
                 fontSize: 13,
               }}
@@ -77,10 +77,10 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
             <Line
               type="monotone"
               dataKey="percentile"
-              stroke="var(--core-accent)"
+              stroke="var(--primary)"
               strokeWidth={2.5}
-              dot={{ r: 4, fill: "var(--core-accent)", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "var(--core-accent)", strokeWidth: 2, stroke: "white" }}
+              dot={{ r: 4, fill: "var(--primary)", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "var(--primary)", strokeWidth: 2, stroke: "white" }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -140,17 +140,17 @@ export default function MyCoursesPage() {
       />
 
       {isLoading ? (
-        <div className="flex flex-col gap-spacing-400">
-          <Skeleton className="h-52 w-full rounded-radius-400" />
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-52 w-full rounded-lg" />
           <SkeletonTable rows={5} columns={["w-24", "w-14", "w-14", "w-14", "w-14", "w-14", "w-14"]} />
         </div>
       ) : courses.length === 0 ? (
         <EmptyState message="수강 중인 수업이 없습니다." />
       ) : (
-        <div className="flex flex-col gap-spacing-400">
-          <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
-            <span className="font-medium text-content-standard-tertiary text-label">필터</span>
-            <div className="flex flex-wrap items-center gap-spacing-300">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
+            <span className="font-medium text-muted-foreground text-sm">필터</span>
+            <div className="flex flex-wrap items-center gap-3">
               <FilterButton active={selectedCourseId === "all"} onClick={() => setSelectedCourseId("all")}>
                 전체
               </FilterButton>
@@ -170,9 +170,9 @@ export default function MyCoursesPage() {
           {sortedData.length === 0 ? (
             <EmptyState message="시험 기록이 없습니다." />
           ) : (
-            <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+            <div className="overflow-x-auto rounded-lg border border-border bg-card">
               <table className="w-full">
-                <thead className="bg-components-fill-standard-secondary">
+                <thead className="bg-muted">
                   <tr>
                     <SortableHeader
                       label="시험"
@@ -216,7 +216,7 @@ export default function MyCoursesPage() {
                       currentDirection={sortState.direction}
                       onSort={toggleSort}
                     />
-                    <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                    <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
                       결과
                     </th>
                   </tr>
@@ -226,39 +226,35 @@ export default function MyCoursesPage() {
                     const passed = score.cutline != null && score.score >= score.cutline;
                     const failed = score.cutline != null && score.score < score.cutline;
                     return (
-                      <tr
-                        key={score.id}
-                        className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          <div className="text-body text-content-standard-primary">{score.exam.name}</div>
-                          <div className="text-content-standard-secondary text-footnote">
+                      <tr key={score.id} className="border-border border-t transition-colors hover:bg-accent">
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <div className="text-base text-foreground">{score.exam.name}</div>
+                          <div className="text-muted-foreground text-xs">
                             {score.exam.course.name} {score.exam.examNumber}회차
                           </div>
                         </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          <span className="font-medium text-body text-content-standard-primary">
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <span className="font-medium text-base text-foreground">
                             {score.score}
-                            {score.maxScore != null && (
-                              <span className="text-content-standard-tertiary">/{score.maxScore}</span>
-                            )}
+                            {score.maxScore != null && <span className="text-muted-foreground">/{score.maxScore}</span>}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          <span className="text-body text-content-standard-primary">
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <span className="text-base text-foreground">
                             {score.rank}
-                            <span className="text-content-standard-tertiary">/{score.totalStudents}</span>
+                            <span className="text-muted-foreground">/{score.totalStudents}</span>
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          <span className="text-body text-content-standard-primary">{score.average}</span>
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <span className="text-base text-foreground">{score.average}</span>
                         </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          <span className="text-body text-content-standard-primary">{score.median}</span>
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <span className="text-base text-foreground">{score.median}</span>
                         </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                          <span className="text-body text-content-standard-primary">{score.highest}</span>
+                        <td className="whitespace-nowrap px-5 py-4">
+                          <span className="text-base text-foreground">{score.highest}</span>
                         </td>
-                        <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                        <td className="whitespace-nowrap px-5 py-4">
                           {passed && (
                             <Badge variant="success" size="sm">
                               통과
@@ -269,9 +265,7 @@ export default function MyCoursesPage() {
                               재시험
                             </Badge>
                           )}
-                          {score.cutline == null && (
-                            <span className="text-content-standard-tertiary text-footnote">-</span>
-                          )}
+                          {score.cutline == null && <span className="text-muted-foreground text-xs">-</span>}
                         </td>
                       </tr>
                     );

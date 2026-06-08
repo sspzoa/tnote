@@ -65,7 +65,7 @@ export default function CourseCreateModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-500">
+      <div className="flex flex-col gap-5">
         <FormInput
           label="수업 이름"
           required
@@ -76,7 +76,7 @@ export default function CourseCreateModal() {
 
         <DayOfWeekPicker label="수업 요일" selectedDays={daysOfWeek} onChange={setDaysOfWeek} />
 
-        <div className="grid grid-cols-2 gap-spacing-400">
+        <div className="grid grid-cols-2 gap-4">
           <FormInput label="시작 날짜" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           <FormInput label="종료 날짜" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>

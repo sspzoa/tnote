@@ -36,14 +36,14 @@ export default function MessageComposer({
   };
 
   return (
-    <div className={`flex flex-col gap-spacing-300 ${className}`}>
+    <div className={`flex flex-col gap-3 ${className}`}>
       <div className="flex items-center justify-between">
-        <label className="font-semibold text-content-standard-primary text-label">메시지 내용</label>
-        <div className="flex items-center gap-spacing-300">
+        <label className="font-semibold text-foreground text-sm">메시지 내용</label>
+        <div className="flex items-center gap-3">
           <Badge variant={isLMS ? "yellow" : "blue"} size="xs">
             {isLMS ? "LMS" : "SMS"}
           </Badge>
-          <span className="text-content-standard-tertiary text-footnote">
+          <span className="text-muted-foreground text-xs">
             {byteLength} / {maxBytes} bytes
           </span>
         </div>
@@ -64,17 +64,17 @@ export default function MessageComposer({
         className="min-h-32 flex-1 resize-none"
       />
 
-      <div className="flex flex-col gap-spacing-200 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
-        <div className="flex items-center gap-spacing-200">
-          <Info className="size-4 text-content-standard-tertiary" />
-          <span className="font-semibold text-content-standard-secondary text-footnote">사용 가능한 변수</span>
+      <div className="flex flex-col gap-2 rounded-md border border-border bg-muted p-3">
+        <div className="flex items-center gap-2">
+          <Info className="size-4 text-muted-foreground" />
+          <span className="font-semibold text-muted-foreground text-xs">사용 가능한 변수</span>
         </div>
-        <div className="flex flex-wrap gap-spacing-200">
+        <div className="flex flex-wrap gap-2">
           {templateVariables.map((variable) => (
             <button
               key={variable.key}
               onClick={() => onMessageChange(messageText + variable.key)}
-              className="rounded-radius-200 bg-components-fill-standard-primary px-spacing-200 py-spacing-100 text-content-standard-secondary text-footnote transition-all hover:bg-core-accent-translucent hover:text-core-accent"
+              className="rounded-sm bg-card px-2 py-1 text-muted-foreground text-xs transition-all hover:bg-primary/10 hover:text-primary"
               title={variable.description}>
               {variable.key}
             </button>

@@ -56,15 +56,15 @@ export default function SolapiSettings({ isOpen, onClose }: SolapiSettingsProps)
       title="SOLAPI 설정"
       subtitle="문자 발송에 사용할 SOLAPI API 키를 설정합니다"
       footer={
-        <div className="flex w-full justify-end gap-spacing-200">
+        <div className="flex w-full justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>
-            <span className="flex items-center gap-spacing-200">
+            <span className="flex items-center gap-2">
               <X className="size-4" />
               취소
             </span>
           </Button>
           <Button onClick={handleSave} isLoading={isUpdating} loadingText="저장 중...">
-            <span className="flex items-center gap-spacing-200">
+            <span className="flex items-center gap-2">
               <Save className="size-4" />
               저장
             </span>
@@ -72,9 +72,9 @@ export default function SolapiSettings({ isOpen, onClose }: SolapiSettingsProps)
         </div>
       }>
       {isLoading ? (
-        <SkeletonSpinner className="py-spacing-600" size="md" />
+        <SkeletonSpinner className="py-7" size="md" />
       ) : (
-        <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-4">
           <FormInput
             label="API Key"
             value={keyInput}
@@ -96,10 +96,10 @@ export default function SolapiSettings({ isOpen, onClose }: SolapiSettingsProps)
             placeholder={apiSecret ? `현재: ${apiSecret}` : "SOLAPI API Secret를 입력하세요"}
             error={error && keyInput.trim() && !secretInput.trim() ? error : undefined}
           />
-          {error && <p className="text-core-status-negative text-footnote">{error}</p>}
-          <div className="flex flex-col gap-spacing-200 rounded-radius-300 bg-solid-translucent-yellow p-spacing-400">
-            <p className="font-semibold text-core-status-warning text-label">안내사항</p>
-            <ul className="flex list-inside list-disc flex-col gap-spacing-100 text-content-standard-secondary text-footnote">
+          {error && <p className="text-destructive text-xs">{error}</p>}
+          <div className="flex flex-col gap-2 rounded-md bg-solid-translucent-yellow p-4">
+            <p className="font-semibold text-warning text-sm">안내사항</p>
+            <ul className="flex list-inside list-disc flex-col gap-1 text-muted-foreground text-xs">
               <li>SOLAPI 콘솔에서 API 키를 발급받을 수 있습니다.</li>
               <li>API 키는 워크스페이스별로 별도 관리됩니다.</li>
               <li>키를 모두 비우면 문자 발송 기능이 비활성화됩니다.</li>

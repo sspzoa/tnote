@@ -1,21 +1,16 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Badge, Button } from "@/shared/components/ui";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatDateDotYMD } from "@/shared/lib/utils/date";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
 import { courseDaysOfWeekAtom, courseEndDateAtom, courseNameAtom, courseStartDateAtom } from "../(atoms)/useFormStore";
-import { openMenuIdAtom, showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
+import { showEditModalAtom, showEnrollModalAtom } from "../(atoms)/useModalStore";
 import { useCourseDelete } from "../(hooks)/useCourseDelete";
 
 interface CourseListProps {
@@ -25,8 +20,6 @@ interface CourseListProps {
 type CourseSortKey = "name" | "studentCount";
 
 export default function CourseList({ courses }: CourseListProps) {
-  const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const setSelectedCourse = useSetAtom(selectedCourseAtom);
   const setShowEditModal = useSetAtom(showEditModalAtom);
   const setShowEnrollModal = useSetAtom(showEnrollModalAtom);
@@ -90,9 +83,9 @@ export default function CourseList({ courses }: CourseListProps) {
   ];
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="수업명"
@@ -108,41 +101,35 @@ export default function CourseList({ courses }: CourseListProps) {
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              기간
-            </th>
-            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              관리
-            </th>
-            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">기간</th>
+            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">관리</th>
+            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
           </tr>
         </thead>
         <tbody>
           {sortedData.map((course) => (
-            <tr
-              key={course.id}
-              className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+            <tr key={course.id} className="border-border border-t transition-colors hover:bg-accent">
+              <td className="whitespace-nowrap px-5 py-4">
                 <Link href={`/courses/${course.id}`}>
-                  <div className="cursor-pointer font-medium text-body text-content-standard-primary transition-colors hover:text-core-accent">
+                  <div className="cursor-pointer font-medium text-base text-foreground transition-colors hover:text-primary">
                     {course.name}
                   </div>
                 </Link>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 <Badge variant="blue" size="sm">
                   {course.student_count || 0}명
                 </Badge>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="text-body text-content-standard-secondary">
+              <td className="whitespace-nowrap px-5 py-4">
+                <span className="text-base text-muted-foreground">
                   {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
                 </span>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="flex gap-spacing-200">
+              <td className="whitespace-nowrap px-5 py-4">
+                <div className="flex gap-2">
                   <Link href={`/courses/${course.id}`}>
-                    <Button variant="primary" size="xs" className="font-medium">
+                    <Button size="xs" className="font-medium">
                       시험 및 과제 관리
                     </Button>
                   </Link>
@@ -155,34 +142,13 @@ export default function CourseList({ courses }: CourseListProps) {
                   </Button>
                 </div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <MoreOptionsButton
-                  onClick={(pos) => {
-                    if (openMenuId === course.id) {
-                      setOpenMenuId(null);
-                      setMenuPosition(null);
-                    } else {
-                      setOpenMenuId(course.id);
-                      setMenuPosition(pos);
-                    }
-                  }}
-                />
+              <td className="whitespace-nowrap px-5 py-4">
+                <DropdownMenu items={getMenuItems(course)} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((c) => c.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

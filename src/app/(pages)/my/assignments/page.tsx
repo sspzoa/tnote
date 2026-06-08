@@ -69,9 +69,9 @@ export default function MyAssignmentsPage() {
       ) : assignments.length === 0 ? (
         <EmptyState message="과제 기록이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-          <table className="w-full rounded-radius-400">
-            <thead className="bg-components-fill-standard-secondary">
+        <div className="overflow-x-auto rounded-lg border border-border bg-card">
+          <table className="w-full rounded-lg">
+            <thead className="bg-muted">
               <tr>
                 <SortableHeader
                   label="과제명"
@@ -103,16 +103,12 @@ export default function MyAssignmentsPage() {
                   label: item.status,
                 };
                 return (
-                  <tr
-                    key={item.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
-                      {item.assignment.name}
-                    </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                  <tr key={item.id} className="border-border border-t transition-colors hover:bg-accent">
+                    <td className="whitespace-nowrap px-5 py-4 text-base text-foreground">{item.assignment.name}</td>
+                    <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                       {item.assignment.course.name}
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                    <td className="whitespace-nowrap px-5 py-4">
                       <Badge variant={statusCfg.variant} size="sm">
                         {statusCfg.label}
                       </Badge>

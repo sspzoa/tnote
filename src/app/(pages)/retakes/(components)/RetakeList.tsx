@@ -1,20 +1,14 @@
 "use client";
 
-import { useAtom } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { StatusColor } from "@/shared/types";
-import { openMenuIdAtom, type Retake } from "../(atoms)/useRetakesStore";
+import type { Retake } from "../(atoms)/useRetakesStore";
 
 interface RetakeListProps {
   retakes: Retake[];
@@ -41,8 +35,6 @@ export default function RetakeList({
   onManagementStatusChange,
   onEditDate,
 }: RetakeListProps) {
-  const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const { statuses: managementStatuses } = useManagementStatuses();
 
   const getMenuItems = useCallback(
@@ -117,9 +109,9 @@ export default function RetakeList({
   };
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="학생"
@@ -156,19 +148,17 @@ export default function RetakeList({
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
           </tr>
         </thead>
         <tbody>
           {sortedData.map((retake) => (
-            <tr
-              key={retake.id}
-              className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+            <tr key={retake.id} className="border-border border-t transition-colors hover:bg-accent">
+              <td className="whitespace-nowrap px-5 py-4">
                 <button
                   onClick={() => onViewStudent(retake.student.id)}
-                  className="flex items-center gap-spacing-200 text-left transition-colors hover:text-core-accent">
-                  <span className="font-medium text-body text-content-standard-primary hover:text-core-accent">
+                  className="flex items-center gap-2 text-left transition-colors hover:text-primary">
+                  <span className="font-medium text-base text-foreground hover:text-primary">
                     {retake.student.name}
                   </span>
                   {(() => {
@@ -177,7 +167,7 @@ export default function RetakeList({
                     );
                     if (activeTags.length === 0) return null;
                     return (
-                      <div className="flex flex-nowrap gap-spacing-100">
+                      <div className="flex flex-nowrap gap-1">
                         {activeTags.map((assignment) => (
                           <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
                             {assignment.tag?.name}
@@ -188,67 +178,42 @@ export default function RetakeList({
                   })()}
                 </button>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="text-body text-content-standard-primary">
+              <td className="whitespace-nowrap px-5 py-4">
+                <span className="text-base text-foreground">
                   {retake.exam.name} ({retake.exam.exam_number}회차)
                 </span>
-                <div className="text-content-standard-secondary text-footnote">{retake.exam.course.name}</div>
+                <div className="text-muted-foreground text-xs">{retake.exam.course.name}</div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="flex flex-col gap-spacing-100">
-                  <div className="text-body text-content-standard-primary">{retake.current_scheduled_date || "-"}</div>
+              <td className="whitespace-nowrap px-5 py-4">
+                <div className="flex flex-col gap-1">
+                  <div className="text-base text-foreground">{retake.current_scheduled_date || "-"}</div>
                   {(retake.postpone_count > 0 || retake.absent_count > 0) && (
-                    <div className="flex gap-spacing-200">
+                    <div className="flex gap-2">
                       {retake.postpone_count > 0 && (
-                        <span className="text-content-standard-tertiary text-footnote">
-                          연기 {retake.postpone_count}회
-                        </span>
+                        <span className="text-muted-foreground text-xs">연기 {retake.postpone_count}회</span>
                       )}
                       {retake.absent_count > 0 && (
-                        <span className="text-content-standard-tertiary text-footnote">
-                          결석 {retake.absent_count}회
-                        </span>
+                        <span className="text-muted-foreground text-xs">결석 {retake.absent_count}회</span>
                       )}
                     </div>
                   )}
                 </div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">{getStatusBadge(retake.status)}</td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">{getStatusBadge(retake.status)}</td>
+              <td className="whitespace-nowrap px-5 py-4">
                 <button
                   onClick={() => onManagementStatusChange(retake)}
                   className="transition-opacity hover:opacity-70">
                   {getManagementStatusBadge(retake.management_status)}
                 </button>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <MoreOptionsButton
-                  onClick={(pos) => {
-                    if (openMenuId === retake.id) {
-                      setOpenMenuId(null);
-                      setMenuPosition(null);
-                    } else {
-                      setOpenMenuId(retake.id);
-                      setMenuPosition(pos);
-                    }
-                  }}
-                />
+              <td className="whitespace-nowrap px-5 py-4">
+                <DropdownMenu items={getMenuItems(retake)} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((r) => r.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

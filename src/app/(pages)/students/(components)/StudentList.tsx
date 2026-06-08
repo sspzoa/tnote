@@ -1,13 +1,8 @@
 import { useAtom } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
@@ -20,7 +15,6 @@ import type { StudentTagAssignment } from "@/shared/types";
 import { editFormAtom } from "../(atoms)/useFormStore";
 import {
   editTagAssignmentDataAtom,
-  openMenuIdAtom,
   showAddTagModalAtom,
   showConsultationModalAtom,
   showEditModalAtom,
@@ -39,8 +33,6 @@ interface StudentListProps {
 type StudentSortKey = "name" | "branch" | "grade" | "phone" | "parentPhone" | "school";
 
 export default function StudentList({ students }: StudentListProps) {
-  const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const [, setSelectedStudent] = useAtom(selectedStudentAtom);
   const [, setShowEditModal] = useAtom(showEditModalAtom);
   const [, setShowConsultationModal] = useAtom(showConsultationModalAtom);
@@ -177,9 +169,9 @@ export default function StudentList({ students }: StudentListProps) {
   );
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="이름"
@@ -188,12 +180,8 @@ export default function StudentList({ students }: StudentListProps) {
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              클리닉
-            </th>
-            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              태그
-            </th>
+            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">클리닉</th>
+            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">태그</th>
             <SortableHeader
               label="지점"
               sortKey="branch"
@@ -229,7 +217,7 @@ export default function StudentList({ students }: StudentListProps) {
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
           </tr>
         </thead>
         <tbody>
@@ -239,15 +227,13 @@ export default function StudentList({ students }: StudentListProps) {
             );
 
             return (
-              <tr
-                key={student.id}
-                className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                  <div className="font-medium text-body text-content-standard-primary">{student.name}</div>
+              <tr key={student.id} className="border-border border-t transition-colors hover:bg-accent">
+                <td className="whitespace-nowrap px-5 py-4">
+                  <div className="font-medium text-base text-foreground">{student.name}</div>
                 </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                   {student.required_clinic_weekdays && student.required_clinic_weekdays.length > 0 ? (
-                    <div className="flex items-center gap-spacing-100">
+                    <div className="flex items-center gap-1">
                       {student.required_clinic_weekdays.map((day) => (
                         <Badge key={day} variant="blue" size="xs">
                           {["일", "월", "화", "수", "목", "금", "토"][day]}
@@ -258,9 +244,9 @@ export default function StudentList({ students }: StudentListProps) {
                     "-"
                   )}
                 </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                   {activeTags.length > 0 ? (
-                    <div className="flex items-center gap-spacing-100">
+                    <div className="flex items-center gap-1">
                       {activeTags.map((assignment) => {
                         const tag = assignment.tag;
                         if (!tag) return null;
@@ -281,10 +267,8 @@ export default function StudentList({ students }: StudentListProps) {
                     "-"
                   )}
                 </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                  {student.branch || "-"}
-                </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">{student.branch || "-"}</td>
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                   {student.birth_year && getGrade(student.birth_year) ? (
                     <Badge variant="blue" size="sm">
                       {getGrade(student.birth_year)}
@@ -293,45 +277,22 @@ export default function StudentList({ students }: StudentListProps) {
                     "-"
                   )}
                 </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                   {formatPhoneNumber(student.phone_number)}
                 </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                   {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
                 </td>
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
-                  {student.school || "-"}
-                </td>
+                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">{student.school || "-"}</td>
 
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                  <MoreOptionsButton
-                    onClick={(pos) => {
-                      if (openMenuId === student.id) {
-                        setOpenMenuId(null);
-                        setMenuPosition(null);
-                      } else {
-                        setOpenMenuId(student.id);
-                        setMenuPosition(pos);
-                      }
-                    }}
-                  />
+                <td className="whitespace-nowrap px-5 py-4">
+                  <DropdownMenu items={getMenuItems(student)} />
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((s) => s.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

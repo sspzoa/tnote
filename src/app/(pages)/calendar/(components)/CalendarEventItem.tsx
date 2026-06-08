@@ -42,7 +42,7 @@ export default function CalendarEventItem({ event, onClick }: Props) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full truncate rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-footnote transition-all duration-150 hover:scale-[1.02]"
+      className="w-full truncate rounded-sm px-1.5 py-0.5 text-left text-xs transition-all duration-150 hover:scale-[1.02]"
       style={{
         backgroundColor: style.backgroundColor,
         color: style.color,

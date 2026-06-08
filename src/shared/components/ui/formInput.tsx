@@ -1,32 +1,38 @@
 import { type InputHTMLAttributes, useId } from "react";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 
-interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+  label?: string;
   required?: boolean;
   error?: string;
+  id?: string;
 }
 
-export function FormInput({ label, required = false, error, className = "", id, ...props }: FormInputProps) {
+export function FormInput({ label, required = false, error, className, id, ...props }: FormInputProps) {
   const generatedId = useId();
   const inputId = id || generatedId;
   const errorId = `${inputId}-error`;
 
   return (
-    <div className="flex flex-col gap-spacing-200">
-      <label htmlFor={inputId} className="block font-semibold text-content-standard-primary text-label">
-        {label} {required && <span className="text-core-status-negative">*</span>}
-      </label>
-      <div className="flex flex-col gap-spacing-100">
-        <input
+    <div className="flex flex-col gap-2">
+      {label && (
+        <Label htmlFor={inputId} className="text-sm font-semibold text-foreground">
+          {label} {required && <span className="text-destructive">*</span>}
+        </Label>
+      )}
+      <div className="flex flex-col gap-1">
+        <Input
           id={inputId}
           aria-describedby={error ? errorId : undefined}
           aria-invalid={error ? "true" : undefined}
           aria-required={required}
-          className={`w-full rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent ${error ? "border-core-status-negative" : ""} ${className}`}
+          error={!!error}
+          className={className}
           {...props}
         />
         {error && (
-          <p id={errorId} className="text-core-status-negative text-label" role="alert">
+          <p id={errorId} className="text-destructive text-xs" role="alert">
             {error}
           </p>
         )}

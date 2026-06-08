@@ -141,19 +141,16 @@ export function ScoreInputModal({
       title="점수 입력"
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
-        <div className="flex w-full flex-col gap-spacing-300">
-          <div className="flex flex-wrap items-center justify-between gap-spacing-200 text-body">
-            <span className="text-content-standard-secondary">점수: {scoreCount}명</span>
-            {belowCutlineCount > 0 && (
-              <span className="text-core-status-negative">커트라인 미달: {belowCutlineCount}명</span>
-            )}
+        <div className="flex w-full flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-base">
+            <span className="text-muted-foreground">점수: {scoreCount}명</span>
+            {belowCutlineCount > 0 && <span className="text-destructive">커트라인 미달: {belowCutlineCount}명</span>}
           </div>
-          <div className="flex gap-spacing-300">
+          <div className="flex gap-3">
             <Button variant="secondary" onClick={handleClose} className="flex-1">
               취소
             </Button>
             <Button
-              variant="primary"
               onClick={handleSave}
               disabled={isLoading || students.length === 0}
               isLoading={isSaving}
@@ -174,8 +171,8 @@ export function ScoreInputModal({
         </div>
       }>
       {isLoading ? (
-        <div className="flex flex-col gap-spacing-400">
-          <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+        <div className="flex flex-col gap-4">
+          <div className="h-12 animate-pulse rounded-md bg-muted" />
           <StudentListContainer>
             <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
           </StudentListContainer>
@@ -185,7 +182,7 @@ export function ScoreInputModal({
           <StudentListEmpty message="수강생이 없습니다." />
         </StudentListContainer>
       ) : (
-        <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-4">
           <SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -207,7 +204,7 @@ export function ScoreInputModal({
                     student={student}
                     highlighted={isBelowCutline}
                     rightContent={
-                      <div className="flex items-center gap-spacing-200">
+                      <div className="flex items-center gap-2">
                         <input
                           type="number"
                           value={scoreValue}
@@ -215,13 +212,13 @@ export function ScoreInputModal({
                           placeholder="-"
                           min="0"
                           max={exam.max_score || 8}
-                          className={`w-16 rounded-radius-300 border px-spacing-200 py-spacing-200 text-center text-body transition-all focus:outline-none focus:ring-2 ${
+                          className={`w-16 rounded-md border px-2 py-2 text-center text-base transition-all focus:outline-none focus:ring-2 ${
                             isBelowCutline
-                              ? "border-core-status-negative bg-solid-translucent-red text-core-status-negative focus:ring-core-status-negative/30"
-                              : "border-line-outline bg-components-fill-standard-primary text-content-standard-primary focus:border-core-accent focus:ring-core-accent-translucent"
+                              ? "border-destructive bg-solid-translucent-red text-destructive focus:ring-destructive/30"
+                              : "border-border bg-card text-foreground focus:border-ring focus:ring-ring/50"
                           }`}
                         />
-                        <span className="text-content-standard-tertiary text-footnote">/ {exam.max_score || 8}</span>
+                        <span className="text-muted-foreground text-xs">/ {exam.max_score || 8}</span>
                       </div>
                     }
                   />

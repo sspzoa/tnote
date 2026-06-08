@@ -1,25 +1,35 @@
-import type { InputHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
+import { cn } from "@/shared/lib/utils/cn";
 
 type InputSize = "sm" | "md" | "lg";
 
-interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
-  size?: InputSize;
-  error?: boolean;
-}
-
 const sizeStyles: Record<InputSize, string> = {
-  sm: "px-spacing-300 py-spacing-200 text-body",
-  md: "px-spacing-400 py-spacing-300 text-body",
-  lg: "px-spacing-500 py-spacing-400 text-body",
+  sm: "h-8 px-3 py-1 text-sm",
+  md: "h-9 px-3 py-1 text-base md:text-sm",
+  lg: "h-10 px-4 py-2 text-base",
 };
 
-export function Input({ size = "sm", error = false, className = "", ...props }: InputProps) {
+type InputProps = Omit<ComponentProps<"input">, "size"> & {
+  size?: InputSize;
+  error?: boolean;
+};
+
+function Input({ className, type, size = "md", error = false, ...props }: InputProps) {
   return (
     <input
-      className={`rounded-radius-300 border bg-components-fill-standard-secondary text-content-standard-primary transition-all placeholder:text-content-standard-quaternary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent ${
-        error ? "border-core-status-negative" : "border-line-outline"
-      } ${sizeStyles[size]} ${className}`}
+      type={type}
+      data-slot="input"
+      aria-invalid={error || undefined}
+      className={cn(
+        "flex w-full min-w-0 rounded-md border border-input bg-transparent shadow-xs outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30",
+        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+        sizeStyles[size],
+        className,
+      )}
       {...props}
     />
   );
 }
+
+export { Input };

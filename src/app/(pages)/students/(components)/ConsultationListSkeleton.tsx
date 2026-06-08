@@ -6,14 +6,14 @@ interface ConsultationListSkeletonProps {
 
 export function ConsultationListSkeleton({ count = 4 }: ConsultationListSkeletonProps) {
   return (
-    <div className="divide-y divide-line-divider overflow-hidden rounded-radius-300 border border-line-outline">
+    <div className="divide-y divide-border overflow-hidden rounded-md border border-border">
       {[...Array(count)].map((_, i) => (
-        <div key={i} className="flex flex-col gap-spacing-100 px-spacing-500 py-spacing-400">
+        <div key={i} className="flex flex-col gap-1 px-5 py-4">
           <div className="flex items-center justify-between">
             <Skeleton className="h-6 w-36" />
-            <Skeleton className="h-5 w-20 rounded-radius-200" />
+            <Skeleton className="h-5 w-20 rounded-sm" />
           </div>
-          <div className="flex items-center gap-spacing-200">
+          <div className="flex items-center gap-2">
             <Skeleton className="h-4 w-12" />
             <Skeleton className="h-4 w-16" />
           </div>

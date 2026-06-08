@@ -87,17 +87,15 @@ export default function StudentsPage() {
         subtitle={`전체 학생 ${students.length}명`}
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
-          <div className="flex items-center gap-spacing-300">
+          <div className="flex items-center gap-3">
             <Button
               variant="secondary"
               onClick={() => setShowConsultationPanel(true)}
-              className="flex items-center gap-spacing-200">
+              className="flex items-center gap-2">
               <MessageSquare className="size-4" />
               최근 상담
               {unreadCount > 0 && (
-                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
-                  {unreadCount}
-                </span>
+                <span className="rounded-full bg-primary px-2 text-primary-foreground text-xs">{unreadCount}</span>
               )}
             </Button>
             <Button onClick={() => setShowCreateModal(true)}>+ 학생 추가</Button>
@@ -152,14 +150,12 @@ export default function StudentsPage() {
         title="최근 상담 내역"
         subtitle={unreadCount > 0 ? `읽지 않은 상담 ${unreadCount}건` : "최근 50건"}>
         {consultationsLoading ? (
-          <div className="flex flex-col gap-spacing-300 p-spacing-600">
+          <div className="flex flex-col gap-3 p-7">
             {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="flex flex-col gap-spacing-200 border-line-divider border-b pb-spacing-300 last:border-b-0">
+              <div key={i} className="flex flex-col gap-2 border-border border-b pb-3 last:border-b-0">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-6 w-16" />
-                  <Skeleton className="h-5 w-16 rounded-radius-200" />
+                  <Skeleton className="h-5 w-16 rounded-sm" />
                 </div>
                 <Skeleton className="h-6 w-4/5" />
                 <Skeleton className="h-4 w-28" />
@@ -167,14 +163,14 @@ export default function StudentsPage() {
             ))}
           </div>
         ) : consultations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
-            <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
-              <MessageSquare className="size-6 text-core-accent" />
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+              <MessageSquare className="size-6 text-primary" />
             </div>
-            <span className="text-content-standard-tertiary text-label">상담 내역이 없습니다.</span>
+            <span className="text-muted-foreground text-sm">상담 내역이 없습니다.</span>
           </div>
         ) : (
-          <div className="divide-y divide-line-divider">
+          <div className="divide-y divide-border">
             {consultations.map((consultation) => {
               const createdAt = new Date(consultation.created_at);
               const dateStr = formatLocaleDateKorean(createdAt);
@@ -185,31 +181,31 @@ export default function StudentsPage() {
                 <button
                   key={consultation.id}
                   onClick={() => handleConsultationClick(consultation)}
-                  className={`flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50 ${!consultation.is_read ? "bg-core-accent-translucent/30" : ""}`}>
+                  className={`flex w-full flex-col gap-1 px-7 py-4 text-left transition-all duration-150 hover:bg-primary/50 ${!consultation.is_read ? "bg-primary/30" : ""}`}>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-spacing-200">
+                    <div className="flex items-center gap-2">
                       <span
-                        className={`text-body text-content-standard-primary ${!consultation.is_read ? "font-semibold" : "font-medium"}`}>
+                        className={`text-base text-foreground ${!consultation.is_read ? "font-semibold" : "font-medium"}`}>
                         {consultation.student?.name || "-"}
                       </span>
                     </div>
-                    <div className="flex items-center gap-spacing-100">
+                    <div className="flex items-center gap-1">
                       {edited && (
-                        <Badge variant="neutral" size="xs" className="gap-spacing-50">
+                        <Badge variant="neutral" size="xs" className="gap-0.5">
                           <Pencil className="size-2.5" />
                           {consultation.updater?.name || "수정됨"}
                         </Badge>
                       )}
-                      <span className="rounded-radius-200 border border-core-accent/20 bg-core-accent-translucent px-spacing-200 py-spacing-50 text-core-accent text-footnote">
+                      <span className="rounded-sm border border-primary/20 bg-primary/10 px-2 py-0.5 text-primary text-xs">
                         {dateStr}
                       </span>
                     </div>
                   </div>
                   <div
-                    className={`truncate text-body ${!consultation.is_read ? "text-content-standard-primary" : "text-content-standard-secondary"}`}>
+                    className={`truncate text-base ${!consultation.is_read ? "text-foreground" : "text-muted-foreground"}`}>
                     {consultation.title}
                   </div>
-                  <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
                     <span>{timeStr}</span>
                     {consultation.creator?.name && (
                       <>

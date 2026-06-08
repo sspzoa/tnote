@@ -1,20 +1,14 @@
-import { useAtom } from "jotai";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { getErrorMessage } from "@/shared/lib/utils/error";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
-import { type Admin, openMenuIdAtom } from "../(atoms)/useAdminsStore";
+import type { Admin } from "../(atoms)/useAdminsStore";
 import { useAdminDelete } from "../(hooks)/useAdminDelete";
 import { useAdminResetPassword } from "../(hooks)/useAdminResetPassword";
 
@@ -26,8 +20,6 @@ interface AdminListProps {
 type AdminSortKey = "name" | "phone" | "role" | "createdAt";
 
 export default function AdminList({ admins, isOwner }: AdminListProps) {
-  const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const { deleteAdmin } = useAdminDelete();
   const { resetPassword } = useAdminResetPassword();
   const toast = useToast();
@@ -92,9 +84,9 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
   ];
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="이름"
@@ -125,61 +117,34 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
               onSort={toggleSort}
             />
             {isOwner && (
-              <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+              <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
             )}
           </tr>
         </thead>
         <tbody>
           {sortedData.map((admin) => (
-            <tr
-              key={admin.id}
-              className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400 font-medium text-body text-content-standard-primary">
-                {admin.name}
-              </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+            <tr key={admin.id} className="border-border border-t transition-colors hover:bg-accent">
+              <td className="whitespace-nowrap px-5 py-4 font-medium text-base text-foreground">{admin.name}</td>
+              <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                 {formatPhoneNumber(admin.phone_number)}
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 <Badge variant={admin.role === "owner" ? "purple" : "blue"} size="sm">
                   {admin.role === "owner" ? "소유자" : "관리자"}
                 </Badge>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+              <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                 {formatLocaleDateKorean(admin.created_at)}
               </td>
               {isOwner && (
-                <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                  {admin.role !== "owner" && (
-                    <MoreOptionsButton
-                      onClick={(pos) => {
-                        if (openMenuId === admin.id) {
-                          setOpenMenuId(null);
-                          setMenuPosition(null);
-                        } else {
-                          setOpenMenuId(admin.id);
-                          setMenuPosition(pos);
-                        }
-                      }}
-                    />
-                  )}
+                <td className="whitespace-nowrap px-5 py-4">
+                  {admin.role !== "owner" && <DropdownMenu items={getMenuItems(admin)} />}
                 </td>
               )}
             </tr>
           ))}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((a) => a.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

@@ -109,62 +109,60 @@ export default function AssignmentTaskHistoryModal({ onSuccess }: AssignmentTask
       {isLoading ? (
         <HistoryListSkeleton count={4} />
       ) : history.length === 0 ? (
-        <div className="py-spacing-900 text-center">
-          <p className="text-body text-content-standard-tertiary">이력이 없습니다.</p>
+        <div className="py-16 text-center">
+          <p className="text-base text-muted-foreground">이력이 없습니다.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-4">
           {history.map((item, index) => (
-            <div
-              key={item.id}
-              className="flex flex-col gap-spacing-300 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
-              <div className="flex items-center justify-between gap-spacing-300">
-                <div className="flex min-w-0 flex-1 items-center gap-spacing-300">
+            <div key={item.id} className="flex flex-col gap-3 rounded-lg border border-border bg-muted p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
                   <Badge variant={getActionBadgeVariant(item.action_type)} size="sm">
                     {getActionLabel(item.action_type)}
                   </Badge>
                   {item.action_type === "assign" && item.new_date && (
-                    <span className="truncate text-body text-content-standard-primary">예정일: {item.new_date}</span>
+                    <span className="truncate text-base text-foreground">예정일: {item.new_date}</span>
                   )}
                   {item.action_type === "assign" && !item.new_date && (
-                    <span className="truncate text-body text-content-standard-tertiary">예정일 미지정</span>
+                    <span className="truncate text-base text-muted-foreground">예정일 미지정</span>
                   )}
                   {(item.action_type === "postpone" ||
                     item.action_type === "date_edit" ||
                     item.action_type === "complete") &&
                     item.new_date && (
-                      <span className="truncate text-body text-content-standard-primary">
+                      <span className="truncate text-base text-foreground">
                         {item.previous_date || "미지정"} → {item.new_date}
                       </span>
                     )}
                   {item.action_type === "status_change" && item.previous_status && item.new_status && (
-                    <span className="truncate text-body text-content-standard-primary">
+                    <span className="truncate text-base text-foreground">
                       {item.previous_status === "completed" ? "완료" : "미완료"} →{" "}
                       {item.new_status === "completed" ? "완료" : "미완료"}
                     </span>
                   )}
                 </div>
-                <div className="flex shrink-0 items-center gap-spacing-300">
-                  <div className="flex shrink-0 flex-col items-end gap-spacing-50">
-                    <span className="text-content-standard-tertiary text-footnote">
+                <div className="flex shrink-0 items-center gap-3">
+                  <div className="flex shrink-0 flex-col items-end gap-0.5">
+                    <span className="text-muted-foreground text-xs">
                       {new Date(item.created_at).toLocaleString("ko-KR")}
                     </span>
                     {item.performed_by && (
-                      <span className="text-content-standard-tertiary text-footnote">{item.performed_by.name}</span>
+                      <span className="text-muted-foreground text-xs">{item.performed_by.name}</span>
                     )}
                   </div>
                   {canUndo(item, index) && (
                     <button
                       onClick={() => handleUndo(item)}
                       disabled={isUndoing}
-                      className="rounded-radius-200 p-spacing-200 text-content-standard-tertiary transition-colors hover:bg-components-interactive-hover hover:text-content-standard-primary disabled:opacity-50"
+                      className="rounded-sm p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
                       title="되돌리기">
                       <Undo2 className="h-4 w-4" />
                     </button>
                   )}
                 </div>
               </div>
-              {item.note && <p className="text-body text-content-standard-secondary">{item.note}</p>}
+              {item.note && <p className="text-base text-muted-foreground">{item.note}</p>}
             </div>
           ))}
         </div>

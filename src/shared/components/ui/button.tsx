@@ -1,61 +1,82 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
+import { Slot } from "radix-ui";
+import type { ComponentProps } from "react";
+import { cn } from "@/shared/lib/utils/cn";
 
-type ButtonVariant = "primary" | "secondary" | "danger" | "success" | "translucent";
-type ButtonSize = "xs" | "sm" | "md" | "lg";
+// `success` and `translucent` are tnote-specific variants with no shadcn equivalent; everything else
+// follows the stock shadcn vocabulary (default / destructive / secondary / outline / ghost / link).
+const buttonVariants = cva(
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+        success: "bg-success text-success-foreground hover:bg-success/90",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        translucent: "bg-primary/10 text-primary hover:bg-primary/15",
+        ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  isLoading?: boolean;
-  loadingText?: string;
-  children: ReactNode;
-}
+type ButtonProps = ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    isLoading?: boolean;
+    loadingText?: string;
+  };
 
-const variantStyles: Record<ButtonVariant, string> = {
-  primary:
-    "bg-core-accent text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
-  secondary:
-    "bg-components-fill-standard-secondary text-content-standard-primary border border-line-outline hover:bg-components-interactive-hover hover:border-core-accent/30 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-line-outline disabled:active:scale-100",
-  danger:
-    "bg-core-status-negative text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
-  success:
-    "bg-core-status-positive text-solid-white hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:active:scale-100",
-  translucent:
-    "bg-solid-translucent-blue text-solid-blue hover:bg-solid-translucent-indigo active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-solid-translucent-blue disabled:active:scale-100",
-};
-
-const sizeStyles: Record<ButtonSize, string> = {
-  xs: "px-spacing-400 py-spacing-200 text-footnote",
-  sm: "px-spacing-300 py-spacing-200 text-label",
-  md: "px-spacing-500 py-spacing-300 text-body",
-  lg: "px-spacing-600 py-spacing-400 text-title",
-};
-
-export function Button({
-  variant = "primary",
-  size = "md",
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  asChild = false,
   isLoading = false,
   loadingText,
-  children,
   disabled,
-  className = "",
+  children,
   ...props
 }: ButtonProps) {
-  const isDisabled = disabled || isLoading;
+  const Comp = asChild ? Slot.Root : "button";
+  const showSpinner = isLoading && !asChild;
 
   return (
-    <button
-      disabled={isDisabled}
-      className={`rounded-radius-300 font-semibold transition-all duration-150 ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      disabled={disabled || (isLoading && !asChild)}
       {...props}>
-      {isLoading ? (
-        <span className="flex items-center justify-center gap-spacing-200">
-          <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          {loadingText || children}
-        </span>
+      {showSpinner ? (
+        <>
+          <Loader2 className="animate-spin" />
+          {loadingText ?? children}
+        </>
       ) : (
         children
       )}
-    </button>
+    </Comp>
   );
 }
+
+export { Button, buttonVariants };

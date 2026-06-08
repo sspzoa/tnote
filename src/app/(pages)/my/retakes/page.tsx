@@ -76,9 +76,9 @@ export default function MyRetakesPage() {
       ) : sortedData.length === 0 ? (
         <EmptyState message="재시험이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-          <table className="w-full rounded-radius-400">
-            <thead className="bg-components-fill-standard-secondary">
+        <div className="overflow-x-auto rounded-lg border border-border bg-card">
+          <table className="w-full rounded-lg">
+            <thead className="bg-muted">
               <tr>
                 <SortableHeader
                   label="시험"
@@ -101,46 +101,38 @@ export default function MyRetakesPage() {
                   currentDirection={sortState.direction}
                   onSort={toggleSort}
                 />
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  비고
-                </th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">비고</th>
               </tr>
             </thead>
             <tbody>
               {sortedData.map((retake) => {
                 const status = statusConfig[retake.status] || { variant: "neutral" as const, label: retake.status };
                 return (
-                  <tr
-                    key={retake.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="text-body text-content-standard-primary">{retake.exam.name}</div>
-                      <div className="text-content-standard-secondary text-footnote">
+                  <tr key={retake.id} className="border-border border-t transition-colors hover:bg-accent">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <div className="text-base text-foreground">{retake.exam.name}</div>
+                      <div className="text-muted-foreground text-xs">
                         {retake.exam.course.name} {retake.exam.examNumber}회차
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <span className="text-body text-content-standard-primary">{retake.scheduledDate || "-"}</span>
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <span className="text-base text-foreground">{retake.scheduledDate || "-"}</span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                    <td className="whitespace-nowrap px-5 py-4">
                       <Badge variant={status.variant} size="sm">
                         {status.label}
                       </Badge>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="flex gap-spacing-200">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <div className="flex gap-2">
                         {retake.postponeCount > 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">
-                            연기 {retake.postponeCount}회
-                          </span>
+                          <span className="text-muted-foreground text-xs">연기 {retake.postponeCount}회</span>
                         )}
                         {retake.absentCount > 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">
-                            결석 {retake.absentCount}회
-                          </span>
+                          <span className="text-muted-foreground text-xs">결석 {retake.absentCount}회</span>
                         )}
                         {retake.postponeCount === 0 && retake.absentCount === 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">-</span>
+                          <span className="text-muted-foreground text-xs">-</span>
                         )}
                       </div>
                     </td>

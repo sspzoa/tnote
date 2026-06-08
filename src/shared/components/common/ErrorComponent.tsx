@@ -4,9 +4,9 @@ interface ErrorComponentProps {
 
 export default function ErrorComponent({ errorMessage }: ErrorComponentProps) {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-spacing-500">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-5">
       <div className="flex size-16 items-center justify-center rounded-full bg-solid-translucent-red">
-        <svg className="size-8 text-core-status-negative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="size-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -15,9 +15,9 @@ export default function ErrorComponent({ errorMessage }: ErrorComponentProps) {
           />
         </svg>
       </div>
-      <div className="flex flex-col gap-spacing-100 text-center">
-        <p className="font-medium text-body text-content-standard-primary">문제가 발생했습니다</p>
-        <p className="text-content-standard-tertiary text-label">{errorMessage}</p>
+      <div className="flex flex-col gap-1 text-center">
+        <p className="font-medium text-base text-foreground">문제가 발생했습니다</p>
+        <p className="text-muted-foreground text-sm">{errorMessage}</p>
       </div>
     </div>
   );

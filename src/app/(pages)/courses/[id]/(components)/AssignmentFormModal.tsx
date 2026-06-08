@@ -69,7 +69,6 @@ export function AssignmentFormModal({
             취소
           </Button>
           <Button
-            variant="primary"
             onClick={handleSubmit}
             disabled={isDisabled}
             isLoading={isSubmitting}
@@ -79,7 +78,7 @@ export function AssignmentFormModal({
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
+      <div className="flex flex-col gap-4">
         <FormInput
           label="과제 이름"
           required

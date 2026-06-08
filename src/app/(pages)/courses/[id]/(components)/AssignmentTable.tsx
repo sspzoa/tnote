@@ -1,13 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
@@ -23,9 +18,6 @@ interface AssignmentTableProps {
 type AssignmentSortKey = "name" | "createdAt";
 
 export function AssignmentTable({ assignments, onManage, onEdit, onDelete }: AssignmentTableProps) {
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
-
   const comparators = useMemo(
     () => ({
       name: (a: Assignment, b: Assignment) => a.name.localeCompare(b.name, "ko"),
@@ -46,9 +38,9 @@ export function AssignmentTable({ assignments, onManage, onEdit, onDelete }: Ass
   ];
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="과제명"
@@ -64,56 +56,31 @@ export function AssignmentTable({ assignments, onManage, onEdit, onDelete }: Ass
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              관리
-            </th>
-            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">관리</th>
+            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
           </tr>
         </thead>
-        <tbody className="divide-y divide-line-divider">
+        <tbody className="divide-y divide-border">
           {sortedData.map((assignment) => (
-            <tr key={assignment.id} className="transition-colors hover:bg-core-accent-translucent/50">
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="font-medium text-body text-content-standard-primary">{assignment.name}</div>
+            <tr key={assignment.id} className="transition-colors hover:bg-primary/10">
+              <td className="whitespace-nowrap px-5 py-4">
+                <div className="font-medium text-base text-foreground">{assignment.name}</div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="text-body text-content-standard-secondary">
-                  {formatLocaleDateKorean(assignment.created_at)}
-                </span>
+              <td className="whitespace-nowrap px-5 py-4">
+                <span className="text-base text-muted-foreground">{formatLocaleDateKorean(assignment.created_at)}</span>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <Button variant="primary" size="xs" className="font-medium" onClick={() => onManage(assignment)}>
+              <td className="whitespace-nowrap px-5 py-4">
+                <Button size="xs" className="font-medium" onClick={() => onManage(assignment)}>
                   학생별 현황
                 </Button>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <MoreOptionsButton
-                  onClick={(pos) => {
-                    if (openMenuId === assignment.id) {
-                      setOpenMenuId(null);
-                      setMenuPosition(null);
-                    } else {
-                      setOpenMenuId(assignment.id);
-                      setMenuPosition(pos);
-                    }
-                  }}
-                />
+              <td className="whitespace-nowrap px-5 py-4">
+                <DropdownMenu items={getMenuItems(assignment)} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((a) => a.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

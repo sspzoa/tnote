@@ -83,12 +83,12 @@ export default function ClinicEditModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-500">
+      <div className="flex flex-col gap-5">
         <FormInput label="클리닉 이름" required value={clinicName} onChange={(e) => setClinicName(e.target.value)} />
 
         <DayOfWeekPicker label="운영 요일" required selectedDays={operatingDays} onChange={setOperatingDays} />
 
-        <div className="grid grid-cols-2 gap-spacing-400">
+        <div className="grid grid-cols-2 gap-4">
           <FormInput
             label="시작 날짜"
             required

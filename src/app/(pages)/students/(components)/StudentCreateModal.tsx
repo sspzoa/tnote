@@ -54,7 +54,6 @@ export default function StudentCreateModal() {
             취소
           </Button>
           <Button
-            variant="primary"
             className="flex-1"
             onClick={handleCreate}
             disabled={
@@ -71,7 +70,7 @@ export default function StudentCreateModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
+      <div className="flex flex-col gap-4">
         <FormInput
           label="이름"
           type="text"
@@ -115,7 +114,7 @@ export default function StudentCreateModal() {
           required
         />
 
-        <div className="flex items-end gap-spacing-200">
+        <div className="flex items-end gap-2">
           <div className="flex-1">
             <FormInput
               label="출생년도"
@@ -128,7 +127,7 @@ export default function StudentCreateModal() {
               required
             />
           </div>
-          <div className="flex gap-spacing-100">
+          <div className="flex gap-1">
             {(["고1", "고2", "고3"] as const).map((grade) => {
               const gradeNumber = Number.parseInt(grade[1]) + 9;
               const birthYear = new Date().getFullYear() - (gradeNumber + 7) + 1;
@@ -138,10 +137,10 @@ export default function StudentCreateModal() {
                   key={grade}
                   type="button"
                   onClick={() => setForm({ ...form, birthYear: birthYear.toString() })}
-                  className={`rounded-radius-300 border px-spacing-300 py-spacing-300 font-medium text-body transition-colors ${
+                  className={`rounded-md border px-3 py-3 font-medium text-base transition-colors ${
                     isActive
-                      ? "border-core-accent bg-core-accent text-solid-white"
-                      : "border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-interactive-hover"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-muted text-muted-foreground hover:bg-accent"
                   }`}>
                   {grade}
                 </button>

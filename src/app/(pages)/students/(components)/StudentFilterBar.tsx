@@ -39,20 +39,20 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
     const isActive = selectedTagIds.has(tag.id);
     const colorClasses = TAG_FILTER_COLOR_CLASSES[tag.color];
     return isActive
-      ? `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
-      : `rounded-radius-300 px-spacing-300 py-spacing-150 font-medium text-label transition-all duration-150 ${colorClasses.bg} ${colorClasses.text} hover:opacity-80`;
+      ? `rounded-md px-3 py-1.5 font-medium text-sm transition-all duration-150 ${colorClasses.activeBg} ${colorClasses.text} ring-1 ring-current`
+      : `rounded-md px-3 py-1.5 font-medium text-sm transition-all duration-150 ${colorClasses.bg} ${colorClasses.text} hover:opacity-80`;
   };
 
   const tagManageButtonClassName =
-    "flex items-center gap-spacing-100 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-300 py-spacing-150 font-medium text-content-standard-secondary text-label transition-all duration-150 hover:border-core-accent/30 hover:bg-components-interactive-hover hover:text-content-standard-primary";
+    "flex items-center gap-1 rounded-md border border-border bg-muted px-3 py-1.5 font-medium text-muted-foreground text-sm transition-all duration-150 hover:border-primary/30 hover:bg-accent hover:text-foreground";
 
   return (
-    <div className="flex flex-col gap-spacing-400">
-      <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-400">
-        <span className="block font-medium text-content-standard-tertiary text-label">필터</span>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
+        <span className="block font-medium text-muted-foreground text-sm">필터</span>
 
-        <div className="flex flex-col gap-spacing-400">
-          <div className="flex flex-wrap items-center gap-spacing-300">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-3">
             <FilterButton active={selectedCourse === "all"} onClick={() => setSelectedCourse("all")}>
               전체
             </FilterButton>
@@ -66,7 +66,7 @@ export default function StudentFilterBar({ courses, tags }: StudentFilterBarProp
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-spacing-300">
+          <div className="flex flex-wrap items-center gap-3">
             <button onClick={() => setShowTagManageModal(true)} className={tagManageButtonClassName}>
               <Settings className="size-4" />
               태그 관리

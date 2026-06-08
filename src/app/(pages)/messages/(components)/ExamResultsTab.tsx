@@ -154,50 +154,46 @@ export default function ExamResultsTab() {
   ]);
 
   const examSelector = (
-    <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
+    <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5">
       <div>
-        <h3 className="font-semibold text-body text-content-standard-primary">시험 선택</h3>
-        <p className="text-content-standard-tertiary text-footnote">결과를 발송할 시험을 선택하세요</p>
+        <h3 className="font-semibold text-base text-foreground">시험 선택</h3>
+        <p className="text-muted-foreground text-xs">결과를 발송할 시험을 선택하세요</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-spacing-400">
-        <div className="flex flex-col gap-spacing-200">
-          <label className="font-semibold text-content-standard-secondary text-label">수업</label>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-muted-foreground text-sm">수업</label>
           <FilterSelect
             value={selectedCourseId}
-            onChange={(e) => handleCourseChange(e.target.value)}
+            onValueChange={(value) => handleCourseChange(value)}
             disabled={coursesLoading}
-            className="w-full">
-            <option value="">수업을 선택하세요</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </FilterSelect>
+            className="w-full"
+            options={[
+              { value: "", label: "수업을 선택하세요" },
+              ...courses.map((course) => ({ value: course.id, label: course.name })),
+            ]}
+          />
         </div>
 
-        <div className="flex flex-col gap-spacing-200">
-          <label className="font-semibold text-content-standard-secondary text-label">시험</label>
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-muted-foreground text-sm">시험</label>
           <FilterSelect
             value={selectedExamId}
-            onChange={(e) => setSelectedExamId(e.target.value)}
+            onValueChange={(value) => setSelectedExamId(value)}
             disabled={!selectedCourseId || examsLoading}
-            className="w-full">
-            <option value="">{selectedCourseId ? "시험을 선택하세요" : "먼저 수업을 선택하세요"}</option>
-            {exams.map((exam) => (
-              <option key={exam.id} value={exam.id}>
-                {exam.exam_number}회 - {exam.name}
-              </option>
-            ))}
-          </FilterSelect>
+            className="w-full"
+            options={[
+              { value: "", label: selectedCourseId ? "시험을 선택하세요" : "먼저 수업을 선택하세요" },
+              ...exams.map((exam) => ({ value: exam.id, label: `${exam.exam_number}회 - ${exam.name}` })),
+            ]}
+          />
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="flex flex-col gap-spacing-600">
+    <div className="flex flex-col gap-7">
       {examSelector}
       <MessageTabLayout
         isLoading={exportFetching}
@@ -215,7 +211,7 @@ export default function ExamResultsTab() {
           noResultsMessage: "검색 결과가 없습니다",
           filteredCount: filteredStudents.length,
           showPlaceholder: !selectedExamId,
-          placeholderIcon: <FileText className="size-6 text-core-accent" />,
+          placeholderIcon: <FileText className="size-6 text-primary" />,
           placeholderMessage: "먼저 시험을 선택하세요",
           renderItems: () =>
             filteredStudents.map((student) => (
@@ -225,7 +221,7 @@ export default function ExamResultsTab() {
                 selected={selectedIds.has(student.id)}
                 onToggle={() => handleToggleStudent(student.id)}
                 rightContent={
-                  <div className="flex items-center gap-spacing-200">
+                  <div className="flex items-center gap-2">
                     <Badge variant={student.isFailed ? "danger" : "success"} size="xs">
                       {student.score ?? "-"}/{exportData?.exam?.maxScore ?? "-"}점 · {student.rank ?? "-"}/
                       {students.length}등

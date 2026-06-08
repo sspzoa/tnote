@@ -1,16 +1,42 @@
-import type { SelectHTMLAttributes } from "react";
+"use client";
 
-interface FilterSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  children: React.ReactNode;
+import {
+  SelectContent,
+  SelectItem,
+  Select as SelectRoot,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { cn } from "@/shared/lib/utils/cn";
+
+type FilterOption = { value: string; label: string };
+
+interface FilterSelectProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  options: FilterOption[];
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
 }
 
-export function FilterSelect({ children, disabled, className = "", ...props }: FilterSelectProps) {
+/** Compact, filter-bar styled Radix Select. Options-based; an empty-value option becomes the placeholder. */
+export function FilterSelect({ value, onValueChange, options, placeholder, disabled, className }: FilterSelectProps) {
+  const placeholderOption = options.find((option) => option.value === "");
+  const items = options.filter((option) => option.value !== "");
+
   return (
-    <select
-      className={`cursor-pointer rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-200 font-medium text-content-standard-primary text-label transition-all duration-150 hover:border-core-accent/30 focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent ${disabled ? "cursor-not-allowed opacity-50 hover:border-line-outline" : ""} ${className}`}
-      disabled={disabled}
-      {...props}>
-      {children}
-    </select>
+    <SelectRoot value={value} onValueChange={onValueChange} disabled={disabled}>
+      <SelectTrigger size="sm" className={cn("w-auto font-medium", className)}>
+        <SelectValue placeholder={placeholder ?? placeholderOption?.label} />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </SelectRoot>
   );
 }

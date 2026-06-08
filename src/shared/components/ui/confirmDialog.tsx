@@ -1,8 +1,16 @@
 "use client";
 
-import { createContext, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
-import { Button } from "./button";
-import { Modal } from "./modal";
+import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./alert-dialog";
 
 interface ConfirmOptions {
   title?: string;
@@ -50,37 +58,34 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
     setState(null);
   }, []);
 
-  const contextValue = useMemo(() => confirm, [confirm]);
-
   return (
-    <ConfirmContext value={contextValue}>
+    <ConfirmContext value={confirm}>
       {children}
-      {state && (
-        <Modal
-          isOpen={true}
-          onClose={handleClose}
-          onSubmit={handleConfirm}
-          title={state.title || "확인"}
-          size="sm"
-          footer={
-            <>
-              <Button variant="secondary" onClick={handleClose} className="flex-1">
-                {state.cancelLabel || "취소"}
-              </Button>
-              <Button
-                variant={state.variant === "danger" ? "danger" : "primary"}
-                onClick={handleConfirm}
-                className="flex-1">
+      <AlertDialog
+        open={state !== null}
+        onOpenChange={(open) => {
+          if (!open) handleClose();
+        }}>
+        {state && (
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{state.title || "확인"}</AlertDialogTitle>
+              <AlertDialogDescription className="whitespace-pre-line text-foreground">
+                {state.message}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            {state.description && <p className="text-muted-foreground text-xs">{state.description}</p>}
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleClose}>{state.cancelLabel || "취소"}</AlertDialogCancel>
+              <AlertDialogAction
+                variant={state.variant === "danger" ? "destructive" : "default"}
+                onClick={handleConfirm}>
                 {state.confirmLabel || "확인"}
-              </Button>
-            </>
-          }>
-          <div className="flex flex-col gap-spacing-200">
-            <p className="whitespace-pre-line text-body text-content-standard-primary">{state.message}</p>
-            {state.description && <p className="text-content-standard-tertiary text-footnote">{state.description}</p>}
-          </div>
-        </Modal>
-      )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        )}
+      </AlertDialog>
     </ConfirmContext>
   );
 }

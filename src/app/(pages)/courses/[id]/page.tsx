@@ -239,14 +239,14 @@ export default function CourseDetailPage() {
   if (courseLoading || examsLoading || assignmentsLoading || !course) {
     return (
       <Container>
-        <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-40" />
           <div className="flex items-end justify-between">
-            <div className="flex flex-col gap-spacing-200">
+            <div className="flex flex-col gap-2">
               <Skeleton className="h-8 w-48" />
               <Skeleton className="h-6 w-24" />
             </div>
-            <Skeleton className="h-12 w-28 rounded-radius-300" />
+            <Skeleton className="h-12 w-28 rounded-md" />
           </div>
         </div>
         <SkeletonTable
@@ -285,24 +285,24 @@ export default function CourseDetailPage() {
         action={actionButton}
       />
 
-      <div className="flex gap-spacing-200">
+      <div className="flex gap-2">
         <button
           type="button"
           onClick={() => setActiveTab("exams")}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+          className={`rounded-md px-4 py-2 font-medium text-sm transition-colors ${
             activeTab === "exams"
-              ? "bg-core-accent text-solid-white"
-              : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-fill-standard-tertiary"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:bg-muted"
           }`}>
           시험
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("assignments")}
-          className={`rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-colors ${
+          className={`rounded-md px-4 py-2 font-medium text-sm transition-colors ${
             activeTab === "assignments"
-              ? "bg-core-accent text-solid-white"
-              : "bg-components-fill-standard-secondary text-content-standard-secondary hover:bg-components-fill-standard-tertiary"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:bg-muted"
           }`}>
           과제
         </button>

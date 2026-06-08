@@ -11,8 +11,6 @@ export const showTagManageModalAtom = atom<boolean>(false);
 export const showAddTagModalAtom = atom<boolean>(false);
 export const showEditTagAssignmentModalAtom = atom<boolean>(false);
 
-export const openMenuIdAtom = atom<string | null>(null);
-
 export interface EditTagAssignmentData {
   studentId: string;
   studentName: string;

@@ -89,7 +89,7 @@ export function PasswordChangeModal({ isOpen, onClose }: PasswordChangeModalProp
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
+      <div className="flex flex-col gap-4">
         <FormInput
           label="현재 비밀번호"
           required

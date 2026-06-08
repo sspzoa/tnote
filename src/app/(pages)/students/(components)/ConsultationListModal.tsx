@@ -54,17 +54,17 @@ export default function ConsultationListModal() {
         {isLoading ? (
           <ConsultationListSkeleton count={4} />
         ) : consultations.length === 0 ? (
-          <div className="flex flex-col items-center gap-spacing-200 py-spacing-900 text-center">
-            <p className="text-body text-content-standard-tertiary">상담일지가 없습니다.</p>
-            <p className="text-content-standard-quaternary text-footnote">첫 상담일지를 작성해보세요.</p>
+          <div className="flex flex-col items-center gap-2 py-16 text-center">
+            <p className="text-base text-muted-foreground">상담일지가 없습니다.</p>
+            <p className="text-muted-foreground/60 text-xs">첫 상담일지를 작성해보세요.</p>
             <button
               onClick={openAddModal}
-              className="rounded-radius-400 bg-core-accent px-spacing-500 py-spacing-400 font-semibold text-body text-solid-white transition-opacity hover:opacity-90">
+              className="rounded-lg bg-primary px-5 py-4 font-semibold text-base text-primary-foreground transition-opacity hover:opacity-90">
               첫 상담일지 작성
             </button>
           </div>
         ) : (
-          <div className="max-h-96 divide-y divide-line-divider overflow-y-auto rounded-radius-300 border border-line-outline">
+          <div className="max-h-96 divide-y divide-border overflow-y-auto rounded-md border border-border">
             {(consultations as ConsultationWithCreator[]).map((log) => {
               const createdAt = new Date(log.created_at);
               const dateStr = formatLocaleDateKorean(createdAt);
@@ -74,14 +74,14 @@ export default function ConsultationListModal() {
                 <button
                   key={log.id}
                   onClick={() => setViewingConsultation(log)}
-                  className="flex w-full flex-col gap-spacing-100 px-spacing-500 py-spacing-400 text-left transition-colors hover:bg-components-interactive-hover">
+                  className="flex w-full flex-col gap-1 px-5 py-4 text-left transition-colors hover:bg-accent">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-body text-content-standard-primary">{log.title}</span>
-                    <span className="shrink-0 rounded-radius-200 bg-solid-translucent-blue px-spacing-200 py-spacing-50 text-footnote text-solid-blue">
+                    <span className="font-medium text-base text-foreground">{log.title}</span>
+                    <span className="shrink-0 rounded-sm bg-solid-translucent-blue px-2 py-0.5 text-xs text-solid-blue">
                       {dateStr}
                     </span>
                   </div>
-                  <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
                     <span>{timeStr}</span>
                     {log.creator?.name && (
                       <>

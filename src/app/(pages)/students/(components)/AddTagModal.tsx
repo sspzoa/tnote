@@ -71,7 +71,6 @@ export default function AddTagModal() {
             취소
           </Button>
           <Button
-            variant="primary"
             className="flex-1"
             onClick={handleAssign}
             disabled={!selectedTagId || !startDate}
@@ -81,19 +80,19 @@ export default function AddTagModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
-        <div className="flex flex-col gap-spacing-200">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <FormSelect
             label="태그"
             required
             value={selectedTagId}
-            onChange={(e) => setSelectedTagId(e.target.value)}
+            onValueChange={(value) => setSelectedTagId(value)}
             options={tagOptions}
             disabled={isTagsLoading}
           />
           {selectedTag && (
-            <div className="flex items-center gap-spacing-200">
-              <span className="text-content-standard-tertiary text-footnote">선택된 태그:</span>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-xs">선택된 태그:</span>
               <Badge variant={selectedTag.color} size="xs">
                 {selectedTag.name}
               </Badge>
@@ -109,7 +108,7 @@ export default function AddTagModal() {
           required
         />
 
-        <div className="flex flex-col gap-spacing-200">
+        <div className="flex flex-col gap-2">
           <FormCheckbox label="무기한" checked={isIndefinite} onChange={(e) => setIsIndefinite(e.target.checked)} />
           {!isIndefinite && (
             <FormInput label="종료일" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />

@@ -67,15 +67,15 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
       title="발신번호 설정"
       subtitle="문자 발송 시 사용할 발신번호를 설정합니다"
       footer={
-        <div className="flex w-full justify-end gap-spacing-200">
+        <div className="flex w-full justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>
-            <span className="flex items-center gap-spacing-200">
+            <span className="flex items-center gap-2">
               <X className="size-4" />
               취소
             </span>
           </Button>
           <Button onClick={handleSave} isLoading={isUpdating} loadingText="저장 중...">
-            <span className="flex items-center gap-spacing-200">
+            <span className="flex items-center gap-2">
               <Save className="size-4" />
               저장
             </span>
@@ -83,9 +83,9 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
         </div>
       }>
       {isLoading ? (
-        <SkeletonSpinner className="py-spacing-600" size="md" />
+        <SkeletonSpinner className="py-7" size="md" />
       ) : (
-        <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-4">
           <FormInput
             label="발신번호"
             value={phoneInput}
@@ -93,9 +93,9 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
             placeholder="010-1234-5678"
             error={error || undefined}
           />
-          <div className="flex flex-col gap-spacing-200 rounded-radius-300 bg-solid-translucent-yellow p-spacing-400">
-            <p className="font-semibold text-core-status-warning text-label">주의사항</p>
-            <ul className="flex list-inside list-disc flex-col gap-spacing-100 text-content-standard-secondary text-footnote">
+          <div className="flex flex-col gap-2 rounded-md bg-solid-translucent-yellow p-4">
+            <p className="font-semibold text-warning text-sm">주의사항</p>
+            <ul className="flex list-inside list-disc flex-col gap-1 text-muted-foreground text-xs">
               <li>SOLAPI에 등록된 발신번호만 사용 가능합니다.</li>
               <li>미등록 번호로 발송 시 실패할 수 있습니다.</li>
               <li>발신번호 등록은 SOLAPI 콘솔에서 진행해주세요.</li>

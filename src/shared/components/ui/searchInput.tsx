@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes } from "react";
+import { cn } from "@/shared/lib/utils/cn";
 
 type SearchInputSize = "md" | "lg";
 
@@ -8,8 +9,8 @@ interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "
 }
 
 const sizeStyles: Record<SearchInputSize, string> = {
-  md: "rounded-radius-300 px-spacing-400 py-spacing-300 text-body",
-  lg: "rounded-radius-400 px-spacing-500 py-spacing-400 text-body",
+  md: "rounded-md px-4 py-3 text-base",
+  lg: "rounded-lg px-5 py-4 text-base",
 };
 
 export function SearchInput({ placeholder = "검색...", size = "md", className = "", ...props }: SearchInputProps) {
@@ -17,7 +18,11 @@ export function SearchInput({ placeholder = "검색...", size = "md", className 
     <input
       type="text"
       placeholder={placeholder}
-      className={`w-full border border-line-outline bg-components-fill-standard-secondary text-content-standard-primary transition-all duration-150 placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent ${sizeStyles[size]} ${className}`}
+      className={cn(
+        "w-full border border-border bg-muted text-foreground outline-none transition-all duration-150 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        sizeStyles[size],
+        className,
+      )}
       {...props}
     />
   );

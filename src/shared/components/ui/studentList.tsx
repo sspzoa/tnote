@@ -2,6 +2,7 @@
 
 import { memo, type ReactNode } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { cn } from "@/shared/lib/utils/cn";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import type { StudentTagAssignment } from "@/shared/types";
 
@@ -21,7 +22,11 @@ interface StudentListContainerProps {
 export function StudentListContainer({ children, className = "" }: StudentListContainerProps) {
   return (
     <div
-      className={`overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary ${className.includes("flex-1") ? "min-h-0" : "h-80"} ${className}`}>
+      className={cn(
+        "overflow-y-auto rounded-md border border-border bg-muted",
+        className.includes("flex-1") ? "min-h-0" : "h-80",
+        className,
+      )}>
       {children}
     </div>
   );
@@ -65,12 +70,12 @@ export const StudentListItem = memo(function StudentListItem({
           type="checkbox"
           checked={selected}
           onChange={onToggle}
-          className="size-4 shrink-0 cursor-pointer accent-core-accent"
+          className="size-4 shrink-0 cursor-pointer accent-primary"
         />
       )}
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-spacing-200">
-          <span className="truncate font-medium text-body text-content-standard-primary">{student.name}</span>
+        <div className="flex items-center gap-2">
+          <span className="truncate font-medium text-base text-foreground">{student.name}</span>
           {activeTags.length > 0 &&
             activeTags.map((assignment) => {
               const tag = assignment.tag;
@@ -83,7 +88,7 @@ export const StudentListItem = memo(function StudentListItem({
             })}
           {badge}
         </div>
-        <div className="truncate text-content-standard-tertiary text-footnote">
+        <div className="truncate text-muted-foreground text-xs">
           {formatPhoneNumber(student.phone_number)}
           {student.school && ` · ${student.school}`}
           {extraInfo}
@@ -93,14 +98,14 @@ export const StudentListItem = memo(function StudentListItem({
     </>
   );
 
-  const baseClassName = `flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0 ${
-    highlighted ? "bg-solid-translucent-red/30" : ""
-  }`;
+  const baseClassName = cn(
+    "flex items-center gap-3 border-border border-b px-4 py-3 last:border-b-0",
+    highlighted && "bg-solid-translucent-red/30",
+  );
 
   if (onToggle !== undefined) {
     return (
-      <label
-        className={`${baseClassName} cursor-pointer transition-all duration-150 hover:bg-core-accent-translucent/50`}>
+      <label className={cn(baseClassName, "cursor-pointer transition-all duration-150 hover:bg-primary/10")}>
         {content}
       </label>
     );
@@ -114,7 +119,7 @@ interface StudentListEmptyProps {
 }
 
 export function StudentListEmpty({ message = "학생이 없습니다." }: StudentListEmptyProps) {
-  return <div className="py-spacing-600 text-center text-content-standard-tertiary">{message}</div>;
+  return <div className="py-7 text-center text-muted-foreground">{message}</div>;
 }
 
 interface StudentListSkeletonProps {
@@ -131,19 +136,13 @@ export function StudentListSkeleton({
   return (
     <>
       {[...Array(count)].map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0">
-          {showCheckbox && (
-            <div className="size-4 shrink-0 animate-pulse rounded-radius-100 bg-components-fill-standard-tertiary" />
-          )}
-          <div className="flex min-w-0 flex-1 flex-col gap-spacing-100">
-            <div className="h-6 w-20 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
-            <div className="h-5 w-40 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
+        <div key={i} className="flex items-center gap-3 border-border border-b px-4 py-3 last:border-b-0">
+          {showCheckbox && <div className="size-4 shrink-0 animate-pulse rounded-sm bg-muted" />}
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <div className="h-6 w-20 animate-pulse rounded-sm bg-muted" />
+            <div className="h-5 w-40 animate-pulse rounded-sm bg-muted" />
           </div>
-          {showRightContent && (
-            <div className="h-8 w-16 shrink-0 animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary" />
-          )}
+          {showRightContent && <div className="h-8 w-16 shrink-0 animate-pulse rounded-sm bg-muted" />}
         </div>
       ))}
     </>

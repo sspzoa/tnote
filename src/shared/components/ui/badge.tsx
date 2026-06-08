@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+import { cn } from "@/shared/lib/utils/cn";
 import type { TagColor } from "@/shared/types";
 
 type SemanticVariant = "success" | "warning" | "danger" | "info" | "neutral";
@@ -27,13 +28,14 @@ interface InteractiveBadgeProps
 export type BadgeProps = StaticBadgeProps | InteractiveBadgeProps;
 
 const semanticStyles: Record<SemanticVariant, string> = {
-  success: "bg-solid-translucent-green text-core-status-positive border border-core-status-positive/20",
-  warning: "bg-solid-translucent-yellow text-core-status-warning border border-core-status-warning/20",
-  danger: "bg-solid-translucent-red text-core-status-negative border border-core-status-negative/20",
-  info: "bg-core-accent-translucent text-core-accent border border-core-accent/20",
-  neutral: "bg-components-fill-standard-secondary text-content-standard-secondary border border-line-outline",
+  success: "bg-success/10 text-success border border-success/20",
+  warning: "bg-warning/10 text-warning border border-warning/20",
+  danger: "bg-destructive/10 text-destructive border border-destructive/20",
+  info: "bg-primary/10 text-primary border border-primary/20",
+  neutral: "bg-muted text-muted-foreground border border-border",
 };
 
+// The 11-hue tag palette has no shadcn equivalent and is preserved as custom theme colors (solid-*).
 const colorStyles: Record<TagColor, string> = {
   red: "bg-solid-translucent-red text-solid-red border border-solid-red/20",
   orange: "bg-solid-translucent-orange text-solid-orange border border-solid-orange/20",
@@ -45,13 +47,13 @@ const colorStyles: Record<TagColor, string> = {
   pink: "bg-solid-translucent-pink text-solid-pink border border-solid-pink/20",
   brown: "bg-solid-translucent-brown text-solid-brown border border-solid-brown/20",
   black: "bg-solid-translucent-black text-solid-black border border-solid-black/20",
-  white: "bg-components-fill-standard-secondary text-content-standard-primary border border-line-outline",
+  white: "bg-muted text-foreground border border-border",
 };
 
 const sizeStyles: Record<BadgeSize, string> = {
-  xs: "px-spacing-200 py-spacing-50 text-footnote",
-  sm: "px-spacing-300 py-spacing-100 text-footnote",
-  md: "px-spacing-300 py-spacing-100 text-label",
+  xs: "px-2 py-0.5 text-xs",
+  sm: "px-3 py-1 text-xs",
+  md: "px-3 py-1 text-sm",
 };
 
 const isSemanticVariant = (variant: BadgeVariant): variant is SemanticVariant => {
@@ -73,12 +75,13 @@ export const Badge = ({
   className = "",
   ...props
 }: BadgeProps) => {
-  const baseStyles = "inline-flex items-center rounded-radius-200 font-medium";
-  const variantStyle = getVariantStyle(variant);
-  const sizeStyle = sizeStyles[size];
-  const interactiveStyle = interactive ? "cursor-pointer transition-opacity hover:opacity-80" : "";
-
-  const combinedClassName = `${baseStyles} ${variantStyle} ${sizeStyle} ${interactiveStyle} ${className}`.trim();
+  const combinedClassName = cn(
+    "inline-flex items-center rounded-md font-medium",
+    getVariantStyle(variant),
+    sizeStyles[size],
+    interactive && "cursor-pointer transition-opacity hover:opacity-80",
+    className,
+  );
 
   if (interactive) {
     const { ...buttonProps } = props as Omit<InteractiveBadgeProps, keyof BaseBadgeProps | "interactive">;

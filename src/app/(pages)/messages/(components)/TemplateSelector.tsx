@@ -47,11 +47,11 @@ export default function TemplateSelector({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-spacing-300">
+    <div className="flex flex-wrap items-center gap-3">
       <Select
         value=""
-        onChange={(e) => {
-          const template = templates.find((t) => t.id === e.target.value);
+        onValueChange={(value) => {
+          const template = templates.find((t) => t.id === value);
           if (template) {
             onSelect(template.content);
           }
@@ -67,7 +67,7 @@ export default function TemplateSelector({
         onClick={() => setIsSaveModalOpen(true)}
         disabled={!currentContent.trim()}
         title="현재 메시지를 템플릿으로 저장">
-        <span className="flex items-center gap-spacing-200">
+        <span className="flex items-center gap-2">
           <Save className="size-4" />
           저장
         </span>
@@ -75,11 +75,11 @@ export default function TemplateSelector({
 
       {matchingTemplate ? (
         <Button
-          variant="danger"
+          variant="destructive"
           size="sm"
           onClick={handleDeleteMatching}
           title={`"${matchingTemplate.name}" 템플릿 삭제`}>
-          <span className="flex items-center gap-spacing-200">
+          <span className="flex items-center gap-2">
             <Trash2 className="size-4" />
             삭제
           </span>
@@ -87,7 +87,7 @@ export default function TemplateSelector({
       ) : (
         templates.length > 0 && (
           <Button variant="secondary" size="sm" onClick={() => setIsManageModalOpen(true)} title="템플릿 관리">
-            <span className="flex items-center gap-spacing-200">
+            <span className="flex items-center gap-2">
               <Settings className="size-4" />
               관리
             </span>

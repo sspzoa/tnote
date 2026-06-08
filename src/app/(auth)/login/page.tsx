@@ -152,7 +152,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-core-accent p-spacing-800 lg:flex lg:min-h-dvh lg:w-[480px]">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-10 lg:flex lg:min-h-dvh lg:w-[480px]">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
@@ -162,42 +162,42 @@ export default function LoginPage() {
           }}
         />
 
-        <div className="relative z-10 flex items-center gap-spacing-200">
-          <div className="flex size-10 items-center justify-center rounded-radius-200 bg-core-accent">
-            <span className="font-bold text-label text-solid-white">T</span>
+        <div className="relative z-10 flex items-center gap-2">
+          <div className="flex size-10 items-center justify-center rounded-sm bg-primary">
+            <span className="font-bold text-sm text-solid-white">T</span>
           </div>
-          <span className="font-bold text-label text-solid-white">Tnote</span>
+          <span className="font-bold text-sm text-solid-white">Tnote</span>
         </div>
 
-        <div className="relative z-10 flex flex-col gap-spacing-600">
+        <div className="relative z-10 flex flex-col gap-7">
           <h1 className="font-bold text-4xl text-solid-white leading-[1.2] tracking-tight">
             학생 관리,
             <br />더 스마트하게
           </h1>
-          <p className="text-body text-solid-white/50 leading-relaxed">
+          <p className="text-base text-solid-white/50 leading-relaxed">
             시험, 과제, 상담까지.
             <br />
             선생님의 모든 학생 관리를 한 곳에서.
           </p>
-          <div className="flex flex-wrap gap-spacing-200">
+          <div className="flex flex-wrap gap-2">
             {heroFeatures.map((label) => (
               <span
                 key={label}
-                className="rounded-radius-full bg-solid-white/8 px-spacing-300 py-spacing-100 text-caption text-solid-white/40">
+                className="rounded-full bg-solid-white/8 px-3 py-1 text-[10px] leading-4 text-solid-white/40">
                 {label}
               </span>
             ))}
           </div>
         </div>
 
-        <p className="relative z-10 text-caption text-solid-white/20">© {new Date().getFullYear()} Tnote</p>
+        <p className="relative z-10 text-[10px] leading-4 text-solid-white/20">© {new Date().getFullYear()} Tnote</p>
       </div>
 
-      <div className="flex flex-1 flex-col justify-center bg-background-standard-primary p-spacing-600 lg:p-spacing-800">
+      <div className="flex flex-1 flex-col justify-center bg-background p-7 lg:p-10">
         <div className="mx-auto w-full max-w-[400px]">
-          <div className="mb-spacing-700 flex flex-col gap-spacing-100">
-            <h2 className="font-bold text-content-standard-primary text-title">로그인</h2>
-            <p className="text-content-standard-tertiary text-label">계정에 로그인하여 시작하세요</p>
+          <div className="mb-8 flex flex-col gap-1">
+            <h2 className="font-bold text-2xl text-foreground">로그인</h2>
+            <p className="text-muted-foreground text-sm">계정에 로그인하여 시작하세요</p>
           </div>
 
           <SegmentedControl
@@ -212,13 +212,13 @@ export default function LoginPage() {
             }}
           />
 
-          <form onSubmit={handleLogin} className="mt-spacing-600 flex flex-col gap-spacing-500">
+          <form onSubmit={handleLogin} className="mt-7 flex flex-col gap-5">
             {tab === "student" && (
               <FormSelect
                 label="워크스페이스"
                 required
                 value={workspaceId}
-                onChange={(e) => setWorkspaceId(e.target.value)}
+                onValueChange={(value) => setWorkspaceId(value)}
                 options={workspaceOptions}
                 disabled={loading}
               />
@@ -249,24 +249,24 @@ export default function LoginPage() {
               disabled={loading}
               isLoading={loading}
               loadingText="로그인 중..."
-              className="mt-spacing-200 w-full">
+              className="mt-2 w-full">
               로그인
             </Button>
 
             {tab === "teacher" && (
               <>
-                <div className="flex items-center gap-spacing-400">
-                  <div className="h-px flex-1 bg-line-divider" />
-                  <span className="text-caption text-content-standard-quaternary">또는</span>
-                  <div className="h-px flex-1 bg-line-divider" />
+                <div className="flex items-center gap-4">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-[10px] leading-4 text-muted-foreground/60">또는</span>
+                  <div className="h-px flex-1 bg-border" />
                 </div>
 
-                <div className="text-center text-body text-content-standard-secondary">
+                <div className="text-center text-base text-muted-foreground">
                   계정이 없으신가요?{" "}
                   <button
                     type="button"
                     onClick={() => setShowRegisterModal(true)}
-                    className="font-semibold text-core-accent transition-all duration-150 hover:brightness-110">
+                    className="font-semibold text-primary transition-all duration-150 hover:brightness-110">
                     회원가입
                   </button>
                 </div>
@@ -274,7 +274,7 @@ export default function LoginPage() {
             )}
           </form>
 
-          <p className="mt-spacing-800 text-center text-caption text-content-standard-quaternary lg:hidden">
+          <p className="mt-10 text-center text-[10px] leading-4 text-muted-foreground/60 lg:hidden">
             © {new Date().getFullYear()} Tnote
           </p>
         </div>
@@ -301,7 +301,7 @@ export default function LoginPage() {
             </Button>
           </>
         }>
-        <form id="register-form" onSubmit={handleRegister} className="flex flex-col gap-spacing-400">
+        <form id="register-form" onSubmit={handleRegister} className="flex flex-col gap-4">
           <FormInput
             label="이름"
             required
@@ -346,52 +346,52 @@ export default function LoginPage() {
             placeholder="비밀번호를 다시 입력하세요"
           />
 
-          <div className="flex flex-col gap-spacing-300 border-line-divider border-t pt-spacing-400">
-            <p className="font-semibold text-content-standard-primary text-label">
-              약관 동의 <span className="text-core-status-negative">*</span>
+          <div className="flex flex-col gap-3 border-border border-t pt-4">
+            <p className="font-semibold text-foreground text-sm">
+              약관 동의 <span className="text-destructive">*</span>
             </p>
-            <div className="flex flex-col gap-spacing-300">
-              <label className="group flex cursor-pointer items-center gap-spacing-200">
+            <div className="flex flex-col gap-3">
+              <label className="group flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={agreements.terms && agreements.privacy}
                   onChange={(e) => setAgreements({ terms: e.target.checked, privacy: e.target.checked })}
-                  className="size-4 cursor-pointer rounded-radius-100 border border-line-outline bg-components-fill-standard-secondary text-core-accent transition-all duration-150 checked:border-core-accent checked:bg-core-accent focus:ring-2 focus:ring-core-accent-translucent group-hover:border-core-accent/50"
+                  className="size-4 cursor-pointer rounded-sm border border-border bg-muted text-primary transition-all duration-150 checked:border-primary checked:bg-primary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 group-hover:border-primary/50"
                 />
-                <span className="font-medium text-body text-content-standard-primary">전체 동의</span>
+                <span className="font-medium text-base text-foreground">전체 동의</span>
               </label>
-              <div className="flex flex-col gap-spacing-200 pl-spacing-100">
-                <label className="group flex cursor-pointer items-center gap-spacing-200">
+              <div className="flex flex-col gap-2 pl-1">
+                <label className="group flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     checked={agreements.terms}
                     onChange={(e) => setAgreements({ ...agreements, terms: e.target.checked })}
-                    className="size-4 cursor-pointer rounded-radius-100 border border-line-outline bg-components-fill-standard-secondary text-core-accent transition-all duration-150 checked:border-core-accent checked:bg-core-accent focus:ring-2 focus:ring-core-accent-translucent group-hover:border-core-accent/50"
+                    className="size-4 cursor-pointer rounded-sm border border-border bg-muted text-primary transition-all duration-150 checked:border-primary checked:bg-primary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 group-hover:border-primary/50"
                   />
-                  <span className="text-body text-content-standard-secondary">
+                  <span className="text-base text-muted-foreground">
                     <a
                       href="/terms"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline transition-colors hover:text-core-accent">
+                      className="underline transition-colors hover:text-primary">
                       이용약관
                     </a>
                     에 동의합니다 (필수)
                   </span>
                 </label>
-                <label className="group flex cursor-pointer items-center gap-spacing-200">
+                <label className="group flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     checked={agreements.privacy}
                     onChange={(e) => setAgreements({ ...agreements, privacy: e.target.checked })}
-                    className="size-4 cursor-pointer rounded-radius-100 border border-line-outline bg-components-fill-standard-secondary text-core-accent transition-all duration-150 checked:border-core-accent checked:bg-core-accent focus:ring-2 focus:ring-core-accent-translucent group-hover:border-core-accent/50"
+                    className="size-4 cursor-pointer rounded-sm border border-border bg-muted text-primary transition-all duration-150 checked:border-primary checked:bg-primary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 group-hover:border-primary/50"
                   />
-                  <span className="text-body text-content-standard-secondary">
+                  <span className="text-base text-muted-foreground">
                     <a
                       href="/privacy"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline transition-colors hover:text-core-accent">
+                      className="underline transition-colors hover:text-primary">
                       개인정보처리방침
                     </a>
                     에 동의합니다 (필수)

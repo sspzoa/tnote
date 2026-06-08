@@ -1,3 +1,5 @@
+import { cn } from "@/shared/lib/utils/cn";
+
 interface FilterButtonProps {
   active: boolean;
   onClick: () => void;
@@ -6,18 +8,18 @@ interface FilterButtonProps {
 }
 
 export function FilterButton({ active, onClick, children, variant = "default" }: FilterButtonProps) {
-  const baseStyles =
-    "rounded-radius-300 px-spacing-400 py-spacing-200 font-medium text-label transition-all duration-150 border";
+  const baseStyles = "rounded-md px-4 py-2 font-medium text-sm transition-all duration-150 border";
 
   if (variant === "toggle") {
     return (
       <button
         onClick={onClick}
-        className={`${baseStyles} ${
+        className={cn(
+          baseStyles,
           active
-            ? "border-core-status-positive/30 bg-solid-translucent-green text-core-status-positive"
-            : "border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:border-core-accent/30 hover:bg-components-interactive-hover"
-        }`}>
+            ? "border-success/30 bg-success/10 text-success"
+            : "border-border bg-muted text-muted-foreground hover:border-primary/30 hover:bg-accent",
+        )}>
         {children}
       </button>
     );
@@ -26,11 +28,12 @@ export function FilterButton({ active, onClick, children, variant = "default" }:
   return (
     <button
       onClick={onClick}
-      className={`${baseStyles} ${
+      className={cn(
+        baseStyles,
         active
-          ? "border-core-accent bg-core-accent text-solid-white"
-          : "border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:border-core-accent/30 hover:bg-components-interactive-hover"
-      }`}>
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-muted text-muted-foreground hover:border-primary/30 hover:bg-accent",
+      )}>
       {children}
     </button>
   );

@@ -126,7 +126,7 @@ export default function ConsultationFormModal() {
             취소
           </Button>
           {isEditMode && (
-            <Button variant="danger" onClick={handleDelete} disabled={isDeleting} className="flex-1">
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="flex-1">
               {isDeleting ? "삭제 중..." : "삭제"}
             </Button>
           )}
@@ -138,7 +138,7 @@ export default function ConsultationFormModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
+      <div className="flex flex-col gap-4">
         <ConsultationTemplateSelector
           templates={templates}
           currentTitle={form.title}

@@ -3,8 +3,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as JotaiProvider } from "jotai";
 import { type PropsWithChildren, useState } from "react";
-import { ToastContainer } from "@/shared/components/common/Toast";
 import { ConfirmDialogProvider } from "@/shared/components/ui/confirmDialog";
+import { Toaster } from "@/shared/components/ui/sonner";
 
 const createQueryClient = () =>
   new QueryClient({
@@ -27,7 +27,7 @@ export function Providers({ children }: PropsWithChildren) {
     <JotaiProvider>
       <QueryClientProvider client={queryClient}>
         <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
-        <ToastContainer />
+        <Toaster />
       </QueryClientProvider>
     </JotaiProvider>
   );
