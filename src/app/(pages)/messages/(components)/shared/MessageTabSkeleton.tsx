@@ -4,25 +4,23 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 export default function MessageTabSkeleton() {
   return (
-    <div className="flex h-[700px] flex-row items-stretch gap-spacing-600">
-      <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-        <div className="flex flex-col gap-spacing-100 border-line-divider border-b px-spacing-500 py-spacing-400">
+    <div className="flex h-[700px] flex-row items-stretch gap-7">
+      <div className="flex flex-1 flex-col rounded-lg border border-border bg-card">
+        <div className="flex flex-col gap-1 border-border border-b px-5 py-4">
           <Skeleton className="h-6 w-24" />
           <Skeleton className="h-5 w-16" />
         </div>
-        <div className="flex items-center gap-spacing-300 border-line-divider border-b px-spacing-500 py-spacing-300">
-          <Skeleton className="size-5 rounded-radius-100" />
+        <div className="flex items-center gap-3 border-border border-b px-5 py-3">
+          <Skeleton className="size-5 rounded-sm" />
           <Skeleton className="h-5 w-20" />
         </div>
-        <div className="flex min-h-0 flex-1 flex-col gap-spacing-300 p-spacing-500">
-          <Skeleton className="h-12 w-full rounded-radius-300" />
-          <div className="flex flex-1 flex-col gap-spacing-200 overflow-hidden">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 p-5">
+          <Skeleton className="h-12 w-full rounded-md" />
+          <div className="flex flex-1 flex-col gap-2 overflow-hidden">
             {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-spacing-300 rounded-radius-300 border border-line-outline p-spacing-300">
-                <Skeleton className="size-5 rounded-radius-100" />
-                <div className="flex flex-1 flex-col gap-spacing-100">
+              <div key={i} className="flex items-center gap-3 rounded-md border border-border p-3">
+                <Skeleton className="size-5 rounded-sm" />
+                <div className="flex flex-1 flex-col gap-1">
                   <Skeleton className="h-6 w-20" />
                   <Skeleton className="h-5 w-28" />
                 </div>
@@ -32,22 +30,22 @@ export default function MessageTabSkeleton() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-        <div className="flex flex-col gap-spacing-100 border-line-divider border-b px-spacing-500 py-spacing-400">
+      <div className="flex flex-1 flex-col rounded-lg border border-border bg-card">
+        <div className="flex flex-col gap-1 border-border border-b px-5 py-4">
           <Skeleton className="h-6 w-24" />
           <Skeleton className="h-5 w-40" />
         </div>
-        <div className="flex items-center gap-spacing-300 border-line-divider border-b px-spacing-500 py-spacing-300">
-          <Skeleton className="h-9 w-20 rounded-radius-300" />
-          <Skeleton className="h-9 w-20 rounded-radius-300" />
+        <div className="flex items-center gap-3 border-border border-b px-5 py-3">
+          <Skeleton className="h-9 w-20 rounded-md" />
+          <Skeleton className="h-9 w-20 rounded-md" />
         </div>
-        <div className="flex min-h-0 flex-1 flex-col gap-spacing-400 px-spacing-500 py-spacing-400">
-          <Skeleton className="min-h-0 flex-1 rounded-radius-300" />
+        <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 py-4">
+          <Skeleton className="min-h-0 flex-1 rounded-md" />
           <div className="flex items-center justify-between">
             <Skeleton className="h-5 w-24" />
-            <div className="flex gap-spacing-200">
-              <Skeleton className="h-12 w-24 rounded-radius-300" />
-              <Skeleton className="h-12 w-24 rounded-radius-300" />
+            <div className="flex gap-2">
+              <Skeleton className="h-12 w-24 rounded-md" />
+              <Skeleton className="h-12 w-24 rounded-md" />
             </div>
           </div>
         </div>

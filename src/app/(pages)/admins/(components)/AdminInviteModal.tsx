@@ -50,17 +50,12 @@ export default function AdminInviteModal() {
             }}>
             취소
           </Button>
-          <Button
-            variant="primary"
-            className="flex-1"
-            onClick={handleSubmit}
-            isLoading={isCreating}
-            loadingText="추가 중...">
+          <Button className="flex-1" onClick={handleSubmit} isLoading={isCreating} loadingText="추가 중...">
             추가
           </Button>
         </>
       }>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-spacing-400">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <FormInput
           label="이름"
           type="text"
@@ -78,10 +73,10 @@ export default function AdminInviteModal() {
           required
         />
 
-        <p className="text-caption text-content-standard-tertiary">초기 비밀번호는 전화번호로 자동 설정됩니다.</p>
+        <p className="text-[10px] leading-4 text-muted-foreground">초기 비밀번호는 전화번호로 자동 설정됩니다.</p>
 
         {error && (
-          <div className="rounded-radius-300 border border-core-status-negative/20 bg-solid-translucent-red px-spacing-400 py-spacing-300 font-medium text-core-status-negative text-label">
+          <div className="rounded-md border border-destructive/20 bg-solid-translucent-red px-4 py-3 font-medium text-destructive text-sm">
             {error}
           </div>
         )}

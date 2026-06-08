@@ -80,16 +80,16 @@ const SortableItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 last:border-b-0 ${isDragging ? "z-10 bg-components-fill-standard-secondary opacity-90 shadow-lg" : "bg-background-standard-primary"}`}>
+      className={`flex items-center gap-3 border-border border-b px-4 py-3 last:border-b-0 ${isDragging ? "z-10 bg-muted opacity-90 shadow-lg" : "bg-background"}`}>
       <button
         type="button"
-        className="cursor-grab touch-none text-content-standard-tertiary hover:text-content-standard-primary active:cursor-grabbing"
+        className="cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
         {...attributes}
         {...listeners}>
         <GripVertical className="size-4" />
       </button>
 
-      <span className="w-6 text-center text-caption text-content-standard-quaternary">{index + 1}</span>
+      <span className="w-6 text-center text-[10px] leading-4 text-muted-foreground/60">{index + 1}</span>
 
       {editingId === status.id ? (
         <>
@@ -102,12 +102,12 @@ const SortableItem = ({
           />
           <Select
             value={editColor}
-            onChange={(e) => onEditColorChange(e.target.value as StatusColor)}
+            onValueChange={(value) => onEditColorChange(value as StatusColor)}
             disabled={isBusy}
             options={COLOR_OPTIONS}
             className="w-32"
           />
-          <Button variant="primary" size="sm" onClick={onConfirmEdit} disabled={isBusy || !editName.trim()}>
+          <Button size="sm" onClick={onConfirmEdit} disabled={isBusy || !editName.trim()}>
             확인
           </Button>
           <Button variant="secondary" size="sm" onClick={onCancelEdit} disabled={isBusy}>
@@ -127,7 +127,7 @@ const SortableItem = ({
             수정
           </Button>
           <Button
-            variant="danger"
+            variant="destructive"
             size="sm"
             onClick={() => onDelete(status.id)}
             disabled={isBusy || editingId !== null}>
@@ -282,29 +282,24 @@ export default function ManagementStatusSettingsModal() {
       title="관리 상태 설정"
       subtitle="관리 상태 목록을 추가, 수정, 삭제하고 순서를 변경할 수 있습니다"
       footer={
-        <div className="flex w-full gap-spacing-300">
+        <div className="flex w-full gap-3">
           <Button variant="secondary" onClick={handleClose} disabled={isBusy} className="flex-1">
             닫기
           </Button>
-          <Button
-            variant="primary"
-            onClick={handleSaveAll}
-            disabled={isBusy || !hasChanges}
-            isLoading={isSaving}
-            className="flex-1">
+          <Button onClick={handleSaveAll} disabled={isBusy || !hasChanges} isLoading={isSaving} className="flex-1">
             저장
           </Button>
         </div>
       }>
       {isLoading ? (
         <div className="flex h-48 items-center justify-center">
-          <span className="text-content-standard-tertiary">로딩 중...</span>
+          <span className="text-muted-foreground">로딩 중...</span>
         </div>
       ) : (
-        <div className="flex flex-col gap-spacing-500">
-          <div className="flex flex-col gap-spacing-200">
-            <span className="font-semibold text-content-standard-secondary text-label">새 상태 추가</span>
-            <div className="flex items-center gap-spacing-300">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <span className="font-semibold text-muted-foreground text-sm">새 상태 추가</span>
+            <div className="flex items-center gap-3">
               <Input
                 type="text"
                 size="md"
@@ -317,24 +312,20 @@ export default function ManagementStatusSettingsModal() {
               <Select
                 size="md"
                 value={newColor}
-                onChange={(e) => setNewColor(e.target.value as StatusColor)}
+                onValueChange={(value) => setNewColor(value as StatusColor)}
                 disabled={isBusy}
                 options={COLOR_OPTIONS}
                 className="w-36"
               />
-              <Button
-                variant="primary"
-                onClick={handleCreate}
-                disabled={isBusy || !newName.trim()}
-                isLoading={isCreating}>
+              <Button onClick={handleCreate} disabled={isBusy || !newName.trim()} isLoading={isCreating}>
                 추가
               </Button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-spacing-200">
-            <span className="font-semibold text-content-standard-secondary text-label">상태 목록</span>
-            <div className="max-h-80 overflow-y-auto rounded-radius-300 border border-line-outline">
+          <div className="flex flex-col gap-2">
+            <span className="font-semibold text-muted-foreground text-sm">상태 목록</span>
+            <div className="max-h-80 overflow-y-auto rounded-md border border-border">
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={localStatuses.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                   {localStatuses.map((status, index) => (
@@ -358,7 +349,7 @@ export default function ManagementStatusSettingsModal() {
               </DndContext>
 
               {localStatuses.length === 0 && (
-                <div className="flex h-24 items-center justify-center text-content-standard-tertiary">
+                <div className="flex h-24 items-center justify-center text-muted-foreground">
                   등록된 관리 상태가 없습니다
                 </div>
               )}

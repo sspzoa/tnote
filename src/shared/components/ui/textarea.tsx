@@ -1,16 +1,24 @@
-import type { TextareaHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
+import { cn } from "@/shared/lib/utils/cn";
 
-interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+type TextareaProps = ComponentProps<"textarea"> & {
   error?: boolean;
-}
+};
 
-export function Textarea({ error = false, className = "", ...props }: TextareaProps) {
+function Textarea({ className, error = false, ...props }: TextareaProps) {
   return (
     <textarea
-      className={`rounded-radius-300 border bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-primary transition-all placeholder:text-content-standard-tertiary focus:border-core-accent focus:outline-none focus:ring-2 focus:ring-core-accent-translucent ${
-        error ? "border-core-status-negative" : "border-line-outline"
-      } ${className}`}
+      data-slot="textarea"
+      aria-invalid={error || undefined}
+      className={cn(
+        "field-sizing-content flex min-h-16 w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30",
+        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+        className,
+      )}
       {...props}
     />
   );
 }
+
+export { Textarea };

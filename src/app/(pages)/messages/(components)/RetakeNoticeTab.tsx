@@ -122,31 +122,28 @@ export default function RetakeNoticeTab() {
   }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection, toast]);
 
   const filterHeader = (
-    <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-      <div className="grid grid-cols-2 gap-spacing-400">
-        <div className="flex flex-col gap-spacing-200">
-          <label className="font-semibold text-content-standard-secondary text-label">진행 상태</label>
-          <FilterSelect value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full">
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </FilterSelect>
+    <div className="border-border border-b px-5 py-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-muted-foreground text-sm">진행 상태</label>
+          <FilterSelect
+            value={statusFilter}
+            onValueChange={(value) => setStatusFilter(value)}
+            className="w-full"
+            options={STATUS_OPTIONS}
+          />
         </div>
-        <div className="flex flex-col gap-spacing-200">
-          <label className="font-semibold text-content-standard-secondary text-label">관리 상태</label>
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-muted-foreground text-sm">관리 상태</label>
           <FilterSelect
             value={managementFilter}
-            onChange={(e) => setManagementFilter(e.target.value)}
-            className="w-full">
-            <option value="all">전체</option>
-            {managementStatuses.map((status) => (
-              <option key={status.id} value={status.name}>
-                {status.name}
-              </option>
-            ))}
-          </FilterSelect>
+            onValueChange={(value) => setManagementFilter(value)}
+            className="w-full"
+            options={[
+              { value: "all", label: "전체" },
+              ...managementStatuses.map((status) => ({ value: status.name, label: status.name })),
+            ]}
+          />
         </div>
       </div>
     </div>
@@ -176,16 +173,16 @@ export default function RetakeNoticeTab() {
             return (
               <label
                 key={retake.id}
-                className="flex cursor-pointer items-center gap-spacing-300 border-line-divider border-b px-spacing-400 py-spacing-300 transition-all duration-150 last:border-b-0 hover:bg-core-accent-translucent/50">
+                className="flex cursor-pointer items-center gap-3 border-border border-b px-4 py-3 transition-all duration-150 last:border-b-0 hover:bg-primary/5">
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => handleToggleRetake(retake.id)}
-                  className="size-4 shrink-0 cursor-pointer accent-core-accent"
+                  className="size-4 shrink-0 cursor-pointer accent-primary"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-spacing-200">
-                    <span className="truncate font-medium text-body text-content-standard-primary">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate font-medium text-base text-foreground">
                       {retake.student.name} - {formatDate(retake.current_scheduled_date)}
                     </span>
                     {retake.management_status &&
@@ -201,7 +198,7 @@ export default function RetakeNoticeTab() {
                         );
                       })()}
                   </div>
-                  <div className="truncate text-content-standard-tertiary text-footnote">
+                  <div className="truncate text-muted-foreground text-xs">
                     {retake.exam.course.name} - {retake.exam.exam_number}회 {retake.exam.name}
                   </div>
                 </div>

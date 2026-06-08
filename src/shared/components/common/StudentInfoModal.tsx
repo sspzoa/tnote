@@ -43,7 +43,7 @@ export default function StudentInfoModal({
       title={studentDetail?.student.name || "학생 정보"}
       subtitle="학생 상세 정보"
       footer={
-        <div className="flex w-full gap-spacing-300">
+        <div className="flex w-full gap-3">
           <Button variant="secondary" onClick={onClose} className="flex-1">
             닫기
           </Button>
@@ -55,55 +55,51 @@ export default function StudentInfoModal({
       {isLoading ? (
         <StudentInfoSkeleton />
       ) : !studentDetail ? (
-        <div className="py-spacing-900 text-center text-content-standard-tertiary">학생 정보를 불러올 수 없습니다.</div>
+        <div className="py-16 text-center text-muted-foreground">학생 정보를 불러올 수 없습니다.</div>
       ) : (
-        <div className="flex flex-col gap-spacing-600">
-          <section className="flex flex-col gap-spacing-300">
-            <h3 className="font-semibold text-body text-content-standard-primary">기본 정보</h3>
-            <div className="grid grid-cols-2 gap-spacing-300 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500">
-              <div className="flex flex-col gap-spacing-50">
-                <span className="text-content-standard-tertiary text-footnote">이름</span>
-                <span className="font-medium text-body text-content-standard-primary">
-                  {studentDetail.student.name}
-                </span>
+        <div className="flex flex-col gap-7">
+          <section className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-foreground">기본 정보</h3>
+            <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted p-5">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">이름</span>
+                <span className="font-medium text-base text-foreground">{studentDetail.student.name}</span>
               </div>
-              <div className="flex flex-col gap-spacing-50">
-                <span className="text-content-standard-tertiary text-footnote">전화번호</span>
-                <span className="font-medium text-body text-content-standard-primary">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">전화번호</span>
+                <span className="font-medium text-base text-foreground">
                   {formatPhoneNumber(studentDetail.student.phoneNumber)}
                 </span>
               </div>
-              <div className="flex flex-col gap-spacing-50">
-                <span className="text-content-standard-tertiary text-footnote">학부모 번호</span>
-                <span className="font-medium text-body text-content-standard-primary">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">학부모 번호</span>
+                <span className="font-medium text-base text-foreground">
                   {studentDetail.student.parentPhoneNumber
                     ? formatPhoneNumber(studentDetail.student.parentPhoneNumber)
                     : "-"}
                 </span>
               </div>
-              <div className="flex flex-col gap-spacing-50">
-                <span className="text-content-standard-tertiary text-footnote">학교</span>
-                <span className="font-medium text-body text-content-standard-primary">
-                  {studentDetail.student.school || "-"}
-                </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">학교</span>
+                <span className="font-medium text-base text-foreground">{studentDetail.student.school || "-"}</span>
               </div>
-              <div className="flex flex-col gap-spacing-50">
-                <span className="text-content-standard-tertiary text-footnote">학년</span>
-                <span className="font-medium text-body text-content-standard-primary">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">학년</span>
+                <span className="font-medium text-base text-foreground">
                   {getGrade(studentDetail.student.birthYear) || "-"}
                 </span>
               </div>
-              <div className="flex flex-col gap-spacing-50">
-                <span className="text-content-standard-tertiary text-footnote">등록일</span>
-                <span className="font-medium text-body text-content-standard-primary">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs">등록일</span>
+                <span className="font-medium text-base text-foreground">
                   {formatLocaleDateKorean(studentDetail.student.createdAt)}
                 </span>
               </div>
               {studentDetail.student.requiredClinicWeekdays &&
                 studentDetail.student.requiredClinicWeekdays.length > 0 && (
-                  <div className="col-span-2 flex flex-col gap-spacing-50">
-                    <span className="text-content-standard-tertiary text-footnote">클리닉 필참요일</span>
-                    <span className="font-medium text-body text-content-standard-primary">
+                  <div className="col-span-2 flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">클리닉 필참요일</span>
+                    <span className="font-medium text-base text-foreground">
                       {formatClinicWeekdays(studentDetail.student.requiredClinicWeekdays)}
                     </span>
                   </div>
@@ -114,9 +110,9 @@ export default function StudentInfoModal({
                 );
                 if (activeTags.length === 0) return null;
                 return (
-                  <div className="col-span-2 flex flex-col gap-spacing-50">
-                    <span className="text-content-standard-tertiary text-footnote">태그</span>
-                    <div className="flex flex-wrap items-center gap-spacing-100">
+                  <div className="col-span-2 flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">태그</span>
+                    <div className="flex flex-wrap items-center gap-1">
                       {activeTags.map((assignment) => (
                         <Badge key={assignment.id} variant={assignment.tag?.color} size="xs">
                           {assignment.tag?.name}
@@ -129,23 +125,19 @@ export default function StudentInfoModal({
             </div>
           </section>
 
-          <section className="flex flex-col gap-spacing-300">
-            <h3 className="font-semibold text-body text-content-standard-primary">수강 중인 수업</h3>
+          <section className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-foreground">수강 중인 수업</h3>
             {studentDetail.courses.length === 0 ? (
-              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
                 수강 중인 수업이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-border rounded-lg border border-border">
                 {studentDetail.courses.map((course) => (
-                  <div
-                    key={course.id}
-                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                      <span className="truncate font-medium text-body text-content-standard-primary">
-                        {course.name}
-                      </span>
-                      <span className="text-content-standard-tertiary text-footnote">
+                  <div key={course.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-4">
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="truncate font-medium text-base text-foreground">{course.name}</span>
+                      <span className="text-muted-foreground text-xs">
                         등록: {formatLocaleDateKorean(course.enrolled_at)}
                       </span>
                     </div>
@@ -158,38 +150,36 @@ export default function StudentInfoModal({
             )}
           </section>
 
-          <section className="flex flex-col gap-spacing-300">
-            <h3 className="font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-foreground">
               시험 성적
               {examScores.length > 0 && (
-                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                <span className="ml-1 font-normal text-muted-foreground">
                   ({Math.min(5, examScores.length)}/{examScores.length}개)
                 </span>
               )}
             </h3>
             {examScores.length === 0 ? (
-              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
                 시험 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-border rounded-lg border border-border">
                 {examScores.slice(0, 5).map((score) => {
                   const isPassed = score.cutline !== null && score.score >= score.cutline;
                   const isFailed = score.cutline !== null && score.score < score.cutline;
                   return (
-                    <div
-                      key={score.id}
-                      className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300">
-                      <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                        <span className="truncate font-medium text-body text-content-standard-primary">
+                    <div key={score.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span className="truncate font-medium text-base text-foreground">
                           {score.exam.course.name} - {score.exam.name}
                         </span>
-                        <span className="text-content-standard-tertiary text-footnote">
+                        <span className="text-muted-foreground text-xs">
                           {score.score}
                           {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
                         </span>
                       </div>
-                      <div className="flex shrink-0 items-center gap-spacing-200">
+                      <div className="flex shrink-0 items-center gap-2">
                         <Badge variant="blue" size="xs">
                           {score.exam.examNumber}회차
                         </Badge>
@@ -211,27 +201,25 @@ export default function StudentInfoModal({
             )}
           </section>
 
-          <section className="flex flex-col gap-spacing-300">
-            <h3 className="font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-foreground">
               과제 현황
               {assignmentHistory.length > 0 && (
-                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                <span className="ml-1 font-normal text-muted-foreground">
                   ({Math.min(5, assignmentHistory.length)}/{assignmentHistory.length}개)
                 </span>
               )}
             </h3>
             {assignmentHistory.length === 0 ? (
-              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
                 과제 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-border rounded-lg border border-border">
                 {assignmentHistory.slice(0, 5).map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300">
-                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                      <span className="truncate font-medium text-body text-content-standard-primary">
+                  <div key={item.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="truncate font-medium text-base text-foreground">
                         {item.assignment.course.name} - {item.assignment.name}
                       </span>
                     </div>
@@ -246,21 +234,21 @@ export default function StudentInfoModal({
             )}
           </section>
 
-          <section className="flex flex-col gap-spacing-300">
-            <h3 className="font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-foreground">
               최근 클리닉 출석
               {studentDetail.clinicHistory.length > 0 && (
-                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                <span className="ml-1 font-normal text-muted-foreground">
                   ({Math.min(5, studentDetail.clinicHistory.length)}/{studentDetail.clinicHistory.length}개)
                 </span>
               )}
             </h3>
             {studentDetail.clinicHistory.length === 0 ? (
-              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
                 클리닉 출석 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-border rounded-lg border border-border">
                 {studentDetail.clinicHistory.slice(0, 5).map((history) => {
                   const activities = [
                     history.didRetakeExam && "재시험",
@@ -268,25 +256,23 @@ export default function StudentInfoModal({
                     history.didQa && "질의응답",
                   ].filter(Boolean);
                   return (
-                    <div
-                      key={history.id}
-                      className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-300">
-                      <div className="flex min-w-0 flex-1 items-center gap-spacing-300">
-                        <span className="shrink-0 text-content-standard-tertiary text-footnote">
+                    <div key={history.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <span className="shrink-0 text-muted-foreground text-xs">
                           {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
                             month: "short",
                             day: "numeric",
                           })}
                         </span>
-                        <span className="truncate text-body text-content-standard-primary">{history.clinic.name}</span>
-                        {history.isRequired && <span className="shrink-0 text-core-accent text-footnote">필참</span>}
+                        <span className="truncate text-base text-foreground">{history.clinic.name}</span>
+                        {history.isRequired && <span className="shrink-0 text-primary text-xs">필참</span>}
                       </div>
-                      <div className="flex shrink-0 items-center gap-spacing-200">
+                      <div className="flex shrink-0 items-center gap-2">
                         <Badge variant={history.status === "absent" ? "danger" : "success"} size="xs">
                           {history.status === "absent" ? "결석" : "출석"}
                         </Badge>
                         {activities.length > 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">{activities.join(", ")}</span>
+                          <span className="text-muted-foreground text-xs">{activities.join(", ")}</span>
                         )}
                       </div>
                     </div>
@@ -296,30 +282,28 @@ export default function StudentInfoModal({
             )}
           </section>
 
-          <section className="flex flex-col gap-spacing-300">
-            <h3 className="font-semibold text-body text-content-standard-primary">
+          <section className="flex flex-col gap-3">
+            <h3 className="font-semibold text-base text-foreground">
               최근 재시험
               {studentDetail.retakeHistory.length > 0 && (
-                <span className="ml-spacing-100 font-normal text-content-standard-tertiary">
+                <span className="ml-1 font-normal text-muted-foreground">
                   ({Math.min(5, studentDetail.retakeHistory.length)}/{studentDetail.retakeHistory.length}개)
                 </span>
               )}
             </h3>
             {studentDetail.retakeHistory.length === 0 ? (
-              <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary p-spacing-500 text-center text-content-standard-tertiary text-footnote">
+              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
                 재시험 기록이 없습니다.
               </div>
             ) : (
-              <div className="divide-y divide-line-divider rounded-radius-400 border border-line-outline">
+              <div className="divide-y divide-border rounded-lg border border-border">
                 {studentDetail.retakeHistory.slice(0, 5).map((retake) => (
-                  <div
-                    key={retake.id}
-                    className="flex items-center justify-between gap-spacing-300 bg-components-fill-standard-secondary px-spacing-500 py-spacing-400">
-                    <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                      <span className="truncate font-medium text-body text-content-standard-primary">
+                  <div key={retake.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-4">
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="truncate font-medium text-base text-foreground">
                         {retake.exam.course.name} - {retake.exam.name}
                       </span>
-                      <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
                         <span>
                           {retake.scheduledDate
                             ? new Date(retake.scheduledDate).toLocaleDateString("ko-KR", {
@@ -329,7 +313,7 @@ export default function StudentInfoModal({
                             : "날짜 미정"}
                         </span>
                         {(retake.postponeCount > 0 || retake.absentCount > 0) && (
-                          <span className="text-content-standard-quaternary">
+                          <span className="text-muted-foreground/60">
                             {retake.postponeCount > 0 && `연기 ${retake.postponeCount}회`}
                             {retake.postponeCount > 0 && retake.absentCount > 0 && " / "}
                             {retake.absentCount > 0 && `결석 ${retake.absentCount}회`}

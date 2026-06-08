@@ -81,28 +81,26 @@ export default function EnrollmentModal() {
         </Button>
       }>
       {isLoadingEnrolled ? (
-        <div className="flex h-96 gap-spacing-500">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
-            <div className="h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
-            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+        <div className="flex h-96 gap-5">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+            <div className="h-6 w-32 animate-pulse rounded-sm bg-muted" />
+            <div className="h-12 animate-pulse rounded-md bg-muted" />
             <StudentListContainer className="flex-1">
               <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
             </StudentListContainer>
           </div>
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
-            <div className="h-6 w-32 animate-pulse rounded-radius-200 bg-components-fill-standard-secondary" />
-            <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+            <div className="h-6 w-32 animate-pulse rounded-sm bg-muted" />
+            <div className="h-12 animate-pulse rounded-md bg-muted" />
             <StudentListContainer className="flex-1">
               <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
             </StudentListContainer>
           </div>
         </div>
       ) : (
-        <div className="flex h-96 gap-spacing-500">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
-            <h3 className="font-bold text-body text-content-standard-primary">
-              등록된 학생 ({enrolledStudents.length}명)
-            </h3>
+        <div className="flex h-96 gap-5">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+            <h3 className="font-bold text-base text-foreground">등록된 학생 ({enrolledStudents.length}명)</h3>
             {enrolledStudents.length === 0 ? (
               <StudentListContainer className="flex-1">
                 <StudentListEmpty message="등록된 학생이 없습니다." />
@@ -126,7 +124,7 @@ export default function EnrollmentModal() {
                           <button
                             onClick={() => handleUnenroll(student.id)}
                             disabled={loadingStudentId === student.id}
-                            className="rounded-radius-200 bg-solid-translucent-red px-spacing-300 py-spacing-150 font-medium text-core-status-negative text-footnote transition-colors hover:bg-solid-translucent-red disabled:cursor-not-allowed disabled:opacity-50">
+                            className="rounded-sm bg-solid-translucent-red px-3 py-1.5 font-medium text-destructive text-xs transition-colors hover:bg-solid-translucent-red disabled:cursor-not-allowed disabled:opacity-50">
                             {loadingStudentId === student.id ? "제거 중..." : "제거"}
                           </button>
                         }
@@ -138,10 +136,8 @@ export default function EnrollmentModal() {
             )}
           </div>
 
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-spacing-300">
-            <h3 className="font-bold text-body text-content-standard-primary">
-              학생 추가 ({unenrolledStudents.length}명)
-            </h3>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+            <h3 className="font-bold text-base text-foreground">학생 추가 ({unenrolledStudents.length}명)</h3>
             {unenrolledStudents.length === 0 ? (
               <StudentListContainer className="flex-1">
                 <StudentListEmpty message="모든 학생이 등록되었습니다." />
@@ -165,7 +161,7 @@ export default function EnrollmentModal() {
                           <button
                             onClick={() => handleEnroll(student.id)}
                             disabled={loadingStudentId === student.id}
-                            className="rounded-radius-200 bg-solid-translucent-green px-spacing-300 py-spacing-150 font-medium text-core-status-positive text-footnote transition-colors hover:bg-solid-translucent-green disabled:cursor-not-allowed disabled:opacity-50">
+                            className="rounded-sm bg-solid-translucent-green px-3 py-1.5 font-medium text-success text-xs transition-colors hover:bg-solid-translucent-green disabled:cursor-not-allowed disabled:opacity-50">
                             {loadingStudentId === student.id ? "추가 중..." : "추가"}
                           </button>
                         }

@@ -32,21 +32,15 @@ export default function CalendarDayCell({
 
   return (
     <div
-      className={`relative flex min-h-[120px] flex-col gap-spacing-100 border-line-outline border-r border-b p-spacing-200 transition-colors duration-150 hover:bg-core-accent-translucent/30 ${
+      className={`relative flex min-h-[120px] flex-col gap-1 border-border border-r border-b p-2 transition-colors duration-150 hover:bg-primary/30 ${
         isLastColumn ? "border-r-0" : ""
-      } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-components-fill-standard-secondary/50" : ""} ${
-        isToday ? "bg-core-accent-translucent" : ""
-      }`}>
+      } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-muted/50" : ""} ${isToday ? "bg-primary/10" : ""}`}>
       <div
-        className={`text-right text-footnote ${
-          !isCurrentMonth
-            ? "text-content-standard-quaternary"
-            : isToday
-              ? "font-bold text-core-accent"
-              : "text-content-standard-tertiary"
+        className={`text-right text-xs ${
+          !isCurrentMonth ? "text-muted-foreground/60" : isToday ? "font-bold text-primary" : "text-muted-foreground"
         }`}>
         {isToday ? (
-          <span className="inline-flex size-6 items-center justify-center rounded-full bg-core-accent text-solid-white">
+          <span className="inline-flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
             {format(day, "d")}
           </span>
         ) : (
@@ -54,7 +48,7 @@ export default function CalendarDayCell({
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-spacing-100">
+      <div className="flex flex-1 flex-col gap-1">
         {visibleEvents.map((event) => (
           <CalendarEventItem key={event.id} event={event} onClick={() => onEventClick(event)} />
         ))}
@@ -63,10 +57,10 @@ export default function CalendarDayCell({
           <button
             type="button"
             onClick={onToggleExpand}
-            className={`rounded-radius-200 px-spacing-150 py-spacing-50 text-left text-footnote transition-all duration-150 ${
+            className={`rounded-sm px-1.5 py-0.5 text-left text-xs transition-all duration-150 ${
               isExpanded
-                ? "text-content-standard-tertiary hover:bg-components-fill-standard-secondary hover:text-content-standard-primary"
-                : "text-core-accent hover:bg-core-accent-translucent"
+                ? "text-muted-foreground hover:bg-muted hover:text-foreground"
+                : "text-primary hover:bg-primary/10"
             }`}>
             {isExpanded ? "접기" : `+${events.length - MAX_VISIBLE_EVENTS}`}
           </button>

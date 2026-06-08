@@ -51,7 +51,7 @@ export default function CalendarPage() {
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
       />
 
-      <div className="flex flex-col gap-spacing-500 overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600">
+      <div className="flex flex-col gap-6 overflow-hidden rounded-xl border border-border bg-card p-7">
         <CalendarToolbar
           currentDate={currentDate}
           filters={filters}
@@ -62,12 +62,12 @@ export default function CalendarPage() {
         />
 
         {isLoading ? (
-          <div className="overflow-hidden rounded-radius-300 border border-line-outline">
-            <div className="grid grid-cols-7 border-line-outline border-b bg-components-fill-standard-secondary">
+          <div className="overflow-hidden rounded-md border border-border">
+            <div className="grid grid-cols-7 border-border border-b bg-muted">
               {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
                 <div
                   key={day}
-                  className="border-line-outline border-r px-spacing-200 py-spacing-300 text-center font-semibold text-content-standard-secondary text-label last:border-r-0">
+                  className="border-border border-r px-2 py-3 text-center font-semibold text-muted-foreground text-sm last:border-r-0">
                   {day}
                 </div>
               ))}
@@ -79,13 +79,13 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={i}
-                    className={`flex min-h-[120px] flex-col gap-spacing-100 p-spacing-200 ${!isLastColumn ? "border-line-outline border-r" : ""} ${!isLastRow ? "border-line-outline border-b" : ""}`}>
+                    className={`flex min-h-[120px] flex-col gap-1 p-2 ${!isLastColumn ? "border-border border-r" : ""} ${!isLastRow ? "border-border border-b" : ""}`}>
                     <div className="flex justify-end">
                       <Skeleton className="size-7 rounded-full" />
                     </div>
-                    <div className="flex flex-col gap-spacing-100">
-                      <Skeleton className="h-6 w-full rounded-radius-200" />
-                      <Skeleton className="h-6 w-4/5 rounded-radius-200" />
+                    <div className="flex flex-col gap-1">
+                      <Skeleton className="h-6 w-full rounded-sm" />
+                      <Skeleton className="h-6 w-4/5 rounded-sm" />
                     </div>
                   </div>
                 );

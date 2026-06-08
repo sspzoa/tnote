@@ -15,7 +15,6 @@ export interface AssignStudent {
 const {
   selectedCourseAtom,
   selectedManagementStatusAtom,
-  openMenuIdAtom,
   searchQueryAtom,
   showCompletedAtom,
   selectedDateAtom,
@@ -28,7 +27,6 @@ const {
 export {
   selectedCourseAtom,
   selectedManagementStatusAtom,
-  openMenuIdAtom,
   searchQueryAtom,
   showCompletedAtom,
   selectedDateAtom,

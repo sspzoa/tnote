@@ -47,7 +47,7 @@ const getMessageTypeBadgeStyle = (type: string) => {
   if (type === "general") return "bg-solid-translucent-blue text-solid-blue";
   if (type === "exam") return "bg-solid-translucent-purple text-solid-purple";
   if (type === "retake") return "bg-solid-translucent-yellow text-solid-yellow";
-  return "bg-components-fill-standard-secondary text-content-standard-secondary";
+  return "bg-muted text-muted-foreground";
 };
 
 const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
@@ -62,37 +62,37 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
       : `${batch.recipients[0].recipient_name} 외 ${batch.recipients.length - 1}건`;
 
   return (
-    <div className="border-line-divider border-b">
+    <div className="border-border border-b">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full flex-col gap-spacing-100 px-spacing-600 py-spacing-400 text-left transition-all duration-150 hover:bg-core-accent-translucent/50">
+        className="flex w-full flex-col gap-1 px-7 py-4 text-left transition-all duration-150 hover:bg-primary/5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-spacing-200">
-            <span className="font-medium text-body text-content-standard-primary">{title}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-base text-foreground">{title}</span>
             <span
-              className={`rounded-radius-200 px-spacing-150 py-spacing-50 font-semibold text-caption ${getMessageTypeBadgeStyle(batch.message_type)}`}>
+              className={`rounded-sm px-1.5 py-0.5 font-semibold text-[10px] leading-4 ${getMessageTypeBadgeStyle(batch.message_type)}`}>
               {getMessageTypeLabel(batch.message_type)}
             </span>
             {batch.fail_count > 0 && (
-              <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-150 py-spacing-50 font-semibold text-caption text-core-status-negative">
+              <span className="rounded-sm bg-solid-translucent-red px-1.5 py-0.5 font-semibold text-[10px] text-destructive leading-4">
                 {batch.fail_count}건 실패
               </span>
             )}
           </div>
-          <div className="flex items-center gap-spacing-200">
-            <span className="rounded-radius-200 border border-core-accent/20 bg-core-accent-translucent px-spacing-200 py-spacing-50 text-core-accent text-footnote">
+          <div className="flex items-center gap-2">
+            <span className="rounded-sm border border-primary/20 bg-primary/10 px-2 py-0.5 text-primary text-xs">
               {dateStr}
             </span>
             {batch.recipients.length > 1 &&
               (isExpanded ? (
-                <ChevronUp className="size-4 text-content-standard-tertiary" />
+                <ChevronUp className="size-4 text-muted-foreground" />
               ) : (
-                <ChevronDown className="size-4 text-content-standard-tertiary" />
+                <ChevronDown className="size-4 text-muted-foreground" />
               ))}
           </div>
         </div>
-        <div className="line-clamp-2 text-body text-content-standard-secondary">{batch.message_content}</div>
-        <div className="flex items-center gap-spacing-200 text-content-standard-tertiary text-footnote">
+        <div className="line-clamp-2 text-base text-muted-foreground">{batch.message_content}</div>
+        <div className="flex items-center gap-2 text-muted-foreground text-xs">
           <span>{timeStr}</span>
           <span>·</span>
           <span>
@@ -108,23 +108,21 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
       </button>
 
       {isExpanded && batch.recipients.length > 1 && (
-        <div className="border-line-divider border-t bg-components-fill-standard-secondary/50 px-spacing-600 py-spacing-300">
-          <div className="flex flex-col gap-spacing-200">
+        <div className="border-border border-t bg-muted/50 px-7 py-3">
+          <div className="flex flex-col gap-2">
             {batch.recipients.map((recipient) => (
-              <div key={recipient.id} className="flex items-center justify-between text-footnote">
-                <div className="flex items-center gap-spacing-200">
-                  <span className="text-content-standard-primary">{recipient.recipient_name}</span>
-                  <span className="text-content-standard-tertiary">
+              <div key={recipient.id} className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground">{recipient.recipient_name}</span>
+                  <span className="text-muted-foreground">
                     ({recipient.recipient_type === "student" ? "학생" : "학부모"})
                   </span>
-                  <span className="text-content-standard-quaternary">
-                    {formatPhoneNumber(recipient.recipient_phone)}
-                  </span>
+                  <span className="text-muted-foreground/60">{formatPhoneNumber(recipient.recipient_phone)}</span>
                 </div>
                 {recipient.is_success ? (
-                  <span className="text-core-status-positive">성공</span>
+                  <span className="text-success">성공</span>
                 ) : (
-                  <span className="text-core-status-negative" title={recipient.error_message || undefined}>
+                  <span className="text-destructive" title={recipient.error_message || undefined}>
                     실패
                   </span>
                 )}
@@ -159,41 +157,35 @@ export default function MessagesPage() {
         subtitle="학생 및 학부모에게 문자를 발송합니다"
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
-          <div className="flex items-center gap-spacing-300">
-            <Button
-              variant="secondary"
-              onClick={() => setShowSolapiSettings(true)}
-              className="flex items-center gap-spacing-200">
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => setShowSolapiSettings(true)} className="flex items-center gap-2">
               <Key className="size-4" />
               <span className="hidden sm:inline">SOLAPI:</span>
               {isSolapiLoading ? (
                 <Skeleton className="h-5 w-16" />
               ) : (
-                <span className={isSolapiConfigured ? "text-core-accent" : "text-core-status-negative"}>
+                <span className={isSolapiConfigured ? "text-primary" : "text-destructive"}>
                   {isSolapiConfigured ? "설정됨" : "미설정"}
                 </span>
               )}
-              <Settings className="size-3 text-content-standard-tertiary" />
+              <Settings className="size-3 text-muted-foreground" />
             </Button>
             <Button
               variant="secondary"
               onClick={() => setShowSenderPhoneSettings(true)}
-              className="flex items-center gap-spacing-200">
+              className="flex items-center gap-2">
               <Phone className="size-4" />
               <span className="hidden sm:inline">발신번호:</span>
               {isSenderPhoneLoading ? (
                 <Skeleton className="h-5 w-28" />
               ) : (
-                <span className={senderPhoneNumber ? "text-core-accent" : "text-core-status-negative"}>
+                <span className={senderPhoneNumber ? "text-primary" : "text-destructive"}>
                   {senderPhoneNumber ? formatPhoneNumber(senderPhoneNumber) : "미설정"}
                 </span>
               )}
-              <Settings className="size-3 text-content-standard-tertiary" />
+              <Settings className="size-3 text-muted-foreground" />
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() => setShowHistoryPanel(true)}
-              className="flex items-center gap-spacing-200">
+            <Button variant="secondary" onClick={() => setShowHistoryPanel(true)} className="flex items-center gap-2">
               <History className="size-4" />
               발송 이력
             </Button>
@@ -213,15 +205,15 @@ export default function MessagesPage() {
         title="발송 이력"
         subtitle="최근 50건">
         {isLoading ? (
-          <div className="flex flex-col gap-spacing-300 p-spacing-600">
+          <div className="flex flex-col gap-3 p-7">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex flex-col gap-spacing-200 border-line-divider border-b pb-spacing-300">
+              <div key={i} className="flex flex-col gap-2 border-border border-b pb-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-spacing-200">
+                  <div className="flex items-center gap-2">
                     <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-5 w-14 rounded-radius-200" />
+                    <Skeleton className="h-5 w-14 rounded-sm" />
                   </div>
-                  <Skeleton className="h-5 w-16 rounded-radius-200" />
+                  <Skeleton className="h-5 w-16 rounded-sm" />
                 </div>
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-4 w-36" />
@@ -229,11 +221,11 @@ export default function MessagesPage() {
             ))}
           </div>
         ) : history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
-            <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
-              <History className="size-6 text-core-accent" />
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+              <History className="size-6 text-primary" />
             </div>
-            <span className="text-content-standard-tertiary text-label">발송 이력이 없습니다.</span>
+            <span className="text-muted-foreground text-sm">발송 이력이 없습니다.</span>
           </div>
         ) : (
           <div>

@@ -50,7 +50,7 @@ export default function TemplateSaveModal({ isOpen, onClose, onSave, content }: 
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
+      <div className="flex flex-col gap-4">
         <FormInput
           label="템플릿 이름"
           value={name}
@@ -59,10 +59,10 @@ export default function TemplateSaveModal({ isOpen, onClose, onSave, content }: 
           required
           disabled={isLoading}
         />
-        <div className="flex flex-col gap-spacing-200">
-          <label className="block font-semibold text-content-standard-primary text-label">저장할 내용</label>
-          <div className="max-h-40 overflow-y-auto rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-300">
-            <p className="whitespace-pre-wrap text-body text-content-standard-secondary">{content}</p>
+        <div className="flex flex-col gap-2">
+          <label className="block font-semibold text-foreground text-sm">저장할 내용</label>
+          <div className="max-h-40 overflow-y-auto rounded-md border border-border bg-muted p-3">
+            <p className="whitespace-pre-wrap text-base text-muted-foreground">{content}</p>
           </div>
         </div>
       </div>

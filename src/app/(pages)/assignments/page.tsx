@@ -61,15 +61,12 @@ export default function AssignmentsPage() {
         subtitle="학생별 과제 상태를 관리합니다"
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
-          <div className="flex items-center gap-spacing-300">
-            <Button
-              variant="secondary"
-              onClick={() => setShowHistoryPanel(true)}
-              className="flex items-center gap-spacing-200">
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => setShowHistoryPanel(true)} className="flex items-center gap-2">
               <History className="size-4" />
               최근 이력
               {allHistory.length > 0 && (
-                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
+                <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">
                   {allHistory.length}
                 </span>
               )}

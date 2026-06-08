@@ -1,14 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import type { Exam } from "../(hooks)/useExams";
@@ -23,9 +18,6 @@ interface ExamTableProps {
 type ExamSortKey = "name" | "examNumber" | "maxScore" | "cutline" | "highest" | "average" | "median" | "retakers";
 
 export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps) {
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
-
   const comparators = useMemo(
     () => ({
       name: (a: Exam, b: Exam) => a.name.localeCompare(b.name, "ko"),
@@ -52,9 +44,9 @@ export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps)
   ];
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="시험명"
@@ -112,92 +104,69 @@ export function ExamTable({ exams, onManage, onEdit, onDelete }: ExamTableProps)
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-              관리
-            </th>
-            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">관리</th>
+            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
           </tr>
         </thead>
-        <tbody className="divide-y divide-line-divider">
+        <tbody className="divide-y divide-border">
           {sortedData.map((exam) => (
-            <tr key={exam.id} className="transition-colors hover:bg-core-accent-translucent/50">
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="font-medium text-body text-content-standard-primary">{exam.name}</div>
+            <tr key={exam.id} className="transition-colors hover:bg-primary/10">
+              <td className="whitespace-nowrap px-5 py-4">
+                <div className="font-medium text-base text-foreground">{exam.name}</div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 <Badge variant="blue" size="sm">
                   {exam.exam_number}회차
                 </Badge>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="text-body text-content-standard-primary">{exam.max_score || 8}점</span>
+              <td className="whitespace-nowrap px-5 py-4">
+                <span className="text-base text-foreground">{exam.max_score || 8}점</span>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="text-body text-content-standard-primary">{exam.cutline || 4}점</span>
+              <td className="whitespace-nowrap px-5 py-4">
+                <span className="text-base text-foreground">{exam.cutline || 4}점</span>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 {exam.highest_score !== null && exam.highest_score !== undefined ? (
-                  <span className="text-body text-content-standard-primary">{exam.highest_score}점</span>
+                  <span className="text-base text-foreground">{exam.highest_score}점</span>
                 ) : (
-                  <span className="text-body text-content-standard-tertiary">-</span>
+                  <span className="text-base text-muted-foreground">-</span>
                 )}
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 {exam.average_score !== null && exam.average_score !== undefined ? (
-                  <span className="text-body text-content-standard-primary">{exam.average_score}점</span>
+                  <span className="text-base text-foreground">{exam.average_score}점</span>
                 ) : (
-                  <span className="text-body text-content-standard-tertiary">-</span>
+                  <span className="text-base text-muted-foreground">-</span>
                 )}
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 {exam.median_score !== null && exam.median_score !== undefined ? (
-                  <span className="text-body text-content-standard-primary">{exam.median_score}점</span>
+                  <span className="text-base text-foreground">{exam.median_score}점</span>
                 ) : (
-                  <span className="text-body text-content-standard-tertiary">-</span>
+                  <span className="text-base text-muted-foreground">-</span>
                 )}
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+              <td className="whitespace-nowrap px-5 py-4">
                 {exam.below_cutline_count !== null && exam.below_cutline_count !== undefined ? (
-                  <span className="text-body text-content-standard-primary">
+                  <span className="text-base text-foreground">
                     {exam.below_cutline_count}명 / {exam.total_score_count}명
                   </span>
                 ) : (
-                  <span className="text-body text-content-standard-tertiary">-</span>
+                  <span className="text-base text-muted-foreground">-</span>
                 )}
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <Button variant="primary" size="xs" className="font-medium" onClick={() => onManage(exam)}>
+              <td className="whitespace-nowrap px-5 py-4">
+                <Button size="xs" className="font-medium" onClick={() => onManage(exam)}>
                   점수 입력
                 </Button>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <MoreOptionsButton
-                  onClick={(pos) => {
-                    if (openMenuId === exam.id) {
-                      setOpenMenuId(null);
-                      setMenuPosition(null);
-                    } else {
-                      setOpenMenuId(exam.id);
-                      setMenuPosition(pos);
-                    }
-                  }}
-                />
+              <td className="whitespace-nowrap px-5 py-4">
+                <DropdownMenu items={getMenuItems(exam)} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((e) => e.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

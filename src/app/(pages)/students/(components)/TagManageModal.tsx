@@ -117,11 +117,9 @@ export default function TagManageModal() {
           닫기
         </Button>
       }>
-      <div className="flex flex-col gap-spacing-600">
-        <div className="flex flex-col gap-spacing-400 rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary/50 p-spacing-500">
-          <h3 className="font-semibold text-body text-content-standard-primary">
-            {editingTag ? "태그 수정" : "새 태그 추가"}
-          </h3>
+      <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-4 rounded-lg border border-border bg-muted/50 p-5">
+          <h3 className="font-semibold text-base text-foreground">{editingTag ? "태그 수정" : "새 태그 추가"}</h3>
 
           <FormInput
             label="태그 이름"
@@ -132,18 +130,18 @@ export default function TagManageModal() {
             required
           />
 
-          <div className="flex flex-col gap-spacing-200">
-            <label className="block font-semibold text-content-standard-primary text-label">
-              색상 <span className="text-core-status-negative">*</span>
+          <div className="flex flex-col gap-2">
+            <label className="block font-semibold text-foreground text-sm">
+              색상 <span className="text-destructive">*</span>
             </label>
-            <div className="flex flex-wrap gap-spacing-200">
+            <div className="flex flex-wrap gap-2">
               {TAG_COLORS.map((color) => (
                 <button
                   key={color}
                   type="button"
                   onClick={() => setForm({ ...form, color })}
-                  className={`size-8 rounded-radius-full transition-all ${TAG_SOLID_COLORS[color]} ${
-                    form.color === color ? "ring-2 ring-offset-2 ring-offset-components-fill-standard-primary" : ""
+                  className={`size-8 rounded-full transition-all ${TAG_SOLID_COLORS[color]} ${
+                    form.color === color ? "ring-2 ring-offset-2 ring-offset-card" : ""
                   } hover:scale-110`}
                   title={color}
                 />
@@ -151,27 +149,26 @@ export default function TagManageModal() {
             </div>
           </div>
 
-          <label className="flex cursor-pointer items-center gap-spacing-300">
+          <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"
               checked={form.hiddenByDefault}
               onChange={(e) => setForm({ ...form, hiddenByDefault: e.target.checked })}
-              className="size-5 cursor-pointer rounded-radius-200 border-line-outline accent-core-accent"
+              className="size-5 cursor-pointer rounded-sm border-border accent-primary"
             />
-            <span className="font-medium text-body text-content-standard-primary">기본으로 숨김</span>
-            <span className="text-content-standard-tertiary text-footnote">
+            <span className="font-medium text-base text-foreground">기본으로 숨김</span>
+            <span className="text-muted-foreground text-xs">
               (이 태그가 있는 학생은 기본적으로 목록에서 숨겨집니다)
             </span>
           </label>
 
-          <div className="flex gap-spacing-300">
+          <div className="flex gap-3">
             {editingTag ? (
               <>
                 <Button variant="secondary" className="flex-1" onClick={handleCancelEdit} disabled={isProcessing}>
                   취소
                 </Button>
                 <Button
-                  variant="primary"
                   className="flex-1"
                   onClick={handleUpdate}
                   disabled={!form.name.trim() || isProcessing}
@@ -182,7 +179,6 @@ export default function TagManageModal() {
               </>
             ) : (
               <Button
-                variant="primary"
                 className="flex-1"
                 onClick={handleCreate}
                 disabled={!form.name.trim() || isProcessing}
@@ -194,35 +190,31 @@ export default function TagManageModal() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-spacing-300">
-          <h3 className="font-semibold text-body text-content-standard-primary">등록된 태그</h3>
+        <div className="flex flex-col gap-3">
+          <h3 className="font-semibold text-base text-foreground">등록된 태그</h3>
 
           {isLoading ? (
             <TagListSkeleton count={4} />
           ) : tags.length === 0 ? (
-            <div className="rounded-radius-400 border border-line-divider bg-components-fill-standard-secondary/30 py-spacing-600 text-center text-content-standard-tertiary text-label">
+            <div className="rounded-lg border border-border bg-muted/30 py-7 text-center text-muted-foreground text-sm">
               등록된 태그가 없습니다.
             </div>
           ) : (
-            <div className="flex flex-col gap-spacing-200">
+            <div className="flex flex-col gap-2">
               {tags.map((tag) => (
                 <div
                   key={tag.id}
-                  className={`flex items-center justify-between rounded-radius-300 border p-spacing-300 transition-colors ${
-                    editingTag?.id === tag.id
-                      ? "border-core-accent bg-core-accent-translucent"
-                      : "border-line-outline bg-components-fill-standard-primary hover:bg-components-interactive-hover"
+                  className={`flex items-center justify-between rounded-md border p-3 transition-colors ${
+                    editingTag?.id === tag.id ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-accent"
                   }`}>
-                  <div className="flex items-center gap-spacing-300">
+                  <div className="flex items-center gap-3">
                     <span
-                      className={`inline-flex items-center rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-label ${TAG_COLOR_STYLES[tag.color].bg} ${TAG_COLOR_STYLES[tag.color].text}`}>
+                      className={`inline-flex items-center rounded-sm px-3 py-1 font-medium text-sm ${TAG_COLOR_STYLES[tag.color].bg} ${TAG_COLOR_STYLES[tag.color].text}`}>
                       {tag.name}
                     </span>
-                    {tag.hidden_by_default && (
-                      <span className="text-content-standard-tertiary text-footnote">(기본 숨김)</span>
-                    )}
+                    {tag.hidden_by_default && <span className="text-muted-foreground text-xs">(기본 숨김)</span>}
                   </div>
-                  <div className="flex gap-spacing-200">
+                  <div className="flex gap-2">
                     <Button
                       variant="secondary"
                       size="sm"
@@ -231,7 +223,7 @@ export default function TagManageModal() {
                       수정
                     </Button>
                     <Button
-                      variant="danger"
+                      variant="destructive"
                       size="sm"
                       onClick={() => handleDelete(tag)}
                       disabled={isProcessing}

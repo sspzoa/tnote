@@ -12,7 +12,7 @@ export { Input } from "./input";
 export { Modal } from "./modal";
 export { SearchInput } from "./searchInput";
 export { SegmentedControl } from "./segmentedControl";
-export { Select } from "./select";
+export { Select } from "./selectField";
 export type { SkeletonColumnDef } from "./skeleton";
 export { Skeleton, SkeletonSpinner, SkeletonTable } from "./skeleton";
 export { SlidePanel } from "./slidePanel";

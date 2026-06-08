@@ -1,19 +1,12 @@
 "use client";
 
-import { useAtom } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
-import {
-  DropdownMenu,
-  type DropdownMenuItem,
-  type MenuPosition,
-  MoreOptionsButton,
-} from "@/shared/components/ui/dropdownMenu";
+import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { SortableHeader } from "@/shared/components/ui/sortableHeader";
 import { useTableSort } from "@/shared/hooks/useTableSort";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { AssignmentTask } from "@/shared/types";
-import { openMenuIdAtom } from "../(atoms)/useAssignmentTaskStore";
 
 interface AssignmentTaskListProps {
   tasks: AssignmentTask[];
@@ -42,9 +35,6 @@ export default function AssignmentTaskList({
   onDelete,
   onEditDate,
 }: AssignmentTaskListProps) {
-  const [openMenuId, setOpenMenuId] = useAtom(openMenuIdAtom);
-  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
-
   const getMenuItems = useCallback(
     (task: AssignmentTask): DropdownMenuItem[] => {
       const items: DropdownMenuItem[] = [];
@@ -113,9 +103,9 @@ export default function AssignmentTaskList({
   };
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full rounded-lg">
+        <thead className="bg-muted">
           <tr>
             <SortableHeader
               label="학생"
@@ -145,28 +135,24 @@ export default function AssignmentTaskList({
               currentDirection={sortState.direction}
               onSort={toggleSort}
             />
-            <th className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary" />
+            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
           </tr>
         </thead>
         <tbody>
           {sortedData.map((task) => (
-            <tr
-              key={task.id}
-              className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+            <tr key={task.id} className="border-border border-t transition-colors hover:bg-accent">
+              <td className="whitespace-nowrap px-5 py-4">
                 <button
                   onClick={() => onViewStudent(task.student.id)}
-                  className="flex items-center gap-spacing-200 text-left transition-colors hover:text-core-accent">
-                  <span className="font-medium text-body text-content-standard-primary hover:text-core-accent">
-                    {task.student.name}
-                  </span>
+                  className="flex items-center gap-2 text-left transition-colors hover:text-primary">
+                  <span className="font-medium text-base text-foreground hover:text-primary">{task.student.name}</span>
                   {(() => {
                     const activeTags = (task.student.tags || []).filter((assignment) =>
                       isTagActive(assignment.start_date, assignment.end_date),
                     );
                     if (activeTags.length === 0) return null;
                     return (
-                      <div className="flex flex-nowrap gap-spacing-100">
+                      <div className="flex flex-nowrap gap-1">
                         {activeTags.map((assignment) => (
                           <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
                             {assignment.tag?.name}
@@ -176,51 +162,30 @@ export default function AssignmentTaskList({
                     );
                   })()}
                 </button>
-                <div className="text-content-standard-secondary text-footnote">{task.student.school}</div>
+                <div className="text-muted-foreground text-xs">{task.student.school}</div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <span className="text-body text-content-standard-primary">{task.assignment.name}</span>
-                <div className="text-content-standard-secondary text-footnote">{task.assignment.course.name}</div>
+              <td className="whitespace-nowrap px-5 py-4">
+                <span className="text-base text-foreground">{task.assignment.name}</span>
+                <div className="text-muted-foreground text-xs">{task.assignment.course.name}</div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <div className="flex flex-col gap-spacing-100">
-                  <div className="text-body text-content-standard-primary">{task.current_scheduled_date || "-"}</div>
+              <td className="whitespace-nowrap px-5 py-4">
+                <div className="flex flex-col gap-1">
+                  <div className="text-base text-foreground">{task.current_scheduled_date || "-"}</div>
                   {task.postpone_count > 0 && (
-                    <div className="flex gap-spacing-200">
-                      <span className="text-content-standard-tertiary text-footnote">연기 {task.postpone_count}회</span>
+                    <div className="flex gap-2">
+                      <span className="text-muted-foreground text-xs">연기 {task.postpone_count}회</span>
                     </div>
                   )}
                 </div>
               </td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">{getStatusBadge(task.status)}</td>
-              <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                <MoreOptionsButton
-                  onClick={(pos) => {
-                    if (openMenuId === task.id) {
-                      setOpenMenuId(null);
-                      setMenuPosition(null);
-                    } else {
-                      setOpenMenuId(task.id);
-                      setMenuPosition(pos);
-                    }
-                  }}
-                />
+              <td className="whitespace-nowrap px-5 py-4">{getStatusBadge(task.status)}</td>
+              <td className="whitespace-nowrap px-5 py-4">
+                <DropdownMenu items={getMenuItems(task)} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {openMenuId && (
-        <DropdownMenu
-          isOpen={true}
-          onClose={() => {
-            setOpenMenuId(null);
-            setMenuPosition(null);
-          }}
-          items={getMenuItems(sortedData.find((t) => t.id === openMenuId)!)}
-          position={menuPosition}
-        />
-      )}
     </div>
   );
 }

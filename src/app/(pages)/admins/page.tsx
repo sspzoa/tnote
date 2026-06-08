@@ -58,15 +58,15 @@ export default function AdminsPage() {
         <>
           <AdminInviteModal />
           <WorkspaceDeleteModal />
-          <div className="overflow-hidden rounded-radius-500 border border-line-outline bg-components-fill-standard-primary">
-            <div className="flex items-center justify-between gap-spacing-400 border-l-4 border-l-core-status-negative p-spacing-600">
-              <div className="flex flex-col gap-spacing-200">
-                <h3 className="font-bold text-content-standard-primary text-title">워크스페이스 삭제</h3>
-                <p className="text-body text-content-standard-secondary">
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between gap-4 border-l-4 border-l-destructive p-7">
+              <div className="flex flex-col gap-2">
+                <h3 className="font-bold text-foreground text-2xl">워크스페이스 삭제</h3>
+                <p className="text-base text-muted-foreground">
                   워크스페이스를 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
               </div>
-              <Button variant="danger" onClick={() => setShowWorkspaceDeleteModal(true)} className="shrink-0">
+              <Button variant="destructive" onClick={() => setShowWorkspaceDeleteModal(true)} className="shrink-0">
                 워크스페이스 삭제
               </Button>
             </div>

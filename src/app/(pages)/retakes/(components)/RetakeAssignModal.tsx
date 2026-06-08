@@ -171,12 +171,12 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-500">
+      <div className="flex flex-col gap-5">
         <FormSelect
           label="수업 선택"
           required
           value={selectedCourseId}
-          onChange={(e) => handleCourseChange(e.target.value)}
+          onValueChange={(value) => handleCourseChange(value)}
           disabled={coursesLoading}
           options={courseOptions}
         />
@@ -185,45 +185,43 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
           label="시험 선택"
           required
           value={selectedExamId}
-          onChange={(e) => setSelectedExamId(e.target.value)}
+          onValueChange={(value) => setSelectedExamId(value)}
           disabled={!selectedCourseId || examsLoading}
           options={examOptions}
         />
 
-        <div className="flex flex-col gap-spacing-100">
+        <div className="flex flex-col gap-1">
           <FormInput
             label="예정일 (선택)"
             type="date"
             value={scheduledDate}
             onChange={(e) => setScheduledDate(e.target.value)}
           />
-          <span className="text-content-standard-tertiary text-footnote">
-            비워두면 학생별 클리닉 필참 요일에 자동 배정됩니다.
-          </span>
+          <span className="text-muted-foreground text-xs">비워두면 학생별 클리닉 필참 요일에 자동 배정됩니다.</span>
         </div>
 
-        <div className="flex flex-col gap-spacing-200">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="font-semibold text-body text-content-standard-primary">
-              학생 선택 <span className="text-core-status-negative">*</span>
+            <label className="font-semibold text-base text-foreground">
+              학생 선택 <span className="text-destructive">*</span>
               {selectedExam && examScores.length > 0 && (
-                <span className="ml-spacing-200 font-normal text-content-standard-tertiary text-footnote">
+                <span className="ml-2 font-normal text-muted-foreground text-xs">
                   (커트라인: {selectedExam.cutline || 4}점)
                 </span>
               )}
             </label>
-            <div className="flex gap-spacing-300">
+            <div className="flex gap-3">
               {selectedExamId && examScores.length > 0 && studentsBelowCutline.length > 0 && (
                 <button
                   onClick={handleSelectBelowCutline}
-                  className="text-body text-core-status-negative hover:underline"
+                  className="text-base text-destructive hover:underline"
                   disabled={isDataLoading}>
                   {allBelowCutlineSelected ? "재시험자 해제" : `재시험자 전체 선택 (${studentsBelowCutline.length}명)`}
                 </button>
               )}
               <button
                 onClick={handleSelectAll}
-                className="text-body text-core-accent hover:underline"
+                className="text-base text-primary hover:underline"
                 disabled={!selectedCourseId || isDataLoading || filteredStudents.length === 0}>
                 {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                   ? "전체 해제"
@@ -260,7 +258,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
                     highlighted={belowCutline}
                     badge={
                       belowCutline && (
-                        <span className="rounded-radius-200 bg-solid-translucent-red px-spacing-200 py-spacing-50 text-core-status-negative text-footnote">
+                        <span className="rounded-sm bg-solid-translucent-red px-2 py-0.5 text-destructive text-xs">
                           재시험 대상
                         </span>
                       )
@@ -268,7 +266,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
                     extraInfo={
                       score !== null &&
                       selectedExam && (
-                        <span className={belowCutline ? "text-core-status-negative" : ""}>
+                        <span className={belowCutline ? "text-destructive" : ""}>
                           {" "}
                           · {score}/{selectedExam.max_score || 8}점
                         </span>
@@ -280,7 +278,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             )}
           </StudentListContainer>
 
-          <div className="text-body text-content-standard-secondary">선택된 학생: {selectedStudentIds.length}명</div>
+          <div className="text-base text-muted-foreground">선택된 학생: {selectedStudentIds.length}명</div>
         </div>
       </div>
     </Modal>

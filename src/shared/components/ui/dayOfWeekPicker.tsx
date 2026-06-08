@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/shared/lib/utils/cn";
+
 interface DayOfWeekPickerProps {
   label: string;
   required?: boolean;
@@ -18,21 +20,22 @@ export function DayOfWeekPicker({ label, required = false, selectedDays, onChang
   };
 
   return (
-    <div className="flex flex-col gap-spacing-200">
-      <label className="block font-semibold text-content-standard-primary text-label">
-        {label} {required && <span className="text-core-status-negative">*</span>}
+    <div className="flex flex-col gap-2">
+      <label className="block font-semibold text-foreground text-sm">
+        {label} {required && <span className="text-destructive">*</span>}
       </label>
-      <div className="grid grid-cols-7 gap-spacing-200">
+      <div className="grid grid-cols-7 gap-2">
         {dayNames.map((day, index) => (
           <button
             key={index}
             type="button"
             onClick={() => toggleDay(index)}
-            className={`rounded-radius-300 py-spacing-200 font-medium text-footnote transition-all duration-150 ${
+            className={cn(
+              "rounded-md py-2 font-medium text-xs transition-all duration-150",
               selectedDays.includes(index)
-                ? "bg-core-accent text-solid-white"
-                : "border border-line-outline bg-components-fill-standard-secondary text-content-standard-secondary hover:border-core-accent/30 hover:bg-components-interactive-hover"
-            }`}>
+                ? "bg-primary text-primary-foreground"
+                : "border border-border bg-muted text-muted-foreground hover:border-primary/30 hover:bg-accent",
+            )}>
             {day}
           </button>
         ))}

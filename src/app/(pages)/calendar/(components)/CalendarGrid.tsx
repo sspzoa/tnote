@@ -31,12 +31,12 @@ export default function CalendarGrid({ currentDate, events, expandedDays, onEven
   const getEventsForDay = (day: Date) => events.filter((event) => isSameDay(new Date(event.date), day));
 
   return (
-    <div className="overflow-hidden rounded-radius-300 border border-line-outline">
-      <div className="grid grid-cols-7 border-line-outline border-b bg-components-fill-standard-secondary">
+    <div className="overflow-hidden rounded-md border border-border">
+      <div className="grid grid-cols-7 border-border border-b bg-muted">
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="border-line-outline border-r px-spacing-200 py-spacing-300 text-center font-semibold text-content-standard-secondary text-label last:border-r-0">
+            className="border-border border-r px-2 py-3 text-center font-semibold text-muted-foreground text-sm last:border-r-0">
             {day}
           </div>
         ))}

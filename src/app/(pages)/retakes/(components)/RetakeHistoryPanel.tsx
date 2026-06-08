@@ -64,46 +64,40 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
   return (
     <SlidePanel isOpen={isOpen} onClose={onClose} title="최근 이력" subtitle="최근 50건">
       {isLoading ? (
-        <SkeletonSpinner className="py-spacing-900" size="md" />
+        <SkeletonSpinner className="py-16" size="md" />
       ) : history.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-spacing-300 py-spacing-900">
-          <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
-            <History className="size-6 text-core-accent" />
+        <div className="flex flex-col items-center justify-center gap-3 py-16">
+          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+            <History className="size-6 text-primary" />
           </div>
-          <span className="text-content-standard-tertiary text-label">이력이 없습니다.</span>
+          <span className="text-muted-foreground text-sm">이력이 없습니다.</span>
         </div>
       ) : (
-        <div className="divide-y divide-line-divider">
+        <div className="divide-y divide-border">
           {history.map((item) => {
             const createdAt = new Date(item.created_at);
             const dateStr = formatLocaleMonthDayKorean(createdAt);
             const timeStr = formatLocaleTimeKorean(createdAt);
 
             return (
-              <div
-                key={item.id}
-                className="flex flex-col gap-spacing-200 px-spacing-600 py-spacing-400 transition-colors hover:bg-components-fill-standard-secondary">
-                <div className="flex items-center justify-between gap-spacing-200">
-                  <div className="flex items-center gap-spacing-200">
-                    <span className="font-semibold text-body text-content-standard-primary">
-                      {item.retake.student.name}
-                    </span>
+              <div key={item.id} className="flex flex-col gap-2 px-7 py-4 transition-colors hover:bg-muted">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-base text-foreground">{item.retake.student.name}</span>
                     <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
                       {getActionLabel(item.action_type)}
                     </Badge>
                   </div>
-                  <span className="shrink-0 text-content-standard-tertiary text-footnote">
+                  <span className="shrink-0 text-muted-foreground text-xs">
                     {dateStr} {timeStr}
                     {item.performed_by && ` · ${item.performed_by.name}`}
                   </span>
                 </div>
-                <div className="truncate text-content-standard-secondary text-label">
-                  {getRetakeItemDescription(item.retake)}
-                </div>
+                <div className="truncate text-muted-foreground text-sm">{getRetakeItemDescription(item.retake)}</div>
 
                 {item.action_type === "assign" && (
-                  <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-purple px-spacing-300 py-spacing-200">
-                    <span className="text-footnote text-solid-purple">
+                  <div className="flex items-center gap-2 rounded-sm bg-solid-translucent-purple px-3 py-2">
+                    <span className="text-xs text-solid-purple">
                       {item.new_date ? `예정일: ${item.new_date}` : "예정일 미지정"}
                     </span>
                   </div>
@@ -113,25 +107,23 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
                   item.action_type === "date_edit" ||
                   item.action_type === "complete") &&
                   item.new_date && (
-                    <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-components-fill-standard-secondary px-spacing-300 py-spacing-200">
-                      <span className="text-content-standard-tertiary text-footnote">
-                        {item.previous_date || "미지정"}
-                      </span>
-                      <span className="text-content-standard-quaternary text-footnote">→</span>
-                      <span className="font-medium text-content-standard-primary text-footnote">{item.new_date}</span>
+                    <div className="flex items-center gap-2 rounded-sm bg-muted px-3 py-2">
+                      <span className="text-muted-foreground text-xs">{item.previous_date || "미지정"}</span>
+                      <span className="text-muted-foreground/60 text-xs">→</span>
+                      <span className="font-medium text-foreground text-xs">{item.new_date}</span>
                     </div>
                   )}
 
                 {item.action_type === "management_status_change" && item.new_management_status && (
-                  <div className="flex items-center gap-spacing-200 rounded-radius-200 bg-solid-translucent-yellow px-spacing-300 py-spacing-200">
-                    <span className="text-footnote text-solid-yellow">
+                  <div className="flex items-center gap-2 rounded-sm bg-solid-translucent-yellow px-3 py-2">
+                    <span className="text-xs text-solid-yellow">
                       {item.previous_management_status} → {item.new_management_status}
                     </span>
                   </div>
                 )}
 
                 {item.note && (
-                  <div className="truncate rounded-radius-200 bg-components-fill-standard-tertiary px-spacing-300 py-spacing-200 text-content-standard-secondary text-footnote italic">
+                  <div className="truncate rounded-sm bg-muted px-3 py-2 text-muted-foreground text-xs italic">
                     "{item.note}"
                   </div>
                 )}

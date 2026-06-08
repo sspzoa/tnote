@@ -77,24 +77,24 @@ interface MessageTabLayoutProps {
 export default function MessageTabLayout({ selection, message, send, preview, isLoading }: MessageTabLayoutProps) {
   return (
     <>
-      <div className="flex h-[700px] flex-row items-stretch gap-spacing-600">
-        <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
+      <div className="flex h-[700px] flex-row items-stretch gap-7">
+        <div className="flex flex-1 flex-col rounded-lg border border-border bg-card">
           {selection.showPlaceholder ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-spacing-300 py-spacing-900">
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
               {selection.placeholderIcon && (
-                <div className="flex size-12 items-center justify-center rounded-full bg-core-accent-translucent">
+                <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
                   {selection.placeholderIcon}
                 </div>
               )}
-              <span className="text-content-standard-tertiary text-label">{selection.placeholderMessage}</span>
+              <span className="text-muted-foreground text-sm">{selection.placeholderMessage}</span>
             </div>
           ) : (
             <>
-              <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-                <h3 className="font-semibold text-body text-content-standard-primary">{selection.title}</h3>
-                <p className="text-content-standard-tertiary text-footnote">
+              <div className="border-border border-b px-5 py-4">
+                <h3 className="font-semibold text-base text-foreground">{selection.title}</h3>
+                <p className="text-muted-foreground text-xs">
                   {selection.selectedCount > 0 ? (
-                    <span className="text-core-accent">
+                    <span className="text-primary">
                       {selection.selectedCount}
                       {selection.unit || "명"} 선택됨
                     </span>
@@ -114,10 +114,10 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                 unit={selection.unit || "명"}
               />
 
-              <div className="relative flex min-h-0 flex-1 flex-col gap-spacing-300 p-spacing-500">
+              <div className="relative flex min-h-0 flex-1 flex-col gap-3 p-5">
                 {isLoading && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-components-fill-standard-primary/60">
-                    <div className="size-6 animate-spin rounded-full border-2 border-core-accent border-t-transparent" />
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/60">
+                    <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                   </div>
                 )}
                 <SearchInput
@@ -139,15 +139,15 @@ export default function MessageTabLayout({ selection, message, send, preview, is
           )}
         </div>
 
-        <div className="flex flex-1 flex-col rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-          <div className="border-line-divider border-b px-spacing-500 py-spacing-400">
-            <h3 className="font-semibold text-body text-content-standard-primary">메시지 템플릿</h3>
-            <p className="text-content-standard-tertiary text-footnote">학생별로 변수가 자동 치환됩니다</p>
+        <div className="flex flex-1 flex-col rounded-lg border border-border bg-card">
+          <div className="border-border border-b px-5 py-4">
+            <h3 className="font-semibold text-base text-foreground">메시지 템플릿</h3>
+            <p className="text-muted-foreground text-xs">학생별로 변수가 자동 치환됩니다</p>
           </div>
 
           <RecipientTypeSelector value={message.recipientType} onChange={message.onRecipientTypeChange} />
 
-          <div className="flex min-h-0 flex-1 flex-col gap-spacing-400 px-spacing-500 py-spacing-400">
+          <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 py-4">
             <MessageComposer
               messageText={message.messageText}
               onMessageChange={message.onMessageChange}
@@ -159,10 +159,10 @@ export default function MessageTabLayout({ selection, message, send, preview, is
             />
 
             <div className="flex items-center justify-between">
-              <div className="text-content-standard-tertiary text-footnote">
+              <div className="text-muted-foreground text-xs">
                 {selection.selectedCount > 0 ? (
                   <span>
-                    <span className="font-semibold text-core-accent">
+                    <span className="font-semibold text-primary">
                       {selection.selectedCount}
                       {selection.unit || "명"}
                     </span>
@@ -172,9 +172,9 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                   <span>{selection.subtitle}</span>
                 )}
               </div>
-              <div className="flex gap-spacing-200">
+              <div className="flex gap-2">
                 <Button variant="secondary" onClick={preview.onOpen} disabled={selection.totalCount === 0}>
-                  <span className="flex items-center gap-spacing-200">
+                  <span className="flex items-center gap-2">
                     <Eye className="size-4" />
                     미리보기
                   </span>
@@ -184,7 +184,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                   disabled={!send.canSend}
                   isLoading={send.isSending}
                   loadingText="발송 중...">
-                  <span className="flex items-center gap-spacing-200">
+                  <span className="flex items-center gap-2">
                     <Send className="size-4" />
                     {send.buttonText}
                   </span>

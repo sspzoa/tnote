@@ -125,27 +125,22 @@ export default function ClinicsPage() {
         subtitle={`전체 ${clinics.length}개 클리닉 (${filteredClinics.length}개 표시)`}
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
-          <div className="flex items-center gap-spacing-300">
+          <div className="flex items-center gap-3">
             <Button
               variant="secondary"
               onClick={() => setShowRequiredAbsentPanel(true)}
-              className="flex items-center gap-spacing-200">
+              className="flex items-center gap-2">
               <UserX className="size-4" />
               필참 결석
               {requiredAbsent.length > 0 && (
-                <span className="rounded-full bg-solid-red px-spacing-200 text-footnote text-solid-white">
-                  {requiredAbsent.length}
-                </span>
+                <span className="rounded-full bg-solid-red px-2 text-xs text-solid-white">{requiredAbsent.length}</span>
               )}
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() => setShowHistoryPanel(true)}
-              className="flex items-center gap-spacing-200">
+            <Button variant="secondary" onClick={() => setShowHistoryPanel(true)} className="flex items-center gap-2">
               <History className="size-4" />
               최근 출석
               {recentAttendance.length > 0 && (
-                <span className="rounded-full bg-core-accent px-spacing-200 text-footnote text-solid-white">
+                <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">
                   {recentAttendance.length}
                 </span>
               )}

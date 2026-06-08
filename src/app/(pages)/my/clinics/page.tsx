@@ -52,9 +52,9 @@ export default function MyClinicPage() {
       ) : records.length === 0 ? (
         <EmptyState message="클리닉 출석 기록이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-          <table className="w-full rounded-radius-400">
-            <thead className="bg-components-fill-standard-secondary">
+        <div className="overflow-x-auto rounded-lg border border-border bg-card">
+          <table className="w-full rounded-lg">
+            <thead className="bg-muted">
               <tr>
                 <SortableHeader
                   label="날짜"
@@ -70,12 +70,8 @@ export default function MyClinicPage() {
                   currentDirection={sortState.direction}
                   onSort={toggleSort}
                 />
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  상태
-                </th>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  활동
-                </th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">상태</th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">활동</th>
               </tr>
             </thead>
             <tbody>
@@ -94,22 +90,18 @@ export default function MyClinicPage() {
                 if (record.didQa) activities.push("질의응답");
 
                 return (
-                  <tr
-                    key={record.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
-                      {dateStr}
+                  <tr key={record.id} className="border-border border-t transition-colors hover:bg-accent">
+                    <td className="whitespace-nowrap px-5 py-4 text-base text-foreground">{dateStr}</td>
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <span className="text-base text-foreground">{record.clinic.name}</span>
+                      {record.isRequired && <span className="ml-1 text-primary text-xs">필참</span>}
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <span className="text-body text-content-standard-primary">{record.clinic.name}</span>
-                      {record.isRequired && <span className="ml-spacing-100 text-core-accent text-footnote">필참</span>}
-                    </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                    <td className="whitespace-nowrap px-5 py-4">
                       <Badge variant={record.status === "absent" ? "danger" : "success"} size="sm">
                         {record.status === "absent" ? "결석" : "출석"}
                       </Badge>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-content-standard-secondary text-footnote">
+                    <td className="whitespace-nowrap px-5 py-4 text-muted-foreground text-xs">
                       {activities.length > 0 ? activities.join(", ") : "-"}
                     </td>
                   </tr>

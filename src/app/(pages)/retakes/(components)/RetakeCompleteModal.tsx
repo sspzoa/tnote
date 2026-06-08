@@ -72,10 +72,10 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
-        <div className="flex flex-col gap-spacing-200">
-          <label className="block font-semibold text-body text-content-standard-primary">예정일</label>
-          <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 text-body text-content-standard-tertiary">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="block font-semibold text-base text-foreground">예정일</label>
+          <div className="rounded-md border border-border bg-muted px-4 py-3 text-base text-muted-foreground">
             {selectedRetake.current_scheduled_date}
           </div>
         </div>

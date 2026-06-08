@@ -1,9 +1,8 @@
-interface SkeletonProps {
-  className?: string;
-}
+import type { ComponentProps } from "react";
+import { cn } from "@/shared/lib/utils/cn";
 
-export function Skeleton({ className = "" }: SkeletonProps) {
-  return <div className={`animate-pulse rounded-radius-200 bg-components-fill-standard-tertiary ${className}`} />;
+function Skeleton({ className, ...props }: ComponentProps<"div">) {
+  return <div data-slot="skeleton" className={cn("animate-pulse rounded-md bg-accent", className)} {...props} />;
 }
 
 interface SkeletonSpinnerProps {
@@ -19,9 +18,12 @@ const spinnerSizeClasses = {
 
 export function SkeletonSpinner({ className = "min-h-[50vh]", size = "lg" }: SkeletonSpinnerProps) {
   return (
-    <div className={`flex items-center justify-center ${className}`} role="status" aria-live="polite">
+    <div className={cn("flex items-center justify-center", className)} role="status" aria-live="polite">
       <div
-        className={`${spinnerSizeClasses[size]} animate-spin rounded-full border-2 border-core-accent border-t-transparent`}
+        className={cn(
+          spinnerSizeClasses[size],
+          "animate-spin rounded-full border-2 border-primary border-t-transparent",
+        )}
       />
     </div>
   );
@@ -43,12 +45,12 @@ interface SkeletonTableProps {
 export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
   const renderHeaderCell = (col: SkeletonColumnDef, index: number) => {
     if (col === "action") {
-      return <th key={index} className="w-24 whitespace-nowrap px-spacing-500 py-spacing-400" />;
+      return <th key={index} className="w-24 whitespace-nowrap px-5 py-4" />;
     }
     const width = typeof col === "string" ? col : col.width;
     return (
-      <th key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left">
-        <Skeleton className={`h-6 ${width}`} />
+      <th key={index} className="whitespace-nowrap px-5 py-4 text-left">
+        <Skeleton className={cn("h-6", width)} />
       </th>
     );
   };
@@ -56,34 +58,34 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
   const renderBodyCell = (col: SkeletonColumnDef, index: number) => {
     if (col === "action") {
       return (
-        <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <Skeleton className="ml-auto h-9 w-11 rounded-radius-200" />
+        <td key={index} className="whitespace-nowrap px-5 py-4">
+          <Skeleton className="ml-auto h-9 w-11 rounded-sm" />
         </td>
       );
     }
 
     if (typeof col === "string") {
       return (
-        <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <Skeleton className={`h-6 ${col}`} />
+        <td key={index} className="whitespace-nowrap px-5 py-4">
+          <Skeleton className={cn("h-6", col)} />
         </td>
       );
     }
 
     if ("rounded" in col && col.rounded) {
       return (
-        <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <Skeleton className={`h-7 ${col.width} rounded-radius-200`} />
+        <td key={index} className="whitespace-nowrap px-5 py-4">
+          <Skeleton className={cn("h-7 rounded-sm", col.width)} />
         </td>
       );
     }
 
     if ("stacked" in col) {
       return (
-        <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <div className="flex flex-col gap-spacing-100">
-            <Skeleton className={`h-6 ${col.stacked[0]}`} />
-            <Skeleton className={`h-5 ${col.stacked[1]}`} />
+        <td key={index} className="whitespace-nowrap px-5 py-4">
+          <div className="flex flex-col gap-1">
+            <Skeleton className={cn("h-6", col.stacked[0])} />
+            <Skeleton className={cn("h-5", col.stacked[1])} />
           </div>
         </td>
       );
@@ -91,10 +93,10 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if ("badges" in col) {
       return (
-        <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <div className="flex gap-spacing-100">
+        <td key={index} className="whitespace-nowrap px-5 py-4">
+          <div className="flex gap-1">
             {col.badges.map((w, i) => (
-              <Skeleton key={i} className={`h-6 ${w} rounded-radius-200`} />
+              <Skeleton key={i} className={cn("h-6 rounded-sm", w)} />
             ))}
           </div>
         </td>
@@ -103,10 +105,10 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if ("buttons" in col) {
       return (
-        <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-          <div className="flex gap-spacing-200">
+        <td key={index} className="whitespace-nowrap px-5 py-4">
+          <div className="flex gap-2">
             {col.buttons.map((w, i) => (
-              <Skeleton key={i} className={`h-9 ${w} rounded-radius-300`} />
+              <Skeleton key={i} className={cn("h-9 rounded-md", w)} />
             ))}
           </div>
         </td>
@@ -114,21 +116,21 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     }
 
     return (
-      <td key={index} className="whitespace-nowrap px-spacing-500 py-spacing-400">
-        <Skeleton className={`h-6 ${col.width}`} />
+      <td key={index} className="whitespace-nowrap px-5 py-4">
+        <Skeleton className={cn("h-6", col.width)} />
       </td>
     );
   };
 
   return (
-    <div className="overflow-x-auto rounded-radius-400 border border-line-outline bg-components-fill-standard-primary">
-      <table className="w-full rounded-radius-400">
-        <thead className="bg-components-fill-standard-secondary">
+    <div className="overflow-x-auto rounded-xl border border-border bg-card">
+      <table className="w-full rounded-xl">
+        <thead className="bg-muted">
           <tr>{columns.map(renderHeaderCell)}</tr>
         </thead>
         <tbody>
           {[...Array(rows)].map((_, rowIndex) => (
-            <tr key={rowIndex} className="border-line-divider border-t">
+            <tr key={rowIndex} className="border-t border-border">
               {columns.map(renderBodyCell)}
             </tr>
           ))}
@@ -137,3 +139,5 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     </div>
   );
 }
+
+export { Skeleton };

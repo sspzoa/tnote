@@ -87,7 +87,7 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
         noPadding>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-components-fill-standard-secondary">
+            <thead className="bg-muted">
               <tr>
                 <SortableHeader
                   label="시험"
@@ -134,9 +134,7 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                   onSort={toggleSort}
                   className="print:hidden"
                 />
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  결과
-                </th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">결과</th>
               </tr>
             </thead>
             <tbody>
@@ -144,39 +142,35 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                 const passed = score.cutline != null && score.score >= score.cutline;
                 const failed = score.cutline != null && score.score < score.cutline;
                 return (
-                  <tr
-                    key={score.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="text-body text-content-standard-primary">{score.exam.name}</div>
-                      <div className="text-content-standard-secondary text-footnote">
+                  <tr key={score.id} className="border-border border-t transition-colors hover:bg-accent">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <div className="text-base text-foreground">{score.exam.name}</div>
+                      <div className="text-muted-foreground text-xs">
                         {score.exam.course.name} {score.exam.examNumber}회차
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <span className="font-medium text-body text-content-standard-primary">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <span className="font-medium text-base text-foreground">
                         {score.score}
-                        {score.maxScore != null && (
-                          <span className="text-content-standard-tertiary">/{score.maxScore}</span>
-                        )}
+                        {score.maxScore != null && <span className="text-muted-foreground">/{score.maxScore}</span>}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <span className="text-body text-content-standard-primary">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <span className="text-base text-foreground">
                         {score.rank}
-                        <span className="text-content-standard-tertiary">/{score.totalStudents}</span>
+                        <span className="text-muted-foreground">/{score.totalStudents}</span>
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 print:hidden">
-                      <span className="text-body text-content-standard-primary">{score.average}</span>
+                    <td className="whitespace-nowrap px-5 py-4 print:hidden">
+                      <span className="text-base text-foreground">{score.average}</span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 print:hidden">
-                      <span className="text-body text-content-standard-primary">{score.median}</span>
+                    <td className="whitespace-nowrap px-5 py-4 print:hidden">
+                      <span className="text-base text-foreground">{score.median}</span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 print:hidden">
-                      <span className="text-body text-content-standard-primary">{score.highest}</span>
+                    <td className="whitespace-nowrap px-5 py-4 print:hidden">
+                      <span className="text-base text-foreground">{score.highest}</span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                    <td className="whitespace-nowrap px-5 py-4">
                       {passed && (
                         <Badge variant="success" size="sm">
                           통과
@@ -187,7 +181,7 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                           재시험
                         </Badge>
                       )}
-                      {score.cutline == null && <span className="text-content-standard-tertiary text-footnote">-</span>}
+                      {score.cutline == null && <span className="text-muted-foreground text-xs">-</span>}
                     </td>
                   </tr>
                 );
@@ -217,17 +211,13 @@ const AssignmentHistoryTable = ({
         noPadding>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-components-fill-standard-secondary">
+            <thead className="bg-muted">
               <tr>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
                   과제명
                 </th>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  수업
-                </th>
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  상태
-                </th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">수업</th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">상태</th>
               </tr>
             </thead>
             <tbody>
@@ -237,16 +227,12 @@ const AssignmentHistoryTable = ({
                   label: item.status,
                 };
                 return (
-                  <tr
-                    key={item.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-primary">
-                      {item.assignment.name}
-                    </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                  <tr key={item.id} className="border-border border-t transition-colors hover:bg-accent">
+                    <td className="whitespace-nowrap px-5 py-4 text-base text-foreground">{item.assignment.name}</td>
+                    <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                       {item.assignment.course.name}
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                    <td className="whitespace-nowrap px-5 py-4">
                       <Badge variant={status.variant} size="sm">
                         {status.label}
                       </Badge>
@@ -290,7 +276,7 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
         noPadding>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-components-fill-standard-secondary">
+            <thead className="bg-muted">
               <tr>
                 <SortableHeader
                   label="시험"
@@ -313,9 +299,7 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
                   currentDirection={sortState.direction}
                   onSort={toggleSort}
                 />
-                <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
-                  비고
-                </th>
+                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">비고</th>
               </tr>
             </thead>
             <tbody>
@@ -325,37 +309,31 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
                   label: retake.status,
                 };
                 return (
-                  <tr
-                    key={retake.id}
-                    className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="text-body text-content-standard-primary">{retake.exam.name}</div>
-                      <div className="text-content-standard-secondary text-footnote">
+                  <tr key={retake.id} className="border-border border-t transition-colors hover:bg-accent">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <div className="text-base text-foreground">{retake.exam.name}</div>
+                      <div className="text-muted-foreground text-xs">
                         {retake.exam.course.name} {retake.exam.examNumber}회차
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <span className="text-body text-content-standard-primary">{retake.scheduledDate || "-"}</span>
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <span className="text-base text-foreground">{retake.scheduledDate || "-"}</span>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                    <td className="whitespace-nowrap px-5 py-4">
                       <Badge variant={status.variant} size="sm">
                         {status.label}
                       </Badge>
                     </td>
-                    <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                      <div className="flex gap-spacing-200">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <div className="flex gap-2">
                         {retake.postponeCount > 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">
-                            연기 {retake.postponeCount}회
-                          </span>
+                          <span className="text-muted-foreground text-xs">연기 {retake.postponeCount}회</span>
                         )}
                         {retake.absentCount > 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">
-                            결석 {retake.absentCount}회
-                          </span>
+                          <span className="text-muted-foreground text-xs">결석 {retake.absentCount}회</span>
                         )}
                         {retake.postponeCount === 0 && retake.absentCount === 0 && (
-                          <span className="text-content-standard-tertiary text-footnote">-</span>
+                          <span className="text-muted-foreground text-xs">-</span>
                         )}
                       </div>
                     </td>
@@ -443,26 +421,26 @@ export default function StudentDetailPage() {
   const consultationCount = studentDetail.consultationHistory.length;
 
   return (
-    <Container className="bg-background-standard-secondary print:min-h-0 print:bg-white print:p-0">
-      <div className="flex flex-col gap-spacing-600 print:gap-spacing-300">
-        <section className="flex flex-col gap-spacing-400">
+    <Container className="bg-muted print:min-h-0 print:bg-white print:p-0">
+      <div className="flex flex-col gap-7 print:gap-3">
+        <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between print:hidden">
-            <Link href="/students" className="text-body text-core-accent hover:underline">
+            <Link href="/students" className="text-base text-primary hover:underline">
               ← 학생 목록으로 돌아가기
             </Link>
             <Button variant="secondary" size="sm" onClick={() => setShowPrintModal(true)}>
-              <span className="flex items-center gap-spacing-200">
+              <span className="flex items-center gap-2">
                 <Printer className="h-4 w-4" />
                 인쇄
               </span>
             </Button>
           </div>
 
-          <div className="rounded-radius-400 border border-line-outline bg-components-fill-standard-primary p-spacing-500 print:rounded-none print:border-0 print:border-line-divider print:border-b print:bg-white print:p-0 print:pb-spacing-300">
-            <div className="flex flex-col gap-spacing-300 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex flex-col gap-spacing-200">
-                <div className="flex items-center gap-spacing-300">
-                  <h1 className="font-bold text-content-standard-primary text-title">{studentDetail.student.name}</h1>
+          <div className="rounded-lg border border-border bg-card p-5 print:rounded-none print:border-0 print:border-border print:border-b print:bg-white print:p-0 print:pb-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <h1 className="font-bold text-foreground text-2xl">{studentDetail.student.name}</h1>
                   {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
                     <Badge variant="blue" size="xs">
                       {getGrade(studentDetail.student.birthYear)}
@@ -470,25 +448,23 @@ export default function StudentDetailPage() {
                   )}
                 </div>
 
-                <p className="text-body text-content-standard-secondary">
-                  {studentDetail.student.school || "학교 정보 없음"}
-                </p>
+                <p className="text-base text-muted-foreground">{studentDetail.student.school || "학교 정보 없음"}</p>
 
-                <div className="flex flex-wrap items-center gap-spacing-400 text-content-standard-secondary text-label">
-                  <span className="flex items-center gap-spacing-100">
-                    <span className="text-content-standard-tertiary">본인</span>
+                <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
+                  <span className="flex items-center gap-1">
+                    <span className="text-muted-foreground">본인</span>
                     {formatPhoneNumber(studentDetail.student.phoneNumber)}
                   </span>
                   {studentDetail.student.parentPhoneNumber && (
-                    <span className="flex items-center gap-spacing-100">
-                      <span className="text-content-standard-tertiary">학부모</span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-muted-foreground">학부모</span>
                       {formatPhoneNumber(studentDetail.student.parentPhoneNumber)}
                     </span>
                   )}
                   {studentDetail.student.requiredClinicWeekdays &&
                     studentDetail.student.requiredClinicWeekdays.length > 0 && (
-                      <span className="flex items-center gap-spacing-100">
-                        <span className="text-content-standard-tertiary">클리닉 필참</span>
+                      <span className="flex items-center gap-1">
+                        <span className="text-muted-foreground">클리닉 필참</span>
                         {studentDetail.student.requiredClinicWeekdays
                           .map((d) => ["일", "월", "화", "수", "목", "금", "토"][d])
                           .join(", ")}
@@ -498,7 +474,7 @@ export default function StudentDetailPage() {
               </div>
 
               {activeTags.length > 0 && (
-                <div className="flex flex-wrap gap-spacing-100">
+                <div className="flex flex-wrap gap-1">
                   {activeTags.map((assignment) => (
                     <Badge key={assignment.id} variant={assignment.tag.color} size="xs">
                       {assignment.tag.name}
@@ -511,7 +487,7 @@ export default function StudentDetailPage() {
         </section>
 
         <section
-          className={`grid grid-cols-2 gap-spacing-400 lg:grid-cols-5 print:gap-spacing-200 ${
+          className={`grid grid-cols-2 gap-4 lg:grid-cols-5 print:gap-2 ${
             {
               1: "print:grid-cols-1",
               2: "print:grid-cols-2",
@@ -572,14 +548,14 @@ export default function StudentDetailPage() {
           isEmpty={studentDetail.courses.length === 0}
           emptyMessage="수강 중인 수업이 없습니다."
           noPadding>
-          <div className="grid gap-spacing-300 p-spacing-400 sm:grid-cols-2 lg:grid-cols-3 print:gap-spacing-200 print:px-0 print:py-spacing-200">
+          <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 print:gap-2 print:px-0 print:py-2">
             {studentDetail.courses.map((course) => (
               <div
                 key={course.id}
-                className="print-break-inside-avoid flex items-center justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary px-spacing-400 py-spacing-300 print:bg-transparent print:px-spacing-200 print:py-spacing-200">
-                <div className="flex min-w-0 flex-1 flex-col gap-spacing-50">
-                  <span className="truncate font-medium text-body text-content-standard-primary">{course.name}</span>
-                  <span className="text-content-standard-tertiary text-footnote">
+                className="print-break-inside-avoid flex items-center justify-between gap-3 rounded-md border border-border bg-muted px-4 py-3 print:bg-transparent print:px-2 print:py-2">
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="truncate font-medium text-base text-foreground">{course.name}</span>
+                  <span className="text-muted-foreground text-xs">
                     등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
                   </span>
                 </div>
@@ -604,18 +580,18 @@ export default function StudentDetailPage() {
           noPadding>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-components-fill-standard-secondary">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
                     날짜
                   </th>
-                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
                     클리닉
                   </th>
-                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
                     출석
                   </th>
-                  <th className="whitespace-nowrap px-spacing-500 py-spacing-400 text-left font-semibold text-body text-content-standard-primary">
+                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
                     활동
                   </th>
                 </tr>
@@ -628,27 +604,23 @@ export default function StudentDetailPage() {
                     history.didQa && "질의응답",
                   ].filter(Boolean);
                   return (
-                    <tr
-                      key={history.id}
-                      className="border-line-divider border-t transition-colors hover:bg-components-interactive-hover">
-                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-body text-content-standard-secondary">
+                    <tr key={history.id} className="border-border border-t transition-colors hover:bg-accent">
+                      <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
                         {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
                           month: "short",
                           day: "numeric",
                         })}
                       </td>
-                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
-                        <span className="text-body text-content-standard-primary">{history.clinic.name}</span>
-                        {history.isRequired && (
-                          <span className="ml-spacing-100 text-core-accent text-footnote">필참</span>
-                        )}
+                      <td className="whitespace-nowrap px-5 py-4">
+                        <span className="text-base text-foreground">{history.clinic.name}</span>
+                        {history.isRequired && <span className="ml-1 text-primary text-xs">필참</span>}
                       </td>
-                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400">
+                      <td className="whitespace-nowrap px-5 py-4">
                         <Badge variant={history.status === "absent" ? "danger" : "success"} size="sm">
                           {history.status === "absent" ? "결석" : "출석"}
                         </Badge>
                       </td>
-                      <td className="whitespace-nowrap px-spacing-500 py-spacing-400 text-content-standard-secondary text-footnote">
+                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground text-xs">
                         {activities.length > 0 ? activities.join(", ") : "-"}
                       </td>
                     </tr>
@@ -679,24 +651,20 @@ export default function StudentDetailPage() {
           {studentDetail.messageHistory.map((message) => (
             <div
               key={message.id}
-              className="print-break-inside-avoid flex flex-col gap-spacing-200 px-spacing-500 py-spacing-400 print:px-0 print:py-spacing-200">
-              <div className="flex items-center justify-between gap-spacing-300">
-                <div className="flex items-center gap-spacing-200">
+              className="print-break-inside-avoid flex flex-col gap-2 px-5 py-4 print:px-0 print:py-2">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
                   <Badge variant={message.isSuccess ? "success" : "danger"} size="xs">
                     {message.isSuccess ? "성공" : "실패"}
                   </Badge>
                   <Badge variant="blue" size="xs">
                     {message.recipientType === "student" ? "학생" : "학부모"}
                   </Badge>
-                  <span className="text-content-standard-secondary text-footnote">
-                    {formatPhoneNumber(message.recipientPhone)}
-                  </span>
+                  <span className="text-muted-foreground text-xs">{formatPhoneNumber(message.recipientPhone)}</span>
                 </div>
-                <div className="flex shrink-0 items-center gap-spacing-200">
-                  {message.sender && (
-                    <span className="text-content-standard-secondary text-footnote">{message.sender.name}</span>
-                  )}
-                  <span className="text-content-standard-tertiary text-footnote">
+                <div className="flex shrink-0 items-center gap-2">
+                  {message.sender && <span className="text-muted-foreground text-xs">{message.sender.name}</span>}
+                  <span className="text-muted-foreground text-xs">
                     {new Date(message.sentAt).toLocaleDateString("ko-KR")}{" "}
                     {new Date(message.sentAt).toLocaleTimeString("ko-KR", {
                       hour: "2-digit",
@@ -705,9 +673,7 @@ export default function StudentDetailPage() {
                   </span>
                 </div>
               </div>
-              <p className="line-clamp-2 whitespace-pre-wrap text-content-standard-primary text-label">
-                {message.messageContent}
-              </p>
+              <p className="line-clamp-2 whitespace-pre-wrap text-foreground text-sm">{message.messageContent}</p>
             </div>
           ))}
         </DashboardCard>
@@ -723,15 +689,15 @@ export default function StudentDetailPage() {
             <Button variant="secondary" className="flex-1" onClick={() => setShowPrintModal(false)}>
               취소
             </Button>
-            <Button variant="primary" className="flex-1" onClick={handlePrint}>
-              <span className="flex items-center justify-center gap-spacing-200">
+            <Button variant="default" className="flex-1" onClick={handlePrint}>
+              <span className="flex items-center justify-center gap-2">
                 <Printer className="h-4 w-4" />
                 인쇄하기
               </span>
             </Button>
           </>
         }>
-        <div className="grid grid-cols-3 gap-spacing-200">
+        <div className="grid grid-cols-3 gap-2">
           {(
             [
               { key: "courses", icon: BookOpen, label: "수업" },
@@ -745,11 +711,11 @@ export default function StudentDetailPage() {
             <label
               key={item.key}
               onClick={() => togglePrintOption(item.key)}
-              className={`flex cursor-pointer items-center gap-spacing-200 rounded-radius-300 border px-spacing-300 py-spacing-300 transition-colors ${printOptions[item.key] ? "border-core-accent bg-core-accent-translucent" : "border-line-outline hover:bg-components-fill-standard-secondary"}`}>
+              className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-3 transition-colors ${printOptions[item.key] ? "border-primary bg-primary/10" : "border-border hover:bg-muted"}`}>
               <div
-                className={`flex size-5 shrink-0 items-center justify-center rounded-radius-200 border transition-colors duration-150 ${printOptions[item.key] ? "border-core-accent bg-core-accent" : "border-line-outline bg-components-fill-standard-secondary"}`}>
+                className={`flex size-5 shrink-0 items-center justify-center rounded-sm border transition-colors duration-150 ${printOptions[item.key] ? "border-primary bg-primary" : "border-border bg-muted"}`}>
                 {printOptions[item.key] && (
-                  <svg className="size-3 text-solid-white" viewBox="0 0 12 12" fill="none">
+                  <svg className="size-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
                     <path
                       d="M2.5 6L5 8.5L9.5 3.5"
                       stroke="currentColor"
@@ -760,8 +726,8 @@ export default function StudentDetailPage() {
                   </svg>
                 )}
               </div>
-              <item.icon className="size-4 shrink-0 text-content-standard-tertiary" />
-              <span className="font-medium text-content-standard-primary text-label">{item.label}</span>
+              <item.icon className="size-4 shrink-0 text-muted-foreground" />
+              <span className="font-medium text-foreground text-sm">{item.label}</span>
             </label>
           ))}
         </div>

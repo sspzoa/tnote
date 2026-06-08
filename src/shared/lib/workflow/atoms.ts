@@ -22,7 +22,6 @@ export const createWorkflowFormAtoms = () => ({
 export const createWorkflowFilterAtoms = () => ({
   selectedCourseAtom: atom<string>("all"),
   selectedManagementStatusAtom: atom<string>("all"),
-  openMenuIdAtom: atom<string | null>(null),
   searchQueryAtom: atom(""),
   showCompletedAtom: atom(false),
   selectedDateAtom: atom<string>("all"),

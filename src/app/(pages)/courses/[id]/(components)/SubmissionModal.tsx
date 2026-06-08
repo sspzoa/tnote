@@ -110,14 +110,12 @@ export function SubmissionModal({
       title="제출 현황 확인"
       subtitle={assignment.name}
       footer={
-        <div className="flex w-full flex-col gap-spacing-300">
-          <div className="flex flex-col gap-spacing-100 text-body">
-            <span className="text-content-standard-secondary">입력: {submissionCount}명</span>
-            <span className="text-content-standard-tertiary text-footnote">
-              상태 변경은 과제 관리 페이지에서만 가능합니다.
-            </span>
+        <div className="flex w-full flex-col gap-3">
+          <div className="flex flex-col gap-1 text-base">
+            <span className="text-muted-foreground">입력: {submissionCount}명</span>
+            <span className="text-muted-foreground text-xs">상태 변경은 과제 관리 페이지에서만 가능합니다.</span>
           </div>
-          <div className="flex gap-spacing-300">
+          <div className="flex gap-3">
             <Button variant="secondary" onClick={handleClose} className="flex-1">
               취소
             </Button>
@@ -134,8 +132,8 @@ export function SubmissionModal({
         </div>
       }>
       {isLoading ? (
-        <div className="flex flex-col gap-spacing-400">
-          <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+        <div className="flex flex-col gap-4">
+          <div className="h-12 animate-pulse rounded-md bg-muted" />
           <StudentListContainer>
             <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
           </StudentListContainer>
@@ -145,7 +143,7 @@ export function SubmissionModal({
           <StudentListEmpty message="수강생이 없습니다." />
         </StudentListContainer>
       ) : (
-        <div className="flex flex-col gap-spacing-400">
+        <div className="flex flex-col gap-4">
           <SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

@@ -18,12 +18,11 @@ import {
   showPostponeModalAtom,
   showStudentModalAtom,
 } from "../(atoms)/useModalStore";
-import { openMenuIdAtom, selectedRetakeAtom } from "../(atoms)/useRetakesStore";
+import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
 import { useRetakeDelete } from "./useRetakeDelete";
 
 export const useRetakeHandlers = (refetch: () => void) => {
   const setSelectedRetake = useSetAtom(selectedRetakeAtom);
-  const setOpenMenuId = useSetAtom(openMenuIdAtom);
   const setShowPostponeModal = useSetAtom(showPostponeModalAtom);
   const setShowAbsentModal = useSetAtom(showAbsentModalAtom);
   const setShowCompleteModal = useSetAtom(showCompleteModalAtom);
@@ -47,41 +46,36 @@ export const useRetakeHandlers = (refetch: () => void) => {
       setPostponeDate("");
       setPostponeNote("");
       setShowPostponeModal(true);
-      setOpenMenuId(null);
     },
-    [setSelectedRetake, setPostponeDate, setPostponeNote, setShowPostponeModal, setOpenMenuId],
+    [setSelectedRetake, setPostponeDate, setPostponeNote, setShowPostponeModal],
   );
 
   const handleAbsent = useCallback(
     (retake: Retake) => {
       setSelectedRetake(retake);
       setShowAbsentModal(true);
-      setOpenMenuId(null);
     },
-    [setSelectedRetake, setShowAbsentModal, setOpenMenuId],
+    [setSelectedRetake, setShowAbsentModal],
   );
 
   const handleComplete = useCallback(
     (retake: Retake) => {
       setSelectedRetake(retake);
       setShowCompleteModal(true);
-      setOpenMenuId(null);
     },
-    [setSelectedRetake, setShowCompleteModal, setOpenMenuId],
+    [setSelectedRetake, setShowCompleteModal],
   );
 
   const handleViewHistory = useCallback(
     (retake: Retake) => {
       setSelectedRetake(retake);
       setShowHistoryModal(true);
-      setOpenMenuId(null);
     },
-    [setSelectedRetake, setShowHistoryModal, setOpenMenuId],
+    [setSelectedRetake, setShowHistoryModal],
   );
 
   const handleDelete = useCallback(
     async (retake: Retake) => {
-      setOpenMenuId(null);
       const ok = await confirm({
         title: "재시험 삭제",
         message: `${retake.student.name} 학생의 ${retake.exam.course.name} 재시험 항목을 삭제하시겠습니까?`,
@@ -97,7 +91,7 @@ export const useRetakeHandlers = (refetch: () => void) => {
         toast.error(getErrorMessage(err, "재시험 삭제에 실패했습니다."));
       }
     },
-    [deleteRetake, setOpenMenuId, toast, confirm],
+    [deleteRetake, toast, confirm],
   );
 
   const handleViewStudent = useCallback(
@@ -116,9 +110,8 @@ export const useRetakeHandlers = (refetch: () => void) => {
     (retake: Retake) => {
       setSelectedRetake(retake);
       setShowManagementStatusModal(true);
-      setOpenMenuId(null);
     },
-    [setSelectedRetake, setShowManagementStatusModal, setOpenMenuId],
+    [setSelectedRetake, setShowManagementStatusModal],
   );
 
   const handleEditDate = useCallback(
@@ -126,9 +119,8 @@ export const useRetakeHandlers = (refetch: () => void) => {
       setSelectedRetake(retake);
       setEditDate("");
       setShowEditDateModal(true);
-      setOpenMenuId(null);
     },
-    [setSelectedRetake, setEditDate, setShowEditDateModal, setOpenMenuId],
+    [setSelectedRetake, setEditDate, setShowEditDateModal],
   );
 
   const handleActionSuccess = useCallback(() => {

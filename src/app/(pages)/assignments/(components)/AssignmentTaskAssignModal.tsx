@@ -128,12 +128,12 @@ export default function AssignmentTaskAssignModal({ onSuccess }: AssignmentTaskA
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-500">
+      <div className="flex flex-col gap-5">
         <FormSelect
           label="수업 선택"
           required
           value={selectedCourseId}
-          onChange={(e) => handleCourseChange(e.target.value)}
+          onValueChange={(value) => handleCourseChange(value)}
           disabled={coursesLoading}
           options={courseOptions}
         />
@@ -142,31 +142,29 @@ export default function AssignmentTaskAssignModal({ onSuccess }: AssignmentTaskA
           label="과제 선택"
           required
           value={selectedAssignmentId}
-          onChange={(e) => setSelectedAssignmentId(e.target.value)}
+          onValueChange={(value) => setSelectedAssignmentId(value)}
           disabled={!selectedCourseId || assignmentsLoading}
           options={assignmentOptions}
         />
 
-        <div className="flex flex-col gap-spacing-100">
+        <div className="flex flex-col gap-1">
           <FormInput
             label="예정일 (선택)"
             type="date"
             value={scheduledDate}
             onChange={(e) => setScheduledDate(e.target.value)}
           />
-          <span className="text-content-standard-tertiary text-footnote">
-            비워두면 학생별 클리닉 필참 요일에 자동 배정됩니다.
-          </span>
+          <span className="text-muted-foreground text-xs">비워두면 학생별 클리닉 필참 요일에 자동 배정됩니다.</span>
         </div>
 
-        <div className="flex flex-col gap-spacing-200">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="font-semibold text-body text-content-standard-primary">
-              학생 선택 <span className="text-core-status-negative">*</span>
+            <label className="font-semibold text-base text-foreground">
+              학생 선택 <span className="text-destructive">*</span>
             </label>
             <button
               onClick={handleSelectAll}
-              className="text-body text-core-accent hover:underline"
+              className="text-base text-primary hover:underline"
               disabled={!selectedCourseId || studentsLoading || filteredStudents.length === 0}>
               {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                 ? "전체 해제"
@@ -200,7 +198,7 @@ export default function AssignmentTaskAssignModal({ onSuccess }: AssignmentTaskA
             )}
           </StudentListContainer>
 
-          <div className="text-body text-content-standard-secondary">선택된 학생: {selectedStudentIds.length}명</div>
+          <div className="text-base text-muted-foreground">선택된 학생: {selectedStudentIds.length}명</div>
         </div>
       </div>
     </Modal>

@@ -95,7 +95,6 @@ export function ExamFormModal({
             취소
           </Button>
           <Button
-            variant="primary"
             onClick={handleSubmit}
             disabled={isDisabled}
             isLoading={isSubmitting}
@@ -105,7 +104,7 @@ export function ExamFormModal({
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-400">
+      <div className="flex flex-col gap-4">
         <FormInput
           label="회차"
           required
@@ -125,7 +124,7 @@ export function ExamFormModal({
           placeholder="예: 복습테스트"
         />
 
-        <div className="flex gap-spacing-400">
+        <div className="flex gap-4">
           <div className="flex-1">
             <FormInput
               label="만점"

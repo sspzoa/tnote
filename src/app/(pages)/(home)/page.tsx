@@ -42,22 +42,20 @@ export default function Home() {
   if (isLoading) {
     return (
       <Container>
-        <div className="flex animate-pulse flex-col gap-spacing-400 rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-          <div className="h-16 w-80 rounded-radius-300 bg-components-fill-standard-secondary" />
-          <div className="h-[38px] w-40 rounded-full bg-components-fill-standard-secondary" />
+        <div className="flex animate-pulse flex-col gap-4 rounded-xl border border-border bg-card p-7 md:p-10">
+          <div className="h-16 w-80 rounded-md bg-muted" />
+          <div className="h-[38px] w-40 rounded-full bg-muted" />
         </div>
-        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="animate-pulse rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500">
-              <div className="flex flex-col gap-spacing-400">
-                <div className="size-8 rounded-radius-200 bg-components-fill-standard-secondary" />
-                <div className="flex flex-col gap-spacing-100">
-                  <div className="h-16 w-12 rounded-radius-200 bg-components-fill-standard-secondary" />
+            <div key={i} className="animate-pulse rounded-xl border border-border bg-card p-5">
+              <div className="flex flex-col gap-4">
+                <div className="size-8 rounded-sm bg-muted" />
+                <div className="flex flex-col gap-1">
+                  <div className="h-16 w-12 rounded-sm bg-muted" />
                   <div>
-                    <div className="h-[22px] w-14 rounded-radius-200 bg-components-fill-standard-secondary" />
-                    <div className="h-5 w-24 rounded-radius-200 bg-components-fill-standard-secondary" />
+                    <div className="h-[22px] w-14 rounded-sm bg-muted" />
+                    <div className="h-5 w-24 rounded-sm bg-muted" />
                   </div>
                 </div>
               </div>
@@ -108,33 +106,33 @@ export default function Home() {
 
   return (
     <Container>
-      <div className="rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-600 md:p-spacing-800">
-        <div className="flex flex-col gap-spacing-400">
-          <h1 className="font-bold text-content-standard-primary text-display">
+      <div className="rounded-xl border border-border bg-card p-7 md:p-10">
+        <div className="flex flex-col gap-4">
+          <h1 className="font-bold text-5xl text-foreground">
             안녕하세요,
-            <br className="md:hidden" /> <span className="text-core-accent">{user?.name}</span>님
+            <br className="md:hidden" /> <span className="text-primary">{user?.name}</span>님
           </h1>
-          <div className="flex w-fit items-center gap-spacing-200 rounded-full border border-core-accent/20 bg-core-accent-translucent px-spacing-400 py-spacing-200">
-            <Sparkles className="size-4 shrink-0 text-core-accent" />
-            <p className="text-core-accent text-label">{typedGreeting || "\u00A0"}</p>
+          <div className="flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+            <Sparkles className="size-4 shrink-0 text-primary" />
+            <p className="text-primary text-sm">{typedGreeting || "\u00A0"}</p>
           </div>
         </div>
       </div>
 
       {!isStudent && stats && (
-        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {statItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="group hover:-translate-y-spacing-50 relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:border-core-accent/30">
-              <div className="flex flex-col gap-spacing-400">
-                <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
-                <div className="relative flex flex-col gap-spacing-100">
-                  <div className="font-bold text-content-standard-primary text-display">{item.value}</div>
+              className="group hover:-translate-y-0.5 relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:border-primary/30">
+              <div className="flex flex-col gap-4">
+                <item.icon className="size-8 text-primary transition-transform duration-300 group-hover:scale-110" />
+                <div className="relative flex flex-col gap-1">
+                  <div className="font-bold text-5xl text-foreground">{item.value}</div>
                   <div>
-                    <div className="font-medium text-content-standard-primary text-label">{item.label}</div>
-                    <div className="text-content-standard-tertiary text-footnote">{item.description}</div>
+                    <div className="font-medium text-foreground text-sm">{item.label}</div>
+                    <div className="text-muted-foreground text-xs">{item.description}</div>
                   </div>
                 </div>
               </div>
@@ -144,7 +142,7 @@ export default function Home() {
       )}
 
       {isStudent && (
-        <div className="grid grid-cols-1 gap-spacing-400 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { href: "/my/courses", icon: BookOpen, label: "시험 현황", description: "시험 성적 확인" },
             { href: "/my/assignments", icon: FileCheck, label: "과제 현황", description: "과제 제출 현황 확인" },
@@ -155,12 +153,12 @@ export default function Home() {
             <Link
               key={item.href}
               href={item.href}
-              className="group hover:-translate-y-spacing-50 relative flex flex-col overflow-hidden rounded-radius-600 border border-line-outline bg-components-fill-standard-primary p-spacing-500 transition-all duration-300 hover:border-core-accent/30">
-              <div className="flex flex-col gap-spacing-400">
-                <item.icon className="size-8 text-core-accent transition-transform duration-300 group-hover:scale-110" />
-                <div className="relative flex flex-col gap-spacing-100">
-                  <div className="font-medium text-content-standard-primary text-label">{item.label}</div>
-                  <div className="text-content-standard-tertiary text-footnote">{item.description}</div>
+              className="group hover:-translate-y-0.5 relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:border-primary/30">
+              <div className="flex flex-col gap-4">
+                <item.icon className="size-8 text-primary transition-transform duration-300 group-hover:scale-110" />
+                <div className="relative flex flex-col gap-1">
+                  <div className="font-medium text-foreground text-sm">{item.label}</div>
+                  <div className="text-muted-foreground text-xs">{item.description}</div>
                 </div>
               </div>
             </Link>

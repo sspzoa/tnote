@@ -12,9 +12,9 @@ export const TAG_FILTER_COLOR_CLASSES: Record<TagColor, { bg: string; text: stri
   brown: { bg: "bg-solid-translucent-brown/50", text: "text-solid-brown", activeBg: "bg-solid-translucent-brown" },
   black: { bg: "bg-solid-translucent-black/50", text: "text-solid-black", activeBg: "bg-solid-translucent-black" },
   white: {
-    bg: "bg-components-fill-standard-secondary",
-    text: "text-content-standard-primary",
-    activeBg: "bg-components-fill-standard-tertiary",
+    bg: "bg-muted",
+    text: "text-foreground",
+    activeBg: "bg-muted-foreground/20",
   },
 };
 
@@ -43,7 +43,7 @@ export const TAG_SOLID_COLORS: Record<TagColor, string> = {
   pink: "bg-solid-pink",
   brown: "bg-solid-brown",
   black: "bg-solid-black",
-  white: "bg-solid-white border border-line-outline",
+  white: "bg-solid-white border border-border",
 };
 
 export const TAG_COLORS: TagColor[] = [

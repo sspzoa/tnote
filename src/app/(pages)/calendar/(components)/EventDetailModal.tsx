@@ -171,30 +171,30 @@ export default function EventDetailModal({ event, onClose }: Props) {
           닫기
         </Button>
       }>
-      <div className="flex flex-col gap-spacing-400">
-        <div className="flex flex-col gap-spacing-100">
-          <label className="block font-semibold text-content-standard-secondary text-label">타입</label>
-          <div className="flex items-center gap-spacing-200">
-            <div className="h-4 w-4 rounded-radius-100" style={{ backgroundColor: getEventColor(event) }} />
-            <span className="text-body text-content-standard-primary">{getEventTypeLabel(event.type)}</span>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="block font-semibold text-muted-foreground text-sm">타입</label>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded-sm" style={{ backgroundColor: getEventColor(event) }} />
+            <span className="text-base text-foreground">{getEventTypeLabel(event.type)}</span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-spacing-100">
-          <label className="block font-semibold text-content-standard-secondary text-label">제목</label>
-          <p className="text-body text-content-standard-primary">{event.title}</p>
+        <div className="flex flex-col gap-1">
+          <label className="block font-semibold text-muted-foreground text-sm">제목</label>
+          <p className="text-base text-foreground">{event.title}</p>
         </div>
 
-        <div className="flex flex-col gap-spacing-100">
-          <label className="block font-semibold text-content-standard-secondary text-label">날짜</label>
-          <p className="text-body text-content-standard-primary">
+        <div className="flex flex-col gap-1">
+          <label className="block font-semibold text-muted-foreground text-sm">날짜</label>
+          <p className="text-base text-foreground">
             {format(new Date(event.date), "yyyy년 M월 d일 (EEE)", { locale: ko })}
           </p>
         </div>
 
         {event.type === "clinic" && clinicStatus && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">상태</label>
             <Badge variant={getClinicStatusVariant(clinicStatus)} size="sm" className="w-fit">
               {getClinicStatusLabel(clinicStatus)}
             </Badge>
@@ -202,23 +202,23 @@ export default function EventDetailModal({ event, onClose }: Props) {
         )}
 
         {event.type === "clinic" && clinicName && clinicStudentName && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">클리닉</label>
-            <p className="text-body text-content-standard-primary">{clinicName}</p>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">클리닉</label>
+            <p className="text-base text-foreground">{clinicName}</p>
           </div>
         )}
 
         {event.type === "clinic" && clinicStudentName && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">학생</label>
-            <p className="text-body text-content-standard-primary">{clinicStudentDisplayLabel ?? clinicStudentName}</p>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">학생</label>
+            <p className="text-base text-foreground">{clinicStudentDisplayLabel ?? clinicStudentName}</p>
           </div>
         )}
 
         {event.type === "clinic" && clinicActivities.length > 0 && (
-          <div className="flex flex-col gap-spacing-200">
-            <label className="block font-semibold text-content-standard-secondary text-label">진행 내용</label>
-            <div className="flex flex-wrap gap-spacing-100">
+          <div className="flex flex-col gap-2">
+            <label className="block font-semibold text-muted-foreground text-sm">진행 내용</label>
+            <div className="flex flex-wrap gap-1">
               {clinicActivities.map((activity) => (
                 <Badge key={activity} variant="info" size="sm">
                   {activity}
@@ -229,11 +229,11 @@ export default function EventDetailModal({ event, onClose }: Props) {
         )}
 
         {event.type === "clinic" && requiredStudents && (
-          <div className="flex flex-col gap-spacing-200">
-            <label className="block font-semibold text-content-standard-secondary text-label">
+          <div className="flex flex-col gap-2">
+            <label className="block font-semibold text-muted-foreground text-sm">
               필참 학생 ({requiredStudents.length}명)
             </label>
-            <div className="flex flex-wrap gap-spacing-100">
+            <div className="flex flex-wrap gap-1">
               {requiredStudents.map((name) => (
                 <Badge key={name} variant="info" size="sm">
                   {name}
@@ -244,8 +244,8 @@ export default function EventDetailModal({ event, onClose }: Props) {
         )}
 
         {event.type === "retake" && retakeStatus && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">상태</label>
             <Badge variant={getRetakeStatusVariant(retakeStatus)} size="sm" className="w-fit">
               {getRetakeStatusLabel(retakeStatus)}
             </Badge>
@@ -253,8 +253,8 @@ export default function EventDetailModal({ event, onClose }: Props) {
         )}
 
         {event.type === "assignment" && assignmentStatus && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">상태</label>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">상태</label>
             <Badge variant={getAssignmentStatusVariant(assignmentStatus)} size="sm" className="w-fit">
               {getAssignmentStatusLabel(assignmentStatus)}
             </Badge>
@@ -262,23 +262,23 @@ export default function EventDetailModal({ event, onClose }: Props) {
         )}
 
         {event.type === "assignment" && courseName && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">과목</label>
-            <p className="text-body text-content-standard-primary">{courseName}</p>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">과목</label>
+            <p className="text-base text-foreground">{courseName}</p>
           </div>
         )}
 
         {event.type === "assignment" && assignmentName && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">과제</label>
-            <p className="text-body text-content-standard-primary">{assignmentName}</p>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">과제</label>
+            <p className="text-base text-foreground">{assignmentName}</p>
           </div>
         )}
 
         {event.type === "assignment" && studentName && (
-          <div className="flex flex-col gap-spacing-100">
-            <label className="block font-semibold text-content-standard-secondary text-label">학생</label>
-            <p className="text-body text-content-standard-primary">{studentName}</p>
+          <div className="flex flex-col gap-1">
+            <label className="block font-semibold text-muted-foreground text-sm">학생</label>
+            <p className="text-base text-foreground">{studentName}</p>
           </div>
         )}
       </div>

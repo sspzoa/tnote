@@ -80,7 +80,6 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
             취소
           </Button>
           <Button
-            variant="primary"
             className="flex-1"
             onClick={handleUpdate}
             disabled={isUpdating || !selectedStatus || selectedStatus === selectedRetake.management_status}
@@ -91,11 +90,11 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
       }>
       {isLoadingStatuses ? (
         <div className="flex h-32 items-center justify-center">
-          <span className="text-content-standard-tertiary">로딩 중...</span>
+          <span className="text-muted-foreground">로딩 중...</span>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-spacing-500">
-          <div className="flex w-full items-center justify-center gap-spacing-300">
+        <div className="flex flex-col items-center gap-5">
+          <div className="flex w-full items-center justify-center gap-3">
             <IconButton
               variant="outline"
               size="lg"
@@ -105,7 +104,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
               <ChevronLeft className="size-6" />
             </IconButton>
 
-            <div className="relative h-16 flex-1 overflow-hidden rounded-radius-400 border border-line-outline bg-components-fill-standard-secondary">
+            <div className="relative h-16 flex-1 overflow-hidden rounded-lg border border-border bg-muted">
               <div
                 className="absolute top-1/2 left-1/2 flex items-center transition-transform duration-300 ease-out"
                 style={{
@@ -137,7 +136,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
             </IconButton>
           </div>
 
-          <div className="flex items-center gap-spacing-200">
+          <div className="flex items-center gap-2">
             {statuses.map((status, index) => (
               <button
                 key={status.id}
@@ -149,9 +148,7 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
                 }}
                 disabled={isUpdating}
                 className={`size-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? "scale-125 bg-core-accent"
-                    : "bg-line-outline hover:bg-content-standard-quaternary"
+                  index === currentIndex ? "scale-125 bg-primary" : "bg-border hover:bg-muted-foreground/60"
                 }`}
                 aria-label={status.name}
               />

@@ -43,19 +43,19 @@ export default function ConsultationTemplateManageModal({
         </Button>
       }>
       {templates.length === 0 ? (
-        <p className="py-spacing-400 text-center text-body text-content-standard-tertiary">저장된 템플릿이 없습니다.</p>
+        <p className="py-4 text-center text-base text-muted-foreground">저장된 템플릿이 없습니다.</p>
       ) : (
-        <div className="flex flex-col gap-spacing-300">
+        <div className="flex flex-col gap-3">
           {templates.map((template) => (
             <div
               key={template.id}
-              className="flex items-start justify-between gap-spacing-300 rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-400">
-              <div className="flex min-w-0 flex-1 flex-col gap-spacing-100">
-                <span className="font-semibold text-body text-content-standard-primary">{template.name}</span>
-                <p className="line-clamp-2 text-content-standard-tertiary text-footnote">{template.content}</p>
+              className="flex items-start justify-between gap-3 rounded-md border border-border bg-muted p-4">
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="font-semibold text-base text-foreground">{template.name}</span>
+                <p className="line-clamp-2 text-muted-foreground text-xs">{template.content}</p>
               </div>
               <Button
-                variant="danger"
+                variant="destructive"
                 size="sm"
                 onClick={() => handleDelete(template.id, template.name)}
                 title="템플릿 삭제">

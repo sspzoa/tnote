@@ -34,13 +34,13 @@ export default function MessagePreviewModal({
           확인
         </Button>
       }>
-      <div className="rounded-radius-300 border border-line-outline bg-components-fill-standard-secondary p-spacing-400">
-        <p className="whitespace-pre-wrap text-body text-content-standard-primary">{previewMessage}</p>
+      <div className="rounded-md border border-border bg-muted p-4">
+        <p className="whitespace-pre-wrap text-base text-foreground">{previewMessage}</p>
       </div>
       {variables.length > 0 && (
-        <div className="flex flex-col gap-spacing-200 rounded-radius-300 bg-solid-translucent-blue p-spacing-400">
-          <p className="font-semibold text-label text-solid-blue">적용된 변수</p>
-          <div className="grid grid-cols-2 gap-spacing-200 text-content-standard-secondary text-footnote">
+        <div className="flex flex-col gap-2 rounded-md bg-solid-translucent-blue p-4">
+          <p className="font-semibold text-sm text-solid-blue">적용된 변수</p>
+          <div className="grid grid-cols-2 gap-2 text-muted-foreground text-xs">
             {variables.map((variable) => (
               <span key={variable.label}>
                 {variable.label}: {variable.value ?? "-"}

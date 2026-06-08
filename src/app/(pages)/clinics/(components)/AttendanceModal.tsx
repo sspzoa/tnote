@@ -206,7 +206,7 @@ export default function AttendanceModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-spacing-500">
+      <div className="flex flex-col gap-5">
         <FormInput
           label="날짜 선택"
           required
@@ -215,13 +215,11 @@ export default function AttendanceModal() {
           onChange={(e) => setSelectedDate(e.target.value)}
         />
 
-        <div className="flex flex-col gap-spacing-300">
-          <h3 className="font-bold text-body text-content-standard-primary">
-            참석 학생 선택 ({visibleStudentCount}명)
-          </h3>
+        <div className="flex flex-col gap-3">
+          <h3 className="font-bold text-base text-foreground">참석 학생 선택 ({visibleStudentCount}명)</h3>
           {loadingAttendance ? (
-            <div className="flex flex-col gap-spacing-300">
-              <div className="h-12 animate-pulse rounded-radius-300 bg-components-fill-standard-secondary" />
+            <div className="flex flex-col gap-3">
+              <div className="h-12 animate-pulse rounded-md bg-muted" />
               <StudentListContainer>
                 <StudentListSkeleton count={6} showCheckbox />
               </StudentListContainer>
@@ -231,15 +229,15 @@ export default function AttendanceModal() {
               <StudentListEmpty />
             </StudentListContainer>
           ) : (
-            <div className="flex flex-col gap-spacing-300">
-              <div className="flex items-center gap-spacing-300">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
                 <SearchInput
                   placeholder="학생 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 {uncheckedRequiredStudents.length > 0 && (
-                  <Button variant="secondary" size="md" className="shrink-0" onClick={handleBulkAbsent}>
+                  <Button variant="secondary" className="shrink-0" onClick={handleBulkAbsent}>
                     필참 미체크 일괄 결석 ({uncheckedRequiredStudents.length}명)
                   </Button>
                 )}
@@ -255,7 +253,7 @@ export default function AttendanceModal() {
                     const studentActivity = activities[student.id];
 
                     return (
-                      <div key={student.id} className="flex flex-col border-line-divider border-b last:border-b-0">
+                      <div key={student.id} className="flex flex-col border-border border-b last:border-b-0">
                         <StudentListItem
                           student={student}
                           selected={isSelected}
@@ -284,10 +282,10 @@ export default function AttendanceModal() {
                                   e.stopPropagation();
                                   toggleAbsent(student.id);
                                 }}
-                                className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-colors ${
+                                className={`rounded-sm px-3 py-1 font-medium text-xs transition-colors ${
                                   isAbsent
                                     ? "bg-solid-translucent-red text-solid-red"
-                                    : "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-fill-standard-tertiary"
+                                    : "bg-muted text-muted-foreground hover:bg-muted"
                                 }`}>
                                 결석
                               </button>
@@ -295,16 +293,16 @@ export default function AttendanceModal() {
                           }
                         />
                         {isSelected && (
-                          <div className="flex items-center gap-spacing-200 bg-components-fill-standard-primary px-spacing-400 py-spacing-200 pl-spacing-900">
+                          <div className="flex items-center gap-2 bg-card px-4 py-2 pl-16">
                             {ACTIVITY_LABELS.map(({ key, label }) => (
                               <button
                                 key={key}
                                 type="button"
                                 onClick={() => toggleActivity(student.id, key)}
-                                className={`rounded-radius-200 px-spacing-300 py-spacing-100 font-medium text-footnote transition-colors ${
+                                className={`rounded-sm px-3 py-1 font-medium text-xs transition-colors ${
                                   studentActivity?.[key]
-                                    ? "bg-core-accent text-solid-white"
-                                    : "bg-components-fill-standard-secondary text-content-standard-tertiary hover:bg-components-fill-standard-tertiary"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-muted text-muted-foreground hover:bg-muted"
                                 }`}>
                                 {label}
                               </button>
