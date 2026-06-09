@@ -117,7 +117,7 @@ export default function RequiredAbsentPanel({
             const uniqueStudents = new Set(group.items.map((i) => i.student.id)).size;
             return (
               <div key={group.weekStart} className="flex flex-col">
-                <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-border border-b bg-muted px-7 py-3">
+                <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-border border-b bg-muted px-4 py-2.5">
                   <span className="font-semibold text-foreground text-sm">
                     {formatWeekLabel(group.weekStart, group.weekEnd)}
                   </span>
@@ -130,10 +130,12 @@ export default function RequiredAbsentPanel({
                     const volKey = `${item.student.id}_${group.weekStart}`;
                     const volRecords = voluntaryByStudentWeek.get(volKey);
                     return (
-                      <div key={item.id} className="flex flex-col gap-1 px-7 py-3 transition-colors hover:bg-muted">
+                      <div
+                        key={item.id}
+                        className="flex flex-col gap-1 px-4 py-2.5 transition-colors hover:bg-muted/50">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex min-w-0 flex-wrap items-center gap-2">
-                            <span className="font-semibold text-base text-foreground">{item.student.name}</span>
+                            <span className="font-semibold text-foreground text-sm">{item.student.name}</span>
                             <Badge variant="danger" size="xs">
                               결석
                             </Badge>

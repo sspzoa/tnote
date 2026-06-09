@@ -20,9 +20,9 @@ export const DashboardCard = ({
   noPadding,
 }: DashboardCardProps) => (
   <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card print:overflow-visible print:rounded-none print:border-0 print:bg-white">
-    <div className="flex items-center gap-2 border-border border-b bg-muted px-5 py-4 print:bg-transparent print:px-0 print:py-2">
-      <Icon className="h-4 w-4 text-muted-foreground" />
-      <h3 className="font-semibold text-base text-foreground">{title}</h3>
+    <div className="flex items-center gap-2 border-border border-b bg-muted px-4 py-3 print:bg-transparent print:px-0 print:py-2">
+      <Icon className="size-4 text-muted-foreground" />
+      <h3 className="font-semibold text-foreground text-sm">{title}</h3>
     </div>
     {isEmpty ? (
       <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground print:py-3">

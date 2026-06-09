@@ -35,7 +35,7 @@ export default function MessagePreviewModal({
         </Button>
       }>
       <div className="rounded-md border border-border bg-muted p-4">
-        <p className="whitespace-pre-wrap text-base text-foreground">{previewMessage}</p>
+        <p className="whitespace-pre-wrap text-foreground text-sm">{previewMessage}</p>
       </div>
       {variables.length > 0 && (
         <div className="flex flex-col gap-2 rounded-md bg-solid-translucent-blue p-4">

@@ -36,7 +36,7 @@ export default function CalendarGrid({ currentDate, events, expandedDays, onEven
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="border-border border-r px-2 py-3 text-center font-semibold text-muted-foreground text-sm last:border-r-0">
+            className="border-border border-r px-2 py-3 text-center font-semibold text-muted-foreground text-xs last:border-r-0">
             {day}
           </div>
         ))}

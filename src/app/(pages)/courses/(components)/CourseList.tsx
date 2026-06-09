@@ -3,9 +3,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { Badge, Button } from "@/shared/components/ui";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatDateDotYMD } from "@/shared/lib/utils/date";
 import { type Course, selectedCourseAtom } from "../(atoms)/useCoursesStore";
@@ -38,12 +37,6 @@ export default function CourseList({ courses }: CourseListProps) {
     }),
     [],
   );
-
-  const { sortedData, sortState, toggleSort } = useTableSort<Course, CourseSortKey>({
-    data: courses,
-    comparators,
-    defaultSort: { key: "name", direction: "asc" },
-  });
 
   const openEditModal = (course: Course) => {
     setSelectedCourse(course);
@@ -82,73 +75,70 @@ export default function CourseList({ courses }: CourseListProps) {
     { label: "삭제", onClick: () => handleDelete(course), variant: "danger" },
   ];
 
+  const columns: DataTableColumn<Course, CourseSortKey>[] = [
+    {
+      id: "name",
+      header: "수업명",
+      sortKey: "name",
+      cell: (course) => (
+        <Link
+          href={`/courses/${course.id}`}
+          className="font-medium text-foreground transition-colors hover:text-primary">
+          {course.name}
+        </Link>
+      ),
+    },
+    {
+      id: "studentCount",
+      header: "학생 수",
+      sortKey: "studentCount",
+      cell: (course) => (
+        <Badge variant="blue" size="sm">
+          {course.student_count || 0}명
+        </Badge>
+      ),
+    },
+    {
+      id: "period",
+      header: "기간",
+      cell: (course) => (
+        <span className="text-muted-foreground">
+          {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
+        </span>
+      ),
+    },
+    {
+      id: "manage",
+      header: "관리",
+      cell: (course) => (
+        <div className="flex gap-2">
+          <Link href={`/courses/${course.id}`}>
+            <Button size="xs" className="font-medium">
+              시험 및 과제 관리
+            </Button>
+          </Link>
+          <Button variant="translucent" size="xs" className="font-medium" onClick={() => openEnrollModal(course)}>
+            학생 관리
+          </Button>
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      align: "right",
+      className: "w-12",
+      cell: (course) => <DropdownMenu items={getMenuItems(course)} />,
+    },
+  ];
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
-      <table className="w-full rounded-lg">
-        <thead className="bg-muted">
-          <tr>
-            <SortableHeader
-              label="수업명"
-              sortKey="name"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="학생 수"
-              sortKey="studentCount"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">기간</th>
-            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">관리</th>
-            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((course) => (
-            <tr key={course.id} className="border-border border-t transition-colors hover:bg-accent">
-              <td className="whitespace-nowrap px-5 py-4">
-                <Link href={`/courses/${course.id}`}>
-                  <div className="cursor-pointer font-medium text-base text-foreground transition-colors hover:text-primary">
-                    {course.name}
-                  </div>
-                </Link>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <Badge variant="blue" size="sm">
-                  {course.student_count || 0}명
-                </Badge>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <span className="text-base text-muted-foreground">
-                  {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
-                </span>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <div className="flex gap-2">
-                  <Link href={`/courses/${course.id}`}>
-                    <Button size="xs" className="font-medium">
-                      시험 및 과제 관리
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="translucent"
-                    size="xs"
-                    className="font-medium"
-                    onClick={() => openEnrollModal(course)}>
-                    학생 관리
-                  </Button>
-                </div>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <DropdownMenu items={getMenuItems(course)} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={courses}
+      getRowId={(course) => course.id}
+      comparators={comparators}
+      defaultSort={{ key: "name", direction: "asc" }}
+    />
   );
 }

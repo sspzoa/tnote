@@ -18,7 +18,7 @@ export default function SelectAllCheckbox({
   unit = "명",
 }: SelectAllCheckboxProps) {
   return (
-    <div className="border-border border-b bg-muted/50 px-5 py-3">
+    <div className="border-border border-b bg-muted/50 px-4 py-2.5">
       <button onClick={onToggle} className="group flex w-full items-center gap-3 rounded-sm">
         <div
           className={`flex size-5 items-center justify-center rounded-sm border transition-all ${
@@ -34,7 +34,7 @@ export default function SelectAllCheckbox({
             <Minus className="size-3 text-primary-foreground" />
           ) : null}
         </div>
-        <span className="font-medium text-base text-foreground">
+        <span className="font-medium text-foreground text-sm">
           {allSelected ? "전체 해제" : "전체 선택"}{" "}
           <span className="text-muted-foreground">
             ({totalCount}

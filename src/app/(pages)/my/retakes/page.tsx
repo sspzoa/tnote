@@ -5,10 +5,9 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Badge } from "@/shared/components/ui/badge";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import type { MyRetake } from "./(hooks)/useMyRetakes";
 import { useMyRetakes } from "./(hooks)/useMyRetakes";
 
@@ -34,11 +33,55 @@ export default function MyRetakesPage() {
     [],
   );
 
-  const { sortedData, sortState, toggleSort } = useTableSort<MyRetake, RetakeSortKey>({
-    data: retakes,
-    comparators,
-    defaultSort: { key: "exam", direction: "desc" },
-  });
+  const columns: DataTableColumn<MyRetake, RetakeSortKey>[] = [
+    {
+      id: "exam",
+      header: "시험",
+      sortKey: "exam",
+      cell: (retake) => (
+        <div>
+          <div className="text-foreground">{retake.exam.name}</div>
+          <div className="text-muted-foreground text-xs">
+            {retake.exam.course.name} {retake.exam.examNumber}회차
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "scheduledDate",
+      header: "예정일",
+      sortKey: "scheduledDate",
+      cell: (retake) => <span className="text-foreground">{retake.scheduledDate || "-"}</span>,
+    },
+    {
+      id: "status",
+      header: "상태",
+      sortKey: "status",
+      cell: (retake) => {
+        const status = statusConfig[retake.status] || { variant: "neutral" as const, label: retake.status };
+        return (
+          <Badge variant={status.variant} size="sm">
+            {status.label}
+          </Badge>
+        );
+      },
+    },
+    {
+      id: "note",
+      header: "비고",
+      cell: (retake) => (
+        <div className="flex gap-2">
+          {retake.postponeCount > 0 && (
+            <span className="text-muted-foreground text-xs">연기 {retake.postponeCount}회</span>
+          )}
+          {retake.absentCount > 0 && <span className="text-muted-foreground text-xs">결석 {retake.absentCount}회</span>}
+          {retake.postponeCount === 0 && retake.absentCount === 0 && (
+            <span className="text-muted-foreground text-xs">-</span>
+          )}
+        </div>
+      ),
+    },
+  ];
 
   if (error) {
     return (
@@ -73,75 +116,16 @@ export default function MyRetakesPage() {
             { width: "w-20" },
           ]}
         />
-      ) : sortedData.length === 0 ? (
+      ) : retakes.length === 0 ? (
         <EmptyState message="재시험이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card">
-          <table className="w-full rounded-lg">
-            <thead className="bg-muted">
-              <tr>
-                <SortableHeader
-                  label="시험"
-                  sortKey="exam"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <SortableHeader
-                  label="예정일"
-                  sortKey="scheduledDate"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <SortableHeader
-                  label="상태"
-                  sortKey="status"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">비고</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((retake) => {
-                const status = statusConfig[retake.status] || { variant: "neutral" as const, label: retake.status };
-                return (
-                  <tr key={retake.id} className="border-border border-t transition-colors hover:bg-accent">
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <div className="text-base text-foreground">{retake.exam.name}</div>
-                      <div className="text-muted-foreground text-xs">
-                        {retake.exam.course.name} {retake.exam.examNumber}회차
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <span className="text-base text-foreground">{retake.scheduledDate || "-"}</span>
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <Badge variant={status.variant} size="sm">
-                        {status.label}
-                      </Badge>
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <div className="flex gap-2">
-                        {retake.postponeCount > 0 && (
-                          <span className="text-muted-foreground text-xs">연기 {retake.postponeCount}회</span>
-                        )}
-                        {retake.absentCount > 0 && (
-                          <span className="text-muted-foreground text-xs">결석 {retake.absentCount}회</span>
-                        )}
-                        {retake.postponeCount === 0 && retake.absentCount === 0 && (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={retakes}
+          getRowId={(retake) => retake.id}
+          comparators={comparators}
+          defaultSort={{ key: "exam", direction: "desc" }}
+        />
       )}
     </Container>
   );

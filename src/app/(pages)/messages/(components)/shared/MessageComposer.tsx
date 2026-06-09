@@ -74,7 +74,7 @@ export default function MessageComposer({
             <button
               key={variable.key}
               onClick={() => onMessageChange(messageText + variable.key)}
-              className="rounded-sm bg-card px-2 py-1 text-muted-foreground text-xs transition-all hover:bg-primary/10 hover:text-primary"
+              className="rounded-sm bg-card px-2 py-1 text-muted-foreground text-xs transition-all hover:bg-accent hover:text-foreground"
               title={variable.description}>
               {variable.key}
             </button>

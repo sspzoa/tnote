@@ -65,10 +65,10 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
     <div className="border-border border-b">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full flex-col gap-1 px-7 py-4 text-left transition-all duration-150 hover:bg-primary/5">
+        className="flex w-full flex-col gap-1 px-7 py-4 text-left transition-all duration-150 hover:bg-muted/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-base text-foreground">{title}</span>
+            <span className="font-medium text-foreground text-sm">{title}</span>
             <span
               className={`rounded-sm px-1.5 py-0.5 font-semibold text-[10px] leading-4 ${getMessageTypeBadgeStyle(batch.message_type)}`}>
               {getMessageTypeLabel(batch.message_type)}
@@ -91,7 +91,7 @@ const HistoryItem = ({ batch }: { batch: MessageBatch }) => {
               ))}
           </div>
         </div>
-        <div className="line-clamp-2 text-base text-muted-foreground">{batch.message_content}</div>
+        <div className="line-clamp-2 text-muted-foreground text-sm">{batch.message_content}</div>
         <div className="flex items-center gap-2 text-muted-foreground text-xs">
           <span>{timeStr}</span>
           <span>·</span>

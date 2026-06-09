@@ -8,10 +8,10 @@ interface StatCardProps {
 }
 
 export const StatCard = ({ icon: Icon, label, value, subValue }: StatCardProps) => (
-  <div className="group relative overflow-hidden rounded-lg border border-border bg-card p-5 transition-all hover:border-border print:rounded-sm print:border-border print:bg-white print:p-3">
+  <div className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-colors print:rounded-sm print:border-border print:bg-white print:p-3">
     <div className="flex items-start justify-between gap-3 print:gap-1">
       <div className="flex flex-col gap-0.5">
-        <span className="font-bold text-foreground text-2xl print:text-base">{value}</span>
+        <span className="font-semibold text-foreground text-xl print:text-base">{value}</span>
         <div>
           <div className="font-medium text-foreground text-sm">{label}</div>
           {subValue && (
@@ -19,7 +19,7 @@ export const StatCard = ({ icon: Icon, label, value, subValue }: StatCardProps) 
           )}
         </div>
       </div>
-      <Icon className="size-8 shrink-0 text-primary" />
+      <Icon className="size-6 shrink-0 text-primary" />
     </div>
   </div>
 );

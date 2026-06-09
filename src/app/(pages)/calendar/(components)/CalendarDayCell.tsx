@@ -32,9 +32,9 @@ export default function CalendarDayCell({
 
   return (
     <div
-      className={`relative flex min-h-[120px] flex-col gap-1 border-border border-r border-b p-2 transition-colors duration-150 hover:bg-primary/30 ${
+      className={`relative flex min-h-[120px] flex-col gap-1 border-border border-r border-b p-2 transition-colors duration-150 hover:bg-muted/50 ${
         isLastColumn ? "border-r-0" : ""
-      } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-muted/50" : ""} ${isToday ? "bg-primary/10" : ""}`}>
+      } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-muted/50" : ""} ${isToday ? "bg-accent" : ""}`}>
       <div
         className={`text-right text-xs ${
           !isCurrentMonth ? "text-muted-foreground/60" : isToday ? "font-bold text-primary" : "text-muted-foreground"
@@ -58,9 +58,7 @@ export default function CalendarDayCell({
             type="button"
             onClick={onToggleExpand}
             className={`rounded-sm px-1.5 py-0.5 text-left text-xs transition-all duration-150 ${
-              isExpanded
-                ? "text-muted-foreground hover:bg-muted hover:text-foreground"
-                : "text-primary hover:bg-primary/10"
+              isExpanded ? "text-muted-foreground hover:bg-muted hover:text-foreground" : "text-primary hover:bg-accent"
             }`}>
             {isExpanded ? "접기" : `+${events.length - MAX_VISIBLE_EVENTS}`}
           </button>

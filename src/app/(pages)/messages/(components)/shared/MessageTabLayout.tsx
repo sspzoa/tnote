@@ -3,6 +3,7 @@
 import { Eye, Send } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/shared/components/ui/button";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { SearchInput } from "@/shared/components/ui/searchInput";
 import { StudentListContainer, StudentListEmpty } from "@/shared/components/ui/studentList";
 import type { RecipientType } from "@/shared/types";
@@ -78,7 +79,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
   return (
     <>
       <div className="flex h-[700px] flex-row items-stretch gap-7">
-        <div className="flex flex-1 flex-col rounded-lg border border-border bg-card">
+        <Card className="flex flex-1 flex-col gap-0 py-0">
           {selection.showPlaceholder ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
               {selection.placeholderIcon && (
@@ -90,8 +91,8 @@ export default function MessageTabLayout({ selection, message, send, preview, is
             </div>
           ) : (
             <>
-              <div className="border-border border-b px-5 py-4">
-                <h3 className="font-semibold text-base text-foreground">{selection.title}</h3>
+              <div className="border-border border-b px-4 py-2.5">
+                <h3 className="font-semibold text-foreground text-sm">{selection.title}</h3>
                 <p className="text-muted-foreground text-xs">
                   {selection.selectedCount > 0 ? (
                     <span className="text-primary">
@@ -114,7 +115,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                 unit={selection.unit || "명"}
               />
 
-              <div className="relative flex min-h-0 flex-1 flex-col gap-3 p-5">
+              <CardContent className="relative flex min-h-0 flex-1 flex-col gap-3 py-2.5">
                 {isLoading && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/60">
                     <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -134,20 +135,20 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                     selection.renderItems()
                   )}
                 </StudentListContainer>
-              </div>
+              </CardContent>
             </>
           )}
-        </div>
+        </Card>
 
-        <div className="flex flex-1 flex-col rounded-lg border border-border bg-card">
-          <div className="border-border border-b px-5 py-4">
-            <h3 className="font-semibold text-base text-foreground">메시지 템플릿</h3>
+        <Card className="flex flex-1 flex-col gap-0 py-0">
+          <div className="border-border border-b px-4 py-2.5">
+            <h3 className="font-semibold text-foreground text-sm">메시지 템플릿</h3>
             <p className="text-muted-foreground text-xs">학생별로 변수가 자동 치환됩니다</p>
           </div>
 
           <RecipientTypeSelector value={message.recipientType} onChange={message.onRecipientTypeChange} />
 
-          <div className="flex min-h-0 flex-1 flex-col gap-4 px-5 py-4">
+          <CardContent className="flex min-h-0 flex-1 flex-col gap-4 py-2.5">
             <MessageComposer
               messageText={message.messageText}
               onMessageChange={message.onMessageChange}
@@ -191,8 +192,8 @@ export default function MessageTabLayout({ selection, message, send, preview, is
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <MessagePreviewModal

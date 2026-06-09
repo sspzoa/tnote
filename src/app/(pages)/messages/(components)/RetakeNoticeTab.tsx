@@ -122,7 +122,7 @@ export default function RetakeNoticeTab() {
   }, [selectedIds, selectedCount, recipientType, messageTemplate, sendRetakeNotice, resetSelection, toast]);
 
   const filterHeader = (
-    <div className="border-border border-b px-5 py-4">
+    <div className="border-border border-b px-4 py-2.5">
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <label className="font-semibold text-muted-foreground text-sm">진행 상태</label>
@@ -173,7 +173,7 @@ export default function RetakeNoticeTab() {
             return (
               <label
                 key={retake.id}
-                className="flex cursor-pointer items-center gap-3 border-border border-b px-4 py-3 transition-all duration-150 last:border-b-0 hover:bg-primary/5">
+                className="flex cursor-pointer items-center gap-3 border-border border-b px-4 py-3 transition-all duration-150 last:border-b-0 hover:bg-muted/50">
                 <input
                   type="checkbox"
                   checked={isSelected}
@@ -182,7 +182,7 @@ export default function RetakeNoticeTab() {
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate font-medium text-base text-foreground">
+                    <span className="truncate font-medium text-foreground text-sm">
                       {retake.student.name} - {formatDate(retake.current_scheduled_date)}
                     </span>
                     {retake.management_status &&

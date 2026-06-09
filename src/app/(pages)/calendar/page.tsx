@@ -4,6 +4,7 @@ import { addMonths, subMonths } from "date-fns";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import type { CalendarEvent } from "@/shared/types";
 import CalendarGrid from "./(components)/CalendarGrid";
@@ -51,68 +52,70 @@ export default function CalendarPage() {
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
       />
 
-      <div className="flex flex-col gap-6 overflow-hidden rounded-xl border border-border bg-card p-7">
-        <CalendarToolbar
-          currentDate={currentDate}
-          filters={filters}
-          onPrevMonth={() => setCurrentDate(subMonths(currentDate, 1))}
-          onNextMonth={() => setCurrentDate(addMonths(currentDate, 1))}
-          onToday={() => setCurrentDate(new Date())}
-          onFilterChange={setFilters}
-        />
-
-        {isLoading ? (
-          <div className="overflow-hidden rounded-md border border-border">
-            <div className="grid grid-cols-7 border-border border-b bg-muted">
-              {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-                <div
-                  key={day}
-                  className="border-border border-r px-2 py-3 text-center font-semibold text-muted-foreground text-sm last:border-r-0">
-                  {day}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7">
-              {[...Array(35)].map((_, i) => {
-                const isLastColumn = i % 7 === 6;
-                const isLastRow = i >= 28;
-                return (
-                  <div
-                    key={i}
-                    className={`flex min-h-[120px] flex-col gap-1 p-2 ${!isLastColumn ? "border-border border-r" : ""} ${!isLastRow ? "border-border border-b" : ""}`}>
-                    <div className="flex justify-end">
-                      <Skeleton className="size-7 rounded-full" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <Skeleton className="h-6 w-full rounded-sm" />
-                      <Skeleton className="h-6 w-4/5 rounded-sm" />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <CalendarGrid
+      <Card>
+        <CardContent className="flex flex-col gap-4">
+          <CalendarToolbar
             currentDate={currentDate}
-            events={filteredEvents}
-            expandedDays={expandedDays}
-            onEventClick={setSelectedEvent}
-            onToggleExpand={(day: Date) => {
-              setExpandedDays((prev) => {
-                const key = day.toISOString();
-                const next = new Set(prev);
-                if (next.has(key)) {
-                  next.delete(key);
-                } else {
-                  next.add(key);
-                }
-                return next;
-              });
-            }}
+            filters={filters}
+            onPrevMonth={() => setCurrentDate(subMonths(currentDate, 1))}
+            onNextMonth={() => setCurrentDate(addMonths(currentDate, 1))}
+            onToday={() => setCurrentDate(new Date())}
+            onFilterChange={setFilters}
           />
-        )}
-      </div>
+
+          {isLoading ? (
+            <div className="overflow-hidden rounded-md border border-border">
+              <div className="grid grid-cols-7 border-border border-b bg-muted">
+                {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+                  <div
+                    key={day}
+                    className="border-border border-r px-2 py-3 text-center font-semibold text-muted-foreground text-xs last:border-r-0">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7">
+                {[...Array(35)].map((_, i) => {
+                  const isLastColumn = i % 7 === 6;
+                  const isLastRow = i >= 28;
+                  return (
+                    <div
+                      key={i}
+                      className={`flex min-h-[120px] flex-col gap-1 p-2 ${!isLastColumn ? "border-border border-r" : ""} ${!isLastRow ? "border-border border-b" : ""}`}>
+                      <div className="flex justify-end">
+                        <Skeleton className="size-7 rounded-full" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <Skeleton className="h-6 w-full rounded-sm" />
+                        <Skeleton className="h-6 w-4/5 rounded-sm" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <CalendarGrid
+              currentDate={currentDate}
+              events={filteredEvents}
+              expandedDays={expandedDays}
+              onEventClick={setSelectedEvent}
+              onToggleExpand={(day: Date) => {
+                setExpandedDays((prev) => {
+                  const key = day.toISOString();
+                  const next = new Set(prev);
+                  if (next.has(key)) {
+                    next.delete(key);
+                  } else {
+                    next.add(key);
+                  }
+                  return next;
+                });
+              }}
+            />
+          )}
+        </CardContent>
+      </Card>
 
       {selectedEvent && <EventDetailModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
     </Container>

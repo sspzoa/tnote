@@ -80,10 +80,10 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
             const timeStr = formatLocaleTimeKorean(createdAt);
 
             return (
-              <div key={item.id} className="flex flex-col gap-2 px-7 py-4 transition-colors hover:bg-muted">
+              <div key={item.id} className="flex flex-col gap-2 px-4 py-2.5 transition-colors hover:bg-muted/50">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-base text-foreground">{item.retake.student.name}</span>
+                    <span className="font-semibold text-foreground text-sm">{item.retake.student.name}</span>
                     <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
                       {getActionLabel(item.action_type)}
                     </Badge>

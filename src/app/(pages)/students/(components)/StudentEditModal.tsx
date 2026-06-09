@@ -1,46 +1,70 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAtom, useAtomValue } from "jotai";
-import { Button, FormInput, Modal } from "@/shared/components/ui";
-import { DayOfWeekPicker } from "@/shared/components/ui/dayOfWeekPicker";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/shared/components/ui/button";
+import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
 import { removePhoneHyphens } from "@/shared/lib/utils/phone";
-import { editFormAtom } from "../(atoms)/useFormStore";
 import { showEditModalAtom } from "../(atoms)/useModalStore";
 import { selectedStudentAtom } from "../(atoms)/useStudentsStore";
 import { useStudentUpdate } from "../(hooks)/useStudentUpdate";
+import { StudentFormFields } from "./StudentFormFields";
+import { editStudentSchema, emptyStudentForm, type StudentFormValues } from "./studentSchema";
 
 export default function StudentEditModal() {
   const [showModal, setShowModal] = useAtom(showEditModalAtom);
-  const [form, setForm] = useAtom(editFormAtom);
   const selectedStudent = useAtomValue(selectedStudentAtom);
   const { updateStudent, isUpdating } = useStudentUpdate();
   const toast = useToast();
+  const form = useForm<StudentFormValues>({
+    resolver: zodResolver(editStudentSchema),
+    defaultValues: emptyStudentForm,
+    mode: "onTouched",
+  });
+
+  useEffect(() => {
+    if (showModal && selectedStudent) {
+      form.reset({
+        name: selectedStudent.name,
+        phoneNumber: selectedStudent.phone_number,
+        parentPhoneNumber: selectedStudent.parent_phone_number || "",
+        school: selectedStudent.school || "",
+        branch: selectedStudent.branch || "",
+        birthYear: selectedStudent.birth_year?.toString() || "",
+        requiredClinicWeekdays: selectedStudent.required_clinic_weekdays || [],
+      });
+    }
+  }, [showModal, selectedStudent, form]);
 
   if (!selectedStudent) return null;
 
-  const handleSave = async () => {
+  const onSubmit = form.handleSubmit(async (values) => {
     try {
       await updateStudent({
         id: selectedStudent.id,
-        name: form.name,
-        phoneNumber: removePhoneHyphens(form.phoneNumber),
-        parentPhoneNumber: form.parentPhoneNumber ? removePhoneHyphens(form.parentPhoneNumber) : null,
-        school: form.school || null,
-        branch: form.branch || null,
-        birthYear: form.birthYear ? Number.parseInt(form.birthYear) : null,
-        requiredClinicWeekdays: form.requiredClinicWeekdays.length > 0 ? form.requiredClinicWeekdays : null,
+        name: values.name,
+        phoneNumber: removePhoneHyphens(values.phoneNumber),
+        parentPhoneNumber: values.parentPhoneNumber ? removePhoneHyphens(values.parentPhoneNumber) : null,
+        school: values.school || null,
+        branch: values.branch || null,
+        birthYear: values.birthYear ? Number.parseInt(values.birthYear) : null,
+        requiredClinicWeekdays: values.requiredClinicWeekdays.length > 0 ? values.requiredClinicWeekdays : null,
       });
       toast.success("학생 정보가 수정되었습니다.");
       setShowModal(false);
     } catch {
       toast.error("정보 수정에 실패했습니다.");
     }
-  };
+  });
 
   return (
     <Modal
       isOpen={showModal}
       onClose={() => setShowModal(false)}
-      onSubmit={handleSave}
+      onSubmit={onSubmit}
       title="학생 정보 수정"
       subtitle={`${selectedStudent.name} 학생의 정보를 수정합니다`}
       footer={
@@ -48,95 +72,12 @@ export default function StudentEditModal() {
           <Button variant="secondary" className="flex-1" onClick={() => setShowModal(false)}>
             취소
           </Button>
-          <Button
-            className="flex-1"
-            onClick={handleSave}
-            disabled={!form.name || !form.phoneNumber}
-            isLoading={isUpdating}
-            loadingText="저장 중...">
+          <Button className="flex-1" onClick={onSubmit} isLoading={isUpdating} loadingText="저장 중...">
             저장
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-4">
-        <FormInput
-          label="이름"
-          type="text"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-
-        <FormInput
-          label="전화번호"
-          type="tel"
-          value={form.phoneNumber}
-          onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-          required
-        />
-
-        <FormInput
-          label="부모님 전화번호"
-          type="tel"
-          value={form.parentPhoneNumber}
-          onChange={(e) => setForm({ ...form, parentPhoneNumber: e.target.value })}
-        />
-
-        <FormInput
-          label="학교"
-          type="text"
-          value={form.school}
-          onChange={(e) => setForm({ ...form, school: e.target.value })}
-        />
-
-        <FormInput
-          label="지점"
-          type="text"
-          value={form.branch}
-          onChange={(e) => setForm({ ...form, branch: e.target.value })}
-          placeholder="러셀부천"
-        />
-
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <FormInput
-              label="출생년도"
-              type="number"
-              min="1900"
-              max="2100"
-              value={form.birthYear}
-              onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
-              placeholder="2010"
-            />
-          </div>
-          <div className="flex gap-1">
-            {(["고1", "고2", "고3"] as const).map((grade) => {
-              const gradeNumber = Number.parseInt(grade[1]) + 9;
-              const birthYear = new Date().getFullYear() - (gradeNumber + 7) + 1;
-              const isActive = form.birthYear === birthYear.toString();
-              return (
-                <button
-                  key={grade}
-                  type="button"
-                  onClick={() => setForm({ ...form, birthYear: birthYear.toString() })}
-                  className={`rounded-md border px-3 py-3 font-medium text-base transition-colors ${
-                    isActive
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-muted text-muted-foreground hover:bg-accent"
-                  }`}>
-                  {grade}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <DayOfWeekPicker
-          label="클리닉 필참 요일"
-          selectedDays={form.requiredClinicWeekdays}
-          onChange={(days) => setForm({ ...form, requiredClinicWeekdays: days })}
-        />
-      </div>
+      <StudentFormFields form={form} />
     </Modal>
   );
 }

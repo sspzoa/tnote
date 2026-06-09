@@ -6,11 +6,12 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardContent } from "@/shared/components/ui/card";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { FilterButton } from "@/shared/components/ui/filterButton";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
+import { FilterBar, FilterRow } from "@/shared/components/ui/toolbar";
 import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import type { MyExamScore } from "./(hooks)/useMyCourses";
 import { useMyCourses } from "./(hooks)/useMyCourses";
@@ -35,57 +36,59 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
   if (chartData.length < 2) return null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5">
-      <div className="flex items-center justify-between">
-        <span className="font-semibold text-base text-foreground">백분위 추이</span>
-        <span className="text-muted-foreground text-xs">높을수록 좋음</span>
-      </div>
-      <div className="h-52">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-              tickLine={false}
-              tickFormatter={(_v: any, i: number) => chartData[i]?.label ?? _v}
-            />
-            <YAxis
-              domain={[0, 100]}
-              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-              tickLine={false}
-              tickFormatter={(v: number) => `${v}%`}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: 8,
-                fontSize: 13,
-              }}
-              formatter={(_v: any, _n: any, props: any) => {
-                const d = props.payload;
-                return [`${d.percentile}% (${d.rank}/${d.total}등)`, "백분위"];
-              }}
-              labelFormatter={(_label: any, payload: any) => {
-                if (payload && payload.length > 0) {
-                  return `${_label} - ${payload[0].payload.examName}`;
-                }
-                return _label;
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="percentile"
-              stroke="var(--primary)"
-              strokeWidth={2.5}
-              dot={{ r: 4, fill: "var(--primary)", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "var(--primary)", strokeWidth: 2, stroke: "white" }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+    <Card>
+      <CardContent className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <span className="font-semibold text-foreground text-sm">백분위 추이</span>
+          <span className="text-muted-foreground text-xs">높을수록 좋음</span>
+        </div>
+        <div className="h-52">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                tickLine={false}
+                tickFormatter={(_v: any, i: number) => chartData[i]?.label ?? _v}
+              />
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                tickLine={false}
+                tickFormatter={(v: number) => `${v}%`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontSize: 13,
+                }}
+                formatter={(_v: any, _n: any, props: any) => {
+                  const d = props.payload;
+                  return [`${d.percentile}% (${d.rank}/${d.total}등)`, "백분위"];
+                }}
+                labelFormatter={(_label: any, payload: any) => {
+                  if (payload && payload.length > 0) {
+                    return `${_label} - ${payload[0].payload.examName}`;
+                  }
+                  return _label;
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="percentile"
+                stroke="var(--primary)"
+                strokeWidth={2.5}
+                dot={{ r: 4, fill: "var(--primary)", strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: "var(--primary)", strokeWidth: 2, stroke: "white" }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -112,11 +115,84 @@ export default function MyCoursesPage() {
     [],
   );
 
-  const { sortedData, sortState, toggleSort } = useTableSort<MyExamScore, ScoreSortKey>({
-    data: filteredScores,
-    comparators,
-    defaultSort: { key: "exam", direction: "desc" },
-  });
+  const columns: DataTableColumn<MyExamScore, ScoreSortKey>[] = [
+    {
+      id: "exam",
+      header: "시험",
+      sortKey: "exam",
+      cell: (score) => (
+        <div>
+          <div className="text-foreground">{score.exam.name}</div>
+          <div className="text-muted-foreground text-xs">
+            {score.exam.course.name} {score.exam.examNumber}회차
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "score",
+      header: "내 점수",
+      sortKey: "score",
+      cell: (score) => (
+        <span className="font-medium text-foreground">
+          {score.score}
+          {score.maxScore != null && <span className="text-muted-foreground">/{score.maxScore}</span>}
+        </span>
+      ),
+    },
+    {
+      id: "rank",
+      header: "등수",
+      sortKey: "rank",
+      cell: (score) => (
+        <span className="text-foreground">
+          {score.rank}
+          <span className="text-muted-foreground">/{score.totalStudents}</span>
+        </span>
+      ),
+    },
+    {
+      id: "average",
+      header: "평균",
+      sortKey: "average",
+      cell: (score) => <span className="text-foreground">{score.average}</span>,
+    },
+    {
+      id: "median",
+      header: "중앙값",
+      sortKey: "median",
+      cell: (score) => <span className="text-foreground">{score.median}</span>,
+    },
+    {
+      id: "highest",
+      header: "최고점",
+      sortKey: "highest",
+      cell: (score) => <span className="text-foreground">{score.highest}</span>,
+    },
+    {
+      id: "result",
+      header: "결과",
+      cell: (score) => {
+        const passed = score.cutline != null && score.score >= score.cutline;
+        const failed = score.cutline != null && score.score < score.cutline;
+        return (
+          <>
+            {passed && (
+              <Badge variant="success" size="sm">
+                통과
+              </Badge>
+            )}
+            {failed && (
+              <Badge variant="danger" size="sm">
+                재시험
+              </Badge>
+            )}
+            {score.cutline == null && <span className="text-muted-foreground text-xs">-</span>}
+          </>
+        );
+      },
+    },
+  ];
 
   if (error) {
     return (
@@ -148,9 +224,8 @@ export default function MyCoursesPage() {
         <EmptyState message="수강 중인 수업이 없습니다." />
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
-            <span className="font-medium text-muted-foreground text-sm">필터</span>
-            <div className="flex flex-wrap items-center gap-3">
+          <FilterBar label="필터">
+            <FilterRow>
               <FilterButton active={selectedCourseId === "all"} onClick={() => setSelectedCourseId("all")}>
                 전체
               </FilterButton>
@@ -162,117 +237,21 @@ export default function MyCoursesPage() {
                   {course.name}
                 </FilterButton>
               ))}
-            </div>
-          </div>
+            </FilterRow>
+          </FilterBar>
 
           <PercentileChart scores={filteredScores} />
 
-          {sortedData.length === 0 ? (
+          {filteredScores.length === 0 ? (
             <EmptyState message="시험 기록이 없습니다." />
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-border bg-card">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <SortableHeader
-                      label="시험"
-                      sortKey="exam"
-                      currentSortKey={sortState.key}
-                      currentDirection={sortState.direction}
-                      onSort={toggleSort}
-                    />
-                    <SortableHeader
-                      label="내 점수"
-                      sortKey="score"
-                      currentSortKey={sortState.key}
-                      currentDirection={sortState.direction}
-                      onSort={toggleSort}
-                    />
-                    <SortableHeader
-                      label="등수"
-                      sortKey="rank"
-                      currentSortKey={sortState.key}
-                      currentDirection={sortState.direction}
-                      onSort={toggleSort}
-                    />
-                    <SortableHeader
-                      label="평균"
-                      sortKey="average"
-                      currentSortKey={sortState.key}
-                      currentDirection={sortState.direction}
-                      onSort={toggleSort}
-                    />
-                    <SortableHeader
-                      label="중앙값"
-                      sortKey="median"
-                      currentSortKey={sortState.key}
-                      currentDirection={sortState.direction}
-                      onSort={toggleSort}
-                    />
-                    <SortableHeader
-                      label="최고점"
-                      sortKey="highest"
-                      currentSortKey={sortState.key}
-                      currentDirection={sortState.direction}
-                      onSort={toggleSort}
-                    />
-                    <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
-                      결과
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedData.map((score) => {
-                    const passed = score.cutline != null && score.score >= score.cutline;
-                    const failed = score.cutline != null && score.score < score.cutline;
-                    return (
-                      <tr key={score.id} className="border-border border-t transition-colors hover:bg-accent">
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <div className="text-base text-foreground">{score.exam.name}</div>
-                          <div className="text-muted-foreground text-xs">
-                            {score.exam.course.name} {score.exam.examNumber}회차
-                          </div>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <span className="font-medium text-base text-foreground">
-                            {score.score}
-                            {score.maxScore != null && <span className="text-muted-foreground">/{score.maxScore}</span>}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <span className="text-base text-foreground">
-                            {score.rank}
-                            <span className="text-muted-foreground">/{score.totalStudents}</span>
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <span className="text-base text-foreground">{score.average}</span>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <span className="text-base text-foreground">{score.median}</span>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <span className="text-base text-foreground">{score.highest}</span>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4">
-                          {passed && (
-                            <Badge variant="success" size="sm">
-                              통과
-                            </Badge>
-                          )}
-                          {failed && (
-                            <Badge variant="danger" size="sm">
-                              재시험
-                            </Badge>
-                          )}
-                          {score.cutline == null && <span className="text-muted-foreground text-xs">-</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              columns={columns}
+              data={filteredScores}
+              getRowId={(score) => score.id}
+              comparators={comparators}
+              defaultSort={{ key: "exam", direction: "desc" }}
+            />
           )}
         </div>
       )}

@@ -5,10 +5,9 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Badge } from "@/shared/components/ui/badge";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useUser } from "@/shared/hooks/useUser";
 import { formatClinicWeekdays } from "@/shared/lib/utils/date";
 import { type MyClinicRecord, useMyClinicAttendance } from "./(hooks)/useMyClinicAttendance";
@@ -27,11 +26,56 @@ export default function MyClinicPage() {
     [],
   );
 
-  const { sortedData, sortState, toggleSort } = useTableSort<MyClinicRecord, ClinicSortKey>({
-    data: records,
-    comparators,
-    defaultSort: { key: "date", direction: "desc" },
-  });
+  const columns: DataTableColumn<MyClinicRecord, ClinicSortKey>[] = [
+    {
+      id: "date",
+      header: "날짜",
+      sortKey: "date",
+      cell: (record) => {
+        const date = new Date(`${record.attendanceDate}T00:00:00`);
+        const dateStr = date.toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          weekday: "short",
+        });
+        return <span className="text-foreground">{dateStr}</span>;
+      },
+    },
+    {
+      id: "clinic",
+      header: "클리닉",
+      sortKey: "clinic",
+      cell: (record) => (
+        <>
+          <span className="text-foreground">{record.clinic.name}</span>
+          {record.isRequired && <span className="ml-1 text-primary text-xs">필참</span>}
+        </>
+      ),
+    },
+    {
+      id: "status",
+      header: "상태",
+      cell: (record) => (
+        <Badge variant={record.status === "absent" ? "danger" : "success"} size="sm">
+          {record.status === "absent" ? "결석" : "출석"}
+        </Badge>
+      ),
+    },
+    {
+      id: "activity",
+      header: "활동",
+      cell: (record) => {
+        const activities: string[] = [];
+        if (record.didRetakeExam) activities.push("재시험");
+        if (record.didHomeworkCheck) activities.push("숙제검사");
+        if (record.didQa) activities.push("질의응답");
+        return (
+          <span className="text-muted-foreground text-xs">{activities.length > 0 ? activities.join(", ") : "-"}</span>
+        );
+      },
+    },
+  ];
 
   if (error) return <ErrorComponent errorMessage="클리닉 출석을 불러오는데 실패했습니다." />;
 
@@ -52,64 +96,13 @@ export default function MyClinicPage() {
       ) : records.length === 0 ? (
         <EmptyState message="클리닉 출석 기록이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card">
-          <table className="w-full rounded-lg">
-            <thead className="bg-muted">
-              <tr>
-                <SortableHeader
-                  label="날짜"
-                  sortKey="date"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <SortableHeader
-                  label="클리닉"
-                  sortKey="clinic"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">상태</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">활동</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((record) => {
-                const date = new Date(`${record.attendanceDate}T00:00:00`);
-                const dateStr = date.toLocaleDateString("ko-KR", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  weekday: "short",
-                });
-
-                const activities: string[] = [];
-                if (record.didRetakeExam) activities.push("재시험");
-                if (record.didHomeworkCheck) activities.push("숙제검사");
-                if (record.didQa) activities.push("질의응답");
-
-                return (
-                  <tr key={record.id} className="border-border border-t transition-colors hover:bg-accent">
-                    <td className="whitespace-nowrap px-5 py-4 text-base text-foreground">{dateStr}</td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <span className="text-base text-foreground">{record.clinic.name}</span>
-                      {record.isRequired && <span className="ml-1 text-primary text-xs">필참</span>}
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <Badge variant={record.status === "absent" ? "danger" : "success"} size="sm">
-                        {record.status === "absent" ? "결석" : "출석"}
-                      </Badge>
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4 text-muted-foreground text-xs">
-                      {activities.length > 0 ? activities.join(", ") : "-"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={records}
+          getRowId={(record) => record.id}
+          comparators={comparators}
+          defaultSort={{ key: "date", direction: "desc" }}
+        />
       )}
     </Container>
   );

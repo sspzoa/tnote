@@ -34,10 +34,10 @@ export default function ClinicHistoryPanel({ isOpen, onClose, attendance, isLoad
             });
 
             return (
-              <div key={item.id} className="flex flex-col gap-2 px-7 py-4 transition-colors hover:bg-muted">
+              <div key={item.id} className="flex flex-col gap-2 px-4 py-2.5 transition-colors hover:bg-muted/50">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-base text-foreground">{item.student.name}</span>
+                    <span className="font-semibold text-foreground text-sm">{item.student.name}</span>
                     {item.is_required ? (
                       <Badge variant="blue" size="xs">
                         필참

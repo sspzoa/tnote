@@ -11,7 +11,7 @@ interface RecipientTypeSelectorProps {
 
 export default function RecipientTypeSelector({ value, onChange }: RecipientTypeSelectorProps) {
   return (
-    <div className="flex flex-col gap-3 border-border border-b px-5 py-4">
+    <div className="flex flex-col gap-3 border-border border-b px-4 py-2.5">
       <label className="block font-semibold text-foreground text-sm">수신자 유형</label>
       <div className="flex flex-wrap gap-2">
         {RECIPIENT_OPTIONS.map((option) => (

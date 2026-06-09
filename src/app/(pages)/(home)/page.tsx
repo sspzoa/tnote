@@ -5,6 +5,7 @@ import { BookOpen, Calendar, ClipboardList, FileCheck, Sparkles, Stethoscope, Us
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Container from "@/shared/components/common/Container";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import { useUser } from "@/shared/hooks/useUser";
 import { getGreetingByTime } from "@/shared/lib/utils/date";
 import { useHomeStats } from "./(hooks)/useHomeStats";
@@ -42,24 +43,28 @@ export default function Home() {
   if (isLoading) {
     return (
       <Container>
-        <div className="flex animate-pulse flex-col gap-4 rounded-xl border border-border bg-card p-7 md:p-10">
-          <div className="h-16 w-80 rounded-md bg-muted" />
-          <div className="h-[38px] w-40 rounded-full bg-muted" />
-        </div>
+        <Card className="animate-pulse">
+          <CardContent className="flex flex-col gap-3 py-3">
+            <div className="h-10 w-72 rounded-md bg-muted" />
+            <div className="h-8 w-40 rounded-full bg-muted" />
+          </CardContent>
+        </Card>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="animate-pulse rounded-xl border border-border bg-card p-5">
-              <div className="flex flex-col gap-4">
-                <div className="size-8 rounded-sm bg-muted" />
-                <div className="flex flex-col gap-1">
-                  <div className="h-16 w-12 rounded-sm bg-muted" />
-                  <div>
-                    <div className="h-[22px] w-14 rounded-sm bg-muted" />
-                    <div className="h-5 w-24 rounded-sm bg-muted" />
+            <Card key={i} className="animate-pulse">
+              <CardContent>
+                <div className="flex flex-col gap-3">
+                  <div className="size-6 rounded-sm bg-muted" />
+                  <div className="flex flex-col gap-1">
+                    <div className="h-9 w-12 rounded-sm bg-muted" />
+                    <div className="flex flex-col gap-1">
+                      <div className="h-4 w-14 rounded-sm bg-muted" />
+                      <div className="h-3 w-24 rounded-sm bg-muted" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </Container>
@@ -106,18 +111,18 @@ export default function Home() {
 
   return (
     <Container>
-      <div className="rounded-xl border border-border bg-card p-7 md:p-10">
-        <div className="flex flex-col gap-4">
-          <h1 className="font-bold text-5xl text-foreground">
+      <Card>
+        <CardContent className="flex flex-col gap-3">
+          <h1 className="font-bold text-2xl text-foreground">
             안녕하세요,
             <br className="md:hidden" /> <span className="text-primary">{user?.name}</span>님
           </h1>
-          <div className="flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+          <div className="flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5">
             <Sparkles className="size-4 shrink-0 text-primary" />
-            <p className="text-primary text-sm">{typedGreeting || "\u00A0"}</p>
+            <p className="text-primary text-xs">{typedGreeting || "\u00A0"}</p>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {!isStudent && stats && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -125,11 +130,11 @@ export default function Home() {
             <Link
               key={item.href}
               href={item.href}
-              className="group hover:-translate-y-0.5 relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:border-primary/30">
-              <div className="flex flex-col gap-4">
-                <item.icon className="size-8 text-primary transition-transform duration-300 group-hover:scale-110" />
+              className="group hover:-translate-y-0.5 relative flex flex-col overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:border-primary/30 hover:bg-muted/50">
+              <div className="flex flex-col gap-3">
+                <item.icon className="size-6 text-primary transition-transform duration-300 group-hover:scale-110" />
                 <div className="relative flex flex-col gap-1">
-                  <div className="font-bold text-5xl text-foreground">{item.value}</div>
+                  <div className="font-bold text-3xl text-foreground">{item.value}</div>
                   <div>
                     <div className="font-medium text-foreground text-sm">{item.label}</div>
                     <div className="text-muted-foreground text-xs">{item.description}</div>
@@ -153,9 +158,9 @@ export default function Home() {
             <Link
               key={item.href}
               href={item.href}
-              className="group hover:-translate-y-0.5 relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:border-primary/30">
-              <div className="flex flex-col gap-4">
-                <item.icon className="size-8 text-primary transition-transform duration-300 group-hover:scale-110" />
+              className="group hover:-translate-y-0.5 relative flex flex-col overflow-hidden rounded-lg border bg-card p-4 transition-all duration-300 hover:border-primary/30 hover:bg-muted/50">
+              <div className="flex flex-col gap-3">
+                <item.icon className="size-6 text-primary transition-transform duration-300 group-hover:scale-110" />
                 <div className="relative flex flex-col gap-1">
                   <div className="font-medium text-foreground text-sm">{item.label}</div>
                   <div className="text-muted-foreground text-xs">{item.description}</div>

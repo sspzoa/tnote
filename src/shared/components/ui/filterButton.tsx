@@ -7,33 +7,18 @@ interface FilterButtonProps {
   variant?: "default" | "toggle";
 }
 
-export function FilterButton({ active, onClick, children, variant = "default" }: FilterButtonProps) {
-  const baseStyles = "rounded-md px-4 py-2 font-medium text-sm transition-all duration-150 border";
+const baseStyles =
+  "inline-flex h-8 items-center rounded-md border px-3 font-medium text-sm whitespace-nowrap transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+const inactive = "border-input bg-background text-muted-foreground hover:bg-accent hover:text-foreground";
 
-  if (variant === "toggle") {
-    return (
-      <button
-        onClick={onClick}
-        className={cn(
-          baseStyles,
-          active
-            ? "border-success/30 bg-success/10 text-success"
-            : "border-border bg-muted text-muted-foreground hover:border-primary/30 hover:bg-accent",
-        )}>
-        {children}
-      </button>
-    );
-  }
+export function FilterButton({ active, onClick, children, variant = "default" }: FilterButtonProps) {
+  const activeStyles =
+    variant === "toggle"
+      ? "border-success/30 bg-success/10 text-success"
+      : "border-primary bg-primary text-primary-foreground";
 
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        baseStyles,
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-muted text-muted-foreground hover:border-primary/30 hover:bg-accent",
-      )}>
+    <button type="button" onClick={onClick} className={cn(baseStyles, active ? activeStyles : inactive)}>
       {children}
     </button>
   );

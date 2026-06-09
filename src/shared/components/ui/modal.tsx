@@ -55,19 +55,19 @@ export function Modal({ isOpen, onClose, onSubmit, title, subtitle, children, fo
         if (!open) onClose();
       }}>
       <DialogContent
-        className={cn("max-h-[80vh] gap-0 overflow-hidden p-0 print:hidden", sizeStyles[size])}
+        className={cn("flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 print:hidden", sizeStyles[size])}
         onKeyDown={handleKeyDown}>
         {(title || subtitle) && (
-          <DialogHeader className="gap-1 border-border border-b px-7 py-5 text-left">
-            {title && <DialogTitle className="text-xl">{title}</DialogTitle>}
+          <DialogHeader className="shrink-0 gap-1 border-border border-b px-6 py-4 text-left">
+            {title && <DialogTitle className="text-lg">{title}</DialogTitle>}
             {subtitle && <DialogDescription className="text-sm">{subtitle}</DialogDescription>}
           </DialogHeader>
         )}
 
-        <div className="flex-1 overflow-y-auto p-7">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">{children}</div>
 
         {footer && (
-          <DialogFooter className="gap-3 border-border border-t bg-muted/50 px-7 py-5 sm:justify-start">
+          <DialogFooter className="shrink-0 gap-3 border-border border-t bg-muted/50 px-6 py-4 sm:justify-start">
             {footer}
           </DialogFooter>
         )}

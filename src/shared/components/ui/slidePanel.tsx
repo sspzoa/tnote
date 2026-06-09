@@ -28,12 +28,12 @@ export function SlidePanel({ isOpen, onClose, title, subtitle, children, width =
       }}>
       <SheetContent side="right" className={cn("gap-0", widthStyles[width])}>
         {(title || subtitle) && (
-          <SheetHeader className="border-border border-b px-7 py-5">
-            {title && <SheetTitle className="font-bold text-xl">{title}</SheetTitle>}
+          <SheetHeader className="shrink-0 border-border border-b px-6 py-4">
+            {title && <SheetTitle className="font-semibold text-lg">{title}</SheetTitle>}
             {subtitle && <SheetDescription className="text-sm">{subtitle}</SheetDescription>}
           </SheetHeader>
         )}
-        <div className="flex-1 overflow-y-auto">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
       </SheetContent>
     </Sheet>
   );

@@ -2,9 +2,8 @@ import { useAtom } from "jotai";
 import { useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/lib/utils/error";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -32,6 +31,8 @@ interface StudentListProps {
 
 type StudentSortKey = "name" | "branch" | "grade" | "phone" | "parentPhone" | "school";
 
+const dayLabels = ["일", "월", "화", "수", "목", "금", "토"];
+
 export default function StudentList({ students }: StudentListProps) {
   const [, setSelectedStudent] = useAtom(selectedStudentAtom);
   const [, setShowEditModal] = useAtom(showEditModalAtom);
@@ -57,12 +58,6 @@ export default function StudentList({ students }: StudentListProps) {
     }),
     [],
   );
-
-  const { sortedData, sortState, toggleSort } = useTableSort<Student, StudentSortKey>({
-    data: students,
-    comparators,
-    defaultSort: { key: "name", direction: "asc" },
-  });
 
   const handleEditClick = useCallback(
     (student: Student) => {
@@ -168,131 +163,116 @@ export default function StudentList({ students }: StudentListProps) {
     [openInfoModal, openConsultationModal, openAddTagModal, handleEditClick, handleResetPassword, handleDelete],
   );
 
+  const columns: DataTableColumn<Student, StudentSortKey>[] = [
+    {
+      id: "name",
+      header: "이름",
+      sortKey: "name",
+      cell: (student) => <span className="font-medium text-foreground">{student.name}</span>,
+    },
+    {
+      id: "clinic",
+      header: "클리닉",
+      cell: (student) =>
+        student.required_clinic_weekdays && student.required_clinic_weekdays.length > 0 ? (
+          <div className="flex items-center gap-1">
+            {student.required_clinic_weekdays.map((day) => (
+              <Badge key={day} variant="blue" size="xs">
+                {dayLabels[day]}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        ),
+    },
+    {
+      id: "tags",
+      header: "태그",
+      cell: (student) => {
+        const activeTags = (student.tags || []).filter((assignment) =>
+          isTagActive(assignment.start_date, assignment.end_date),
+        );
+        return activeTags.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1">
+            {activeTags.map((assignment) => {
+              const tag = assignment.tag;
+              if (!tag) return null;
+              return (
+                <Badge
+                  key={assignment.id}
+                  variant={tag.color}
+                  size="xs"
+                  interactive
+                  onClick={() => openEditTagAssignmentModal(student, assignment)}
+                  title="클릭하여 수정">
+                  {tag.name}
+                </Badge>
+              );
+            })}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        );
+      },
+    },
+    {
+      id: "branch",
+      header: "지점",
+      sortKey: "branch",
+      cell: (student) => <span className="text-muted-foreground">{student.branch || "-"}</span>,
+    },
+    {
+      id: "grade",
+      header: "학년",
+      sortKey: "grade",
+      cell: (student) =>
+        student.birth_year && getGrade(student.birth_year) ? (
+          <Badge variant="blue" size="sm">
+            {getGrade(student.birth_year)}
+          </Badge>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        ),
+    },
+    {
+      id: "phone",
+      header: "전화번호",
+      sortKey: "phone",
+      cell: (student) => <span className="text-muted-foreground">{formatPhoneNumber(student.phone_number)}</span>,
+    },
+    {
+      id: "parentPhone",
+      header: "학부모 번호",
+      sortKey: "parentPhone",
+      cell: (student) => (
+        <span className="text-muted-foreground">
+          {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
+        </span>
+      ),
+    },
+    {
+      id: "school",
+      header: "학교",
+      sortKey: "school",
+      cell: (student) => <span className="text-muted-foreground">{student.school || "-"}</span>,
+    },
+    {
+      id: "actions",
+      header: "",
+      align: "right",
+      className: "w-12",
+      cell: (student) => <DropdownMenu items={getMenuItems(student)} />,
+    },
+  ];
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
-      <table className="w-full rounded-lg">
-        <thead className="bg-muted">
-          <tr>
-            <SortableHeader
-              label="이름"
-              sortKey="name"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">클리닉</th>
-            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">태그</th>
-            <SortableHeader
-              label="지점"
-              sortKey="branch"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="학년"
-              sortKey="grade"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="전화번호"
-              sortKey="phone"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="학부모 번호"
-              sortKey="parentPhone"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="학교"
-              sortKey="school"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((student) => {
-            const activeTags = (student.tags || []).filter((assignment) =>
-              isTagActive(assignment.start_date, assignment.end_date),
-            );
-
-            return (
-              <tr key={student.id} className="border-border border-t transition-colors hover:bg-accent">
-                <td className="whitespace-nowrap px-5 py-4">
-                  <div className="font-medium text-base text-foreground">{student.name}</div>
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                  {student.required_clinic_weekdays && student.required_clinic_weekdays.length > 0 ? (
-                    <div className="flex items-center gap-1">
-                      {student.required_clinic_weekdays.map((day) => (
-                        <Badge key={day} variant="blue" size="xs">
-                          {["일", "월", "화", "수", "목", "금", "토"][day]}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                  {activeTags.length > 0 ? (
-                    <div className="flex items-center gap-1">
-                      {activeTags.map((assignment) => {
-                        const tag = assignment.tag;
-                        if (!tag) return null;
-                        return (
-                          <Badge
-                            key={assignment.id}
-                            variant={tag.color}
-                            size="xs"
-                            interactive
-                            onClick={() => openEditTagAssignmentModal(student, assignment)}
-                            title="클릭하여 수정">
-                            {tag.name}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">{student.branch || "-"}</td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                  {student.birth_year && getGrade(student.birth_year) ? (
-                    <Badge variant="blue" size="sm">
-                      {getGrade(student.birth_year)}
-                    </Badge>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                  {formatPhoneNumber(student.phone_number)}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                  {student.parent_phone_number ? formatPhoneNumber(student.parent_phone_number) : "-"}
-                </td>
-                <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">{student.school || "-"}</td>
-
-                <td className="whitespace-nowrap px-5 py-4">
-                  <DropdownMenu items={getMenuItems(student)} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={students}
+      getRowId={(student) => student.id}
+      comparators={comparators}
+      defaultSort={{ key: "name", direction: "asc" }}
+    />
   );
 }

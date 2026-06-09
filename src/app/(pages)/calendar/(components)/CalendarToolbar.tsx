@@ -1,5 +1,7 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
 
 interface FilterState {
   course: boolean;
@@ -29,32 +31,23 @@ export default function CalendarToolbar({
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div className="flex items-center justify-between gap-2 md:justify-start">
         <div className="flex items-center gap-2">
-          <button
-            onClick={onPrevMonth}
-            className="rounded-md border border-border bg-muted px-4 py-2 font-medium text-base text-foreground transition-all duration-150 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
-            type="button">
-            ←
-          </button>
-          <button
-            onClick={onToday}
-            className="rounded-md bg-primary px-4 py-2 font-medium text-base text-primary-foreground transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
-            type="button">
+          <Button variant="outline" size="icon-sm" onClick={onPrevMonth} type="button" aria-label="이전 달">
+            <ChevronLeft className="size-4" />
+          </Button>
+          <Button size="sm" onClick={onToday} type="button">
             오늘
-          </button>
-          <button
-            onClick={onNextMonth}
-            className="rounded-md border border-border bg-muted px-4 py-2 font-medium text-base text-foreground transition-all duration-150 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
-            type="button">
-            →
-          </button>
+          </Button>
+          <Button variant="outline" size="icon-sm" onClick={onNextMonth} type="button" aria-label="다음 달">
+            <ChevronRight className="size-4" />
+          </Button>
         </div>
 
-        <h2 className="font-bold text-foreground text-xl md:hidden">
+        <h2 className="font-semibold text-base text-foreground md:hidden">
           {format(currentDate, "yyyy년 M월", { locale: ko })}
         </h2>
       </div>
 
-      <h2 className="hidden font-bold text-foreground text-xl md:block">
+      <h2 className="hidden font-semibold text-base text-foreground md:block">
         {format(currentDate, "yyyy년 M월", { locale: ko })}
       </h2>
 

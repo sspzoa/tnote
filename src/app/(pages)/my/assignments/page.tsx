@@ -5,10 +5,9 @@ import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
 import { Badge } from "@/shared/components/ui/badge";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import { type MyAssignment, useMyAssignments } from "./(hooks)/useMyAssignments";
 
@@ -35,11 +34,36 @@ export default function MyAssignmentsPage() {
     [],
   );
 
-  const { sortedData, sortState, toggleSort } = useTableSort<MyAssignment, SortKey>({
-    data: assignments,
-    comparators,
-    defaultSort: { key: "assignment", direction: "desc" },
-  });
+  const columns: DataTableColumn<MyAssignment, SortKey>[] = [
+    {
+      id: "assignment",
+      header: "과제명",
+      sortKey: "assignment",
+      cell: (item) => <span className="text-foreground">{item.assignment.name}</span>,
+    },
+    {
+      id: "course",
+      header: "수업",
+      sortKey: "course",
+      cell: (item) => <span className="text-muted-foreground">{item.assignment.course.name}</span>,
+    },
+    {
+      id: "status",
+      header: "상태",
+      sortKey: "status",
+      cell: (item) => {
+        const statusCfg = submissionStatusConfig[item.status] || {
+          variant: "warning" as const,
+          label: item.status,
+        };
+        return (
+          <Badge variant={statusCfg.variant} size="sm">
+            {statusCfg.label}
+          </Badge>
+        );
+      },
+    },
+  ];
 
   if (error) {
     return (
@@ -69,56 +93,13 @@ export default function MyAssignmentsPage() {
       ) : assignments.length === 0 ? (
         <EmptyState message="과제 기록이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card">
-          <table className="w-full rounded-lg">
-            <thead className="bg-muted">
-              <tr>
-                <SortableHeader
-                  label="과제명"
-                  sortKey="assignment"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <SortableHeader
-                  label="수업"
-                  sortKey="course"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-                <SortableHeader
-                  label="상태"
-                  sortKey="status"
-                  currentSortKey={sortState.key}
-                  currentDirection={sortState.direction}
-                  onSort={toggleSort}
-                />
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((item) => {
-                const statusCfg = submissionStatusConfig[item.status] || {
-                  variant: "warning" as const,
-                  label: item.status,
-                };
-                return (
-                  <tr key={item.id} className="border-border border-t transition-colors hover:bg-accent">
-                    <td className="whitespace-nowrap px-5 py-4 text-base text-foreground">{item.assignment.name}</td>
-                    <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                      {item.assignment.course.name}
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <Badge variant={statusCfg.variant} size="sm">
-                        {statusCfg.label}
-                      </Badge>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={assignments}
+          getRowId={(item) => item.id}
+          comparators={comparators}
+          defaultSort={{ key: "assignment", direction: "desc" }}
+        />
       )}
     </Container>
   );

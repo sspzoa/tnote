@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { FilterButton } from "@/shared/components/ui/filterButton";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { SearchInput } from "@/shared/components/ui/searchInput";
+import { FilterBar, FilterRow } from "@/shared/components/ui/toolbar";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import {
   filterAtom,
@@ -73,148 +74,147 @@ export default function RetakeFilters() {
     minPostponeAbsentCount > 0;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
+    <div className="flex flex-col gap-3">
+      <FilterBar>
         <div className="flex items-center justify-between">
-          <span className="font-medium text-muted-foreground text-sm">필터</span>
+          <span className="font-medium text-muted-foreground text-xs">필터</span>
           {isFilterActive && (
             <button
+              type="button"
               onClick={handleResetFilters}
-              className="font-medium text-muted-foreground text-xs transition-all duration-150 hover:text-primary">
+              className="font-medium text-muted-foreground text-xs transition-colors hover:text-foreground">
               초기화
             </button>
           )}
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
-              {showCompleted ? "완료 숨기기" : "완료 보기"}
+        <FilterRow>
+          <FilterButton active={showCompleted} onClick={() => setShowCompleted(!showCompleted)} variant="toggle">
+            {showCompleted ? "완료 숨기기" : "완료 보기"}
+          </FilterButton>
+
+          <FilterSelect
+            value={filter}
+            onValueChange={(value) => setFilter(value as typeof filter)}
+            options={[
+              { value: "all", label: "전체 상태" },
+              { value: "pending", label: "대기중" },
+              { value: "completed", label: "완료" },
+              { value: "absent", label: "결석" },
+            ]}
+          />
+
+          <FilterSelect
+            value={selectedManagementStatus}
+            onValueChange={setSelectedManagementStatus}
+            options={[
+              { value: "all", label: "전체 관리 상태" },
+              ...managementStatuses.map((status) => ({ value: status.name, label: status.name })),
+            ]}
+          />
+
+          <input
+            type="date"
+            value={selectedDate === "all" ? "" : selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value || "all")}
+            className="inline-flex h-8 cursor-pointer rounded-md border border-input bg-background px-3 font-medium text-foreground text-sm outline-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          />
+        </FilterRow>
+
+        <FilterRow>
+          <FilterSelect
+            value={minIncompleteCount.toString()}
+            onValueChange={(value) => setMinIncompleteCount(Number(value))}
+            options={[
+              { value: "0", label: "미완료 재시험" },
+              { value: "2", label: "2개 이상" },
+              { value: "3", label: "3개 이상" },
+              { value: "4", label: "4개 이상" },
+            ]}
+          />
+
+          <FilterSelect
+            value={minTotalRetakeCount.toString()}
+            onValueChange={(value) => setMinTotalRetakeCount(Number(value))}
+            options={[
+              { value: "0", label: "누적 재시험" },
+              { value: "2", label: "2회 이상" },
+              { value: "3", label: "3회 이상" },
+              { value: "4", label: "4회 이상" },
+              { value: "5", label: "5회 이상" },
+            ]}
+          />
+
+          <FilterSelect
+            value={minPostponeCount.toString()}
+            onValueChange={(value) => setMinPostponeCount(Number(value))}
+            options={[
+              { value: "0", label: "누적 연기" },
+              { value: "1", label: "1회 이상" },
+              { value: "2", label: "2회 이상" },
+              { value: "3", label: "3회 이상" },
+            ]}
+          />
+
+          <FilterSelect
+            value={minAbsentCount.toString()}
+            onValueChange={(value) => setMinAbsentCount(Number(value))}
+            options={[
+              { value: "0", label: "누적 결석" },
+              { value: "1", label: "1회 이상" },
+              { value: "2", label: "2회 이상" },
+              { value: "3", label: "3회 이상" },
+            ]}
+          />
+
+          <FilterSelect
+            value={minPostponeAbsentCount.toString()}
+            onValueChange={(value) => setMinPostponeAbsentCount(Number(value))}
+            options={[
+              { value: "0", label: "누적 연기+결석" },
+              { value: "2", label: "2회 이상" },
+              { value: "3", label: "3회 이상" },
+              { value: "4", label: "4회 이상" },
+              { value: "5", label: "5회 이상" },
+            ]}
+          />
+        </FilterRow>
+
+        <FilterRow>
+          <FilterButton active={selectedCourse === "all"} onClick={() => handleCourseChange("all")}>
+            전체
+          </FilterButton>
+          {courses.map((course) => (
+            <FilterButton
+              key={course.id}
+              active={selectedCourse === course.id}
+              onClick={() => handleCourseChange(course.id)}>
+              {course.name}
             </FilterButton>
+          ))}
+        </FilterRow>
 
-            <FilterSelect
-              value={filter}
-              onValueChange={(value) => setFilter(value as typeof filter)}
-              options={[
-                { value: "all", label: "전체 상태" },
-                { value: "pending", label: "대기중" },
-                { value: "completed", label: "완료" },
-                { value: "absent", label: "결석" },
-              ]}
-            />
+        <FilterRow>
+          <FilterSelect
+            value={selectedCourse}
+            onValueChange={handleCourseChange}
+            options={[
+              { value: "all", label: "전체 반" },
+              ...courses.map((course) => ({ value: course.id, label: course.name })),
+            ]}
+          />
 
-            <FilterSelect
-              value={selectedManagementStatus}
-              onValueChange={setSelectedManagementStatus}
-              options={[
-                { value: "all", label: "전체 관리 상태" },
-                ...managementStatuses.map((status) => ({ value: status.name, label: status.name })),
-              ]}
-            />
-
-            <input
-              type="date"
-              value={selectedDate === "all" ? "" : selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value || "all")}
-              className="cursor-pointer rounded-md border border-border bg-muted px-4 py-2 font-medium text-foreground text-sm transition-all duration-150 hover:border-primary/30 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <FilterSelect
-              value={minIncompleteCount.toString()}
-              onValueChange={(value) => setMinIncompleteCount(Number(value))}
-              options={[
-                { value: "0", label: "미완료 재시험" },
-                { value: "2", label: "2개 이상" },
-                { value: "3", label: "3개 이상" },
-                { value: "4", label: "4개 이상" },
-              ]}
-            />
-
-            <FilterSelect
-              value={minTotalRetakeCount.toString()}
-              onValueChange={(value) => setMinTotalRetakeCount(Number(value))}
-              options={[
-                { value: "0", label: "누적 재시험" },
-                { value: "2", label: "2회 이상" },
-                { value: "3", label: "3회 이상" },
-                { value: "4", label: "4회 이상" },
-                { value: "5", label: "5회 이상" },
-              ]}
-            />
-
-            <FilterSelect
-              value={minPostponeCount.toString()}
-              onValueChange={(value) => setMinPostponeCount(Number(value))}
-              options={[
-                { value: "0", label: "누적 연기" },
-                { value: "1", label: "1회 이상" },
-                { value: "2", label: "2회 이상" },
-                { value: "3", label: "3회 이상" },
-              ]}
-            />
-
-            <FilterSelect
-              value={minAbsentCount.toString()}
-              onValueChange={(value) => setMinAbsentCount(Number(value))}
-              options={[
-                { value: "0", label: "누적 결석" },
-                { value: "1", label: "1회 이상" },
-                { value: "2", label: "2회 이상" },
-                { value: "3", label: "3회 이상" },
-              ]}
-            />
-
-            <FilterSelect
-              value={minPostponeAbsentCount.toString()}
-              onValueChange={(value) => setMinPostponeAbsentCount(Number(value))}
-              options={[
-                { value: "0", label: "누적 연기+결석" },
-                { value: "2", label: "2회 이상" },
-                { value: "3", label: "3회 이상" },
-                { value: "4", label: "4회 이상" },
-                { value: "5", label: "5회 이상" },
-              ]}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <FilterButton active={selectedCourse === "all"} onClick={() => handleCourseChange("all")}>
-              전체
-            </FilterButton>
-            {courses.map((course) => (
-              <FilterButton
-                key={course.id}
-                active={selectedCourse === course.id}
-                onClick={() => handleCourseChange(course.id)}>
-                {course.name}
-              </FilterButton>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <FilterSelect
-              value={selectedCourse}
-              onValueChange={handleCourseChange}
-              options={[
-                { value: "all", label: "전체 반" },
-                ...courses.map((course) => ({ value: course.id, label: course.name })),
-              ]}
-            />
-
-            <FilterSelect
-              value={selectedExam}
-              onValueChange={setSelectedExam}
-              disabled={selectedCourse === "all"}
-              options={[
-                { value: "all", label: "전체 시험" },
-                ...exams.map((exam) => ({ value: exam.id, label: exam.name })),
-              ]}
-            />
-          </div>
-        </div>
-      </div>
+          <FilterSelect
+            value={selectedExam}
+            onValueChange={setSelectedExam}
+            disabled={selectedCourse === "all"}
+            options={[
+              { value: "all", label: "전체 시험" },
+              ...exams.map((exam) => ({ value: exam.id, label: exam.name })),
+            ]}
+          />
+        </FilterRow>
+      </FilterBar>
 
       <SearchInput
         placeholder="학생 검색..."

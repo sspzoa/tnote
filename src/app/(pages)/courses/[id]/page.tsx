@@ -8,6 +8,7 @@ import Header from "@/shared/components/common/Header";
 import { Button } from "@/shared/components/ui/button";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { EmptyState } from "@/shared/components/ui/emptyState";
+import { SegmentedControl } from "@/shared/components/ui/segmentedControl";
 import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/lib/utils/error";
@@ -45,6 +46,11 @@ import { useExamDelete } from "./(hooks)/useExamDelete";
 import { useExamScores, useExamScoresSave } from "./(hooks)/useExamScores";
 import { type Exam, useExams } from "./(hooks)/useExams";
 import { useExamUpdate } from "./(hooks)/useExamUpdate";
+
+const TABS: { value: "exams" | "assignments"; label: string }[] = [
+  { value: "exams", label: "시험" },
+  { value: "assignments", label: "과제" },
+];
 
 export default function CourseDetailPage() {
   const router = useRouter();
@@ -285,28 +291,7 @@ export default function CourseDetailPage() {
         action={actionButton}
       />
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setActiveTab("exams")}
-          className={`rounded-md px-4 py-2 font-medium text-sm transition-colors ${
-            activeTab === "exams"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted"
-          }`}>
-          시험
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("assignments")}
-          className={`rounded-md px-4 py-2 font-medium text-sm transition-colors ${
-            activeTab === "assignments"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted"
-          }`}>
-          과제
-        </button>
-      </div>
+      <SegmentedControl items={TABS} value={activeTab} onChange={setActiveTab} />
 
       {activeTab === "exams" ? (
         exams.length === 0 ? (

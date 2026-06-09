@@ -2,9 +2,8 @@
 
 import { useMemo } from "react";
 import { Button } from "@/shared/components/ui/button";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import type { Assignment } from "../(hooks)/useAssignments";
 
@@ -26,61 +25,51 @@ export function AssignmentTable({ assignments, onManage, onEdit, onDelete }: Ass
     [],
   );
 
-  const { sortedData, sortState, toggleSort } = useTableSort<Assignment, AssignmentSortKey>({
-    data: assignments,
-    comparators,
-    defaultSort: { key: "createdAt", direction: "asc" },
-  });
-
   const getMenuItems = (assignment: Assignment): DropdownMenuItem[] => [
     { label: "수정", onClick: () => onEdit(assignment), dividerAfter: true },
     { label: "삭제", onClick: () => onDelete(assignment), variant: "danger" },
   ];
 
+  const columns: DataTableColumn<Assignment, AssignmentSortKey>[] = [
+    {
+      id: "name",
+      header: "과제명",
+      sortKey: "name",
+      cell: (assignment) => <span className="font-medium text-foreground">{assignment.name}</span>,
+    },
+    {
+      id: "createdAt",
+      header: "생성일",
+      sortKey: "createdAt",
+      cell: (assignment) => (
+        <span className="text-muted-foreground">{formatLocaleDateKorean(assignment.created_at)}</span>
+      ),
+    },
+    {
+      id: "manage",
+      header: "관리",
+      cell: (assignment) => (
+        <Button size="xs" className="font-medium" onClick={() => onManage(assignment)}>
+          학생별 현황
+        </Button>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      align: "right",
+      className: "w-12",
+      cell: (assignment) => <DropdownMenu items={getMenuItems(assignment)} />,
+    },
+  ];
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
-      <table className="w-full rounded-lg">
-        <thead className="bg-muted">
-          <tr>
-            <SortableHeader
-              label="과제명"
-              sortKey="name"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="생성일"
-              sortKey="createdAt"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">관리</th>
-            <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {sortedData.map((assignment) => (
-            <tr key={assignment.id} className="transition-colors hover:bg-primary/10">
-              <td className="whitespace-nowrap px-5 py-4">
-                <div className="font-medium text-base text-foreground">{assignment.name}</div>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <span className="text-base text-muted-foreground">{formatLocaleDateKorean(assignment.created_at)}</span>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <Button size="xs" className="font-medium" onClick={() => onManage(assignment)}>
-                  학생별 현황
-                </Button>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <DropdownMenu items={getMenuItems(assignment)} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={assignments}
+      getRowId={(assignment) => assignment.id}
+      comparators={comparators}
+      defaultSort={{ key: "createdAt", direction: "asc" }}
+    />
   );
 }

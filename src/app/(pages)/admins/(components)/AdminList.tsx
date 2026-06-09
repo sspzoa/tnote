@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
+import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
-import { SortableHeader } from "@/shared/components/ui/sortableHeader";
-import { useTableSort } from "@/shared/hooks/useTableSort";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { getErrorMessage } from "@/shared/lib/utils/error";
@@ -34,12 +33,6 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
     }),
     [],
   );
-
-  const { sortedData, sortState, toggleSort } = useTableSort<Admin, AdminSortKey>({
-    data: admins,
-    comparators,
-    defaultSort: { key: "name", direction: "asc" },
-  });
 
   const handleDelete = async (admin: Admin) => {
     if (admin.role === "owner") {
@@ -83,68 +76,55 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
     { label: "삭제", onClick: () => handleDelete(admin), variant: "danger" },
   ];
 
+  const columns: DataTableColumn<Admin, AdminSortKey>[] = [
+    {
+      id: "name",
+      header: "이름",
+      sortKey: "name",
+      cell: (admin) => <span className="font-medium text-foreground">{admin.name}</span>,
+    },
+    {
+      id: "phone",
+      header: "전화번호",
+      sortKey: "phone",
+      cell: (admin) => <span className="text-muted-foreground">{formatPhoneNumber(admin.phone_number)}</span>,
+    },
+    {
+      id: "role",
+      header: "역할",
+      sortKey: "role",
+      cell: (admin) => (
+        <Badge variant={admin.role === "owner" ? "purple" : "blue"} size="sm">
+          {admin.role === "owner" ? "소유자" : "관리자"}
+        </Badge>
+      ),
+    },
+    {
+      id: "createdAt",
+      header: "가입일",
+      sortKey: "createdAt",
+      cell: (admin) => <span className="text-muted-foreground">{formatLocaleDateKorean(admin.created_at)}</span>,
+    },
+    ...(isOwner
+      ? [
+          {
+            id: "actions",
+            header: "",
+            align: "right" as const,
+            className: "w-12",
+            cell: (admin: Admin) => (admin.role !== "owner" ? <DropdownMenu items={getMenuItems(admin)} /> : null),
+          },
+        ]
+      : []),
+  ];
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
-      <table className="w-full rounded-lg">
-        <thead className="bg-muted">
-          <tr>
-            <SortableHeader
-              label="이름"
-              sortKey="name"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="전화번호"
-              sortKey="phone"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="역할"
-              sortKey="role"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            <SortableHeader
-              label="가입일"
-              sortKey="createdAt"
-              currentSortKey={sortState.key}
-              currentDirection={sortState.direction}
-              onSort={toggleSort}
-            />
-            {isOwner && (
-              <th className="w-24 whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground" />
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((admin) => (
-            <tr key={admin.id} className="border-border border-t transition-colors hover:bg-accent">
-              <td className="whitespace-nowrap px-5 py-4 font-medium text-base text-foreground">{admin.name}</td>
-              <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                {formatPhoneNumber(admin.phone_number)}
-              </td>
-              <td className="whitespace-nowrap px-5 py-4">
-                <Badge variant={admin.role === "owner" ? "purple" : "blue"} size="sm">
-                  {admin.role === "owner" ? "소유자" : "관리자"}
-                </Badge>
-              </td>
-              <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
-                {formatLocaleDateKorean(admin.created_at)}
-              </td>
-              {isOwner && (
-                <td className="whitespace-nowrap px-5 py-4">
-                  {admin.role !== "owner" && <DropdownMenu items={getMenuItems(admin)} />}
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={admins}
+      getRowId={(admin) => admin.id}
+      comparators={comparators}
+      defaultSort={{ key: "name", direction: "asc" }}
+    />
   );
 }

@@ -51,8 +51,8 @@ export default function AssignmentTaskHistoryPanel({
         <SkeletonSpinner className="py-16" size="md" />
       ) : history.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-16">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
-            <History className="size-6 text-primary" />
+          <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+            <History className="size-6 text-muted-foreground" />
           </div>
           <span className="text-muted-foreground text-sm">이력이 없습니다.</span>
         </div>
@@ -67,7 +67,7 @@ export default function AssignmentTaskHistoryPanel({
               <div key={item.id} className="flex flex-col gap-2 px-7 py-4 transition-colors hover:bg-muted">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-base text-foreground">{item.task.student.name}</span>
+                    <span className="font-semibold text-foreground text-sm">{item.task.student.name}</span>
                     <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
                       {getActionLabel(item.action_type)}
                     </Badge>

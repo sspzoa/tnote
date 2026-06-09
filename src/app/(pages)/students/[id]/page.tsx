@@ -134,7 +134,9 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                   onSort={toggleSort}
                   className="print:hidden"
                 />
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">결과</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  결과
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -142,35 +144,35 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                 const passed = score.cutline != null && score.score >= score.cutline;
                 const failed = score.cutline != null && score.score < score.cutline;
                 return (
-                  <tr key={score.id} className="border-border border-t transition-colors hover:bg-accent">
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <div className="text-base text-foreground">{score.exam.name}</div>
+                  <tr key={score.id} className="border-border border-t transition-colors hover:bg-muted/50">
+                    <td className="whitespace-nowrap px-4 py-2.5">
+                      <div className="text-sm text-foreground">{score.exam.name}</div>
                       <div className="text-muted-foreground text-xs">
                         {score.exam.course.name} {score.exam.examNumber}회차
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <span className="font-medium text-base text-foreground">
+                    <td className="whitespace-nowrap px-4 py-2.5">
+                      <span className="font-medium text-sm text-foreground">
                         {score.score}
                         {score.maxScore != null && <span className="text-muted-foreground">/{score.maxScore}</span>}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <span className="text-base text-foreground">
+                    <td className="whitespace-nowrap px-4 py-2.5">
+                      <span className="text-sm text-foreground">
                         {score.rank}
                         <span className="text-muted-foreground">/{score.totalStudents}</span>
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4 print:hidden">
-                      <span className="text-base text-foreground">{score.average}</span>
+                    <td className="whitespace-nowrap px-4 py-2.5 print:hidden">
+                      <span className="text-sm text-foreground">{score.average}</span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4 print:hidden">
-                      <span className="text-base text-foreground">{score.median}</span>
+                    <td className="whitespace-nowrap px-4 py-2.5 print:hidden">
+                      <span className="text-sm text-foreground">{score.median}</span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4 print:hidden">
-                      <span className="text-base text-foreground">{score.highest}</span>
+                    <td className="whitespace-nowrap px-4 py-2.5 print:hidden">
+                      <span className="text-sm text-foreground">{score.highest}</span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
+                    <td className="whitespace-nowrap px-4 py-2.5">
                       {passed && (
                         <Badge variant="success" size="sm">
                           통과
@@ -213,11 +215,15 @@ const AssignmentHistoryTable = ({
           <table className="w-full">
             <thead className="bg-muted">
               <tr>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
                   과제명
                 </th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">수업</th>
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">상태</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  수업
+                </th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  상태
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -227,12 +233,12 @@ const AssignmentHistoryTable = ({
                   label: item.status,
                 };
                 return (
-                  <tr key={item.id} className="border-border border-t transition-colors hover:bg-accent">
-                    <td className="whitespace-nowrap px-5 py-4 text-base text-foreground">{item.assignment.name}</td>
-                    <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
+                  <tr key={item.id} className="border-border border-t transition-colors hover:bg-muted/50">
+                    <td className="whitespace-nowrap px-4 py-2.5 text-sm text-foreground">{item.assignment.name}</td>
+                    <td className="whitespace-nowrap px-4 py-2.5 text-sm text-muted-foreground">
                       {item.assignment.course.name}
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
+                    <td className="whitespace-nowrap px-4 py-2.5">
                       <Badge variant={status.variant} size="sm">
                         {status.label}
                       </Badge>
@@ -299,7 +305,9 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
                   currentDirection={sortState.direction}
                   onSort={toggleSort}
                 />
-                <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">비고</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  비고
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -309,22 +317,22 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
                   label: retake.status,
                 };
                 return (
-                  <tr key={retake.id} className="border-border border-t transition-colors hover:bg-accent">
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <div className="text-base text-foreground">{retake.exam.name}</div>
+                  <tr key={retake.id} className="border-border border-t transition-colors hover:bg-muted/50">
+                    <td className="whitespace-nowrap px-4 py-2.5">
+                      <div className="text-sm text-foreground">{retake.exam.name}</div>
                       <div className="text-muted-foreground text-xs">
                         {retake.exam.course.name} {retake.exam.examNumber}회차
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <span className="text-base text-foreground">{retake.scheduledDate || "-"}</span>
+                    <td className="whitespace-nowrap px-4 py-2.5">
+                      <span className="text-sm text-foreground">{retake.scheduledDate || "-"}</span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
+                    <td className="whitespace-nowrap px-4 py-2.5">
                       <Badge variant={status.variant} size="sm">
                         {status.label}
                       </Badge>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4">
+                    <td className="whitespace-nowrap px-4 py-2.5">
                       <div className="flex gap-2">
                         {retake.postponeCount > 0 && (
                           <span className="text-muted-foreground text-xs">연기 {retake.postponeCount}회</span>
@@ -425,7 +433,7 @@ export default function StudentDetailPage() {
       <div className="flex flex-col gap-7 print:gap-3">
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between print:hidden">
-            <Link href="/students" className="text-base text-primary hover:underline">
+            <Link href="/students" className="text-sm text-primary hover:underline">
               ← 학생 목록으로 돌아가기
             </Link>
             <Button variant="secondary" size="sm" onClick={() => setShowPrintModal(true)}>
@@ -440,7 +448,7 @@ export default function StudentDetailPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="font-bold text-foreground text-2xl">{studentDetail.student.name}</h1>
+                  <h1 className="font-semibold text-foreground text-xl">{studentDetail.student.name}</h1>
                   {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
                     <Badge variant="blue" size="xs">
                       {getGrade(studentDetail.student.birthYear)}
@@ -448,7 +456,7 @@ export default function StudentDetailPage() {
                   )}
                 </div>
 
-                <p className="text-base text-muted-foreground">{studentDetail.student.school || "학교 정보 없음"}</p>
+                <p className="text-sm text-muted-foreground">{studentDetail.student.school || "학교 정보 없음"}</p>
 
                 <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
                   <span className="flex items-center gap-1">
@@ -554,7 +562,7 @@ export default function StudentDetailPage() {
                 key={course.id}
                 className="print-break-inside-avoid flex items-center justify-between gap-3 rounded-md border border-border bg-muted px-4 py-3 print:bg-transparent print:px-2 print:py-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate font-medium text-base text-foreground">{course.name}</span>
+                  <span className="truncate font-medium text-sm text-foreground">{course.name}</span>
                   <span className="text-muted-foreground text-xs">
                     등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
                   </span>
@@ -582,16 +590,16 @@ export default function StudentDetailPage() {
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
                     날짜
                   </th>
-                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
                     클리닉
                   </th>
-                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
                     출석
                   </th>
-                  <th className="whitespace-nowrap px-5 py-4 text-left font-semibold text-base text-foreground">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
                     활동
                   </th>
                 </tr>
@@ -604,23 +612,23 @@ export default function StudentDetailPage() {
                     history.didQa && "질의응답",
                   ].filter(Boolean);
                   return (
-                    <tr key={history.id} className="border-border border-t transition-colors hover:bg-accent">
-                      <td className="whitespace-nowrap px-5 py-4 text-base text-muted-foreground">
+                    <tr key={history.id} className="border-border border-t transition-colors hover:bg-muted/50">
+                      <td className="whitespace-nowrap px-4 py-2.5 text-sm text-muted-foreground">
                         {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
                           month: "short",
                           day: "numeric",
                         })}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4">
-                        <span className="text-base text-foreground">{history.clinic.name}</span>
+                      <td className="whitespace-nowrap px-4 py-2.5">
+                        <span className="text-sm text-foreground">{history.clinic.name}</span>
                         {history.isRequired && <span className="ml-1 text-primary text-xs">필참</span>}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4">
+                      <td className="whitespace-nowrap px-4 py-2.5">
                         <Badge variant={history.status === "absent" ? "danger" : "success"} size="sm">
                           {history.status === "absent" ? "결석" : "출석"}
                         </Badge>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-muted-foreground text-xs">
+                      <td className="whitespace-nowrap px-4 py-2.5 text-muted-foreground text-xs">
                         {activities.length > 0 ? activities.join(", ") : "-"}
                       </td>
                     </tr>

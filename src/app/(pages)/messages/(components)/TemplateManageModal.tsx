@@ -40,7 +40,7 @@ export default function TemplateManageModal({ isOpen, onClose, templates, onDele
         </Button>
       }>
       {templates.length === 0 ? (
-        <p className="py-4 text-center text-base text-muted-foreground">저장된 템플릿이 없습니다.</p>
+        <p className="py-4 text-center text-muted-foreground text-sm">저장된 템플릿이 없습니다.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {templates.map((template) => (
@@ -48,7 +48,7 @@ export default function TemplateManageModal({ isOpen, onClose, templates, onDele
               key={template.id}
               className="flex items-start justify-between gap-3 rounded-md border border-border bg-muted p-4">
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <span className="font-semibold text-base text-foreground">{template.name}</span>
+                <span className="font-semibold text-foreground text-sm">{template.name}</span>
                 <p className="line-clamp-2 text-muted-foreground text-xs">{template.content}</p>
               </div>
               <Button

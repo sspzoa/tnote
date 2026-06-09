@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { FileText } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { FilterSelect } from "@/shared/components/ui/filterSelect";
 import { StudentListItem } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
@@ -154,42 +155,43 @@ export default function ExamResultsTab() {
   ]);
 
   const examSelector = (
-    <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5">
-      <div>
-        <h3 className="font-semibold text-base text-foreground">시험 선택</h3>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm">시험 선택</CardTitle>
         <p className="text-muted-foreground text-xs">결과를 발송할 시험을 선택하세요</p>
-      </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-muted-foreground text-sm">수업</label>
+            <FilterSelect
+              value={selectedCourseId}
+              onValueChange={(value) => handleCourseChange(value)}
+              disabled={coursesLoading}
+              className="w-full"
+              options={[
+                { value: "", label: "수업을 선택하세요" },
+                ...courses.map((course) => ({ value: course.id, label: course.name })),
+              ]}
+            />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="font-semibold text-muted-foreground text-sm">수업</label>
-          <FilterSelect
-            value={selectedCourseId}
-            onValueChange={(value) => handleCourseChange(value)}
-            disabled={coursesLoading}
-            className="w-full"
-            options={[
-              { value: "", label: "수업을 선택하세요" },
-              ...courses.map((course) => ({ value: course.id, label: course.name })),
-            ]}
-          />
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-muted-foreground text-sm">시험</label>
+            <FilterSelect
+              value={selectedExamId}
+              onValueChange={(value) => setSelectedExamId(value)}
+              disabled={!selectedCourseId || examsLoading}
+              className="w-full"
+              options={[
+                { value: "", label: selectedCourseId ? "시험을 선택하세요" : "먼저 수업을 선택하세요" },
+                ...exams.map((exam) => ({ value: exam.id, label: `${exam.exam_number}회 - ${exam.name}` })),
+              ]}
+            />
+          </div>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="font-semibold text-muted-foreground text-sm">시험</label>
-          <FilterSelect
-            value={selectedExamId}
-            onValueChange={(value) => setSelectedExamId(value)}
-            disabled={!selectedCourseId || examsLoading}
-            className="w-full"
-            options={[
-              { value: "", label: selectedCourseId ? "시험을 선택하세요" : "먼저 수업을 선택하세요" },
-              ...exams.map((exam) => ({ value: exam.id, label: `${exam.exam_number}회 - ${exam.name}` })),
-            ]}
-          />
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 
   return (

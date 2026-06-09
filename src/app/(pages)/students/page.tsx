@@ -87,19 +87,18 @@ export default function StudentsPage() {
         subtitle={`전체 학생 ${students.length}명`}
         backLink={{ href: "/", label: "홈으로 돌아가기" }}
         action={
-          <div className="flex items-center gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => setShowConsultationPanel(true)}
-              className="flex items-center gap-2">
+          <>
+            <Button variant="outline" onClick={() => setShowConsultationPanel(true)}>
               <MessageSquare className="size-4" />
               최근 상담
               {unreadCount > 0 && (
-                <span className="rounded-full bg-primary px-2 text-primary-foreground text-xs">{unreadCount}</span>
+                <span className="ml-0.5 rounded-full bg-primary px-1.5 text-primary-foreground text-xs">
+                  {unreadCount}
+                </span>
               )}
             </Button>
             <Button onClick={() => setShowCreateModal(true)}>+ 학생 추가</Button>
-          </div>
+          </>
         }
       />
 
@@ -181,11 +180,11 @@ export default function StudentsPage() {
                 <button
                   key={consultation.id}
                   onClick={() => handleConsultationClick(consultation)}
-                  className={`flex w-full flex-col gap-1 px-7 py-4 text-left transition-all duration-150 hover:bg-primary/50 ${!consultation.is_read ? "bg-primary/30" : ""}`}>
+                  className={`flex w-full flex-col gap-1 px-6 py-3.5 text-left transition-colors hover:bg-muted/50 ${!consultation.is_read ? "bg-primary/5" : ""}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-base text-foreground ${!consultation.is_read ? "font-semibold" : "font-medium"}`}>
+                        className={`text-sm text-foreground ${!consultation.is_read ? "font-semibold" : "font-medium"}`}>
                         {consultation.student?.name || "-"}
                       </span>
                     </div>
@@ -202,7 +201,7 @@ export default function StudentsPage() {
                     </div>
                   </div>
                   <div
-                    className={`truncate text-base ${!consultation.is_read ? "text-foreground" : "text-muted-foreground"}`}>
+                    className={`truncate text-sm ${!consultation.is_read ? "text-foreground" : "text-muted-foreground"}`}>
                     {consultation.title}
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground text-xs">
