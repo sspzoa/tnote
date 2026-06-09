@@ -119,7 +119,7 @@ export default function TagManageModal() {
       }>
       <div className="flex flex-col gap-7">
         <div className="flex flex-col gap-4 rounded-lg border border-border bg-muted/50 p-5">
-          <h3 className="font-semibold text-base text-foreground">{editingTag ? "태그 수정" : "새 태그 추가"}</h3>
+          <h3 className="font-semibold text-foreground text-sm">{editingTag ? "태그 수정" : "새 태그 추가"}</h3>
 
           <FormInput
             label="태그 이름"
@@ -156,7 +156,7 @@ export default function TagManageModal() {
               onChange={(e) => setForm({ ...form, hiddenByDefault: e.target.checked })}
               className="size-5 cursor-pointer rounded-sm border-border accent-primary"
             />
-            <span className="font-medium text-base text-foreground">기본으로 숨김</span>
+            <span className="font-medium text-foreground text-sm">기본으로 숨김</span>
             <span className="text-muted-foreground text-xs">
               (이 태그가 있는 학생은 기본적으로 목록에서 숨겨집니다)
             </span>
@@ -191,7 +191,7 @@ export default function TagManageModal() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <h3 className="font-semibold text-base text-foreground">등록된 태그</h3>
+          <h3 className="font-semibold text-foreground text-sm">등록된 태그</h3>
 
           {isLoading ? (
             <TagListSkeleton count={4} />

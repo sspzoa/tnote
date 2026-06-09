@@ -216,7 +216,7 @@ export default function AttendanceModal() {
         />
 
         <div className="flex flex-col gap-3">
-          <h3 className="font-bold text-base text-foreground">참석 학생 선택 ({visibleStudentCount}명)</h3>
+          <h3 className="font-semibold text-foreground text-sm">참석 학생 선택 ({visibleStudentCount}명)</h3>
           {loadingAttendance ? (
             <div className="flex flex-col gap-3">
               <div className="h-12 animate-pulse rounded-md bg-muted" />

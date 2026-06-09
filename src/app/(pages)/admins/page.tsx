@@ -61,8 +61,8 @@ export default function AdminsPage() {
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <div className="flex items-center justify-between gap-4 border-l-4 border-l-destructive p-7">
               <div className="flex flex-col gap-2">
-                <h3 className="font-bold text-foreground text-2xl">워크스페이스 삭제</h3>
-                <p className="text-base text-muted-foreground">
+                <h3 className="font-semibold text-foreground text-lg">워크스페이스 삭제</h3>
+                <p className="text-muted-foreground text-sm">
                   워크스페이스를 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
                 </p>
               </div>

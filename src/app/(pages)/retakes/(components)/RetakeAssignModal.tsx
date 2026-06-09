@@ -202,7 +202,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="font-semibold text-base text-foreground">
+            <label className="font-semibold text-foreground text-sm">
               학생 선택 <span className="text-destructive">*</span>
               {selectedExam && examScores.length > 0 && (
                 <span className="ml-2 font-normal text-muted-foreground text-xs">
@@ -214,14 +214,14 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
               {selectedExamId && examScores.length > 0 && studentsBelowCutline.length > 0 && (
                 <button
                   onClick={handleSelectBelowCutline}
-                  className="text-base text-destructive hover:underline"
+                  className="text-destructive text-sm hover:underline"
                   disabled={isDataLoading}>
                   {allBelowCutlineSelected ? "재시험자 해제" : `재시험자 전체 선택 (${studentsBelowCutline.length}명)`}
                 </button>
               )}
               <button
                 onClick={handleSelectAll}
-                className="text-base text-primary hover:underline"
+                className="text-primary text-sm hover:underline"
                 disabled={!selectedCourseId || isDataLoading || filteredStudents.length === 0}>
                 {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                   ? "전체 해제"
@@ -278,7 +278,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
             )}
           </StudentListContainer>
 
-          <div className="text-base text-muted-foreground">선택된 학생: {selectedStudentIds.length}명</div>
+          <div className="text-muted-foreground text-sm">선택된 학생: {selectedStudentIds.length}명</div>
         </div>
       </div>
     </Modal>

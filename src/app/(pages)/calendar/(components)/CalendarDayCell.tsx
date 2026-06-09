@@ -37,7 +37,11 @@ export default function CalendarDayCell({
       } ${isLastRow ? "border-b-0" : ""} ${!isCurrentMonth ? "bg-muted/50" : ""} ${isToday ? "bg-accent" : ""}`}>
       <div
         className={`text-right text-xs ${
-          !isCurrentMonth ? "text-muted-foreground/60" : isToday ? "font-bold text-primary" : "text-muted-foreground"
+          !isCurrentMonth
+            ? "text-muted-foreground/60"
+            : isToday
+              ? "font-semibold text-primary"
+              : "text-muted-foreground"
         }`}>
         {isToday ? (
           <span className="inline-flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">

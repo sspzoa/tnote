@@ -7,31 +7,31 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-7 px-7 py-10">
-      <h1 className="font-bold text-5xl text-foreground">개인정보처리방침</h1>
+      <h1 className="font-semibold text-5xl text-foreground tracking-tight">개인정보처리방침</h1>
 
-      <div className="flex flex-col gap-7 text-base text-muted-foreground">
+      <div className="flex flex-col gap-7 text-muted-foreground text-sm leading-relaxed">
         <section className="flex flex-col gap-3">
           <h2 className="font-semibold text-2xl text-foreground">제1조 (개인정보의 수집 항목 및 수집 방법)</h2>
           <p>서비스는 다음과 같은 개인정보를 수집합니다:</p>
 
-          <h3 className="font-medium text-base text-foreground">1. 소유자 (직접 회원가입)</h3>
+          <h3 className="font-medium text-foreground text-sm">1. 소유자 (직접 회원가입)</h3>
           <ul className="flex list-disc flex-col gap-2 pl-5">
             <li>필수 항목: 이름, 전화번호, 비밀번호, 워크스페이스 이름</li>
             <li>자동 수집 항목: 접속 로그, IP 주소, 서비스 이용 기록, 쿠키, 브라우저 정보(User-Agent)</li>
           </ul>
 
-          <h3 className="font-medium text-base text-foreground">2. 관리자 (소유자가 등록)</h3>
+          <h3 className="font-medium text-foreground text-sm">2. 관리자 (소유자가 등록)</h3>
           <ul className="flex list-disc flex-col gap-2 pl-5">
             <li>필수 항목: 이름, 전화번호, 비밀번호</li>
           </ul>
 
-          <h3 className="font-medium text-base text-foreground">3. 학생 (소유자 또는 관리자가 등록)</h3>
+          <h3 className="font-medium text-foreground text-sm">3. 학생 (소유자 또는 관리자가 등록)</h3>
           <ul className="flex list-disc flex-col gap-2 pl-5">
             <li>필수 항목: 이름, 전화번호</li>
             <li>선택 항목: 학부모 전화번호, 학교, 분원, 출생연도</li>
           </ul>
 
-          <h3 className="font-medium text-base text-foreground">4. 서비스 이용 과정에서 생성되는 정보</h3>
+          <h3 className="font-medium text-foreground text-sm">4. 서비스 이용 과정에서 생성되는 정보</h3>
           <ul className="flex list-disc flex-col gap-2 pl-5">
             <li>시험 성적 및 재시험 이력 (일정, 상태 변경, 출결 기록)</li>
             <li>상담 기록 (제목, 내용, 작성일)</li>

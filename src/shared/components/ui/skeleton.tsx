@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/shared/lib/utils/cn";
 
 function Skeleton({ className, ...props }: ComponentProps<"div">) {
-  return <div data-slot="skeleton" className={cn("animate-pulse rounded-md bg-accent", className)} {...props} />;
+  return <div data-slot="skeleton" className={cn("animate-pulse rounded-xl bg-muted", className)} {...props} />;
 }
 
 interface SkeletonSpinnerProps {
@@ -45,11 +45,11 @@ interface SkeletonTableProps {
 export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
   const renderHeaderCell = (col: SkeletonColumnDef, index: number) => {
     if (col === "action") {
-      return <th key={index} className="w-24 whitespace-nowrap px-5 py-4" />;
+      return <th key={index} className="w-24 whitespace-nowrap px-4 py-2.5" />;
     }
     const width = typeof col === "string" ? col : col.width;
     return (
-      <th key={index} className="whitespace-nowrap px-5 py-4 text-left">
+      <th key={index} className="whitespace-nowrap px-4 py-2.5 text-left">
         <Skeleton className={cn("h-6", width)} />
       </th>
     );
@@ -58,7 +58,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
   const renderBodyCell = (col: SkeletonColumnDef, index: number) => {
     if (col === "action") {
       return (
-        <td key={index} className="whitespace-nowrap px-5 py-4">
+        <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <Skeleton className="ml-auto h-9 w-11 rounded-sm" />
         </td>
       );
@@ -66,7 +66,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if (typeof col === "string") {
       return (
-        <td key={index} className="whitespace-nowrap px-5 py-4">
+        <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <Skeleton className={cn("h-6", col)} />
         </td>
       );
@@ -74,7 +74,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if ("rounded" in col && col.rounded) {
       return (
-        <td key={index} className="whitespace-nowrap px-5 py-4">
+        <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <Skeleton className={cn("h-7 rounded-sm", col.width)} />
         </td>
       );
@@ -82,7 +82,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if ("stacked" in col) {
       return (
-        <td key={index} className="whitespace-nowrap px-5 py-4">
+        <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <div className="flex flex-col gap-1">
             <Skeleton className={cn("h-6", col.stacked[0])} />
             <Skeleton className={cn("h-5", col.stacked[1])} />
@@ -93,7 +93,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if ("badges" in col) {
       return (
-        <td key={index} className="whitespace-nowrap px-5 py-4">
+        <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <div className="flex gap-1">
             {col.badges.map((w, i) => (
               <Skeleton key={i} className={cn("h-6 rounded-sm", w)} />
@@ -105,7 +105,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     if ("buttons" in col) {
       return (
-        <td key={index} className="whitespace-nowrap px-5 py-4">
+        <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <div className="flex gap-2">
             {col.buttons.map((w, i) => (
               <Skeleton key={i} className={cn("h-9 rounded-md", w)} />
@@ -116,21 +116,21 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     }
 
     return (
-      <td key={index} className="whitespace-nowrap px-5 py-4">
+      <td key={index} className="whitespace-nowrap px-4 py-2.5">
         <Skeleton className={cn("h-6", col.width)} />
       </td>
     );
   };
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-card">
-      <table className="w-full rounded-xl">
+    <div className="overflow-x-auto rounded-2xl border border-transparent bg-card shadow-sm">
+      <table className="w-full rounded-2xl">
         <thead className="bg-muted">
           <tr>{columns.map(renderHeaderCell)}</tr>
         </thead>
         <tbody>
           {[...Array(rows)].map((_, rowIndex) => (
-            <tr key={rowIndex} className="border-t border-border">
+            <tr key={rowIndex} className="border-border border-t">
               {columns.map(renderBodyCell)}
             </tr>
           ))}

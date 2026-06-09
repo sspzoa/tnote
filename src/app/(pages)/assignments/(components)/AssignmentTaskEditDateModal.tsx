@@ -72,8 +72,8 @@ export default function AssignmentTaskEditDateModal({ onSuccess }: AssignmentTas
       }>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label className="block font-semibold text-base text-foreground">현재 예정일</label>
-          <div className="rounded-md border border-border bg-muted px-4 py-3 text-base text-muted-foreground">
+          <label className="block font-semibold text-foreground text-sm">현재 예정일</label>
+          <div className="rounded-md border border-border bg-muted px-4 py-3 text-muted-foreground text-sm">
             {selectedTask.current_scheduled_date || "미지정"}
           </div>
         </div>

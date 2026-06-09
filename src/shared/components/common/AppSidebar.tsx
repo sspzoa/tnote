@@ -19,6 +19,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -33,6 +34,21 @@ import { PasswordChangeModal } from "./PasswordChangeModal";
 
 const roleLabel = (role?: string) => (role === "owner" ? "소유자" : role === "student" ? "학생" : "관리자");
 
+// Admin nav grouped into friendly sections (route paths unchanged).
+const ADMIN_NAV_GROUPS: { label: string; hrefs: string[] }[] = [
+  { label: "소통", hrefs: ["/calendar", "/messages"] },
+  { label: "학습 관리", hrefs: ["/retakes", "/assignments"] },
+  { label: "학생", hrefs: ["/students", "/courses", "/clinics"] },
+  { label: "설정", hrefs: ["/admins"] },
+];
+
+const adminNavGroups = ADMIN_NAV_GROUPS.map((group) => ({
+  label: group.label,
+  items: group.hrefs
+    .map((href) => adminNavItems.find((item) => item.href === href))
+    .filter(Boolean) as typeof adminNavItems,
+}));
+
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -46,6 +62,20 @@ export function AppSidebar() {
   const navItems = isAdmin ? adminNavItems : studentNavItems;
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  const renderNavItem = (item: (typeof adminNavItems)[number]) => {
+    const active = isActive(item.href);
+    return (
+      <SidebarMenuItem key={item.href}>
+        <SidebarMenuButton asChild isActive={active} tooltip={item.label} className="rounded-full">
+          <Link href={item.href} onClick={() => setOpenMobile(false)}>
+            <item.icon />
+            <span>{item.label}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  };
 
   const handleLogout = async () => {
     const ok = await confirm({ title: "로그아웃", message: "로그아웃 하시겠습니까?" });
@@ -72,7 +102,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
                 <Link href="/" onClick={() => setOpenMobile(false)}>
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-brand">
                     <span className="font-bold text-sm">T</span>
                   </div>
                   <div className="grid flex-1 text-left leading-tight">
@@ -92,33 +122,32 @@ export function AppSidebar() {
         </SidebarHeader>
 
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarMenu>
-              {isLoading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
-                    <SidebarMenuItem key={i}>
-                      <div className="flex h-8 items-center gap-2 rounded-md px-2">
-                        <Skeleton className="size-4 shrink-0 rounded-md" />
-                        <Skeleton className="h-4 w-24" />
-                      </div>
-                    </SidebarMenuItem>
-                  ))
-                : navItems.map((item) => {
-                    const active = isActive(item.href);
-                    return (
-                      <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
-                          <Link href={item.href} onClick={() => setOpenMobile(false)}>
-                            <item.icon />
-                            <span>{item.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-            </SidebarMenu>
-          </SidebarGroup>
+          {isLoading ? (
+            <SidebarGroup>
+              <SidebarMenu>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
+                  <SidebarMenuItem key={i}>
+                    <div className="flex h-8 items-center gap-2 rounded-md px-2">
+                      <Skeleton className="size-4 shrink-0 rounded-md" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          ) : isAdmin ? (
+            adminNavGroups.map((group) => (
+              <SidebarGroup key={group.label}>
+                <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+                <SidebarMenu>{group.items.map(renderNavItem)}</SidebarMenu>
+              </SidebarGroup>
+            ))
+          ) : (
+            <SidebarGroup>
+              <SidebarMenu>{navItems.map(renderNavItem)}</SidebarMenu>
+            </SidebarGroup>
+          )}
         </SidebarContent>
 
         <SidebarFooter>
@@ -138,7 +167,7 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       size="lg"
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                      <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary text-sm">
+                      <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-primary-soft font-semibold text-primary text-sm">
                         {user?.name?.charAt(0) || "U"}
                       </div>
                       <div className="grid flex-1 text-left leading-tight">

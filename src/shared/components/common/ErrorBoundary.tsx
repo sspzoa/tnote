@@ -35,8 +35,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 p-7">
           <div className="text-center">
-            <h2 className="mb-2 font-bold text-foreground text-xl">문제가 발생했습니다</h2>
-            <p className="text-base text-muted-foreground">
+            <h2 className="mb-2 font-semibold text-foreground text-xl">문제가 발생했습니다</h2>
+            <p className="text-muted-foreground text-sm">
               예기치 않은 오류가 발생했습니다. 페이지를 새로고침 해주세요.
             </p>
             {this.state.error && <p className="mt-2 text-muted-foreground text-xs">{this.state.error.message}</p>}
@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               this.setState({ hasError: false, error: null });
               window.location.reload();
             }}
-            className="rounded-md bg-primary px-5 py-3 font-medium text-sm text-primary-foreground transition-opacity hover:opacity-90">
+            className="rounded-md bg-primary px-5 py-3 font-medium text-primary-foreground text-sm transition-opacity hover:opacity-90">
             새로고침
           </button>
         </div>

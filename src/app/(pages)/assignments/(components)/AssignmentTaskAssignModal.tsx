@@ -159,12 +159,12 @@ export default function AssignmentTaskAssignModal({ onSuccess }: AssignmentTaskA
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="font-semibold text-base text-foreground">
+            <label className="font-semibold text-foreground text-sm">
               학생 선택 <span className="text-destructive">*</span>
             </label>
             <button
               onClick={handleSelectAll}
-              className="text-base text-primary hover:underline"
+              className="text-primary text-sm hover:underline"
               disabled={!selectedCourseId || studentsLoading || filteredStudents.length === 0}>
               {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
                 ? "전체 해제"
@@ -198,7 +198,7 @@ export default function AssignmentTaskAssignModal({ onSuccess }: AssignmentTaskA
             )}
           </StudentListContainer>
 
-          <div className="text-base text-muted-foreground">선택된 학생: {selectedStudentIds.length}명</div>
+          <div className="text-muted-foreground text-sm">선택된 학생: {selectedStudentIds.length}명</div>
         </div>
       </div>
     </Modal>

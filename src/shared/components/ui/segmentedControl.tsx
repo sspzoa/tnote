@@ -20,7 +20,7 @@ interface SegmentedControlProps<T extends string> {
 export function SegmentedControl<T extends string>({ items, value, onChange, className }: SegmentedControlProps<T>) {
   return (
     <Tabs value={value} onValueChange={(next) => onChange(next as T)} className={className}>
-      <TabsList className="h-10 w-full">
+      <TabsList className="h-11 w-full">
         {items.map((item) => {
           const Icon = item.icon;
           return (

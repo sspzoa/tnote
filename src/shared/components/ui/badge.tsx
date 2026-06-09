@@ -76,10 +76,11 @@ export const Badge = ({
   ...props
 }: BadgeProps) => {
   const combinedClassName = cn(
-    "inline-flex items-center rounded-md font-medium",
+    "inline-flex items-center rounded-full font-medium",
     getVariantStyle(variant),
     sizeStyles[size],
-    interactive && "cursor-pointer transition-opacity hover:opacity-80",
+    interactive &&
+      "cursor-pointer transition-[opacity,box-shadow] duration-150 hover:opacity-90 hover:shadow-xs active:scale-[0.98]",
     className,
   );
 
@@ -105,5 +106,27 @@ export const StatusBadge = ({ variant, children }: { variant: SemanticVariant; c
     <Badge variant={variant} size="md">
       {children}
     </Badge>
+  );
+};
+
+/** A count + label chip for summary strips (e.g. "대기 12", "지연 4"). Number is tabular for column alignment. */
+export const MetricBadge = ({
+  variant = "neutral",
+  label,
+  value,
+}: {
+  variant?: SemanticVariant;
+  label: string;
+  value: ReactNode;
+}) => {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-xs",
+        semanticStyles[variant],
+      )}>
+      <span className="font-bold tabular-nums">{value}</span>
+      <span className="opacity-80">{label}</span>
+    </span>
   );
 };

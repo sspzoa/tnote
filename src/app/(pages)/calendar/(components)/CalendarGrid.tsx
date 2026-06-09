@@ -31,7 +31,7 @@ export default function CalendarGrid({ currentDate, events, expandedDays, onEven
   const getEventsForDay = (day: Date) => events.filter((event) => isSameDay(new Date(event.date), day));
 
   return (
-    <div className="overflow-hidden rounded-md border border-border">
+    <div className="overflow-hidden rounded-lg border border-border shadow-xs">
       <div className="grid grid-cols-7 border-border border-b bg-muted">
         {WEEKDAYS.map((day) => (
           <div

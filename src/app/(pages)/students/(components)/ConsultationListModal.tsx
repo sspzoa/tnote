@@ -1,6 +1,9 @@
 import { useAtom, useAtomValue } from "jotai";
+import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
+import { DateChip } from "@/shared/components/ui/dateChip";
+import { EmptyState } from "@/shared/components/ui/emptyState";
 import { Modal } from "@/shared/components/ui/modal";
 import { formatLocaleDateKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
 import type { ConsultationLog } from "@/shared/types";
@@ -54,15 +57,13 @@ export default function ConsultationListModal() {
         {isLoading ? (
           <ConsultationListSkeleton count={4} />
         ) : consultations.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-16 text-center">
-            <p className="text-base text-muted-foreground">상담일지가 없습니다.</p>
-            <p className="text-muted-foreground/60 text-xs">첫 상담일지를 작성해보세요.</p>
-            <button
-              onClick={openAddModal}
-              className="rounded-lg bg-primary px-5 py-4 font-semibold text-base text-primary-foreground transition-opacity hover:opacity-90">
-              첫 상담일지 작성
-            </button>
-          </div>
+          <EmptyState
+            icon={<MessageSquare className="size-7" />}
+            message="상담일지가 없습니다."
+            subtitle="첫 상담일지를 작성해보세요."
+            actionLabel="첫 상담일지 작성"
+            onAction={openAddModal}
+          />
         ) : (
           <div className="max-h-96 divide-y divide-border overflow-y-auto rounded-md border border-border">
             {(consultations as ConsultationWithCreator[]).map((log) => {
@@ -76,10 +77,8 @@ export default function ConsultationListModal() {
                   onClick={() => setViewingConsultation(log)}
                   className="flex w-full flex-col gap-1 px-5 py-4 text-left transition-colors hover:bg-accent">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-base text-foreground">{log.title}</span>
-                    <span className="shrink-0 rounded-sm bg-solid-translucent-blue px-2 py-0.5 text-xs text-solid-blue">
-                      {dateStr}
-                    </span>
+                    <span className="font-medium text-foreground text-sm">{log.title}</span>
+                    <DateChip className="shrink-0">{dateStr}</DateChip>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground text-xs">
                     <span>{timeStr}</span>

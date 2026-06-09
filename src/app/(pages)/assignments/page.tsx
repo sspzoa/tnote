@@ -5,6 +5,7 @@ import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
 import Header from "@/shared/components/common/Header";
+import { MetricBadge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { SkeletonTable } from "@/shared/components/ui/skeleton";
@@ -66,7 +67,7 @@ export default function AssignmentsPage() {
               <History className="size-4" />
               최근 이력
               {allHistory.length > 0 && (
-                <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">
+                <span className="rounded-full bg-primary px-2 text-primary-foreground text-xs">
                   {allHistory.length}
                 </span>
               )}
@@ -75,6 +76,31 @@ export default function AssignmentsPage() {
           </div>
         }
       />
+
+      {fetchedTasks.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          <MetricBadge variant="neutral" label="전체" value={fetchedTasks.length} />
+          <MetricBadge
+            variant="warning"
+            label="검사예정"
+            value={fetchedTasks.filter((t) => t.status === "pending").length}
+          />
+          <MetricBadge
+            variant="success"
+            label="완료"
+            value={fetchedTasks.filter((t) => t.status === "completed").length}
+          />
+          <MetricBadge
+            variant="danger"
+            label="미흡·미제출·결석"
+            value={
+              fetchedTasks.filter(
+                (t) => t.status === "insufficient" || t.status === "not_submitted" || t.status === "absent",
+              ).length
+            }
+          />
+        </div>
+      )}
 
       <AssignmentTaskFilters />
 

@@ -16,7 +16,7 @@ export default function ErrorComponent({ errorMessage }: ErrorComponentProps) {
         </svg>
       </div>
       <div className="flex flex-col gap-1 text-center">
-        <p className="font-medium text-base text-foreground">문제가 발생했습니다</p>
+        <p className="font-medium text-foreground text-sm">문제가 발생했습니다</p>
         <p className="text-muted-foreground text-sm">{errorMessage}</p>
       </div>
     </div>

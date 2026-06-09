@@ -7,9 +7,9 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-7 px-7 py-10">
-      <h1 className="font-bold text-5xl text-foreground">이용약관</h1>
+      <h1 className="font-semibold text-5xl text-foreground tracking-tight">이용약관</h1>
 
-      <div className="flex flex-col gap-7 text-base text-muted-foreground">
+      <div className="flex flex-col gap-7 text-muted-foreground text-sm leading-relaxed">
         <section className="flex flex-col gap-3">
           <h2 className="font-semibold text-2xl text-foreground">제1조 (목적)</h2>
           <p>

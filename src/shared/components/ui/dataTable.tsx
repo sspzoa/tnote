@@ -15,6 +15,8 @@ export interface DataTableColumn<T, K extends string = string> {
   /** When set (and a matching comparator exists), the header becomes a sort toggle. */
   sortKey?: K;
   align?: "left" | "center" | "right";
+  /** Right-aligns and applies `tabular-nums font-medium` to header + cell (for score/count/rank columns). */
+  numeric?: boolean;
   /** Applied to the body `<td>`. */
   className?: string;
   /** Applied to the header `<th>`. */
@@ -63,9 +65,9 @@ export function DataTable<T, K extends string = string>({
   });
 
   return (
-    <div className={cn("overflow-hidden rounded-lg border bg-card", className)}>
+    <div className={cn("overflow-hidden rounded-2xl border border-transparent bg-card shadow-sm", className)}>
       <Table>
-        <TableHeader className="bg-muted">
+        <TableHeader className="bg-muted/40">
           <TableRow className="hover:bg-transparent">
             {columns.map((col) => {
               const sortable = !!col.sortKey && !!comparators?.[col.sortKey];
@@ -74,8 +76,8 @@ export function DataTable<T, K extends string = string>({
                 <TableHead
                   key={col.id}
                   className={cn(
-                    "text-xs font-medium",
-                    col.align && alignClass[col.align],
+                    "font-semibold text-xs",
+                    col.numeric ? "text-right" : col.align && alignClass[col.align],
                     sortable && "cursor-pointer select-none transition-colors hover:text-foreground",
                     col.headerClassName,
                   )}
@@ -84,7 +86,7 @@ export function DataTable<T, K extends string = string>({
                     className={cn(
                       "inline-flex items-center gap-1",
                       col.align === "center" && "justify-center",
-                      col.align === "right" && "justify-end",
+                      (col.align === "right" || col.numeric) && "justify-end",
                     )}>
                     {col.header}
                     {sortable &&
@@ -108,16 +110,22 @@ export function DataTable<T, K extends string = string>({
             Array.from({ length: skeletonRows }).map((_, rowIndex) => (
               <TableRow key={`skeleton-${rowIndex}`} className="hover:bg-transparent">
                 {columns.map((col) => (
-                  <TableCell key={col.id} className={cn(col.align && alignClass[col.align], col.className)}>
-                    <Skeleton className="h-4 w-full max-w-[120px]" />
+                  <TableCell
+                    key={col.id}
+                    className={cn(col.numeric ? "text-right" : col.align && alignClass[col.align], col.className)}>
+                    <Skeleton className={cn("h-4 w-full max-w-[120px]", col.numeric && "ml-auto")} />
                   </TableCell>
                 ))}
               </TableRow>
             ))
-          ) : sortedData.length === 0 && empty ? (
+          ) : sortedData.length === 0 ? (
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={columns.length} className="h-32 whitespace-normal p-0 text-center">
-                {empty}
+                {empty ?? (
+                  <div className="flex h-32 items-center justify-center text-muted-foreground text-sm">
+                    데이터가 없습니다.
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ) : (
@@ -125,9 +133,26 @@ export function DataTable<T, K extends string = string>({
               <TableRow
                 key={getRowId(row)}
                 className={cn(onRowClick && "cursor-pointer", rowClassName?.(row))}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}>
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                role={onRowClick ? "button" : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }>
                 {columns.map((col) => (
-                  <TableCell key={col.id} className={cn(col.align && alignClass[col.align], col.className)}>
+                  <TableCell
+                    key={col.id}
+                    className={cn(
+                      col.numeric ? "text-right font-medium tabular-nums" : col.align && alignClass[col.align],
+                      col.className,
+                    )}>
                     {col.cell(row)}
                   </TableCell>
                 ))}

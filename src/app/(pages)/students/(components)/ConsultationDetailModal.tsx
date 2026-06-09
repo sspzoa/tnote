@@ -83,7 +83,7 @@ export default function ConsultationDetailModal({ consultation, studentName, onC
           </Button>
         </>
       }>
-      <div className="whitespace-pre-wrap text-base text-foreground">{consultation?.content}</div>
+      <div className="whitespace-pre-wrap text-foreground text-sm">{consultation?.content}</div>
     </Modal>
   );
 }

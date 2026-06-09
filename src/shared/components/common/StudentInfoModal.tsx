@@ -59,21 +59,21 @@ export default function StudentInfoModal({
       ) : (
         <div className="flex flex-col gap-7">
           <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-base text-foreground">기본 정보</h3>
+            <h3 className="font-semibold text-foreground text-sm">기본 정보</h3>
             <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted p-5">
               <div className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">이름</span>
-                <span className="font-medium text-base text-foreground">{studentDetail.student.name}</span>
+                <span className="font-medium text-foreground text-sm">{studentDetail.student.name}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">전화번호</span>
-                <span className="font-medium text-base text-foreground">
+                <span className="font-medium text-foreground text-sm">
                   {formatPhoneNumber(studentDetail.student.phoneNumber)}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">학부모 번호</span>
-                <span className="font-medium text-base text-foreground">
+                <span className="font-medium text-foreground text-sm">
                   {studentDetail.student.parentPhoneNumber
                     ? formatPhoneNumber(studentDetail.student.parentPhoneNumber)
                     : "-"}
@@ -81,17 +81,17 @@ export default function StudentInfoModal({
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">학교</span>
-                <span className="font-medium text-base text-foreground">{studentDetail.student.school || "-"}</span>
+                <span className="font-medium text-foreground text-sm">{studentDetail.student.school || "-"}</span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">학년</span>
-                <span className="font-medium text-base text-foreground">
+                <span className="font-medium text-foreground text-sm">
                   {getGrade(studentDetail.student.birthYear) || "-"}
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-muted-foreground text-xs">등록일</span>
-                <span className="font-medium text-base text-foreground">
+                <span className="font-medium text-foreground text-sm">
                   {formatLocaleDateKorean(studentDetail.student.createdAt)}
                 </span>
               </div>
@@ -99,7 +99,7 @@ export default function StudentInfoModal({
                 studentDetail.student.requiredClinicWeekdays.length > 0 && (
                   <div className="col-span-2 flex flex-col gap-0.5">
                     <span className="text-muted-foreground text-xs">클리닉 필참요일</span>
-                    <span className="font-medium text-base text-foreground">
+                    <span className="font-medium text-foreground text-sm">
                       {formatClinicWeekdays(studentDetail.student.requiredClinicWeekdays)}
                     </span>
                   </div>
@@ -126,7 +126,7 @@ export default function StudentInfoModal({
           </section>
 
           <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-base text-foreground">수강 중인 수업</h3>
+            <h3 className="font-semibold text-foreground text-sm">수강 중인 수업</h3>
             {studentDetail.courses.length === 0 ? (
               <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
                 수강 중인 수업이 없습니다.
@@ -136,7 +136,7 @@ export default function StudentInfoModal({
                 {studentDetail.courses.map((course) => (
                   <div key={course.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-4">
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-medium text-base text-foreground">{course.name}</span>
+                      <span className="truncate font-medium text-foreground text-sm">{course.name}</span>
                       <span className="text-muted-foreground text-xs">
                         등록: {formatLocaleDateKorean(course.enrolled_at)}
                       </span>
@@ -151,7 +151,7 @@ export default function StudentInfoModal({
           </section>
 
           <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-base text-foreground">
+            <h3 className="font-semibold text-foreground text-sm">
               시험 성적
               {examScores.length > 0 && (
                 <span className="ml-1 font-normal text-muted-foreground">
@@ -171,7 +171,7 @@ export default function StudentInfoModal({
                   return (
                     <div key={score.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span className="truncate font-medium text-base text-foreground">
+                        <span className="truncate font-medium text-foreground text-sm">
                           {score.exam.course.name} - {score.exam.name}
                         </span>
                         <span className="text-muted-foreground text-xs">
@@ -202,7 +202,7 @@ export default function StudentInfoModal({
           </section>
 
           <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-base text-foreground">
+            <h3 className="font-semibold text-foreground text-sm">
               과제 현황
               {assignmentHistory.length > 0 && (
                 <span className="ml-1 font-normal text-muted-foreground">
@@ -219,7 +219,7 @@ export default function StudentInfoModal({
                 {assignmentHistory.slice(0, 5).map((item) => (
                   <div key={item.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-medium text-base text-foreground">
+                      <span className="truncate font-medium text-foreground text-sm">
                         {item.assignment.course.name} - {item.assignment.name}
                       </span>
                     </div>
@@ -235,7 +235,7 @@ export default function StudentInfoModal({
           </section>
 
           <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-base text-foreground">
+            <h3 className="font-semibold text-foreground text-sm">
               최근 클리닉 출석
               {studentDetail.clinicHistory.length > 0 && (
                 <span className="ml-1 font-normal text-muted-foreground">
@@ -264,7 +264,7 @@ export default function StudentInfoModal({
                             day: "numeric",
                           })}
                         </span>
-                        <span className="truncate text-base text-foreground">{history.clinic.name}</span>
+                        <span className="truncate text-foreground text-sm">{history.clinic.name}</span>
                         {history.isRequired && <span className="shrink-0 text-primary text-xs">필참</span>}
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
@@ -283,7 +283,7 @@ export default function StudentInfoModal({
           </section>
 
           <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-base text-foreground">
+            <h3 className="font-semibold text-foreground text-sm">
               최근 재시험
               {studentDetail.retakeHistory.length > 0 && (
                 <span className="ml-1 font-normal text-muted-foreground">
@@ -300,7 +300,7 @@ export default function StudentInfoModal({
                 {studentDetail.retakeHistory.slice(0, 5).map((retake) => (
                   <div key={retake.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-4">
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-medium text-base text-foreground">
+                      <span className="truncate font-medium text-foreground text-sm">
                         {retake.exam.course.name} - {retake.exam.name}
                       </span>
                       <div className="flex items-center gap-2 text-muted-foreground text-xs">

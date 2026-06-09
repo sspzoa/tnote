@@ -62,7 +62,7 @@ export default function WorkspaceDeleteModal() {
       }>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2 rounded-md border border-destructive/30 bg-solid-translucent-red p-4">
-          <p className="font-semibold text-base text-destructive">경고: 이 작업은 되돌릴 수 없습니다!</p>
+          <p className="font-semibold text-destructive text-sm">경고: 이 작업은 되돌릴 수 없습니다!</p>
           <ul className="flex list-inside list-disc flex-col gap-1 text-muted-foreground text-sm">
             <li>모든 학생 데이터가 삭제됩니다</li>
             <li>모든 수업 및 시험 데이터가 삭제됩니다</li>
@@ -74,7 +74,7 @@ export default function WorkspaceDeleteModal() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-base text-foreground">
+          <p className="text-foreground text-sm">
             삭제를 확인하려면 <span className="font-bold text-destructive">{CONFIRM_TEXT}</span>를 입력하세요.
           </p>
           <FormInput

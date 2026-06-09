@@ -19,15 +19,17 @@ export const DashboardCard = ({
   scrollable,
   noPadding,
 }: DashboardCardProps) => (
-  <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card print:overflow-visible print:rounded-none print:border-0 print:bg-white">
-    <div className="flex items-center gap-2 border-border border-b bg-muted px-4 py-3 print:bg-transparent print:px-0 print:py-2">
-      <Icon className="size-4 text-muted-foreground" />
-      <h3 className="font-semibold text-foreground text-sm">{title}</h3>
+  <div className="flex flex-col overflow-hidden rounded-2xl border border-transparent bg-card shadow-sm print:overflow-visible print:rounded-none print:border print:bg-white print:shadow-none">
+    <div className="flex items-center gap-2.5 px-5 py-4 print:px-0 print:py-2">
+      <span className="flex size-8 items-center justify-center rounded-xl bg-primary-soft text-primary print:hidden">
+        <Icon className="size-4" />
+      </span>
+      <h3 className="font-semibold text-base text-foreground tracking-[-0.01em]">{title}</h3>
     </div>
     {isEmpty ? (
-      <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground print:py-3">
+      <div className="flex flex-col items-center justify-center gap-2 px-5 pb-8 text-muted-foreground print:py-3">
         <Icon className="h-8 w-8 opacity-30 print:hidden" />
-        <span className="text-xs">{emptyMessage}</span>
+        <span className="text-sm">{emptyMessage}</span>
       </div>
     ) : (
       <div

@@ -111,7 +111,7 @@ export function SubmissionModal({
       subtitle={assignment.name}
       footer={
         <div className="flex w-full flex-col gap-3">
-          <div className="flex flex-col gap-1 text-base">
+          <div className="flex flex-col gap-1 text-sm">
             <span className="text-muted-foreground">입력: {submissionCount}명</span>
             <span className="text-muted-foreground text-xs">상태 변경은 과제 관리 페이지에서만 가능합니다.</span>
           </div>

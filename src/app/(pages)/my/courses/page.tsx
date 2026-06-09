@@ -45,7 +45,7 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
         <div className="h-52">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
               <XAxis
                 dataKey="name"
                 tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
@@ -79,10 +79,10 @@ const PercentileChart = ({ scores }: { scores: MyExamScore[] }) => {
               <Line
                 type="monotone"
                 dataKey="percentile"
-                stroke="var(--primary)"
-                strokeWidth={2.5}
-                dot={{ r: 4, fill: "var(--primary)", strokeWidth: 0 }}
-                activeDot={{ r: 6, fill: "var(--primary)", strokeWidth: 2, stroke: "white" }}
+                stroke="var(--chart-1)"
+                strokeWidth={1.5}
+                dot={{ r: 3, fill: "var(--chart-1)", strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: "var(--chart-1)", strokeWidth: 2, stroke: "var(--card)" }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -133,6 +133,7 @@ export default function MyCoursesPage() {
       id: "score",
       header: "내 점수",
       sortKey: "score",
+      numeric: true,
       cell: (score) => (
         <span className="font-medium text-foreground">
           {score.score}
@@ -144,6 +145,7 @@ export default function MyCoursesPage() {
       id: "rank",
       header: "등수",
       sortKey: "rank",
+      numeric: true,
       cell: (score) => (
         <span className="text-foreground">
           {score.rank}
@@ -155,18 +157,21 @@ export default function MyCoursesPage() {
       id: "average",
       header: "평균",
       sortKey: "average",
+      numeric: true,
       cell: (score) => <span className="text-foreground">{score.average}</span>,
     },
     {
       id: "median",
       header: "중앙값",
       sortKey: "median",
+      numeric: true,
       cell: (score) => <span className="text-foreground">{score.median}</span>,
     },
     {
       id: "highest",
       header: "최고점",
       sortKey: "highest",
+      numeric: true,
       cell: (score) => <span className="text-foreground">{score.highest}</span>,
     },
     {

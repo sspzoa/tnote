@@ -1,3 +1,4 @@
+import { cn } from "@/shared/lib/utils/cn";
 import type { CalendarEvent } from "@/shared/types";
 
 interface Props {
@@ -5,49 +6,40 @@ interface Props {
   onClick: () => void;
 }
 
-const getEventStyle = (event: CalendarEvent) => {
+// Token-driven event styling (replaces inline hex) → respects dark mode and theming automatically.
+// Static literals so Tailwind's JIT picks them up. course→primary, retake→destructive, clinic→event-clinic,
+// assignment→warning; completed→success, absent→neutral.
+const NEUTRAL = "border-l-muted-foreground bg-muted text-muted-foreground";
+
+const getEventClass = (event: CalendarEvent): string => {
   switch (event.type) {
     case "course":
-      return { color: "#2563EB", backgroundColor: "rgba(59, 130, 246, 0.12)" };
+      return "border-l-primary bg-primary/10 text-primary";
     case "retake":
-      if (event.metadata?.status === "completed") {
-        return { color: "#059669", backgroundColor: "rgba(16, 185, 129, 0.12)" };
-      }
-      if (event.metadata?.status === "absent") {
-        return { color: "#4B5563", backgroundColor: "rgba(107, 114, 128, 0.12)" };
-      }
-      return { color: "#DC2626", backgroundColor: "rgba(239, 68, 68, 0.12)" };
+      if (event.metadata?.status === "completed") return "border-l-success bg-success/10 text-success";
+      if (event.metadata?.status === "absent") return NEUTRAL;
+      return "border-l-destructive bg-destructive/10 text-destructive";
     case "clinic":
-      if (event.metadata?.status === "attended") {
-        return { color: "#059669", backgroundColor: "rgba(16, 185, 129, 0.12)" };
-      }
-      if (event.metadata?.status === "absent") {
-        return { color: "#4B5563", backgroundColor: "rgba(107, 114, 128, 0.12)" };
-      }
-      return { color: "#7C3AED", backgroundColor: "rgba(139, 92, 246, 0.12)" };
+      if (event.metadata?.status === "attended") return "border-l-success bg-success/10 text-success";
+      if (event.metadata?.status === "absent") return NEUTRAL;
+      return "border-l-event-clinic bg-event-clinic/10 text-event-clinic";
     case "assignment":
-      if (event.metadata?.status === "completed") {
-        return { color: "#059669", backgroundColor: "rgba(16, 185, 129, 0.12)" };
-      }
-      return { color: "#D97706", backgroundColor: "rgba(245, 158, 11, 0.16)" };
+      if (event.metadata?.status === "completed") return "border-l-success bg-success/10 text-success";
+      return "border-l-warning bg-warning/10 text-warning";
     default:
-      return { color: "#6B7280", backgroundColor: "rgba(107, 114, 128, 0.12)" };
+      return NEUTRAL;
   }
 };
 
 export default function CalendarEventItem({ event, onClick }: Props) {
-  const style = getEventStyle(event);
-
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full truncate rounded-sm px-1.5 py-0.5 text-left text-xs transition-all duration-150 hover:scale-[1.02]"
-      style={{
-        backgroundColor: style.backgroundColor,
-        color: style.color,
-        borderLeft: `3px solid ${style.color}`,
-      }}>
+      className={cn(
+        "w-full truncate rounded-md border-l-[3px] px-2 py-0.5 text-left text-xs transition-transform duration-150 hover:scale-[1.02]",
+        getEventClass(event),
+      )}>
       {event.title}
     </button>
   );

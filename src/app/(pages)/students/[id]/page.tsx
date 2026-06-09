@@ -30,6 +30,7 @@ import {
   DashboardSkeleton,
   formatDaysOfWeek,
   isTagActive,
+  ScoreTrendChart,
   StatCard,
 } from "./(components)";
 
@@ -77,8 +78,18 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
     defaultSort: { key: "exam", direction: "desc" },
   });
 
+  const trendData = [...examScores]
+    .filter((s) => s.maxScore && s.maxScore > 0)
+    .sort((a, b) => a.exam.examNumber - b.exam.examNumber)
+    .map((s) => ({ name: `${s.exam.examNumber}회`, value: Math.round((s.score / (s.maxScore as number)) * 100) }));
+
   return (
-    <section className={printHidden ? "print:hidden" : ""}>
+    <section className={`flex flex-col gap-6 ${printHidden ? "print:hidden" : ""}`}>
+      {trendData.length >= 2 && (
+        <DashboardCard title="성적 추이" icon={TrendingUp} noPadding>
+          <ScoreTrendChart data={trendData} />
+        </DashboardCard>
+      )}
       <DashboardCard
         title="시험 성적"
         icon={TrendingUp}
@@ -134,7 +145,7 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                   onSort={toggleSort}
                   className="print:hidden"
                 />
-                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                   결과
                 </th>
               </tr>
@@ -146,31 +157,31 @@ const ExamScoreTable = ({ examScores, printHidden }: { examScores: ExamScoreInfo
                 return (
                   <tr key={score.id} className="border-border border-t transition-colors hover:bg-muted/50">
                     <td className="whitespace-nowrap px-4 py-2.5">
-                      <div className="text-sm text-foreground">{score.exam.name}</div>
+                      <div className="text-foreground text-sm">{score.exam.name}</div>
                       <div className="text-muted-foreground text-xs">
                         {score.exam.course.name} {score.exam.examNumber}회차
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
-                      <span className="font-medium text-sm text-foreground">
+                      <span className={`font-medium text-sm ${failed ? "text-destructive" : "text-foreground"}`}>
                         {score.score}
                         {score.maxScore != null && <span className="text-muted-foreground">/{score.maxScore}</span>}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
-                      <span className="text-sm text-foreground">
+                      <span className="text-foreground text-sm">
                         {score.rank}
                         <span className="text-muted-foreground">/{score.totalStudents}</span>
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5 print:hidden">
-                      <span className="text-sm text-foreground">{score.average}</span>
+                      <span className="text-foreground text-sm">{score.average}</span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5 print:hidden">
-                      <span className="text-sm text-foreground">{score.median}</span>
+                      <span className="text-foreground text-sm">{score.median}</span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5 print:hidden">
-                      <span className="text-sm text-foreground">{score.highest}</span>
+                      <span className="text-foreground text-sm">{score.highest}</span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
                       {passed && (
@@ -215,13 +226,13 @@ const AssignmentHistoryTable = ({
           <table className="w-full">
             <thead className="bg-muted">
               <tr>
-                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                   과제명
                 </th>
-                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                   수업
                 </th>
-                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                   상태
                 </th>
               </tr>
@@ -234,8 +245,8 @@ const AssignmentHistoryTable = ({
                 };
                 return (
                   <tr key={item.id} className="border-border border-t transition-colors hover:bg-muted/50">
-                    <td className="whitespace-nowrap px-4 py-2.5 text-sm text-foreground">{item.assignment.name}</td>
-                    <td className="whitespace-nowrap px-4 py-2.5 text-sm text-muted-foreground">
+                    <td className="whitespace-nowrap px-4 py-2.5 text-foreground text-sm">{item.assignment.name}</td>
+                    <td className="whitespace-nowrap px-4 py-2.5 text-muted-foreground text-sm">
                       {item.assignment.course.name}
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
@@ -305,7 +316,7 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
                   currentDirection={sortState.direction}
                   onSort={toggleSort}
                 />
-                <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                   비고
                 </th>
               </tr>
@@ -319,13 +330,13 @@ const RetakeTable = ({ retakes, printHidden }: { retakes: RetakeHistoryInfo[]; p
                 return (
                   <tr key={retake.id} className="border-border border-t transition-colors hover:bg-muted/50">
                     <td className="whitespace-nowrap px-4 py-2.5">
-                      <div className="text-sm text-foreground">{retake.exam.name}</div>
+                      <div className="text-foreground text-sm">{retake.exam.name}</div>
                       <div className="text-muted-foreground text-xs">
                         {retake.exam.course.name} {retake.exam.examNumber}회차
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
-                      <span className="text-sm text-foreground">{retake.scheduledDate || "-"}</span>
+                      <span className="text-foreground text-sm">{retake.scheduledDate || "-"}</span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">
                       <Badge variant={status.variant} size="sm">
@@ -433,7 +444,7 @@ export default function StudentDetailPage() {
       <div className="flex flex-col gap-7 print:gap-3">
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between print:hidden">
-            <Link href="/students" className="text-sm text-primary hover:underline">
+            <Link href="/students" className="text-primary text-sm hover:underline">
               ← 학생 목록으로 돌아가기
             </Link>
             <Button variant="secondary" size="sm" onClick={() => setShowPrintModal(true)}>
@@ -444,40 +455,47 @@ export default function StudentDetailPage() {
             </Button>
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-5 print:rounded-none print:border-0 print:border-border print:border-b print:bg-white print:p-0 print:pb-3">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <h1 className="font-semibold text-foreground text-xl">{studentDetail.student.name}</h1>
-                  {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
-                    <Badge variant="blue" size="xs">
-                      {getGrade(studentDetail.student.birthYear)}
-                    </Badge>
-                  )}
-                </div>
+          <div className="rounded-2xl border border-transparent bg-card p-5 shadow-sm print:rounded-none print:border-0 print:border-border print:border-b print:bg-white print:p-0 print:pb-3 print:shadow-none">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-4">
+                <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary-soft font-bold text-2xl text-primary print:hidden">
+                  {studentDetail.student.name.charAt(0)}
+                </span>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <h1 className="font-bold text-2xl text-foreground tracking-[-0.02em]">
+                      {studentDetail.student.name}
+                    </h1>
+                    {studentDetail.student.birthYear && getGrade(studentDetail.student.birthYear) && (
+                      <Badge variant="blue" size="xs">
+                        {getGrade(studentDetail.student.birthYear)}
+                      </Badge>
+                    )}
+                  </div>
 
-                <p className="text-sm text-muted-foreground">{studentDetail.student.school || "학교 정보 없음"}</p>
+                  <p className="text-muted-foreground text-sm">{studentDetail.student.school || "학교 정보 없음"}</p>
 
-                <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
-                  <span className="flex items-center gap-1">
-                    <span className="text-muted-foreground">본인</span>
-                    {formatPhoneNumber(studentDetail.student.phoneNumber)}
-                  </span>
-                  {studentDetail.student.parentPhoneNumber && (
+                  <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-xs">
                     <span className="flex items-center gap-1">
-                      <span className="text-muted-foreground">학부모</span>
-                      {formatPhoneNumber(studentDetail.student.parentPhoneNumber)}
+                      <span className="text-muted-foreground">본인</span>
+                      {formatPhoneNumber(studentDetail.student.phoneNumber)}
                     </span>
-                  )}
-                  {studentDetail.student.requiredClinicWeekdays &&
-                    studentDetail.student.requiredClinicWeekdays.length > 0 && (
+                    {studentDetail.student.parentPhoneNumber && (
                       <span className="flex items-center gap-1">
-                        <span className="text-muted-foreground">클리닉 필참</span>
-                        {studentDetail.student.requiredClinicWeekdays
-                          .map((d) => ["일", "월", "화", "수", "목", "금", "토"][d])
-                          .join(", ")}
+                        <span className="text-muted-foreground">학부모</span>
+                        {formatPhoneNumber(studentDetail.student.parentPhoneNumber)}
                       </span>
                     )}
+                    {studentDetail.student.requiredClinicWeekdays &&
+                      studentDetail.student.requiredClinicWeekdays.length > 0 && (
+                        <span className="flex items-center gap-1">
+                          <span className="text-muted-foreground">클리닉 필참</span>
+                          {studentDetail.student.requiredClinicWeekdays
+                            .map((d) => ["일", "월", "화", "수", "목", "금", "토"][d])
+                            .join(", ")}
+                        </span>
+                      )}
+                  </div>
                 </div>
               </div>
 
@@ -562,7 +580,7 @@ export default function StudentDetailPage() {
                 key={course.id}
                 className="print-break-inside-avoid flex items-center justify-between gap-3 rounded-md border border-border bg-muted px-4 py-3 print:bg-transparent print:px-2 print:py-2">
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate font-medium text-sm text-foreground">{course.name}</span>
+                  <span className="truncate font-medium text-foreground text-sm">{course.name}</span>
                   <span className="text-muted-foreground text-xs">
                     등록: {new Date(course.enrolled_at).toLocaleDateString("ko-KR")}
                   </span>
@@ -590,16 +608,16 @@ export default function StudentDetailPage() {
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                     날짜
                   </th>
-                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                     클리닉
                   </th>
-                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                     출석
                   </th>
-                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-medium text-muted-foreground text-xs">
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs">
                     활동
                   </th>
                 </tr>
@@ -613,14 +631,14 @@ export default function StudentDetailPage() {
                   ].filter(Boolean);
                   return (
                     <tr key={history.id} className="border-border border-t transition-colors hover:bg-muted/50">
-                      <td className="whitespace-nowrap px-4 py-2.5 text-sm text-muted-foreground">
+                      <td className="whitespace-nowrap px-4 py-2.5 text-muted-foreground text-sm">
                         {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
                           month: "short",
                           day: "numeric",
                         })}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5">
-                        <span className="text-sm text-foreground">{history.clinic.name}</span>
+                        <span className="text-foreground text-sm">{history.clinic.name}</span>
                         {history.isRequired && <span className="ml-1 text-primary text-xs">필참</span>}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5">

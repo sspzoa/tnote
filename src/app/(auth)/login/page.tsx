@@ -152,7 +152,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-10 lg:flex lg:min-h-dvh lg:w-[480px]">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary to-[oklch(0.52_0.2_280)] p-10 lg:flex lg:min-h-dvh lg:w-[480px]">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
@@ -163,7 +163,7 @@ export default function LoginPage() {
         />
 
         <div className="relative z-10 flex items-center gap-2">
-          <div className="flex size-10 items-center justify-center rounded-sm bg-primary">
+          <div className="flex size-10 items-center justify-center rounded-md bg-solid-white/10 ring-1 ring-solid-white/20">
             <span className="font-bold text-sm text-solid-white">T</span>
           </div>
           <span className="font-bold text-sm text-solid-white">Tnote</span>
@@ -174,7 +174,7 @@ export default function LoginPage() {
             학생 관리,
             <br />더 스마트하게
           </h1>
-          <p className="text-base text-solid-white/50 leading-relaxed">
+          <p className="text-sm text-solid-white/50 leading-relaxed">
             시험, 과제, 상담까지.
             <br />
             선생님의 모든 학생 관리를 한 곳에서.
@@ -183,20 +183,20 @@ export default function LoginPage() {
             {heroFeatures.map((label) => (
               <span
                 key={label}
-                className="rounded-full bg-solid-white/8 px-3 py-1 text-[10px] leading-4 text-solid-white/40">
+                className="rounded-full bg-solid-white/8 px-3 py-1 text-[10px] text-solid-white/40 leading-4">
                 {label}
               </span>
             ))}
           </div>
         </div>
 
-        <p className="relative z-10 text-[10px] leading-4 text-solid-white/20">© {new Date().getFullYear()} Tnote</p>
+        <p className="relative z-10 text-[10px] text-solid-white/20 leading-4">© {new Date().getFullYear()} Tnote</p>
       </div>
 
       <div className="flex flex-1 flex-col justify-center bg-background p-7 lg:p-10">
         <div className="mx-auto w-full max-w-[400px]">
           <div className="mb-8 flex flex-col gap-1">
-            <h2 className="font-bold text-2xl text-foreground">로그인</h2>
+            <h2 className="font-semibold text-2xl text-foreground tracking-tight">로그인</h2>
             <p className="text-muted-foreground text-sm">계정에 로그인하여 시작하세요</p>
           </div>
 
@@ -257,11 +257,11 @@ export default function LoginPage() {
               <>
                 <div className="flex items-center gap-4">
                   <div className="h-px flex-1 bg-border" />
-                  <span className="text-[10px] leading-4 text-muted-foreground/60">또는</span>
+                  <span className="text-[10px] text-muted-foreground/60 leading-4">또는</span>
                   <div className="h-px flex-1 bg-border" />
                 </div>
 
-                <div className="text-center text-base text-muted-foreground">
+                <div className="text-center text-muted-foreground text-sm">
                   계정이 없으신가요?{" "}
                   <button
                     type="button"
@@ -274,7 +274,7 @@ export default function LoginPage() {
             )}
           </form>
 
-          <p className="mt-10 text-center text-[10px] leading-4 text-muted-foreground/60 lg:hidden">
+          <p className="mt-10 text-center text-[10px] text-muted-foreground/60 leading-4 lg:hidden">
             © {new Date().getFullYear()} Tnote
           </p>
         </div>
@@ -346,7 +346,7 @@ export default function LoginPage() {
             placeholder="비밀번호를 다시 입력하세요"
           />
 
-          <div className="flex flex-col gap-3 border-border border-t pt-4">
+          <div className="flex flex-col gap-3 rounded-md border border-border bg-muted/30 p-4">
             <p className="font-semibold text-foreground text-sm">
               약관 동의 <span className="text-destructive">*</span>
             </p>
@@ -358,7 +358,7 @@ export default function LoginPage() {
                   onChange={(e) => setAgreements({ terms: e.target.checked, privacy: e.target.checked })}
                   className="size-4 cursor-pointer rounded-sm border border-border bg-muted text-primary transition-all duration-150 checked:border-primary checked:bg-primary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 group-hover:border-primary/50"
                 />
-                <span className="font-medium text-base text-foreground">전체 동의</span>
+                <span className="font-medium text-foreground text-sm">전체 동의</span>
               </label>
               <div className="flex flex-col gap-2 pl-1">
                 <label className="group flex cursor-pointer items-center gap-2">
@@ -368,7 +368,7 @@ export default function LoginPage() {
                     onChange={(e) => setAgreements({ ...agreements, terms: e.target.checked })}
                     className="size-4 cursor-pointer rounded-sm border border-border bg-muted text-primary transition-all duration-150 checked:border-primary checked:bg-primary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 group-hover:border-primary/50"
                   />
-                  <span className="text-base text-muted-foreground">
+                  <span className="text-muted-foreground text-sm">
                     <a
                       href="/terms"
                       target="_blank"
@@ -386,7 +386,7 @@ export default function LoginPage() {
                     onChange={(e) => setAgreements({ ...agreements, privacy: e.target.checked })}
                     className="size-4 cursor-pointer rounded-sm border border-border bg-muted text-primary transition-all duration-150 checked:border-primary checked:bg-primary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 group-hover:border-primary/50"
                   />
-                  <span className="text-base text-muted-foreground">
+                  <span className="text-muted-foreground text-sm">
                     <a
                       href="/privacy"
                       target="_blank"

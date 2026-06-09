@@ -40,7 +40,7 @@ export const SortableHeader = <K extends string = string>({
   return (
     <th
       className={cn(
-        "h-10 cursor-pointer select-none whitespace-nowrap px-4 text-left align-middle font-medium text-muted-foreground text-xs transition-colors hover:text-foreground",
+        "h-10 cursor-pointer select-none whitespace-nowrap px-4 text-left align-middle font-semibold text-muted-foreground text-xs transition-colors hover:text-foreground",
         className,
       )}
       onClick={() => onSort(sortKey)}>

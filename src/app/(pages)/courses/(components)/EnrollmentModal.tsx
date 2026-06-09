@@ -100,7 +100,7 @@ export default function EnrollmentModal() {
       ) : (
         <div className="flex h-96 gap-5">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            <h3 className="font-bold text-base text-foreground">등록된 학생 ({enrolledStudents.length}명)</h3>
+            <h3 className="font-semibold text-foreground text-sm">등록된 학생 ({enrolledStudents.length}명)</h3>
             {enrolledStudents.length === 0 ? (
               <StudentListContainer className="flex-1">
                 <StudentListEmpty message="등록된 학생이 없습니다." />
@@ -137,7 +137,7 @@ export default function EnrollmentModal() {
           </div>
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            <h3 className="font-bold text-base text-foreground">학생 추가 ({unenrolledStudents.length}명)</h3>
+            <h3 className="font-semibold text-foreground text-sm">학생 추가 ({unenrolledStudents.length}명)</h3>
             {unenrolledStudents.length === 0 ? (
               <StudentListContainer className="flex-1">
                 <StudentListEmpty message="모든 학생이 등록되었습니다." />

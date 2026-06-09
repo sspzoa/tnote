@@ -3,6 +3,7 @@ import { ko } from "date-fns/locale";
 import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { cn } from "@/shared/lib/utils/cn";
 import type { CalendarEvent } from "@/shared/types";
 
 interface Props {
@@ -10,16 +11,17 @@ interface Props {
   onClose: () => void;
 }
 
-const getEventColor = (event: CalendarEvent) => {
-  if (event.type === "course") return "#3B82F6";
-  if (event.type === "retake") return "#EF4444";
+// Token-driven dot color (matches CalendarEventItem) — dark-mode safe, no hex.
+const getEventDotClass = (event: CalendarEvent) => {
+  if (event.type === "course") return "bg-primary";
+  if (event.type === "retake") return "bg-destructive";
   if (event.type === "assignment") {
-    return getMetadataStatus(event) === "completed" ? "#10B981" : "#F59E0B";
+    return getMetadataStatus(event) === "completed" ? "bg-success" : "bg-warning";
   }
   const status = getMetadataStatus(event);
-  if (status === "attended") return "#10B981";
-  if (status === "absent") return "#6B7280";
-  return "#8B5CF6";
+  if (status === "attended") return "bg-success";
+  if (status === "absent") return "bg-muted-foreground";
+  return "bg-event-clinic";
 };
 
 const getEventTypeLabel = (type: CalendarEvent["type"]) => {
@@ -175,19 +177,19 @@ export default function EventDetailModal({ event, onClose }: Props) {
         <div className="flex flex-col gap-1">
           <label className="block font-semibold text-muted-foreground text-sm">타입</label>
           <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-sm" style={{ backgroundColor: getEventColor(event) }} />
-            <span className="text-base text-foreground">{getEventTypeLabel(event.type)}</span>
+            <div className={cn("size-4 rounded-full", getEventDotClass(event))} />
+            <span className="text-foreground text-sm">{getEventTypeLabel(event.type)}</span>
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
           <label className="block font-semibold text-muted-foreground text-sm">제목</label>
-          <p className="text-base text-foreground">{event.title}</p>
+          <p className="text-foreground text-sm">{event.title}</p>
         </div>
 
         <div className="flex flex-col gap-1">
           <label className="block font-semibold text-muted-foreground text-sm">날짜</label>
-          <p className="text-base text-foreground">
+          <p className="text-foreground text-sm">
             {format(new Date(event.date), "yyyy년 M월 d일 (EEE)", { locale: ko })}
           </p>
         </div>
@@ -204,14 +206,14 @@ export default function EventDetailModal({ event, onClose }: Props) {
         {event.type === "clinic" && clinicName && clinicStudentName && (
           <div className="flex flex-col gap-1">
             <label className="block font-semibold text-muted-foreground text-sm">클리닉</label>
-            <p className="text-base text-foreground">{clinicName}</p>
+            <p className="text-foreground text-sm">{clinicName}</p>
           </div>
         )}
 
         {event.type === "clinic" && clinicStudentName && (
           <div className="flex flex-col gap-1">
             <label className="block font-semibold text-muted-foreground text-sm">학생</label>
-            <p className="text-base text-foreground">{clinicStudentDisplayLabel ?? clinicStudentName}</p>
+            <p className="text-foreground text-sm">{clinicStudentDisplayLabel ?? clinicStudentName}</p>
           </div>
         )}
 
@@ -264,21 +266,21 @@ export default function EventDetailModal({ event, onClose }: Props) {
         {event.type === "assignment" && courseName && (
           <div className="flex flex-col gap-1">
             <label className="block font-semibold text-muted-foreground text-sm">과목</label>
-            <p className="text-base text-foreground">{courseName}</p>
+            <p className="text-foreground text-sm">{courseName}</p>
           </div>
         )}
 
         {event.type === "assignment" && assignmentName && (
           <div className="flex flex-col gap-1">
             <label className="block font-semibold text-muted-foreground text-sm">과제</label>
-            <p className="text-base text-foreground">{assignmentName}</p>
+            <p className="text-foreground text-sm">{assignmentName}</p>
           </div>
         )}
 
         {event.type === "assignment" && studentName && (
           <div className="flex flex-col gap-1">
             <label className="block font-semibold text-muted-foreground text-sm">학생</label>
-            <p className="text-base text-foreground">{studentName}</p>
+            <p className="text-foreground text-sm">{studentName}</p>
           </div>
         )}
       </div>

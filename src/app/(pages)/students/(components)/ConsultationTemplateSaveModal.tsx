@@ -69,7 +69,7 @@ export default function ConsultationTemplateSaveModal({
         <div className="flex flex-col gap-2">
           <label className="block font-semibold text-foreground text-sm">저장할 내용</label>
           <div className="max-h-40 overflow-y-auto rounded-md border border-border bg-muted p-3">
-            <p className="whitespace-pre-wrap text-base text-muted-foreground">{content}</p>
+            <p className="whitespace-pre-wrap text-muted-foreground text-sm">{content}</p>
           </div>
         </div>
       </div>

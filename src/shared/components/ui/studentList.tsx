@@ -75,7 +75,7 @@ export const StudentListItem = memo(function StudentListItem({
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="truncate font-medium text-base text-foreground">{student.name}</span>
+          <span className="truncate font-medium text-foreground text-sm">{student.name}</span>
           {activeTags.length > 0 &&
             activeTags.map((assignment) => {
               const tag = assignment.tag;

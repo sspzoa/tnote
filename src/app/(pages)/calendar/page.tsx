@@ -4,6 +4,7 @@ import { addMonths, subMonths } from "date-fns";
 import { useState } from "react";
 import Container from "@/shared/components/common/Container";
 import Header from "@/shared/components/common/Header";
+import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import type { CalendarEvent } from "@/shared/types";
@@ -30,7 +31,7 @@ export default function CalendarPage() {
     assignment: true,
   });
 
-  const { events, isLoading } = useCalendarEvents(currentDate);
+  const { events, isLoading, error, refetch } = useCalendarEvents(currentDate);
 
   const filteredEvents = events.filter((event) => {
     if (event.type === "course" && !filters.course) return false;
@@ -64,7 +65,7 @@ export default function CalendarPage() {
           />
 
           {isLoading ? (
-            <div className="overflow-hidden rounded-md border border-border">
+            <div className="overflow-hidden rounded-lg border border-border shadow-xs">
               <div className="grid grid-cols-7 border-border border-b bg-muted">
                 {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
                   <div
@@ -94,25 +95,37 @@ export default function CalendarPage() {
                 })}
               </div>
             </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <p className="text-muted-foreground text-sm">캘린더 일정을 불러오지 못했습니다.</p>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
+                다시 시도
+              </Button>
+            </div>
           ) : (
-            <CalendarGrid
-              currentDate={currentDate}
-              events={filteredEvents}
-              expandedDays={expandedDays}
-              onEventClick={setSelectedEvent}
-              onToggleExpand={(day: Date) => {
-                setExpandedDays((prev) => {
-                  const key = day.toISOString();
-                  const next = new Set(prev);
-                  if (next.has(key)) {
-                    next.delete(key);
-                  } else {
-                    next.add(key);
-                  }
-                  return next;
-                });
-              }}
-            />
+            <>
+              <CalendarGrid
+                currentDate={currentDate}
+                events={filteredEvents}
+                expandedDays={expandedDays}
+                onEventClick={setSelectedEvent}
+                onToggleExpand={(day: Date) => {
+                  setExpandedDays((prev) => {
+                    const key = day.toISOString();
+                    const next = new Set(prev);
+                    if (next.has(key)) {
+                      next.delete(key);
+                    } else {
+                      next.add(key);
+                    }
+                    return next;
+                  });
+                }}
+              />
+              {filteredEvents.length === 0 && (
+                <p className="text-center text-muted-foreground text-xs">이 달에 일정이 없습니다.</p>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

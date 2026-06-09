@@ -142,7 +142,7 @@ export function ScoreInputModal({
       subtitle={`${exam.name} (${exam.exam_number}회차) - 만점: ${exam.max_score || 8}점, 커트라인: ${exam.cutline || 4}점`}
       footer={
         <div className="flex w-full flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-base">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
             <span className="text-muted-foreground">점수: {scoreCount}명</span>
             {belowCutlineCount > 0 && <span className="text-destructive">커트라인 미달: {belowCutlineCount}명</span>}
           </div>
@@ -212,7 +212,7 @@ export function ScoreInputModal({
                           placeholder="-"
                           min="0"
                           max={exam.max_score || 8}
-                          className={`w-16 rounded-md border px-2 py-2 text-center text-base transition-all focus:outline-none focus:ring-2 ${
+                          className={`w-16 rounded-md border px-2 py-2 text-center text-sm transition-all focus:outline-none focus:ring-2 ${
                             isBelowCutline
                               ? "border-destructive bg-solid-translucent-red text-destructive focus:ring-destructive/30"
                               : "border-border bg-card text-foreground focus:border-ring focus:ring-ring/50"

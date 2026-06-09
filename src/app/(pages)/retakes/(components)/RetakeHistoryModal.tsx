@@ -110,7 +110,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
         <HistoryListSkeleton count={4} />
       ) : history.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-base text-muted-foreground">이력이 없습니다.</p>
+          <p className="text-muted-foreground text-sm">이력이 없습니다.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -122,21 +122,21 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
                     {getActionLabel(item.action_type)}
                   </Badge>
                   {item.action_type === "assign" && item.new_date && (
-                    <span className="truncate text-base text-foreground">예정일: {item.new_date}</span>
+                    <span className="truncate text-foreground text-sm">예정일: {item.new_date}</span>
                   )}
                   {item.action_type === "assign" && !item.new_date && (
-                    <span className="truncate text-base text-muted-foreground">예정일 미지정</span>
+                    <span className="truncate text-muted-foreground text-sm">예정일 미지정</span>
                   )}
                   {(item.action_type === "postpone" ||
                     item.action_type === "date_edit" ||
                     item.action_type === "complete") &&
                     item.new_date && (
-                      <span className="truncate text-base text-foreground">
+                      <span className="truncate text-foreground text-sm">
                         {item.previous_date || "미지정"} → {item.new_date}
                       </span>
                     )}
                   {item.action_type === "status_change" && item.previous_status && item.new_status && (
-                    <span className="truncate text-base text-foreground">
+                    <span className="truncate text-foreground text-sm">
                       {item.previous_status === "pending"
                         ? "대기중"
                         : item.previous_status === "completed"
@@ -148,7 +148,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
                   {item.action_type === "management_status_change" &&
                     item.previous_management_status &&
                     item.new_management_status && (
-                      <span className="truncate text-base text-foreground">
+                      <span className="truncate text-foreground text-sm">
                         {item.previous_management_status} → {item.new_management_status}
                       </span>
                     )}
@@ -173,7 +173,7 @@ export default function RetakeHistoryModal({ onSuccess }: RetakeHistoryModalProp
                   )}
                 </div>
               </div>
-              {item.note && <p className="text-base text-muted-foreground">{item.note}</p>}
+              {item.note && <p className="text-muted-foreground text-sm">{item.note}</p>}
             </div>
           ))}
         </div>

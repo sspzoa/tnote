@@ -12,7 +12,7 @@ export function FilterBar({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col gap-3 rounded-lg border bg-card p-4", className)}>
+    <div className={cn("flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-xs", className)}>
       {label != null && <span className="font-medium text-muted-foreground text-xs">{label}</span>}
       {children}
     </div>
