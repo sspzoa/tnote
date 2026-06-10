@@ -9,7 +9,7 @@ Tnote (티노트) is a Korean **학원** (private academy) student-management Sa
 ## Commands
 
 ```bash
-bun dev            # dev server (Turbopack via next dev)
+bun dev            # dev server
 bun run build      # production build
 bun run typecheck  # tsc --noEmit
 bun run lint       # biome check (read-only)
@@ -20,8 +20,8 @@ bun test src/shared/lib/utils/date.test.ts   # single test file
 ```
 
 Notes:
-- Tests import from `node:test`/`node:assert` but **must be run with `bun test`**, not `node --test` (the date tests assert against the Asia/Seoul timezone and Bun handles the TS + intl setup transparently).
-- Package manager is **Bun** (`bun.lock`). React Compiler is enabled (`reactCompiler: true`) — do not hand-add `useMemo`/`useCallback` purely for referential stability.
+- Tests import from `node:test`/`node:assert` but **must be run with `bun test`**, not `node --test` (the date tests assert against the Asia/Seoul timezone and Bun handles the TS setup transparently).
+- Package manager is **Bun** (`bun.lock`). React Compiler is enabled (`reactCompiler: true` in `next.config.ts`) — do not hand-add `useMemo`/`useCallback` purely for referential stability.
 
 ## Architecture
 
@@ -29,19 +29,19 @@ Notes:
 Every domain row carries a `workspace` column. **Every query must filter by `session.workspace`**, and every insert must stamp it. This is enforced in application code, not (solely) by RLS — forgetting it leaks data across academies. The CRUD factories and most handlers apply `.eq("workspace", session.workspace)` for you; preserve that whenever you touch a query by hand.
 
 ### Auth = Supabase Auth (not custom JWT)
-There is **no custom JWT and no `jsonwebtoken` dependency**. Auth is Supabase Auth via cookie sessions (`@supabase/ssr`):
+Auth is Supabase Auth via cookie sessions (`@supabase/ssr`); there is no custom JWT:
 - Users have no real email — login maps phone → `` `${phoneNumber}@tnote.local` ``. `getSession()` strips the `@tnote.local` suffix back to a phone number.
 - `role` (`"owner" | "admin" | "student"`) and `workspace` live in Supabase `user_metadata`, read via `getSession()` in `src/shared/lib/supabase/auth.ts`.
 - Centralized request gating lives in **`src/proxy.ts`** (Next.js 16's renamed middleware). It refreshes the Supabase session on every request, returns 401 for unauthenticated API calls / redirects pages to `/login`, and confines `student`-role users to `/`, `/my/*`, and the `/api/my/*` + `/api/auth/*` endpoints. Handlers still re-check auth/roles via `withLogging`.
 
-### Two Supabase clients — pick deliberately (`src/shared/lib/supabase/`)
-- `createClient()` (server, anon key, cookie-scoped) — the default. Subject to RLS and the logged-in user's permissions. Used inside `withLogging` handlers as `ctx.supabase`.
+### Two Supabase clients — pick deliberately (`src/shared/lib/supabase/server.ts`)
+- `createClient()` (anon key, cookie-scoped) — the default. Subject to RLS and the logged-in user's permissions. Available inside `withLogging` handlers as `ctx.supabase`.
 - `createAdminClient()` (service-role key, **bypasses RLS**) — only for privileged operations: creating/deleting Supabase Auth users (`auth.admin.*`), registration, password resets. When you use it, you are responsible for workspace scoping manually.
-- `createClient()` in `client.ts` is the browser client (rarely used directly; data flows through the API + React Query instead).
+- There is no browser Supabase client — all client data flows through the API routes + React Query.
 
 ### API layer (`src/app/api/**` + `src/shared/lib/api/`)
 Route handlers are wrapped, never bare:
-- **`withLogging(handler, { resource, action, allowedRoles, requireAuth })`** — resolves the session, enforces `allowedRoles`, injects `ApiContext { request, session, supabase, params }`, and logs every request to Axiom via `after()`. Throwing `new Error("Unauthorized")` / `"Forbidden")"` inside a handler is converted to 401/403 with Korean messages; any other throw becomes a 500. Return Korean error bodies as `NextResponse.json({ error }, { status })`. `withPublicLogging` is the unauthenticated variant.
+- **`withLogging(handler, { resource, action, allowedRoles, requireAuth })`** — resolves the session, enforces `allowedRoles`, injects `ApiContext { request, session, supabase, params }`, and logs every request to Axiom via `after()`. Throwing `new Error("Unauthorized")` / `"Forbidden"` inside a handler is converted to 401/403 with Korean messages; any other throw becomes a 500. Return Korean error bodies as `NextResponse.json({ error }, { status })`. `withPublicLogging` is the unauthenticated variant.
 - **`createCrudRoute.ts`** factories — `createListHandler`, `createDetailHandler`, `createCreateHandler`, `createUpdateHandler`, `createDeleteHandler`. Use these for standard table CRUD; they auto-apply the workspace filter/stamp, map Postgres `23505` → 409, and standardize response shapes (`{ data }` for reads, `{ success, data }` for writes). Reach for a hand-written handler only when logic exceeds a simple table op (see `api/students/route.ts` for the pattern).
 - Role guards: `["owner", "admin"]` for teacher/staff endpoints; `["student"]` (or include it) for the student-facing `my/*` endpoints.
 
@@ -72,10 +72,10 @@ The DB (`StudentAssignments`/`StudentAssignmentHistory`) stores English statuses
 - **Validation/format utils** (`utils/`) — `phone.ts` (normalize/validate, strip hyphens — phone numbers are stored without hyphens), `password.ts`, `date.ts` (Korean/Asia-Seoul formatting). Prefer these over inline logic.
 
 ### Styling & theming
-Tailwind CSS v4 (config in `tailwind.config.ts`, imported from `globals.css`). Colors are CSS-variable **design tokens** (`--solid-*`, `--background-*`, `--text-*`, etc.) defined in `globals.css` with light/dark values; use the semantic Tailwind classes, not raw hex. Dark mode is class-based with an inline FOUC-prevention script in `layout.tsx` reading `localStorage["tnote-theme"]`.
+Tailwind CSS v4 — no `tailwind.config.ts`; all config lives in `src/app/globals.css` (`@theme inline` + `:root`/`.dark` token blocks). Colors are CSS-variable **design tokens** (`--solid-*`, `--feature-*`, `--background-*`, etc.); use the semantic Tailwind classes, not raw hex. Dark mode is class-based with an inline FOUC-prevention script in `layout.tsx` reading `localStorage["tnote-theme"]`.
 
 #### "Toss풍" design system (2026-06 redesign — keep these invariants)
-Friendly / rounded / colorful / soft. Floating white cards on a warm off-white page; the look comes from soft colored shadows + big radius + per-feature pastel accents + generous type. All values are oklch tokens in `globals.css` (`@theme inline` + `:root`/`.dark`). Light/dark/print must all keep working.
+Friendly / rounded / colorful / soft. Floating white cards on a warm off-white page; the look comes from soft colored shadows + big radius + per-feature pastel accents + generous type. All values are oklch tokens in `globals.css`. Light/dark/print must all keep working.
 - **Floating cards + big radius.** `--radius: 1rem` (ladder: sm10 / md12 / lg16 / xl24 / 2xl32). Cards/inputs/dialogs use the named radii; **buttons / chips / badges / search are `rounded-full` pills** (but never tall inputs — that reads toy-like). Surfaces lean on shadow, not borders (`border-transparent` + shadow on Card/DataTable/SectionCard).
 - **Soft elevation, 4 tiers + brand glow.** `--shadow-xs/-sm/-md/-lg` + `--shadow-brand` (mode-aware via `--elevation-*`; light = soft brand-tinted, dark = deep black + top-highlight inset). Tier-1 resting card = `shadow-sm`; interactive hover = `shadow-md + -translate-y-0.5`; Tier-2 (Dialog/Sheet/Popover) = `shadow-lg`; primary CTA / today-pill add `shadow-brand`. Never freelance a shadow.
 - **Color is welcome, but channeled.** Brand blue + a per-feature pastel set: `--feature-{calendar|messages|retakes|assignments|students|courses|clinics|admins}` (+`-soft`). These are **chrome accents only** (icon wells / section headers / nav-active / empty-state gradients) via the shared `toneWell` map (`ui/featureTone.ts`) used by `StatCard` / `SectionCard` / `IconBadge`. The `--solid-*` 11-hue palette stays **tags-only** — the two channels never cross. Soft semantic tints: `--{success|warning|destructive}-soft`, `--primary-soft` (pastel bg; text uses the solid hue or `*-soft-foreground` for AA).
@@ -88,17 +88,17 @@ Friendly / rounded / colorful / soft. Floating white cards on a warm off-white p
 
 ## Environment variables
 
-Actually consumed by the code (the README's `JWT_*` and `SOLAPI_*` entries are stale — JWT is unused, Solapi creds are per-workspace in the DB):
+See `.env.example`:
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase client (required)
+- `SUPABASE_SERVICE_ROLE_KEY` — admin client, server only (required)
+- `AXIOM_TOKEN`, `AXIOM_DATASET` (optional) — logging is a no-op without the token
 
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase client
-- `SUPABASE_SERVICE_ROLE_KEY` — admin client (server only)
-- `AXIOM_TOKEN`, `AXIOM_DATASET` (optional) — logging; logging is a no-op without the token
+Solapi (SMS) credentials are not env vars — they are stored per-workspace in the DB.
 
 ## Database
 
-Schema is **managed in Supabase, not in this repo** (no migrations directory). A Supabase MCP server is configured (`.mcp.json`) for inspecting/querying the live schema. Tables are PascalCase (`Users`, `Workspaces`, `Courses`, `CourseEnrollments`, `ConsultationLogs`, `StudentTags`, `StudentTagAssignments`, `StudentAssignments`, `StudentAssignmentHistory`, `Retakes`, `Exams`, `Clinics`, …). Students and staff are both rows in `Users` distinguished by `role`.
+Schema is **managed in Supabase, not in this repo** (no migrations directory). A Supabase MCP server is configured (`.mcp.json`, gitignored) for inspecting/querying the live schema. Tables are PascalCase (`Users`, `Workspaces`, `Courses`, `CourseEnrollments`, `ConsultationLogs`, `StudentTags`, `StudentTagAssignments`, `StudentAssignments`, `StudentAssignmentHistory`, `Retakes`, `Exams`, `Clinics`, …). Students and staff are both rows in `Users` distinguished by `role`.
 
 ## Conventions
 
 - **Code style**: Biome (`biome.json`) — 2-space indent, 120-col, double quotes, semicolons, trailing commas. `noExplicitAny` is **off** (the factories use `any` deliberately); `useExhaustiveDependencies` is off (React Compiler). Run `bun run lint:fix` before finishing.
-- `CLAUDE.md`, `.claude/`, and `.mcp.json` are gitignored — this file is local-only.
