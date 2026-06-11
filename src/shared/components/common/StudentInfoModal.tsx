@@ -1,12 +1,22 @@
 "use client";
 
+import { BookOpen, CalendarCheck, ClipboardList, FileText, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import type { ComponentType, ReactNode } from "react";
 
 import type { StudentDetail } from "@/app/(pages)/students/(hooks)/useStudentDetail";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import type { FeatureTone } from "@/shared/components/ui/featureTone";
 import { Modal } from "@/shared/components/ui/modal";
-import { formatClinicWeekdays, formatCourseDaysOfWeek, formatLocaleDateKorean } from "@/shared/lib/utils/date";
+import { SectionCard } from "@/shared/components/ui/sectionCard";
+import { StatStrip, type StatStripItem } from "@/shared/components/ui/statStrip";
+import {
+  formatClinicWeekdays,
+  formatCourseDaysOfWeek,
+  formatLocaleDateKorean,
+  formatLocaleMonthDayKorean,
+} from "@/shared/lib/utils/date";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { getGrade } from "@/shared/lib/utils/student";
 import { isTagActive } from "@/shared/lib/utils/tags";
@@ -26,6 +36,56 @@ interface StudentInfoModalProps {
   isLoading: boolean;
 }
 
+/** One uniform record row across every list section: title + meta sub-line on the left, trailing slot on the right. */
+function RecordRow({ title, meta, trailing }: { title: ReactNode; meta?: ReactNode; trailing?: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-border border-b px-5 py-3 transition-colors last:border-b-0 hover:bg-muted/40">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate font-medium text-foreground text-sm">{title}</span>
+        {meta && <span className="flex items-center gap-1.5 text-muted-foreground text-xs">{meta}</span>}
+      </div>
+      {trailing && <div className="flex shrink-0 items-center gap-2">{trailing}</div>}
+    </div>
+  );
+}
+
+/** SectionCard wrapper for the list slices — colored icon-well header + a count Badge + flush rows. */
+function ListSection({
+  title,
+  icon,
+  tone,
+  count,
+  emptyMessage,
+  children,
+}: {
+  title: string;
+  icon: ComponentType<{ className?: string }>;
+  tone: FeatureTone;
+  count: number;
+  emptyMessage: string;
+  children: ReactNode;
+}) {
+  const isEmpty = count === 0;
+  return (
+    <SectionCard
+      title={title}
+      icon={icon}
+      tone={tone}
+      noPadding
+      isEmpty={isEmpty}
+      emptyMessage={emptyMessage}
+      action={
+        !isEmpty && (
+          <Badge variant="neutral" size="xs">
+            {count}
+          </Badge>
+        )
+      }>
+      <div className="border-border border-t">{children}</div>
+    </SectionCard>
+  );
+}
+
 export default function StudentInfoModal({
   isOpen,
   onClose,
@@ -35,6 +95,28 @@ export default function StudentInfoModal({
 }: StudentInfoModalProps) {
   const examScores = studentDetail?.examScores || [];
   const assignmentHistory = studentDetail?.assignmentHistory || [];
+
+  const student = studentDetail?.student;
+  const grade = student ? getGrade(student.birthYear) : null;
+  const activeTags = (student?.tags || []).filter((assignment) =>
+    isTagActive(assignment.start_date, assignment.end_date),
+  );
+
+  const basicInfoItems: StatStripItem[] = student
+    ? [
+        { label: "전화번호", value: formatPhoneNumber(student.phoneNumber) },
+        {
+          label: "학부모 번호",
+          value: student.parentPhoneNumber ? formatPhoneNumber(student.parentPhoneNumber) : "-",
+        },
+        { label: "학교", value: student.school || "-" },
+        { label: "학년", value: grade || "-" },
+        { label: "등록일", value: formatLocaleDateKorean(student.createdAt) },
+        ...(student.requiredClinicWeekdays && student.requiredClinicWeekdays.length > 0
+          ? [{ label: "클리닉 필참요일", value: formatClinicWeekdays(student.requiredClinicWeekdays) }]
+          : []),
+      ]
+    : [];
 
   return (
     <Modal
@@ -54,285 +136,204 @@ export default function StudentInfoModal({
       }>
       {isLoading ? (
         <StudentInfoSkeleton />
-      ) : !studentDetail ? (
+      ) : !studentDetail || !student ? (
         <div className="py-16 text-center text-muted-foreground">학생 정보를 불러올 수 없습니다.</div>
       ) : (
-        <div className="flex flex-col gap-7">
-          <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">기본 정보</h3>
-            <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted p-5">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">이름</span>
-                <span className="font-medium text-foreground text-sm">{studentDetail.student.name}</span>
+        <div className="flex flex-col gap-6">
+          {/* Header band — identity cluster + contact meta */}
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 shadow-xs">
+            <div className="flex items-start gap-4">
+              <div className="flex min-w-0 flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold text-foreground text-lg tracking-[-0.01em]">{student.name}</span>
+                  {grade && (
+                    <Badge variant="info" size="xs">
+                      {grade}
+                    </Badge>
+                  )}
+                  {activeTags.map((assignment) => (
+                    <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
+                      {assignment.tag?.name}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs">
+                  <span className="tabular-nums">{formatPhoneNumber(student.phoneNumber)}</span>
+                  {student.parentPhoneNumber && (
+                    <span className="tabular-nums">학부모 {formatPhoneNumber(student.parentPhoneNumber)}</span>
+                  )}
+                  {student.school && <span>{student.school}</span>}
+                </div>
               </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">전화번호</span>
-                <span className="font-medium text-foreground text-sm">
-                  {formatPhoneNumber(studentDetail.student.phoneNumber)}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">학부모 번호</span>
-                <span className="font-medium text-foreground text-sm">
-                  {studentDetail.student.parentPhoneNumber
-                    ? formatPhoneNumber(studentDetail.student.parentPhoneNumber)
-                    : "-"}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">학교</span>
-                <span className="font-medium text-foreground text-sm">{studentDetail.student.school || "-"}</span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">학년</span>
-                <span className="font-medium text-foreground text-sm">
-                  {getGrade(studentDetail.student.birthYear) || "-"}
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-muted-foreground text-xs">등록일</span>
-                <span className="font-medium text-foreground text-sm">
-                  {formatLocaleDateKorean(studentDetail.student.createdAt)}
-                </span>
-              </div>
-              {studentDetail.student.requiredClinicWeekdays &&
-                studentDetail.student.requiredClinicWeekdays.length > 0 && (
-                  <div className="col-span-2 flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-xs">클리닉 필참요일</span>
-                    <span className="font-medium text-foreground text-sm">
-                      {formatClinicWeekdays(studentDetail.student.requiredClinicWeekdays)}
-                    </span>
-                  </div>
-                )}
-              {(() => {
-                const activeTags = (studentDetail.student.tags || []).filter((assignment) =>
-                  isTagActive(assignment.start_date, assignment.end_date),
-                );
-                if (activeTags.length === 0) return null;
-                return (
-                  <div className="col-span-2 flex flex-col gap-0.5">
-                    <span className="text-muted-foreground text-xs">태그</span>
-                    <div className="flex flex-wrap items-center gap-1">
-                      {activeTags.map((assignment) => (
-                        <Badge key={assignment.id} variant={assignment.tag?.color} size="xs">
-                          {assignment.tag?.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
-          </section>
+            <StatStrip orientation="vertical" items={basicInfoItems} className="border-border border-t pt-1" />
+          </div>
 
-          <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">수강 중인 수업</h3>
-            {studentDetail.courses.length === 0 ? (
-              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
-                수강 중인 수업이 없습니다.
-              </div>
-            ) : (
-              <div className="divide-y divide-border rounded-lg border border-border">
-                {studentDetail.courses.map((course) => (
-                  <div key={course.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-4">
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-medium text-foreground text-sm">{course.name}</span>
-                      <span className="text-muted-foreground text-xs">
-                        등록: {formatLocaleDateKorean(course.enrolled_at)}
-                      </span>
-                    </div>
-                    <Badge variant="blue" size="xs">
-                      {formatCourseDaysOfWeek(course.days_of_week)}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <ListSection
+            title="수강 중인 수업"
+            icon={BookOpen}
+            tone="courses"
+            count={studentDetail.courses.length}
+            emptyMessage="수강 중인 수업이 없습니다.">
+            {studentDetail.courses.map((course) => (
+              <RecordRow
+                key={course.id}
+                title={course.name}
+                meta={<span>등록 {formatLocaleDateKorean(course.enrolled_at)}</span>}
+                trailing={
+                  <Badge variant="blue" size="xs">
+                    {formatCourseDaysOfWeek(course.days_of_week)}
+                  </Badge>
+                }
+              />
+            ))}
+          </ListSection>
 
-          <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">
-              시험 성적
-              {examScores.length > 0 && (
-                <span className="ml-1 font-normal text-muted-foreground">
-                  ({Math.min(5, examScores.length)}/{examScores.length}개)
-                </span>
-              )}
-            </h3>
-            {examScores.length === 0 ? (
-              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
-                시험 기록이 없습니다.
-              </div>
-            ) : (
-              <div className="divide-y divide-border rounded-lg border border-border">
-                {examScores.slice(0, 5).map((score) => {
-                  const isPassed = score.cutline !== null && score.score >= score.cutline;
-                  const isFailed = score.cutline !== null && score.score < score.cutline;
-                  return (
-                    <div key={score.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
-                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span className="truncate font-medium text-foreground text-sm">
-                          {score.exam.course.name} - {score.exam.name}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          {score.score}
-                          {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
-                        </span>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <Badge variant="blue" size="xs">
-                          {score.exam.examNumber}회차
+          <ListSection
+            title="시험 성적"
+            icon={FileText}
+            tone="primary"
+            count={examScores.length}
+            emptyMessage="시험 기록이 없습니다.">
+            {examScores.slice(0, 5).map((score) => {
+              const isPassed = score.cutline !== null && score.score >= score.cutline;
+              const isFailed = score.cutline !== null && score.score < score.cutline;
+              return (
+                <RecordRow
+                  key={score.id}
+                  title={`${score.exam.course.name} · ${score.exam.name}`}
+                  meta={
+                    <span className="tabular-nums">
+                      {score.score}
+                      {score.maxScore !== null && `/${score.maxScore}`}점 · {score.rank}/{score.totalStudents}등
+                    </span>
+                  }
+                  trailing={
+                    <>
+                      <Badge variant="blue" size="xs">
+                        {score.exam.examNumber}회차
+                      </Badge>
+                      {isPassed && (
+                        <Badge variant="success" size="xs">
+                          통과
                         </Badge>
-                        {isPassed && (
-                          <Badge variant="success" size="xs">
-                            통과
-                          </Badge>
-                        )}
-                        {isFailed && (
-                          <Badge variant="danger" size="xs">
-                            재시험
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">
-              과제 현황
-              {assignmentHistory.length > 0 && (
-                <span className="ml-1 font-normal text-muted-foreground">
-                  ({Math.min(5, assignmentHistory.length)}/{assignmentHistory.length}개)
-                </span>
-              )}
-            </h3>
-            {assignmentHistory.length === 0 ? (
-              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
-                과제 기록이 없습니다.
-              </div>
-            ) : (
-              <div className="divide-y divide-border rounded-lg border border-border">
-                {assignmentHistory.slice(0, 5).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-medium text-foreground text-sm">
-                        {item.assignment.course.name} - {item.assignment.name}
-                      </span>
-                    </div>
-                    <Badge
-                      variant={item.status === "완료" ? "success" : item.status === "검사예정" ? "warning" : "danger"}
-                      size="xs">
-                      {item.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">
-              최근 클리닉 출석
-              {studentDetail.clinicHistory.length > 0 && (
-                <span className="ml-1 font-normal text-muted-foreground">
-                  ({Math.min(5, studentDetail.clinicHistory.length)}/{studentDetail.clinicHistory.length}개)
-                </span>
-              )}
-            </h3>
-            {studentDetail.clinicHistory.length === 0 ? (
-              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
-                클리닉 출석 기록이 없습니다.
-              </div>
-            ) : (
-              <div className="divide-y divide-border rounded-lg border border-border">
-                {studentDetail.clinicHistory.slice(0, 5).map((history) => {
-                  const activities = [
-                    history.didRetakeExam && "재시험",
-                    history.didHomeworkCheck && "숙제검사",
-                    history.didQa && "질의응답",
-                  ].filter(Boolean);
-                  return (
-                    <div key={history.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-3">
-                      <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <span className="shrink-0 text-muted-foreground text-xs">
-                          {new Date(history.attendanceDate).toLocaleDateString("ko-KR", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
-                        <span className="truncate text-foreground text-sm">{history.clinic.name}</span>
-                        {history.isRequired && <span className="shrink-0 text-primary text-xs">필참</span>}
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <Badge variant={history.status === "absent" ? "danger" : "success"} size="xs">
-                          {history.status === "absent" ? "결석" : "출석"}
+                      )}
+                      {isFailed && (
+                        <Badge variant="danger" size="xs">
+                          재시험
                         </Badge>
-                        {activities.length > 0 && (
-                          <span className="text-muted-foreground text-xs">{activities.join(", ")}</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+                      )}
+                    </>
+                  }
+                />
+              );
+            })}
+          </ListSection>
 
-          <section className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">
-              최근 재시험
-              {studentDetail.retakeHistory.length > 0 && (
-                <span className="ml-1 font-normal text-muted-foreground">
-                  ({Math.min(5, studentDetail.retakeHistory.length)}/{studentDetail.retakeHistory.length}개)
-                </span>
-              )}
-            </h3>
-            {studentDetail.retakeHistory.length === 0 ? (
-              <div className="rounded-lg border border-border bg-muted p-5 text-center text-muted-foreground text-xs">
-                재시험 기록이 없습니다.
-              </div>
-            ) : (
-              <div className="divide-y divide-border rounded-lg border border-border">
-                {studentDetail.retakeHistory.slice(0, 5).map((retake) => (
-                  <div key={retake.id} className="flex items-center justify-between gap-3 bg-muted px-5 py-4">
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate font-medium text-foreground text-sm">
-                        {retake.exam.course.name} - {retake.exam.name}
-                      </span>
-                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                        <span>
-                          {retake.scheduledDate
-                            ? new Date(retake.scheduledDate).toLocaleDateString("ko-KR", {
-                                month: "long",
-                                day: "numeric",
-                              })
-                            : "날짜 미정"}
+          <ListSection
+            title="과제 현황"
+            icon={ClipboardList}
+            tone="assignments"
+            count={assignmentHistory.length}
+            emptyMessage="과제 기록이 없습니다.">
+            {assignmentHistory.slice(0, 5).map((item) => (
+              <RecordRow
+                key={item.id}
+                title={`${item.assignment.course.name} · ${item.assignment.name}`}
+                trailing={
+                  <Badge
+                    variant={item.status === "완료" ? "success" : item.status === "검사예정" ? "warning" : "danger"}
+                    size="xs">
+                    {item.status}
+                  </Badge>
+                }
+              />
+            ))}
+          </ListSection>
+
+          <ListSection
+            title="최근 클리닉 출석"
+            icon={CalendarCheck}
+            tone="clinics"
+            count={studentDetail.clinicHistory.length}
+            emptyMessage="클리닉 출석 기록이 없습니다.">
+            {studentDetail.clinicHistory.slice(0, 5).map((history) => {
+              const activities = [
+                history.didRetakeExam && "재시험",
+                history.didHomeworkCheck && "숙제검사",
+                history.didQa && "질의응답",
+              ].filter(Boolean);
+              return (
+                <RecordRow
+                  key={history.id}
+                  title={history.clinic.name}
+                  meta={
+                    <>
+                      <span className="tabular-nums">{formatLocaleMonthDayKorean(history.attendanceDate)}</span>
+                      {activities.length > 0 && (
+                        <>
+                          <span className="text-muted-foreground/40">·</span>
+                          <span>{activities.join(", ")}</span>
+                        </>
+                      )}
+                    </>
+                  }
+                  trailing={
+                    <>
+                      {history.isRequired && (
+                        <Badge variant="info" size="xs">
+                          필참
+                        </Badge>
+                      )}
+                      <Badge variant={history.status === "absent" ? "danger" : "success"} size="xs">
+                        {history.status === "absent" ? "결석" : "출석"}
+                      </Badge>
+                    </>
+                  }
+                />
+              );
+            })}
+          </ListSection>
+
+          <ListSection
+            title="최근 재시험"
+            icon={RotateCcw}
+            tone="retakes"
+            count={studentDetail.retakeHistory.length}
+            emptyMessage="재시험 기록이 없습니다.">
+            {studentDetail.retakeHistory.slice(0, 5).map((retake) => (
+              <RecordRow
+                key={retake.id}
+                title={`${retake.exam.course.name} · ${retake.exam.name}`}
+                meta={
+                  <>
+                    <span className="tabular-nums">
+                      {retake.scheduledDate ? formatLocaleMonthDayKorean(retake.scheduledDate) : "날짜 미정"}
+                    </span>
+                    {(retake.postponeCount > 0 || retake.absentCount > 0) && (
+                      <>
+                        <span className="text-muted-foreground/40">·</span>
+                        <span className="text-muted-foreground/70">
+                          {retake.postponeCount > 0 && `연기 ${retake.postponeCount}회`}
+                          {retake.postponeCount > 0 && retake.absentCount > 0 && " / "}
+                          {retake.absentCount > 0 && `결석 ${retake.absentCount}회`}
                         </span>
-                        {(retake.postponeCount > 0 || retake.absentCount > 0) && (
-                          <span className="text-muted-foreground/60">
-                            {retake.postponeCount > 0 && `연기 ${retake.postponeCount}회`}
-                            {retake.postponeCount > 0 && retake.absentCount > 0 && " / "}
-                            {retake.absentCount > 0 && `결석 ${retake.absentCount}회`}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <Badge
-                      variant={
-                        retake.status === "completed" ? "success" : retake.status === "absent" ? "danger" : "warning"
-                      }
-                      size="xs">
-                      {RETAKE_STATUS_LABELS[retake.status]}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+                      </>
+                    )}
+                  </>
+                }
+                trailing={
+                  <Badge
+                    variant={
+                      retake.status === "completed" ? "success" : retake.status === "absent" ? "danger" : "warning"
+                    }
+                    size="xs">
+                    {RETAKE_STATUS_LABELS[retake.status]}
+                  </Badge>
+                }
+              />
+            ))}
+          </ListSection>
         </div>
       )}
     </Modal>

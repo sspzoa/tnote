@@ -1,12 +1,11 @@
 "use client";
 
 import { useSetAtom } from "jotai";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Button } from "@/shared/components/ui/button";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useUser } from "@/shared/hooks/useUser";
 import { showInviteModalAtom, showWorkspaceDeleteModalAtom } from "./(atoms)/useModalStore";
 import AdminInviteModal from "./(components)/AdminInviteModal";
@@ -20,39 +19,36 @@ export default function AdminsPage() {
   const setShowWorkspaceDeleteModal = useSetAtom(showWorkspaceDeleteModalAtom);
   const { isOwner, isLoading: userLoading } = useUser();
 
-  if (error) {
-    return <ErrorComponent errorMessage="관리자 목록을 불러오는데 실패했습니다." />;
-  }
+  const actions = isOwner ? (
+    <Button size="sm" onClick={() => setShowInviteModal(true)}>
+      관리자 추가
+    </Button>
+  ) : undefined;
 
-  const adminTableSkeleton = (
-    <SkeletonTable
-      rows={5}
-      columns={["w-16", "w-24", { width: "w-14", rounded: true }, "w-20", { width: "w-14", rounded: true }, "action"]}
-    />
-  );
+  if (error) {
+    return (
+      <PageShell title="관리자 관리" subtitle={`워크스페이스 관리자 ${admins.length}명`} actions={actions}>
+        <ErrorComponent errorMessage="관리자 목록을 불러오는데 실패했습니다." />
+      </PageShell>
+    );
+  }
 
   const isDataLoading = isLoading || userLoading;
 
-  return (
-    <Container>
-      <Header
-        title="관리자 관리"
-        subtitle={`워크스페이스 관리자 ${admins.length}명`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={isOwner ? <Button onClick={() => setShowInviteModal(true)}>관리자 추가</Button> : undefined}
-      />
+  const emptyNode = (
+    <EmptyState
+      tone="admins"
+      message="관리자가 없습니다."
+      actionLabel={isOwner ? "관리자 추가" : undefined}
+      onAction={isOwner ? () => setShowInviteModal(true) : undefined}
+    />
+  );
 
-      {isDataLoading ? (
-        adminTableSkeleton
-      ) : admins.length === 0 ? (
-        <EmptyState
-          message="관리자가 없습니다."
-          actionLabel={isOwner ? "관리자 추가" : undefined}
-          onAction={isOwner ? () => setShowInviteModal(true) : undefined}
-        />
-      ) : (
-        <AdminList admins={admins} isOwner={isOwner} />
-      )}
+  return (
+    <PageShell title="관리자 관리" subtitle={`워크스페이스 관리자 ${admins.length}명`} actions={actions}>
+      <CollectionView>
+        <AdminList admins={admins} isOwner={isOwner} isLoading={isDataLoading} empty={emptyNode} />
+      </CollectionView>
 
       {isOwner && (
         <>
@@ -73,6 +69,6 @@ export default function AdminsPage() {
           </div>
         </>
       )}
-    </Container>
+    </PageShell>
   );
 }

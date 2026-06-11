@@ -67,12 +67,19 @@ export default function ConsultationDetailModal({ consultation, studentName, onC
     setShowEditModal(true);
   };
 
+  const authorName = consultation?.creator?.name ?? studentName;
+  const createdLabel = consultation?.created_at ? formatLocaleDateKorean(consultation.created_at) : "";
+  const updatedLabel =
+    consultation?.updated_at && consultation.updated_at !== consultation.created_at
+      ? formatLocaleDateKorean(consultation.updated_at)
+      : null;
+
   return (
     <Modal
       isOpen={!!consultation}
       onClose={onClose}
       title={consultation?.title || ""}
-      subtitle={`${studentName} - ${consultation?.created_at ? formatLocaleDateKorean(consultation.created_at) : ""}${consultation?.creator?.name ? ` (작성자: ${consultation.creator.name})` : ""}`}
+      subtitle={studentName}
       footer={
         <>
           <Button variant="secondary" onClick={onClose} className="flex-1">
@@ -83,7 +90,23 @@ export default function ConsultationDetailModal({ consultation, studentName, onC
           </Button>
         </>
       }>
-      <div className="whitespace-pre-wrap text-foreground text-sm">{consultation?.content}</div>
+      <div className="flex flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="font-semibold text-foreground text-sm">{authorName}</span>
+          <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-muted-foreground text-xs">
+            <span className="tabular-nums">{createdLabel}</span>
+            {updatedLabel && (
+              <>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="tabular-nums">{updatedLabel} 수정됨</span>
+              </>
+            )}
+          </span>
+        </div>
+        <p className="whitespace-pre-wrap rounded-lg bg-muted/50 p-3.5 text-[15px] text-foreground leading-relaxed">
+          {consultation?.content}
+        </p>
+      </div>
     </Modal>
   );
 }

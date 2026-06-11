@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, UserX } from "lucide-react";
+import { CheckCircle2, UserX } from "lucide-react";
 import { useMemo } from "react";
+import { FeedItem } from "@/shared/components/common/FeedItem";
 import { Badge, SkeletonSpinner, SlidePanel } from "@/shared/components/ui";
 import type { RequiredAbsentItem, VoluntaryAttendanceItem } from "../(hooks)/useRequiredAbsent";
 
@@ -106,8 +107,8 @@ export default function RequiredAbsentPanel({
         <SkeletonSpinner className="py-16" size="md" />
       ) : weekGroups.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-16">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
-            <UserX className="size-6 text-primary" />
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-destructive-soft">
+            <UserX className="size-6 text-destructive" />
           </div>
           <span className="text-muted-foreground text-sm">필참 결석 기록이 없습니다.</span>
         </div>
@@ -125,50 +126,50 @@ export default function RequiredAbsentPanel({
                     {uniqueStudents}명 · {group.items.length}건
                   </Badge>
                 </div>
-                <div className="divide-y divide-border">
-                  {group.items.map((item) => {
+                <div className="px-4 py-4">
+                  {group.items.map((item, index) => {
                     const volKey = `${item.student.id}_${group.weekStart}`;
                     const volRecords = voluntaryByStudentWeek.get(volKey);
                     return (
-                      <div
+                      <FeedItem
                         key={item.id}
-                        className="flex flex-col gap-1 px-4 py-2.5 transition-colors hover:bg-muted/50">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        icon={UserX}
+                        tone="destructive"
+                        rail={index !== group.items.length - 1}
+                        title={
+                          <>
                             <span className="font-semibold text-foreground text-sm">{item.student.name}</span>
                             <Badge variant="danger" size="xs">
                               결석
                             </Badge>
-                          </div>
-                          <span className="shrink-0 text-muted-foreground text-xs">
-                            {formatDayLabel(item.attendance_date)}
-                          </span>
-                        </div>
-                        <div className="truncate text-muted-foreground text-xs">{item.clinic.name}</div>
-                        {item.student.school && (
-                          <span className="text-muted-foreground/60 text-xs">{item.student.school}</span>
-                        )}
+                            {item.student.school && (
+                              <span className="text-muted-foreground/70 text-xs">{item.student.school}</span>
+                            )}
+                          </>
+                        }
+                        meta={formatDayLabel(item.attendance_date)}
+                        description={item.clinic.name}>
                         {item.note && (
-                          <div className="truncate rounded-sm bg-muted px-3 py-2 text-muted-foreground text-xs italic">
+                          <p className="truncate border-border border-l-2 pl-2.5 text-muted-foreground text-xs italic">
                             "{item.note}"
-                          </div>
+                          </p>
                         )}
                         {volRecords && volRecords.length > 0 && (
-                          <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                            <div className="flex items-center gap-1 rounded-sm bg-solid-translucent-green px-2 py-1">
-                              <Check className="size-3 text-success" />
-                              <span className="text-[10px] leading-4 text-success">자율 참석</span>
-                            </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 rounded-md bg-success-soft px-2.5 py-1 text-success text-xs">
+                              <CheckCircle2 className="size-3" />
+                              자율 참석
+                            </span>
                             {volRecords.map((vol) => (
                               <span
                                 key={vol.id}
-                                className="rounded-sm bg-muted px-2 py-1 text-[10px] leading-4 text-muted-foreground">
+                                className="inline-flex items-center rounded-md bg-muted px-2.5 py-1 text-muted-foreground text-xs">
                                 {formatDayLabel(vol.attendance_date)} · {vol.clinic.name}
                               </span>
                             ))}
                           </div>
                         )}
-                      </div>
+                      </FeedItem>
                     );
                   })}
                 </div>

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
@@ -14,11 +14,13 @@ import { useAdminResetPassword } from "../(hooks)/useAdminResetPassword";
 interface AdminListProps {
   admins: Admin[];
   isOwner: boolean;
+  isLoading?: boolean;
+  empty?: ReactNode;
 }
 
 type AdminSortKey = "name" | "phone" | "role" | "createdAt";
 
-export default function AdminList({ admins, isOwner }: AdminListProps) {
+export default function AdminList({ admins, isOwner, isLoading, empty }: AdminListProps) {
   const { deleteAdmin } = useAdminDelete();
   const { resetPassword } = useAdminResetPassword();
   const toast = useToast();
@@ -81,7 +83,14 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
       id: "name",
       header: "이름",
       sortKey: "name",
-      cell: (admin) => <span className="font-medium text-foreground">{admin.name}</span>,
+      cell: (admin) => (
+        <div className="group flex min-w-0 flex-col gap-0.5">
+          <span className="font-medium text-foreground transition-colors group-hover:text-primary">{admin.name}</span>
+          <span className="text-muted-foreground text-xs">
+            {admin.role === "owner" ? "소유자" : "관리자"} · {formatPhoneNumber(admin.phone_number)}
+          </span>
+        </div>
+      ),
     },
     {
       id: "phone",
@@ -120,6 +129,10 @@ export default function AdminList({ admins, isOwner }: AdminListProps) {
 
   return (
     <DataTable
+      flush
+      isLoading={isLoading}
+      skeletonRows={8}
+      empty={empty}
       columns={columns}
       data={admins}
       getRowId={(admin) => admin.id}

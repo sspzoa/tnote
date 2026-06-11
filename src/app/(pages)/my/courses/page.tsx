@@ -2,15 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { FilterButton } from "@/shared/components/ui/filterButton";
-import { Skeleton, SkeletonTable } from "@/shared/components/ui/skeleton";
 import { FilterBar, FilterRow } from "@/shared/components/ui/toolbar";
 import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import type { MyExamScore } from "./(hooks)/useMyCourses";
@@ -201,31 +199,15 @@ export default function MyCoursesPage() {
 
   if (error) {
     return (
-      <Container>
-        <Header
-          title="시험 현황"
-          subtitle="나의 수업과 시험 현황을 확인합니다"
-          backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        />
+      <PageShell title="시험 현황" subtitle="나의 수업과 시험 현황을 확인합니다" width="narrow">
         <ErrorComponent errorMessage={error.message} />
-      </Container>
+      </PageShell>
     );
   }
 
   return (
-    <Container>
-      <Header
-        title="시험 현황"
-        subtitle={`수강 중인 수업 ${courses.length}개`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-      />
-
-      {isLoading ? (
-        <div className="flex flex-col gap-4">
-          <Skeleton className="h-52 w-full rounded-lg" />
-          <SkeletonTable rows={5} columns={["w-24", "w-14", "w-14", "w-14", "w-14", "w-14", "w-14"]} />
-        </div>
-      ) : courses.length === 0 ? (
+    <PageShell title="시험 현황" subtitle={`수강 중인 수업 ${courses.length}개`} width="narrow">
+      {!isLoading && courses.length === 0 ? (
         <EmptyState message="수강 중인 수업이 없습니다." />
       ) : (
         <div className="flex flex-col gap-4">
@@ -247,19 +229,18 @@ export default function MyCoursesPage() {
 
           <PercentileChart scores={filteredScores} />
 
-          {filteredScores.length === 0 ? (
-            <EmptyState message="시험 기록이 없습니다." />
-          ) : (
-            <DataTable
-              columns={columns}
-              data={filteredScores}
-              getRowId={(score) => score.id}
-              comparators={comparators}
-              defaultSort={{ key: "exam", direction: "desc" }}
-            />
-          )}
+          <DataTable
+            isLoading={isLoading}
+            skeletonRows={8}
+            empty={<EmptyState message="시험 기록이 없습니다." />}
+            columns={columns}
+            data={filteredScores}
+            getRowId={(score) => score.id}
+            comparators={comparators}
+            defaultSort={{ key: "exam", direction: "desc" }}
+          />
         </div>
       )}
-    </Container>
+    </PageShell>
   );
 }

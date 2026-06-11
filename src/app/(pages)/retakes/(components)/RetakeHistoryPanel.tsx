@@ -1,7 +1,19 @@
 "use client";
 
-import { History } from "lucide-react";
+import {
+  CalendarClock,
+  CircleCheck,
+  ClipboardList,
+  History,
+  type LucideIcon,
+  RefreshCw,
+  StickyNote,
+  Tag,
+  UserX,
+} from "lucide-react";
+import { FeedItem, TransitionChip } from "@/shared/components/common/FeedItem";
 import { Badge, type BadgeVariant, SkeletonSpinner, SlidePanel } from "@/shared/components/ui";
+import type { FeatureTone } from "@/shared/components/ui/featureTone";
 import { formatLocaleMonthDayKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
 
 interface HistoryItem {
@@ -31,33 +43,22 @@ interface RetakeHistoryPanelProps {
   isLoading: boolean;
 }
 
-const getActionLabel = (actionType: string) => {
-  const labels: Record<string, string> = {
-    assign: "할당",
-    postpone: "연기",
-    absent: "결석",
-    complete: "완료",
-    status_change: "상태 변경",
-    management_status_change: "관리 상태 변경",
-    note_update: "메모 수정",
-    date_edit: "날짜 수정",
-  };
-  return labels[actionType] || actionType;
+const ACTION_CONFIG: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon; tone: FeatureTone }> = {
+  assign: { label: "할당", variant: "info", icon: ClipboardList, tone: "retakes" },
+  postpone: { label: "연기", variant: "warning", icon: CalendarClock, tone: "warning" },
+  absent: { label: "결석", variant: "danger", icon: UserX, tone: "destructive" },
+  complete: { label: "완료", variant: "success", icon: CircleCheck, tone: "success" },
+  status_change: { label: "상태 변경", variant: "info", icon: RefreshCw, tone: "primary" },
+  management_status_change: { label: "관리 상태 변경", variant: "warning", icon: Tag, tone: "warning" },
+  note_update: { label: "메모 수정", variant: "neutral", icon: StickyNote, tone: "neutral" },
+  date_edit: { label: "날짜 수정", variant: "info", icon: CalendarClock, tone: "neutral" },
 };
 
-const getActionBadgeVariant = (actionType: string): BadgeVariant => {
-  if (actionType === "assign") return "purple";
-  if (actionType === "postpone") return "blue";
-  if (actionType === "absent") return "red";
-  if (actionType === "complete") return "green";
-  if (actionType === "status_change") return "purple";
-  if (actionType === "management_status_change") return "yellow";
-  if (actionType === "date_edit") return "blue";
-  return "neutral";
-};
-
-const getRetakeItemDescription = (retake: HistoryItem["retake"]): string => {
-  return `${retake.exam.course.name} · ${retake.exam.name} ${retake.exam.exam_number}회차`;
+const fallbackConfig = {
+  label: "변경",
+  variant: "neutral" as BadgeVariant,
+  icon: History,
+  tone: "neutral" as FeatureTone,
 };
 
 export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading }: RetakeHistoryPanelProps) {
@@ -67,67 +68,62 @@ export default function RetakeHistoryPanel({ isOpen, onClose, history, isLoading
         <SkeletonSpinner className="py-16" size="md" />
       ) : history.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-16">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-primary-soft">
             <History className="size-6 text-primary" />
           </div>
           <span className="text-muted-foreground text-sm">이력이 없습니다.</span>
         </div>
       ) : (
-        <div className="divide-y divide-border">
-          {history.map((item) => {
+        <div className="px-4 py-4">
+          {history.map((item, index) => {
+            const config = ACTION_CONFIG[item.action_type] ?? fallbackConfig;
             const createdAt = new Date(item.created_at);
-            const dateStr = formatLocaleMonthDayKorean(createdAt);
-            const timeStr = formatLocaleTimeKorean(createdAt);
+            const meta = (
+              <>
+                {formatLocaleMonthDayKorean(createdAt)} {formatLocaleTimeKorean(createdAt)}
+                {item.performed_by && ` · ${item.performed_by.name}`}
+              </>
+            );
 
             return (
-              <div key={item.id} className="flex flex-col gap-2 px-4 py-2.5 transition-colors hover:bg-muted/50">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
+              <FeedItem
+                key={item.id}
+                icon={config.icon}
+                tone={config.tone}
+                rail={index !== history.length - 1}
+                title={
+                  <>
                     <span className="font-semibold text-foreground text-sm">{item.retake.student.name}</span>
-                    <Badge variant={getActionBadgeVariant(item.action_type)} size="xs">
-                      {getActionLabel(item.action_type)}
+                    <Badge variant={config.variant} size="xs">
+                      {config.label}
                     </Badge>
-                  </div>
-                  <span className="shrink-0 text-muted-foreground text-xs">
-                    {dateStr} {timeStr}
-                    {item.performed_by && ` · ${item.performed_by.name}`}
-                  </span>
-                </div>
-                <div className="truncate text-muted-foreground text-sm">{getRetakeItemDescription(item.retake)}</div>
-
+                  </>
+                }
+                meta={meta}
+                description={`${item.retake.exam.course.name} · ${item.retake.exam.name} ${item.retake.exam.exam_number}회차`}>
                 {item.action_type === "assign" && (
-                  <div className="flex items-center gap-2 rounded-sm bg-solid-translucent-purple px-3 py-2">
-                    <span className="text-xs text-solid-purple">
-                      {item.new_date ? `예정일: ${item.new_date}` : "예정일 미지정"}
-                    </span>
-                  </div>
+                  <span className="inline-flex w-fit items-center gap-1.5 rounded-md bg-primary-soft px-2.5 py-1 text-primary text-xs">
+                    <CalendarClock className="size-3" />
+                    {item.new_date ? `예정일 ${item.new_date}` : "예정일 미지정"}
+                  </span>
                 )}
-
                 {(item.action_type === "postpone" ||
                   item.action_type === "date_edit" ||
                   item.action_type === "complete") &&
-                  item.new_date && (
-                    <div className="flex items-center gap-2 rounded-sm bg-muted px-3 py-2">
-                      <span className="text-muted-foreground text-xs">{item.previous_date || "미지정"}</span>
-                      <span className="text-muted-foreground/60 text-xs">→</span>
-                      <span className="font-medium text-foreground text-xs">{item.new_date}</span>
-                    </div>
-                  )}
-
+                  item.new_date && <TransitionChip from={item.previous_date || "미지정"} to={item.new_date} />}
                 {item.action_type === "management_status_change" && item.new_management_status && (
-                  <div className="flex items-center gap-2 rounded-sm bg-solid-translucent-yellow px-3 py-2">
-                    <span className="text-xs text-solid-yellow">
-                      {item.previous_management_status} → {item.new_management_status}
-                    </span>
-                  </div>
+                  <TransitionChip
+                    tone="warning"
+                    from={item.previous_management_status || "미지정"}
+                    to={item.new_management_status}
+                  />
                 )}
-
                 {item.note && (
-                  <div className="truncate rounded-sm bg-muted px-3 py-2 text-muted-foreground text-xs italic">
-                    "{item.note}"
-                  </div>
+                  <p className="truncate border-border border-l-2 pl-2.5 text-muted-foreground text-xs italic">
+                    {item.note}
+                  </p>
                 )}
-              </div>
+              </FeedItem>
             );
           })}
         </div>

@@ -3,13 +3,12 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { History, UserX } from "lucide-react";
 import { useMemo } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Button } from "@/shared/components/ui/button";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useToast } from "@/shared/hooks/useToast";
 import { getTodayKST } from "@/shared/lib/utils/date";
 import { getErrorMessage } from "@/shared/lib/utils/error";
@@ -81,8 +80,41 @@ export default function ClinicsPage() {
     });
   }, [clinics, showEndedClinics]);
 
+  const actions = (
+    <>
+      <Button variant="secondary" size="sm" onClick={() => setShowRequiredAbsentPanel(true)}>
+        <UserX className="size-4" />
+        <span className="hidden sm:inline">필참 결석</span>
+        {requiredAbsent.length > 0 && (
+          <span className="rounded-full bg-destructive px-1.5 text-destructive-foreground text-xs tabular-nums">
+            {requiredAbsent.length}
+          </span>
+        )}
+      </Button>
+      <Button variant="secondary" size="sm" onClick={() => setShowHistoryPanel(true)}>
+        <History className="size-4" />
+        <span className="hidden md:inline">최근 출석</span>
+        {recentAttendance.length > 0 && (
+          <span className="rounded-full bg-primary px-1.5 text-primary-foreground text-xs tabular-nums">
+            {recentAttendance.length}
+          </span>
+        )}
+      </Button>
+      <Button size="sm" onClick={() => setShowCreateModal(true)}>
+        + 클리닉 생성
+      </Button>
+    </>
+  );
+
   if (error) {
-    return <ErrorComponent errorMessage="클리닉 목록을 불러오는데 실패했습니다." />;
+    return (
+      <PageShell
+        title="클리닉 관리"
+        subtitle={`전체 ${clinics.length}개 클리닉 (${filteredClinics.length}개 표시)`}
+        actions={actions}>
+        <ErrorComponent errorMessage="클리닉 목록을 불러오는데 실패했습니다." />
+      </PageShell>
+    );
   }
 
   const handleEdit = (clinic: Clinic) => {
@@ -118,65 +150,34 @@ export default function ClinicsPage() {
     setShowAttendanceModal(true);
   };
 
-  return (
-    <Container>
-      <Header
-        title="클리닉 관리"
-        subtitle={`전체 ${clinics.length}개 클리닉 (${filteredClinics.length}개 표시)`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={
-          <div className="flex items-center gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => setShowRequiredAbsentPanel(true)}
-              className="flex items-center gap-2">
-              <UserX className="size-4" />
-              필참 결석
-              {requiredAbsent.length > 0 && (
-                <span className="rounded-full bg-solid-red px-2 text-xs text-solid-white">{requiredAbsent.length}</span>
-              )}
-            </Button>
-            <Button variant="secondary" onClick={() => setShowHistoryPanel(true)} className="flex items-center gap-2">
-              <History className="size-4" />
-              최근 출석
-              {recentAttendance.length > 0 && (
-                <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">
-                  {recentAttendance.length}
-                </span>
-              )}
-            </Button>
-            <Button onClick={() => setShowCreateModal(true)}>+ 클리닉 생성</Button>
-          </div>
-        }
+  const emptyNode =
+    clinics.length === 0 ? (
+      <EmptyState
+        tone="clinics"
+        message="클리닉이 없습니다."
+        subtitle="첫 클리닉을 만들어 보세요."
+        actionLabel="첫 클리닉 만들기"
+        onAction={() => setShowCreateModal(true)}
       />
+    ) : (
+      <EmptyState tone="clinics" message="조건에 맞는 결과가 없어요" subtitle="필터를 조정해 보세요." />
+    );
 
-      <ClinicFilters />
-
-      {isLoading ? (
-        <SkeletonTable
-          rows={5}
-          columns={[
-            "w-24",
-            { width: "w-20", badges: ["w-6", "w-6", "w-6"] },
-            "w-44",
-            { width: "w-20", buttons: ["w-20"] },
-            "action",
-          ]}
-        />
-      ) : filteredClinics.length === 0 ? (
-        <EmptyState
-          message={showEndedClinics ? "클리닉이 없습니다." : "진행 중인 클리닉이 없습니다."}
-          actionLabel="첫 클리닉 만들기"
-          onAction={() => setShowCreateModal(true)}
-        />
-      ) : (
+  return (
+    <PageShell
+      title="클리닉 관리"
+      subtitle={`전체 ${clinics.length}개 클리닉 (${filteredClinics.length}개 표시)`}
+      actions={actions}>
+      <CollectionView filters={<ClinicFilters />}>
         <ClinicList
           clinics={filteredClinics}
+          isLoading={isLoading}
+          empty={emptyNode}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onAttendance={handleAttendance}
         />
-      )}
+      </CollectionView>
 
       <ClinicCreateModal />
       <ClinicEditModal />
@@ -196,6 +197,6 @@ export default function ClinicsPage() {
         voluntaryAttendance={voluntaryAttendance}
         isLoading={requiredAbsentLoading}
       />
-    </Container>
+    </PageShell>
   );
 }

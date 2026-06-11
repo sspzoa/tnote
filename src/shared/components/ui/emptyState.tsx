@@ -41,7 +41,7 @@ export function EmptyState({ message, subtitle, actionLabel, onAction, icon, ton
       {icon && (
         <div
           className={cn(
-            "flex size-20 items-center justify-center rounded-full bg-gradient-to-br to-card ring-1 ring-border/60 [&_svg:not([class*='size-'])]:size-9",
+            "flex size-18 items-center justify-center rounded-2xl bg-gradient-to-br to-card ring-1 ring-border/70 [&_svg:not([class*='size-'])]:size-8",
             toneStyles[tone],
           )}>
           {icon}

@@ -23,10 +23,10 @@ interface ModalProps {
 }
 
 const sizeStyles = {
-  sm: "max-w-md",
-  md: "max-w-xl",
-  lg: "max-w-3xl",
-  xl: "max-w-5xl",
+  sm: "max-w-lg",
+  md: "max-w-2xl",
+  lg: "max-w-4xl",
+  xl: "max-w-6xl",
 };
 
 export function Modal({ isOpen, onClose, onSubmit, title, subtitle, children, footer, size = "lg" }: ModalProps) {

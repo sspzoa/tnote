@@ -2,8 +2,7 @@
 
 import { addMonths, subMonths } from "date-fns";
 import { useState } from "react";
-import Container from "@/shared/components/common/Container";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -46,13 +45,7 @@ export default function CalendarPage() {
   });
 
   return (
-    <Container>
-      <Header
-        title="캘린더"
-        subtitle="수업, 재시험, 클리닉 일정을 확인하세요"
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-      />
-
+    <PageShell title="캘린더" subtitle="수업, 재시험, 클리닉 일정을 확인하세요">
       <Card>
         <CardContent className="flex flex-col gap-4">
           <CalendarToolbar
@@ -131,6 +124,6 @@ export default function CalendarPage() {
       </Card>
 
       {selectedEvent && <EventDetailModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
-    </Container>
+    </PageShell>
   );
 }

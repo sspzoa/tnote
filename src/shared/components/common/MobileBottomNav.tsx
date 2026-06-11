@@ -35,7 +35,7 @@ export function MobileBottomNav() {
               )}>
               <span
                 className={cn(
-                  "flex h-8 w-12 items-center justify-center rounded-full transition-colors [&_svg]:size-5",
+                  "flex h-8 w-12 items-center justify-center rounded-lg transition-colors [&_svg]:size-5",
                   active && "bg-primary-soft",
                 )}>
                 <item.icon />
@@ -48,7 +48,7 @@ export function MobileBottomNav() {
           type="button"
           onClick={() => setOpenMobile(true)}
           className="flex flex-1 flex-col items-center gap-1 px-1 py-2 text-muted-foreground text-xs transition-colors">
-          <span className="flex h-8 w-12 items-center justify-center rounded-full [&_svg]:size-5">
+          <span className="flex h-8 w-12 items-center justify-center rounded-lg [&_svg]:size-5">
             <MoreHorizontal />
           </span>
           <span className="font-medium">더보기</span>

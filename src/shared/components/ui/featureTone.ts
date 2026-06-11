@@ -29,7 +29,7 @@ export const toneWell: Record<FeatureTone, string> = {
   clinics: "bg-feature-clinics-soft text-feature-clinics",
   admins: "bg-feature-admins-soft text-feature-admins",
   success: "bg-success-soft text-success",
-  warning: "bg-warning-soft text-warning-foreground",
+  warning: "bg-warning-soft text-warning",
   destructive: "bg-destructive-soft text-destructive",
   neutral: "bg-muted text-muted-foreground",
 };

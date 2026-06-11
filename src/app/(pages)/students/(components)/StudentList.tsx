@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useCallback, useMemo } from "react";
+import { type ReactNode, useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
@@ -27,13 +27,15 @@ import { useStudentPasswordReset } from "../(hooks)/useStudentPasswordReset";
 
 interface StudentListProps {
   students: Student[];
+  isLoading?: boolean;
+  empty?: ReactNode;
 }
 
 type StudentSortKey = "name" | "branch" | "grade" | "phone" | "parentPhone" | "school";
 
 const dayLabels = ["일", "월", "화", "수", "목", "금", "토"];
 
-export default function StudentList({ students }: StudentListProps) {
+export default function StudentList({ students, isLoading, empty }: StudentListProps) {
   const [, setSelectedStudent] = useAtom(selectedStudentAtom);
   const [, setShowEditModal] = useAtom(showEditModalAtom);
   const [, setShowConsultationModal] = useAtom(showConsultationModalAtom);
@@ -168,7 +170,21 @@ export default function StudentList({ students }: StudentListProps) {
       id: "name",
       header: "이름",
       sortKey: "name",
-      cell: (student) => <span className="font-medium text-foreground">{student.name}</span>,
+      cell: (student) => {
+        const grade = student.birth_year ? getGrade(student.birth_year) : null;
+        const secondary = [student.school, grade].filter(Boolean).join(" · ");
+        return (
+          <button
+            type="button"
+            onClick={() => openInfoModal(student)}
+            className="group flex min-w-0 flex-col gap-0.5 text-left">
+            <span className="font-medium text-foreground transition-colors group-hover:text-primary">
+              {student.name}
+            </span>
+            {secondary && <span className="truncate text-muted-foreground text-xs">{secondary}</span>}
+          </button>
+        );
+      },
     },
     {
       id: "clinic",
@@ -268,6 +284,10 @@ export default function StudentList({ students }: StudentListProps) {
 
   return (
     <DataTable
+      flush
+      isLoading={isLoading}
+      skeletonRows={8}
+      empty={empty}
       columns={columns}
       data={students}
       getRowId={(student) => student.id}

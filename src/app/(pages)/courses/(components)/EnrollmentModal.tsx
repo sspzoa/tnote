@@ -124,7 +124,7 @@ export default function EnrollmentModal() {
                           <button
                             onClick={() => handleUnenroll(student.id)}
                             disabled={loadingStudentId === student.id}
-                            className="rounded-sm bg-solid-translucent-red px-3 py-1.5 font-medium text-destructive text-xs transition-colors hover:bg-solid-translucent-red disabled:cursor-not-allowed disabled:opacity-50">
+                            className="rounded-sm bg-destructive-soft px-3 py-1.5 font-medium text-destructive text-xs transition-colors hover:bg-destructive-soft disabled:cursor-not-allowed disabled:opacity-50">
                             {loadingStudentId === student.id ? "제거 중..." : "제거"}
                           </button>
                         }
@@ -161,7 +161,7 @@ export default function EnrollmentModal() {
                           <button
                             onClick={() => handleEnroll(student.id)}
                             disabled={loadingStudentId === student.id}
-                            className="rounded-sm bg-solid-translucent-green px-3 py-1.5 font-medium text-success text-xs transition-colors hover:bg-solid-translucent-green disabled:cursor-not-allowed disabled:opacity-50">
+                            className="rounded-sm bg-success-soft px-3 py-1.5 font-medium text-success text-xs transition-colors hover:bg-success-soft disabled:cursor-not-allowed disabled:opacity-50">
                             {loadingStudentId === student.id ? "추가 중..." : "추가"}
                           </button>
                         }

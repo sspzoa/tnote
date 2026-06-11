@@ -35,6 +35,8 @@ export interface DataTableProps<T, K extends string = string> {
   skeletonRows?: number;
   /** Rendered (spanning all columns) when there is no data and not loading. */
   empty?: ReactNode;
+  /** Render the table flush (no own border/radius/shadow) for nesting inside a CollectionView panel. */
+  flush?: boolean;
   /** Applied to the bordered card wrapper. */
   className?: string;
 }
@@ -56,6 +58,7 @@ export function DataTable<T, K extends string = string>({
   isLoading = false,
   skeletonRows = 6,
   empty,
+  flush = false,
   className,
 }: DataTableProps<T, K>) {
   const { sortedData, sortState, toggleSort } = useTableSort<T, K>({
@@ -65,9 +68,13 @@ export function DataTable<T, K extends string = string>({
   });
 
   return (
-    <div className={cn("overflow-hidden rounded-2xl border border-transparent bg-card shadow-sm", className)}>
+    <div
+      className={cn(
+        flush ? "overflow-x-auto" : "overflow-hidden rounded-xl border border-border bg-card shadow-xs",
+        className,
+      )}>
       <Table>
-        <TableHeader className="bg-muted/40">
+        <TableHeader className="bg-muted/50">
           <TableRow className="hover:bg-transparent">
             {columns.map((col) => {
               const sortable = !!col.sortKey && !!comparators?.[col.sortKey];

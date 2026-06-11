@@ -3,10 +3,11 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MessageSquare, Pencil } from "lucide-react";
 import { useState } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
-import { Badge, Button, EmptyState, Skeleton, SkeletonTable, SlidePanel } from "@/shared/components/ui";
+import { PageShell } from "@/shared/components/common/PageShell";
+import { Badge, Button, EmptyState, Skeleton, SlidePanel } from "@/shared/components/ui";
+import { CollectionView } from "@/shared/components/ui/collectionView";
+import { SearchInput } from "@/shared/components/ui/searchInput";
 import { formatLocaleDateKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { ConsultationWithDetails } from "@/shared/types";
@@ -40,7 +41,7 @@ export default function StudentsPage() {
   const { courses, isLoading: coursesLoading } = useCourses();
   const { consultations, isLoading: consultationsLoading, markAsRead, unreadCount } = useAllConsultations();
   const { tags, isLoading: tagsLoading } = useTags();
-  const searchQuery = useAtomValue(searchQueryAtom);
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const selectedTagIds = useAtomValue(selectedTagIdsAtom);
   const [, setShowCreateModal] = useAtom(showCreateModalAtom);
   const [selectedConsultation, setSelectedConsultation] = useState<ConsultationWithDetails | null>(null);
@@ -77,56 +78,55 @@ export default function StudentsPage() {
   };
 
   if (studentsError) {
-    return <ErrorComponent errorMessage="학생 목록을 불러오는데 실패했습니다." />;
+    return (
+      <PageShell title="학생 관리">
+        <ErrorComponent errorMessage="학생 목록을 불러오는데 실패했습니다." />
+      </PageShell>
+    );
   }
 
-  return (
-    <Container>
-      <Header
-        title="학생 관리"
-        subtitle={`전체 학생 ${students.length}명`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={
-          <>
-            <Button variant="outline" onClick={() => setShowConsultationPanel(true)}>
-              <MessageSquare className="size-4" />
-              최근 상담
-              {unreadCount > 0 && (
-                <span className="ml-0.5 rounded-full bg-primary px-1.5 text-primary-foreground text-xs">
-                  {unreadCount}
-                </span>
-              )}
-            </Button>
-            <Button onClick={() => setShowCreateModal(true)}>+ 학생 추가</Button>
-          </>
-        }
+  const actions = (
+    <>
+      <Button variant="secondary" size="sm" onClick={() => setShowConsultationPanel(true)}>
+        <MessageSquare className="size-4" />
+        <span className="hidden sm:inline">최근 상담</span>
+        {unreadCount > 0 && (
+          <span className="rounded-full bg-primary px-1.5 text-primary-foreground text-xs tabular-nums">
+            {unreadCount}
+          </span>
+        )}
+      </Button>
+      <Button size="sm" onClick={() => setShowCreateModal(true)}>
+        + 학생 추가
+      </Button>
+    </>
+  );
+
+  const emptyNode =
+    students.length === 0 ? (
+      <EmptyState
+        tone="students"
+        message="학생이 없습니다."
+        actionLabel="학생 추가"
+        onAction={() => setShowCreateModal(true)}
       />
+    ) : (
+      <EmptyState tone="students" message="조건에 맞는 결과가 없어요" subtitle="검색어나 필터를 조정해 보세요." />
+    );
 
-      <StudentFilterBar courses={courses} tags={tags} />
-
-      {isLoading ? (
-        <SkeletonTable
-          rows={8}
-          columns={[
-            "w-16",
-            { width: "w-20", badges: ["w-12", "w-10"] },
-            "w-14",
-            { width: "w-12", rounded: true },
-            "w-28",
-            "w-28",
-            "w-20",
-            "action",
-          ]}
-        />
-      ) : filteredStudents.length === 0 ? (
-        <EmptyState
-          message={students.length === 0 ? "학생이 없습니다." : "검색 결과가 없습니다."}
-          actionLabel={students.length === 0 ? "학생 추가" : undefined}
-          onAction={students.length === 0 ? () => setShowCreateModal(true) : undefined}
-        />
-      ) : (
-        <StudentList students={filteredStudents} />
-      )}
+  return (
+    <PageShell title="학생 관리" subtitle={`전체 학생 ${students.length}명`} actions={actions}>
+      <CollectionView
+        search={
+          <SearchInput
+            placeholder="학생 검색..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        }
+        filters={<StudentFilterBar courses={courses} tags={tags} />}>
+        <StudentList students={filteredStudents} isLoading={isLoading} empty={emptyNode} />
+      </CollectionView>
 
       <ConsultationDetailModal
         consultation={selectedConsultation}
@@ -163,7 +163,7 @@ export default function StudentsPage() {
           </div>
         ) : consultations.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-16">
-            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10">
               <MessageSquare className="size-6 text-primary" />
             </div>
             <span className="text-muted-foreground text-sm">상담 내역이 없습니다.</span>
@@ -219,6 +219,6 @@ export default function StudentsPage() {
           </div>
         )}
       </SlidePanel>
-    </Container>
+    </PageShell>
   );
 }

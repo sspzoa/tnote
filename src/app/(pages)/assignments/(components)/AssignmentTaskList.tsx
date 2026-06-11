@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { type ReactNode, useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
@@ -9,6 +9,8 @@ import type { AssignmentTask } from "@/shared/types";
 
 interface AssignmentTaskListProps {
   tasks: AssignmentTask[];
+  isLoading?: boolean;
+  empty?: ReactNode;
   onViewStudent: (studentId: string) => void;
   onPostpone: (task: AssignmentTask) => void;
   onComplete: (task: AssignmentTask) => void;
@@ -24,6 +26,8 @@ type TaskSortKey = "student" | "assignment" | "scheduledDate" | "status";
 
 export default function AssignmentTaskList({
   tasks,
+  isLoading,
+  empty,
   onViewStudent,
   onPostpone,
   onComplete,
@@ -105,12 +109,15 @@ export default function AssignmentTaskList({
           isTagActive(assignment.start_date, assignment.end_date),
         );
         return (
-          <>
-            <button
-              onClick={() => onViewStudent(task.student.id)}
-              className="flex items-center gap-2 text-left transition-colors hover:text-primary">
-              <span className="font-medium text-foreground hover:text-primary">{task.student.name}</span>
-              {activeTags.length > 0 && (
+          <button
+            type="button"
+            onClick={() => onViewStudent(task.student.id)}
+            className="group flex items-center gap-2.5 text-left">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-medium text-foreground transition-colors group-hover:text-primary">
+                {task.student.name}
+              </span>
+              {activeTags.length > 0 ? (
                 <div className="flex flex-nowrap gap-1">
                   {activeTags.map((assignment) => (
                     <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
@@ -118,10 +125,11 @@ export default function AssignmentTaskList({
                     </Badge>
                   ))}
                 </div>
+              ) : (
+                <span className="text-muted-foreground text-xs">{task.student.school}</span>
               )}
-            </button>
-            <div className="text-muted-foreground text-xs">{task.student.school}</div>
-          </>
+            </div>
+          </button>
         );
       },
     },
@@ -168,6 +176,10 @@ export default function AssignmentTaskList({
 
   return (
     <DataTable
+      flush
+      isLoading={isLoading}
+      skeletonRows={8}
+      empty={empty}
       columns={columns}
       data={tasks}
       getRowId={(task) => task.id}

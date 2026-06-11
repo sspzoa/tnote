@@ -100,7 +100,7 @@ export const StudentListItem = memo(function StudentListItem({
 
   const baseClassName = cn(
     "flex items-center gap-3 border-border border-b px-4 py-3 last:border-b-0",
-    highlighted && "bg-solid-translucent-red/30",
+    highlighted && "bg-destructive-soft",
   );
 
   if (onToggle !== undefined) {

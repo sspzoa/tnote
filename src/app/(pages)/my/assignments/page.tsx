@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Badge } from "@/shared/components/ui/badge";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { parseDatePrefix } from "@/shared/lib/utils/sort";
 import { type MyAssignment, useMyAssignments } from "./(hooks)/useMyAssignments";
 
@@ -67,40 +66,31 @@ export default function MyAssignmentsPage() {
 
   if (error) {
     return (
-      <Container>
-        <Header
-          title="과제 현황"
-          subtitle="나의 과제 현황을 확인합니다"
-          backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        />
+      <PageShell title="과제 현황" subtitle="나의 과제 현황을 확인합니다" width="narrow">
         <ErrorComponent errorMessage={(error as Error).message} />
-      </Container>
+      </PageShell>
     );
   }
 
   const incompleteCount = assignments.filter((a) => a.status !== "완료").length;
 
-  return (
-    <Container>
-      <Header
-        title="과제 현황"
-        subtitle={`전체 ${assignments.length}개 (미완료 ${incompleteCount}개)`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-      />
+  const emptyNode = <EmptyState message="과제 기록이 없습니다." />;
 
-      {isLoading ? (
-        <SkeletonTable rows={5} columns={["w-24", "w-20", "w-14"]} />
-      ) : assignments.length === 0 ? (
-        <EmptyState message="과제 기록이 없습니다." />
-      ) : (
+  return (
+    <PageShell title="과제 현황" subtitle={`전체 ${assignments.length}개 (미완료 ${incompleteCount}개)`} width="narrow">
+      <CollectionView>
         <DataTable
+          flush
+          isLoading={isLoading}
+          skeletonRows={8}
+          empty={emptyNode}
           columns={columns}
           data={assignments}
           getRowId={(item) => item.id}
           comparators={comparators}
           defaultSort={{ key: "assignment", direction: "desc" }}
         />
-      )}
-    </Container>
+      </CollectionView>
+    </PageShell>
   );
 }

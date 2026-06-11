@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Badge } from "@/shared/components/ui/badge";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { useUser } from "@/shared/hooks/useUser";
 import { formatClinicWeekdays } from "@/shared/lib/utils/date";
 import { type MyClinicRecord, useMyClinicAttendance } from "./(hooks)/useMyClinicAttendance";
@@ -77,33 +76,34 @@ export default function MyClinicPage() {
     },
   ];
 
-  if (error) return <ErrorComponent errorMessage="클리닉 출석을 불러오는데 실패했습니다." />;
+  const subtitle =
+    user?.requiredClinicWeekdays && user.requiredClinicWeekdays.length > 0
+      ? `필참요일: ${formatClinicWeekdays(user.requiredClinicWeekdays, "")}`
+      : undefined;
+
+  if (error) {
+    return (
+      <PageShell title="클리닉 출석" subtitle={subtitle} width="narrow">
+        <ErrorComponent errorMessage="클리닉 출석을 불러오는데 실패했습니다." />
+      </PageShell>
+    );
+  }
 
   return (
-    <Container>
-      <Header
-        title="클리닉 출석"
-        subtitle={
-          user?.requiredClinicWeekdays && user.requiredClinicWeekdays.length > 0
-            ? `필참요일: ${formatClinicWeekdays(user.requiredClinicWeekdays, "")}`
-            : undefined
-        }
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-      />
-
-      {isLoading ? (
-        <SkeletonTable rows={5} columns={["w-32", "w-24", { width: "w-20", badges: ["w-8"] }, "w-24"]} />
-      ) : records.length === 0 ? (
-        <EmptyState message="클리닉 출석 기록이 없습니다." />
-      ) : (
+    <PageShell title="클리닉 출석" subtitle={subtitle} width="narrow">
+      <CollectionView>
         <DataTable
+          flush
+          isLoading={isLoading}
+          skeletonRows={8}
+          empty={<EmptyState message="클리닉 출석 기록이 없습니다." />}
           columns={columns}
           data={records}
           getRowId={(record) => record.id}
           comparators={comparators}
           defaultSort={{ key: "date", direction: "desc" }}
         />
-      )}
-    </Container>
+      </CollectionView>
+    </PageShell>
   );
 }

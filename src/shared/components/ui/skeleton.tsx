@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/shared/lib/utils/cn";
 
 function Skeleton({ className, ...props }: ComponentProps<"div">) {
-  return <div data-slot="skeleton" className={cn("animate-pulse rounded-xl bg-muted", className)} {...props} />;
+  return <div data-slot="skeleton" className={cn("animate-pulse rounded-md bg-muted", className)} {...props} />;
 }
 
 interface SkeletonSpinnerProps {
@@ -123,9 +123,9 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
   };
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-transparent bg-card shadow-sm">
-      <table className="w-full rounded-2xl">
-        <thead className="bg-muted">
+    <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+      <table className="w-full rounded-xl">
+        <thead className="bg-muted/50">
           <tr>{columns.map(renderHeaderCell)}</tr>
         </thead>
         <tbody>

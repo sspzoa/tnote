@@ -36,6 +36,9 @@ const SUBMISSION_STATUS_META = {
   미배정: { variant: "neutral", label: "미배정" },
 } as const;
 
+// Display order for the summary band — completed/expected first, then severity, then unassigned.
+const SUMMARY_ORDER = ["완료", "검사예정", "미흡", "미제출", "결석", "미배정"] as const;
+
 export function SubmissionModal({
   isOpen,
   onClose,
@@ -101,7 +104,13 @@ export function SubmissionModal({
     .filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
-  const submissionCount = Object.values(submissionStatuses).filter((v) => v !== "").length;
+  // Distribution across all students (not the search-filtered view) — the point of a 현황 확인 screen.
+  const statusCounts = students.reduce<Record<string, number>>((acc, student) => {
+    const status = submissionStatuses[student.id] || "미배정";
+    acc[status] = (acc[status] ?? 0) + 1;
+    return acc;
+  }, {});
+  const unassignedCount = statusCounts["미배정"] ?? 0;
 
   return (
     <Modal
@@ -111,29 +120,28 @@ export function SubmissionModal({
       subtitle={assignment.name}
       footer={
         <div className="flex w-full flex-col gap-3">
-          <div className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">입력: {submissionCount}명</span>
-            <span className="text-muted-foreground text-xs">상태 변경은 과제 관리 페이지에서만 가능합니다.</span>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="secondary" onClick={handleClose} className="flex-1">
-              취소
-            </Button>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-muted-foreground text-sm">
+              미배정 <span className="font-semibold text-foreground tabular-nums">{unassignedCount}</span>명
+            </span>
             <Button
               variant="secondary"
               onClick={handleAssign}
-              disabled={isAssigning}
+              disabled={isAssigning || unassignedCount === 0}
               isLoading={isAssigning}
-              loadingText="할당 중..."
-              className="flex-1">
+              loadingText="할당 중...">
               미배정 학생 배정
             </Button>
           </div>
+          <span className="text-muted-foreground text-xs">상태 변경은 과제 관리 페이지에서만 가능합니다.</span>
+          <Button variant="secondary" onClick={handleClose} className="w-full">
+            닫기
+          </Button>
         </div>
       }>
       {isLoading ? (
         <div className="flex flex-col gap-4">
-          <div className="h-12 animate-pulse rounded-md bg-muted" />
+          <div className="h-9 animate-pulse rounded-lg bg-muted" />
           <StudentListContainer>
             <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
           </StudentListContainer>
@@ -144,6 +152,21 @@ export function SubmissionModal({
         </StudentListContainer>
       ) : (
         <div className="flex flex-col gap-4">
+          {/* At-a-glance distribution — this is a 현황 확인 screen, not an editor. */}
+          <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2.5 shadow-xs">
+            {SUMMARY_ORDER.map((status) => {
+              const count = statusCounts[status] ?? 0;
+              if (count === 0 && status !== "미배정") return null;
+              const meta = SUBMISSION_STATUS_META[status];
+              return (
+                <Badge key={status} variant={meta.variant} size="sm">
+                  <span className="font-bold tabular-nums">{count}</span>
+                  <span className="ml-1 font-medium opacity-80">{meta.label}</span>
+                </Badge>
+              );
+            })}
+          </div>
+
           <SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

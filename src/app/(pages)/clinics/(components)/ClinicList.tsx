@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { Badge, Button } from "@/shared/components/ui";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
@@ -9,6 +9,8 @@ import type { Clinic } from "../(atoms)/useClinicsStore";
 
 interface ClinicListProps {
   clinics: Clinic[];
+  isLoading?: boolean;
+  empty?: ReactNode;
   onEdit: (clinic: Clinic) => void;
   onDelete: (clinic: Clinic) => void;
   onAttendance: (clinic: Clinic) => void;
@@ -18,7 +20,7 @@ const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
 type ClinicSortKey = "name" | "operatingDays";
 
-export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: ClinicListProps) {
+export default function ClinicList({ clinics, isLoading, empty, onEdit, onDelete, onAttendance }: ClinicListProps) {
   const comparators = useMemo(
     () => ({
       name: (a: Clinic, b: Clinic) => a.name.localeCompare(b.name, "ko"),
@@ -37,7 +39,17 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
       id: "name",
       header: "클리닉명",
       sortKey: "name",
-      cell: (clinic) => <span className="font-medium text-foreground">{clinic.name}</span>,
+      cell: (clinic) => {
+        const sortedDays = [...clinic.operating_days].sort();
+        return (
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="font-medium text-foreground">{clinic.name}</span>
+            {sortedDays.length > 0 && (
+              <span className="text-muted-foreground text-xs">{sortedDays.map((day) => dayNames[day]).join("·")}</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       id: "operatingDays",
@@ -82,6 +94,10 @@ export default function ClinicList({ clinics, onEdit, onDelete, onAttendance }: 
 
   return (
     <DataTable
+      flush
+      isLoading={isLoading}
+      skeletonRows={8}
+      empty={empty}
       columns={columns}
       data={clinics}
       getRowId={(clinic) => clinic.id}

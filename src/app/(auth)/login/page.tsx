@@ -152,7 +152,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary to-[oklch(0.52_0.2_280)] p-10 lg:flex lg:min-h-dvh lg:w-[480px]">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-[oklch(0.47_0.19_276)] to-[oklch(0.38_0.15_282)] p-10 lg:flex lg:min-h-dvh lg:w-[480px]">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
@@ -163,10 +163,7 @@ export default function LoginPage() {
         />
 
         <div className="relative z-10 flex items-center gap-2">
-          <div className="flex size-10 items-center justify-center rounded-md bg-solid-white/10 ring-1 ring-solid-white/20">
-            <span className="font-bold text-sm text-solid-white">T</span>
-          </div>
-          <span className="font-bold text-sm text-solid-white">Tnote</span>
+          <span className="font-bold text-lg text-solid-white tracking-[-0.01em]">Tnote</span>
         </div>
 
         <div className="relative z-10 flex flex-col gap-7">
@@ -183,7 +180,7 @@ export default function LoginPage() {
             {heroFeatures.map((label) => (
               <span
                 key={label}
-                className="rounded-full bg-solid-white/8 px-3 py-1 text-[10px] text-solid-white/40 leading-4">
+                className="rounded-md bg-solid-white/8 px-3 py-1 text-[10px] text-solid-white/40 leading-4">
                 {label}
               </span>
             ))}

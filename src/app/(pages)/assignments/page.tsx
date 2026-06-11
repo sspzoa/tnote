@@ -1,14 +1,16 @@
 "use client";
 
+import { useAtom } from "jotai";
 import { History } from "lucide-react";
 import { useState } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
-import { MetricBadge } from "@/shared/components/ui/badge";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Button } from "@/shared/components/ui/button";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
+import { SearchInput } from "@/shared/components/ui/searchInput";
+import { type ViewTabItem, ViewTabs } from "@/shared/components/ui/viewTabs";
+import { searchQueryAtom } from "./(atoms)/useAssignmentTaskStore";
 import AssignmentTaskAssignModal from "./(components)/AssignmentTaskAssignModal";
 import AssignmentTaskCompleteModal from "./(components)/AssignmentTaskCompleteModal";
 import AssignmentTaskEditDateModal from "./(components)/AssignmentTaskEditDateModal";
@@ -22,8 +24,12 @@ import { useAllAssignmentTaskHistory } from "./(hooks)/useAllAssignmentTaskHisto
 import { useAssignmentTaskFilters } from "./(hooks)/useAssignmentTaskFilters";
 import { useAssignmentTaskHandlers } from "./(hooks)/useAssignmentTaskHandlers";
 
+type AssignmentTaskView = "all" | "pending" | "completed" | "problem";
+
 export default function AssignmentsPage() {
   const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+  const [activeView, setActiveView] = useState<AssignmentTaskView>("all");
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
 
   const { fetchedTasks, filteredTasks, isLoading, error, refetch } = useAssignmentTaskFilters();
   const { history: allHistory, isLoading: historyLoading } = useAllAssignmentTaskHistory();
@@ -42,87 +48,86 @@ export default function AssignmentsPage() {
     handleActionSuccess,
   } = useAssignmentTaskHandlers(refetch);
 
+  const isProblem = (status: string) => status === "insufficient" || status === "not_submitted" || status === "absent";
+
+  const viewTasks =
+    activeView === "all"
+      ? filteredTasks
+      : activeView === "problem"
+        ? filteredTasks.filter((t) => isProblem(t.status))
+        : filteredTasks.filter((t) => t.status === activeView);
+
+  const viewItems: ViewTabItem<AssignmentTaskView>[] = [
+    { value: "all", label: "전체", count: fetchedTasks.length },
+    {
+      value: "pending",
+      label: "검사예정",
+      count: fetchedTasks.filter((t) => t.status === "pending").length,
+      tone: "warning",
+    },
+    {
+      value: "completed",
+      label: "완료",
+      count: fetchedTasks.filter((t) => t.status === "completed").length,
+      tone: "success",
+    },
+    {
+      value: "problem",
+      label: "문제",
+      count: fetchedTasks.filter((t) => isProblem(t.status)).length,
+      tone: "danger",
+    },
+  ];
+
+  const actions = (
+    <>
+      <Button variant="secondary" size="sm" onClick={() => setShowHistoryPanel(true)}>
+        <History className="size-4" />
+        <span className="hidden sm:inline">최근 이력</span>
+        {allHistory.length > 0 && (
+          <span className="rounded-full bg-primary px-1.5 text-primary-foreground text-xs tabular-nums">
+            {allHistory.length}
+          </span>
+        )}
+      </Button>
+      <Button size="sm" onClick={handleAssignClick}>
+        + 개별 과제 배정
+      </Button>
+    </>
+  );
+
   if (error) {
     return (
-      <Container>
-        <Header
-          title="과제 관리"
-          subtitle="학생별 과제 상태를 관리합니다"
-          backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        />
+      <PageShell title="과제 관리" subtitle="학생별 과제 상태를 관리합니다" actions={actions}>
         <ErrorComponent errorMessage={error.message} />
-      </Container>
+      </PageShell>
     );
   }
 
+  const emptyNode =
+    fetchedTasks.length === 0 ? (
+      <EmptyState tone="assignments" message="과제가 없습니다." subtitle="과제를 등록하고 학생에게 배정해 보세요." />
+    ) : (
+      <EmptyState tone="assignments" message="조건에 맞는 과제가 없어요" subtitle="검색어나 필터를 조정해 보세요." />
+    );
+
   return (
-    <Container>
-      <Header
-        title="과제 관리"
-        subtitle="학생별 과제 상태를 관리합니다"
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={
-          <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={() => setShowHistoryPanel(true)} className="flex items-center gap-2">
-              <History className="size-4" />
-              최근 이력
-              {allHistory.length > 0 && (
-                <span className="rounded-full bg-primary px-2 text-primary-foreground text-xs">
-                  {allHistory.length}
-                </span>
-              )}
-            </Button>
-            <Button onClick={handleAssignClick}>+ 개별 과제 배정</Button>
-          </div>
+    <PageShell title="과제 관리" subtitle="학생별 과제 상태를 관리합니다" actions={actions}>
+      <ViewTabs items={viewItems} value={activeView} onChange={setActiveView} />
+
+      <CollectionView
+        search={
+          <SearchInput
+            placeholder="학생 검색..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         }
-      />
-
-      {fetchedTasks.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          <MetricBadge variant="neutral" label="전체" value={fetchedTasks.length} />
-          <MetricBadge
-            variant="warning"
-            label="검사예정"
-            value={fetchedTasks.filter((t) => t.status === "pending").length}
-          />
-          <MetricBadge
-            variant="success"
-            label="완료"
-            value={fetchedTasks.filter((t) => t.status === "completed").length}
-          />
-          <MetricBadge
-            variant="danger"
-            label="미흡·미제출·결석"
-            value={
-              fetchedTasks.filter(
-                (t) => t.status === "insufficient" || t.status === "not_submitted" || t.status === "absent",
-              ).length
-            }
-          />
-        </div>
-      )}
-
-      <AssignmentTaskFilters />
-
-      {isLoading ? (
-        <SkeletonTable
-          rows={8}
-          columns={[
-            { width: "w-28", badges: ["w-16", "w-10"] },
-            { width: "w-24", stacked: ["w-24", "w-28"] },
-            { width: "w-24", stacked: ["w-20", "w-16"] },
-            { width: "w-14", rounded: true },
-            { width: "w-20", rounded: true },
-            "action",
-          ]}
-        />
-      ) : fetchedTasks.length === 0 ? (
-        <EmptyState message="과제가 없습니다." />
-      ) : filteredTasks.length === 0 ? (
-        <EmptyState message="검색 결과가 없습니다." />
-      ) : (
+        filters={<AssignmentTaskFilters />}>
         <AssignmentTaskList
-          tasks={filteredTasks}
+          tasks={viewTasks}
+          isLoading={isLoading}
+          empty={emptyNode}
           onViewStudent={handleViewStudent}
           onPostpone={handlePostpone}
           onComplete={handleComplete}
@@ -133,7 +138,7 @@ export default function AssignmentsPage() {
           onDelete={handleDelete}
           onEditDate={handleEditDate}
         />
-      )}
+      </CollectionView>
 
       <AssignmentTaskPostponeModal onSuccess={handleActionSuccess} />
       <AssignmentTaskCompleteModal onSuccess={handleActionSuccess} />
@@ -148,6 +153,6 @@ export default function AssignmentsPage() {
         history={allHistory}
         isLoading={historyLoading}
       />
-    </Container>
+    </PageShell>
   );
 }

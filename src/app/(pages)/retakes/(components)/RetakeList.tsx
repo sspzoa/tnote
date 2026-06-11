@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { type ReactNode, useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
@@ -11,6 +11,8 @@ import type { Retake } from "../(atoms)/useRetakesStore";
 
 interface RetakeListProps {
   retakes: Retake[];
+  isLoading?: boolean;
+  empty?: ReactNode;
   onViewStudent: (studentId: string) => void;
   onPostpone: (retake: Retake) => void;
   onAbsent: (retake: Retake) => void;
@@ -25,6 +27,8 @@ type RetakeSortKey = "student" | "exam" | "scheduledDate" | "status" | "manageme
 
 export default function RetakeList({
   retakes,
+  isLoading,
+  empty,
   onViewStudent,
   onPostpone,
   onAbsent,
@@ -114,8 +118,10 @@ export default function RetakeList({
           <button
             type="button"
             onClick={() => onViewStudent(retake.student.id)}
-            className="flex items-center gap-2 text-left transition-colors hover:text-primary">
-            <span className="font-medium text-foreground hover:text-primary">{retake.student.name}</span>
+            className="group flex min-w-0 flex-col gap-0.5 text-left">
+            <span className="font-medium text-foreground transition-colors group-hover:text-primary">
+              {retake.student.name}
+            </span>
             {activeTags.length > 0 && (
               <div className="flex flex-nowrap gap-1">
                 {activeTags.map((assignment) => (
@@ -192,6 +198,10 @@ export default function RetakeList({
 
   return (
     <DataTable
+      flush
+      isLoading={isLoading}
+      skeletonRows={8}
+      empty={empty}
       columns={columns}
       data={retakes}
       getRowId={(retake) => retake.id}

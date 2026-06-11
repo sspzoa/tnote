@@ -31,7 +31,7 @@ const deltaTone: Record<DeltaDirection, string> = {
 const DeltaIcon = { up: ArrowUp, down: ArrowDown, neutral: Minus } as const;
 
 /**
- * Toss풍 stat card — floating white card, big bold tabular metric, colored icon well.
+ * Stat card — crisp bordered white surface, big bold tabular metric, a single colored icon well.
  * Drives the home dashboard, list-page summary rows, and detail headers.
  */
 export function StatCard({
@@ -52,10 +52,7 @@ export function StatCard({
       <div className="flex items-start justify-between gap-3">
         <span className="font-medium text-muted-foreground text-sm">{label}</span>
         <span
-          className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-2xl [&_svg]:size-5",
-            toneWell[tone],
-          )}>
+          className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg]:size-5", toneWell[tone])}>
           <Icon />
         </span>
       </div>
@@ -76,7 +73,7 @@ export function StatCard({
     </>
   );
 
-  const base = "flex flex-col gap-3 rounded-2xl border border-transparent bg-card p-5 text-card-foreground shadow-sm";
+  const base = "flex flex-col gap-3 rounded-xl border border-border bg-card p-5 text-card-foreground shadow-xs";
 
   if (href) {
     return (

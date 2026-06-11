@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
+import { StatStrip } from "@/shared/components/ui/statStrip";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -14,6 +15,7 @@ import {
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { cn } from "@/shared/lib/utils/cn";
 import { getErrorMessage } from "@/shared/lib/utils/error";
 import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
 import type { Student } from "@/shared/types";
@@ -36,6 +38,58 @@ const ACTIVITY_LABELS = [
   { key: "homeworkCheck" as const, label: "숙제검사" },
   { key: "qa" as const, label: "질의응답" },
 ];
+
+/**
+ * The row's primary action — a single segmented 참석 / 결석 control with the refined chip
+ * language. Lives inside the StudentListItem label, so each segment stops the event from
+ * also flipping the row checkbox and sets its state explicitly instead.
+ */
+function AttendanceSegmentedControl({
+  isSelected,
+  isAbsent,
+  onPresent,
+  onAbsent,
+}: {
+  isSelected: boolean;
+  isAbsent: boolean;
+  onPresent: () => void;
+  onAbsent: () => void;
+}) {
+  const segment =
+    "h-9 px-3 font-medium text-xs outline-none transition-[color,background-color,box-shadow] duration-[--motion-fast] focus-visible:z-10 focus-visible:ring-[3px] focus-visible:ring-ring/50";
+
+  const handle = (run: () => void) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    run();
+  };
+
+  return (
+    <div className="inline-flex overflow-hidden rounded-lg border border-input">
+      <button
+        type="button"
+        aria-pressed={isSelected}
+        onClick={handle(onPresent)}
+        className={cn(
+          segment,
+          isSelected ? "bg-primary-soft text-primary" : "bg-muted/50 text-muted-foreground hover:bg-card",
+        )}>
+        참석
+      </button>
+      <button
+        type="button"
+        aria-pressed={isAbsent}
+        onClick={handle(onAbsent)}
+        className={cn(
+          segment,
+          "border-input border-l",
+          isAbsent ? "bg-destructive-soft text-destructive" : "bg-muted/50 text-muted-foreground hover:bg-card",
+        )}>
+        결석
+      </button>
+    </div>
+  );
+}
 
 export default function AttendanceModal() {
   const [isOpen, setIsOpen] = useAtom(showAttendanceModalAtom);
@@ -206,117 +260,118 @@ export default function AttendanceModal() {
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-5">
-        <FormInput
-          label="날짜 선택"
-          required
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-
+      <div className="flex flex-col gap-4">
+        {/* Header band: date · live tally ribbon · toolbar */}
         <div className="flex flex-col gap-3">
-          <h3 className="font-semibold text-foreground text-sm">참석 학생 선택 ({visibleStudentCount}명)</h3>
-          {loadingAttendance ? (
-            <div className="flex flex-col gap-3">
-              <div className="h-12 animate-pulse rounded-md bg-muted" />
-              <StudentListContainer>
-                <StudentListSkeleton count={6} showCheckbox />
-              </StudentListContainer>
-            </div>
-          ) : students.length === 0 ? (
-            <StudentListContainer>
-              <StudentListEmpty />
-            </StudentListContainer>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <SearchInput
-                  placeholder="학생 검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {uncheckedRequiredStudents.length > 0 && (
-                  <Button variant="secondary" className="shrink-0" onClick={handleBulkAbsent}>
-                    필참 미체크 일괄 결석 ({uncheckedRequiredStudents.length}명)
-                  </Button>
-                )}
-              </div>
-              <StudentListContainer>
-                {filteredStudents.length === 0 ? (
-                  <StudentListEmpty message="검색 결과가 없습니다." />
-                ) : (
-                  filteredStudents.map((student) => {
-                    const isSelected = selectedStudentIds.includes(student.id);
-                    const isAbsent = absentStudentIds.includes(student.id);
-                    const required = isRequiredDay(student);
-                    const studentActivity = activities[student.id];
+          <FormInput
+            label="날짜 선택"
+            required
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
 
-                    return (
-                      <div key={student.id} className="flex flex-col border-border border-b last:border-b-0">
-                        <StudentListItem
-                          student={student}
-                          selected={isSelected}
-                          onToggle={() => toggleStudent(student.id)}
-                          badge={
-                            <>
-                              {required && (
-                                <Badge variant="blue" size="xs">
-                                  필참
-                                </Badge>
-                              )}
-                              {isAbsent && (
-                                <Badge variant="danger" size="xs">
-                                  결석
-                                </Badge>
-                              )}
-                            </>
-                          }
-                          highlighted={isAbsent}
-                          rightContent={
-                            required && !isSelected ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  toggleAbsent(student.id);
-                                }}
-                                className={`rounded-sm px-3 py-1 font-medium text-xs transition-colors ${
-                                  isAbsent
-                                    ? "bg-solid-translucent-red text-solid-red"
-                                    : "bg-muted text-muted-foreground hover:bg-muted"
-                                }`}>
-                                결석
-                              </button>
-                            ) : undefined
-                          }
-                        />
-                        {isSelected && (
-                          <div className="flex items-center gap-2 bg-card px-4 py-2 pl-16">
-                            {ACTIVITY_LABELS.map(({ key, label }) => (
-                              <button
-                                key={key}
-                                type="button"
-                                onClick={() => toggleActivity(student.id, key)}
-                                className={`rounded-sm px-3 py-1 font-medium text-xs transition-colors ${
-                                  studentActivity?.[key]
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-muted text-muted-foreground hover:bg-muted"
-                                }`}>
-                                {label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </StudentListContainer>
+          <StatStrip
+            items={[
+              { label: "전체", value: visibleStudentCount },
+              { label: "참석", value: selectedStudentIds.length, emphasis: selectedStudentIds.length > 0 },
+              { label: "결석", value: absentStudentIds.length },
+              { label: "필참 미체크", value: uncheckedRequiredStudents.length },
+            ]}
+          />
+
+          {!loadingAttendance && students.length > 0 && (
+            <div className="flex items-center gap-3">
+              <SearchInput
+                placeholder="학생 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {uncheckedRequiredStudents.length > 0 && (
+                <Button variant="secondary" className="shrink-0" onClick={handleBulkAbsent}>
+                  필참 미체크 일괄 결석 ({uncheckedRequiredStudents.length}명)
+                </Button>
+              )}
             </div>
           )}
         </div>
+
+        {/* Roster scroll body */}
+        {loadingAttendance ? (
+          <StudentListContainer>
+            <StudentListSkeleton count={6} showCheckbox showRightContent />
+          </StudentListContainer>
+        ) : students.length === 0 ? (
+          <StudentListContainer>
+            <StudentListEmpty />
+          </StudentListContainer>
+        ) : (
+          <StudentListContainer>
+            {filteredStudents.length === 0 ? (
+              <StudentListEmpty message="검색 결과가 없습니다." />
+            ) : (
+              filteredStudents.map((student) => {
+                const isSelected = selectedStudentIds.includes(student.id);
+                const isAbsent = absentStudentIds.includes(student.id);
+                const required = isRequiredDay(student);
+                const studentActivity = activities[student.id];
+
+                return (
+                  <div key={student.id} className="border-border border-b last:border-b-0">
+                    <StudentListItem
+                      student={student}
+                      selected={isSelected}
+                      onToggle={() => toggleStudent(student.id)}
+                      badge={
+                        required ? (
+                          <Badge variant="blue" size="xs">
+                            필참
+                          </Badge>
+                        ) : undefined
+                      }
+                      highlighted={isAbsent}
+                      rightContent={
+                        <AttendanceSegmentedControl
+                          isSelected={isSelected}
+                          isAbsent={isAbsent}
+                          onPresent={() => {
+                            if (!isSelected) toggleStudent(student.id);
+                          }}
+                          onAbsent={() => {
+                            if (!isAbsent) toggleAbsent(student.id);
+                          }}
+                        />
+                      }
+                    />
+                    {isSelected && (
+                      <div className="flex flex-wrap items-center gap-2 bg-card px-4 pt-0.5 pb-3 pl-[5.5rem]">
+                        <span className="text-muted-foreground text-xs">활동</span>
+                        {ACTIVITY_LABELS.map(({ key, label }) => {
+                          const on = !!studentActivity?.[key];
+                          return (
+                            <button
+                              key={key}
+                              type="button"
+                              aria-pressed={on}
+                              onClick={() => toggleActivity(student.id, key)}
+                              className={cn(
+                                "h-7 rounded-md px-2.5 font-medium text-xs outline-none transition-[color,background-color,box-shadow] duration-[--motion-fast] focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                                on
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted/50 text-muted-foreground hover:bg-muted",
+                              )}>
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </StudentListContainer>
+        )}
       </div>
     </Modal>
   );

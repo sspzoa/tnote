@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Modal, SearchInput } from "@/shared/components/ui";
+import { Badge, Button, Modal, SearchInput } from "@/shared/components/ui";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -10,6 +10,7 @@ import {
   type StudentListStudent,
 } from "@/shared/components/ui/studentList";
 import { useToast } from "@/shared/hooks/useToast";
+import { cn } from "@/shared/lib/utils/cn";
 import { getErrorMessage } from "@/shared/lib/utils/error";
 import type { Exam } from "../(hooks)/useExams";
 import { useRetakeAssignFromExam } from "../(hooks)/useRetakeAssign";
@@ -127,6 +128,7 @@ export function ScoreInputModal({
     .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 
   const scoreCount = Object.values(scoreInputs).filter((v) => v !== "" && !Number.isNaN(Number.parseInt(v))).length;
+  const maxScoreValue = exam.max_score || 8;
   const cutlineValue = exam.cutline || 4;
   const belowCutlineCount = Object.entries(scoreInputs).filter(([, value]) => {
     const score = Number.parseInt(value);
@@ -172,7 +174,7 @@ export function ScoreInputModal({
       }>
       {isLoading ? (
         <div className="flex flex-col gap-4">
-          <div className="h-12 animate-pulse rounded-md bg-muted" />
+          <div className="h-9 animate-pulse rounded-lg bg-muted/50" />
           <StudentListContainer>
             <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
           </StudentListContainer>
@@ -190,13 +192,36 @@ export function ScoreInputModal({
           />
 
           <StudentListContainer>
+            {/* Sticky cutline + tally header so the reference stays visible while scrolling a long roster. */}
+            <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-border border-b bg-card/95 px-4 py-2.5 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+              <div className="flex items-center gap-3 text-xs">
+                <span className="text-muted-foreground">
+                  만점 <span className="font-semibold text-foreground tabular-nums">{maxScoreValue}</span>
+                </span>
+                <span className="h-3 w-px bg-border" />
+                <span className="text-muted-foreground">
+                  커트라인 <span className="font-semibold text-foreground tabular-nums">{cutlineValue}</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="neutral" size="xs">
+                  점수 <span className="ml-0.5 font-semibold tabular-nums">{scoreCount}</span>명
+                </Badge>
+                {belowCutlineCount > 0 && (
+                  <Badge variant="danger" size="xs">
+                    커트라인 미달 <span className="ml-0.5 font-semibold tabular-nums">{belowCutlineCount}</span>명
+                  </Badge>
+                )}
+              </div>
+            </div>
+
             {filteredStudents.length === 0 ? (
               <StudentListEmpty message="검색 결과가 없습니다." />
             ) : (
               filteredStudents.map((student) => {
                 const scoreValue = scoreInputs[student.id] || "";
                 const score = Number.parseInt(scoreValue);
-                const isBelowCutline = !Number.isNaN(score) && score < (exam.cutline || 4);
+                const isBelowCutline = !Number.isNaN(score) && score < cutlineValue;
 
                 return (
                   <StudentListItem
@@ -204,21 +229,30 @@ export function ScoreInputModal({
                     student={student}
                     highlighted={isBelowCutline}
                     rightContent={
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={scoreValue}
-                          onChange={(e) => handleScoreChange(student.id, e.target.value)}
-                          placeholder="-"
-                          min="0"
-                          max={exam.max_score || 8}
-                          className={`w-16 rounded-md border px-2 py-2 text-center text-sm transition-all focus:outline-none focus:ring-2 ${
-                            isBelowCutline
-                              ? "border-destructive bg-solid-translucent-red text-destructive focus:ring-destructive/30"
-                              : "border-border bg-card text-foreground focus:border-ring focus:ring-ring/50"
-                          }`}
-                        />
-                        <span className="text-muted-foreground text-xs">/ {exam.max_score || 8}</span>
+                      <div className="flex items-center gap-2.5">
+                        {isBelowCutline && (
+                          <Badge variant="danger" size="xs">
+                            미달
+                          </Badge>
+                        )}
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="number"
+                            value={scoreValue}
+                            onChange={(e) => handleScoreChange(student.id, e.target.value)}
+                            placeholder="-"
+                            min="0"
+                            max={maxScoreValue}
+                            aria-label={`${student.name} 점수`}
+                            className={cn(
+                              "h-9 w-16 rounded-lg border text-center text-sm tabular-nums outline-none transition-[color,box-shadow,background-color] duration-[--motion-fast] focus-visible:ring-[3px]",
+                              isBelowCutline
+                                ? "border-destructive/40 bg-destructive-soft text-destructive focus-visible:border-destructive focus-visible:ring-destructive/30"
+                                : "border-input bg-muted/50 text-foreground focus-visible:border-ring focus-visible:bg-card focus-visible:ring-ring/50",
+                            )}
+                          />
+                          <span className="text-muted-foreground text-xs tabular-nums">/ {maxScoreValue}</span>
+                        </div>
                       </div>
                     }
                   />

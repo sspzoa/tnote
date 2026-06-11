@@ -48,7 +48,7 @@
   /* calendar event hue — the documented exception to "solid-* is tags only" */
   --color-event-clinic: var(--event-clinic);
 
-  /* per-feature pastel chrome accents (wells/section headers/icon badges) — DISTINCT from --solid-* tags */
+  /* per-feature accents (sparing chrome: icon wells / dots / section markers) — DISTINCT from --solid-* tags */
   --color-feature-calendar: var(--feature-calendar);
   --color-feature-calendar-soft: var(--feature-calendar-soft);
   --color-feature-messages: var(--feature-messages);
@@ -106,59 +106,68 @@
   --shadow-md: var(--elevation-md);
   --shadow-lg: var(--elevation-lg);
   --shadow-brand: var(--elevation-brand);
+  /* tactile control shadows — a soft top sheen + drop, so buttons read as crafted, not flat fills */
+  --shadow-btn: var(--elevation-btn);
+  --shadow-btn-primary: var(--elevation-btn-primary);
+  --shadow-inset-sheen: var(--sheen);
+  --shadow-well: var(--elevation-well);
 
-  /* friendlier radius ladder (base 1rem) */
-  --radius-sm: calc(var(--radius) - 6px);
-  --radius-md: calc(var(--radius) - 4px);
+  /* refined radius ladder (base 0.625rem / 10px) — crisp, not bubbly */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 8px);
-  --radius-2xl: calc(var(--radius) + 16px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
   --font-sans: "Wanted Sans Variable", "Wanted Sans", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
     "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
 }
 
-/* Toss풍 tokens — warm off-white page, pure-white floating cards, friendly brand blue, soft colored shadows. */
+/*
+ * "Refined precision workspace" — cool neutral page, crisp hairline-bordered white surfaces,
+ * a confident deep-indigo brand, deepened semantics, restrained neutral elevation.
+ * Surfaces are defined by BORDER first, shadow second (the inverse of the old shadow-only cards).
+ */
 :root {
-  --radius: 1rem;
+  --radius: 0.625rem;
 
-  /* brand: a friendlier, slightly warmer Toss-blue */
-  --primary: oklch(0.62 0.19 256);
-  --primary-foreground: oklch(0.99 0 0);
-  --primary-soft: oklch(0.95 0.04 256);
-  --primary-soft-foreground: oklch(0.45 0.16 256);
+  /* brand: a confident, premium deep indigo (distinct from the old warm 256° blue) */
+  --primary: oklch(0.54 0.2 269);
+  --primary-foreground: oklch(0.99 0.005 269);
+  --primary-soft: oklch(0.95 0.035 269);
+  --primary-soft-foreground: oklch(0.45 0.18 269);
 
-  /* surface ramp: warm off-white page, pure-white cards */
-  --background: oklch(0.985 0.004 250);
-  --foreground: oklch(0.21 0.02 256);
+  /* surface ramp: cool near-white page, pure-white cards */
+  --background: oklch(0.985 0.0025 265);
+  --foreground: oklch(0.2 0.015 265);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.02 256);
+  --card-foreground: oklch(0.2 0.015 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.02 256);
+  --popover-foreground: oklch(0.2 0.015 265);
 
-  /* muted / secondary / accent: subtly warm-blue gray */
-  --secondary: oklch(0.965 0.005 256);
-  --secondary-foreground: oklch(0.34 0.02 256);
-  --muted: oklch(0.965 0.005 256);
-  --muted-foreground: oklch(0.53 0.02 256);
-  --accent: oklch(0.95 0.01 256);
-  --accent-foreground: oklch(0.3 0.02 256);
+  /* muted / secondary / accent: cool neutral grays */
+  --secondary: oklch(0.965 0.004 265);
+  --secondary-foreground: oklch(0.32 0.018 265);
+  --muted: oklch(0.965 0.004 265);
+  --muted-foreground: oklch(0.5 0.016 265);
+  --accent: oklch(0.955 0.006 265);
+  --accent-foreground: oklch(0.28 0.02 265);
 
-  /* semantic — friendly-tuned, with soft pastel companions */
-  --success: oklch(0.72 0.17 152);
-  --success-foreground: oklch(0.99 0 0);
-  --success-soft: oklch(0.95 0.05 152);
-  --warning: oklch(0.8 0.15 78);
-  --warning-foreground: oklch(0.3 0.04 78);
-  --warning-soft: oklch(0.96 0.05 85);
-  --destructive: oklch(0.63 0.21 22);
-  --destructive-foreground: oklch(0.99 0 0);
-  --destructive-soft: oklch(0.95 0.04 22);
+  /* semantic — deepened so the solid hue reads as text on its own /10 tint */
+  --success: oklch(0.6 0.14 158);
+  --success-foreground: oklch(0.99 0.01 158);
+  --success-soft: oklch(0.95 0.04 158);
+  --warning: oklch(0.66 0.14 67);
+  --warning-foreground: oklch(0.99 0.01 67);
+  --warning-soft: oklch(0.95 0.05 75);
+  --destructive: oklch(0.58 0.21 26);
+  --destructive-foreground: oklch(0.99 0.01 26);
+  --destructive-soft: oklch(0.95 0.04 26);
 
-  /* borders: light hairlines — cards lean on shadow, not border */
-  --border: oklch(0.93 0.004 256);
-  --border-strong: oklch(0.88 0.006 256);
-  --input: oklch(0.92 0.005 256);
-  --ring: oklch(0.62 0.19 256);
+  /* borders: crisp hairlines — surfaces lean on border first, shadow second */
+  --border: oklch(0.915 0.005 265);
+  --border-strong: oklch(0.85 0.008 265);
+  --input: oklch(0.895 0.006 265);
+  --ring: oklch(0.54 0.2 269);
 
   --info: var(--primary);
   --info-foreground: var(--primary-foreground);
@@ -168,55 +177,64 @@
   --chart-2: var(--success);
   --chart-3: var(--warning);
   --chart-4: var(--destructive);
-  --chart-5: oklch(0.55 0.03 256);
+  --chart-5: oklch(0.55 0.04 230);
   --chart-grid: var(--border);
-  --sparkline-fill: oklch(0.62 0.19 256 / 0.08);
+  --sparkline-fill: oklch(0.54 0.2 269 / 0.08);
 
   /* calendar event hue (documented solid-* exception) */
   --event-clinic: var(--solid-purple);
   --event-clinic-bg: var(--solid-translucent-purple);
 
-  /* per-feature pastel chrome accents (desaturated, oklch — NOT the saturated --solid-* tags) */
-  --feature-calendar: oklch(0.62 0.19 256);
-  --feature-calendar-soft: oklch(0.95 0.04 256);
-  --feature-messages: oklch(0.66 0.16 200);
-  --feature-messages-soft: oklch(0.95 0.04 200);
-  --feature-retakes: oklch(0.64 0.16 35);
-  --feature-retakes-soft: oklch(0.95 0.05 50);
-  --feature-assignments: oklch(0.64 0.16 300);
-  --feature-assignments-soft: oklch(0.95 0.04 300);
-  --feature-students: oklch(0.62 0.19 256);
-  --feature-students-soft: oklch(0.95 0.04 256);
-  --feature-courses: oklch(0.66 0.15 152);
-  --feature-courses-soft: oklch(0.95 0.05 152);
-  --feature-clinics: oklch(0.64 0.17 330);
-  --feature-clinics-soft: oklch(0.95 0.04 330);
-  --feature-admins: oklch(0.55 0.03 256);
-  --feature-admins-soft: oklch(0.95 0.01 256);
+  /* per-feature accents (refined, oklch — NOT the saturated --solid-* tags) */
+  --feature-calendar: oklch(0.54 0.18 262);
+  --feature-calendar-soft: oklch(0.95 0.035 262);
+  --feature-messages: oklch(0.58 0.12 215);
+  --feature-messages-soft: oklch(0.95 0.035 215);
+  --feature-retakes: oklch(0.62 0.15 45);
+  --feature-retakes-soft: oklch(0.95 0.05 55);
+  --feature-assignments: oklch(0.55 0.16 302);
+  --feature-assignments-soft: oklch(0.95 0.04 302);
+  --feature-students: oklch(0.55 0.15 250);
+  --feature-students-soft: oklch(0.95 0.035 250);
+  --feature-courses: oklch(0.58 0.13 162);
+  --feature-courses-soft: oklch(0.95 0.045 162);
+  --feature-clinics: oklch(0.58 0.16 350);
+  --feature-clinics-soft: oklch(0.95 0.035 350);
+  --feature-admins: oklch(0.52 0.025 265);
+  --feature-admins-soft: oklch(0.95 0.008 265);
 
-  /* elevation ladder — light: soft, large-blur, faintly brand-tinted */
-  --elevation-xs: 0 1px 2px 0 oklch(0.55 0.06 256 / 0.06);
-  --elevation-sm: 0 2px 8px -2px oklch(0.55 0.08 256 / 0.1), 0 1px 3px -1px oklch(0.55 0.06 256 / 0.06);
-  --elevation-md: 0 8px 24px -6px oklch(0.55 0.1 256 / 0.14), 0 3px 8px -3px oklch(0.55 0.07 256 / 0.08);
-  --elevation-lg: 0 16px 40px -8px oklch(0.5 0.12 256 / 0.18), 0 6px 14px -6px oklch(0.5 0.08 256 / 0.1);
-  --elevation-brand: 0 6px 20px -4px oklch(0.62 0.19 256 / 0.32);
+  /* elevation ladder — light: tight, neutral cool-gray (no brand glow on chrome) */
+  --elevation-xs: 0 1px 2px 0 oklch(0.22 0.02 265 / 0.05);
+  --elevation-sm: 0 1px 2px -1px oklch(0.22 0.02 265 / 0.08), 0 1px 3px 0 oklch(0.22 0.02 265 / 0.05);
+  --elevation-md: 0 4px 12px -2px oklch(0.22 0.02 265 / 0.1), 0 2px 6px -3px oklch(0.22 0.02 265 / 0.07);
+  --elevation-lg: 0 12px 30px -6px oklch(0.2 0.02 265 / 0.16), 0 4px 10px -5px oklch(0.2 0.02 265 / 0.08);
+  --elevation-brand: 0 4px 14px -3px oklch(0.54 0.2 269 / 0.28);
 
-  /* motion */
-  --motion-fast: 140ms;
-  --motion-base: 220ms;
-  --motion-slow: 320ms;
-  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  /* tactile control shadows — top sheen + tight drop */
+  --sheen: inset 0 1px 0 0 oklch(1 0 0 / 0.55);
+  --elevation-btn: inset 0 1px 0 0 oklch(1 0 0 / 0.6), 0 1px 1px 0 oklch(0.22 0.02 265 / 0.1), 0 1px 2px -1px oklch(0.22 0.02 265 / 0.12);
+  --elevation-btn-primary: inset 0 1px 0 0 oklch(1 0 0 / 0.22), 0 1px 2px 0 oklch(0.45 0.18 269 / 0.45), 0 2px 6px -1px oklch(0.45 0.18 269 / 0.35);
+  /* recessed well — inputs/selects read as something you type INTO (opposite of raised buttons) */
+  --elevation-well: inset 0 1px 2px 0 oklch(0.22 0.02 265 / 0.06);
+  /* skeleton shimmer sweep highlight */
+  --shimmer-highlight: oklch(1 0 0 / 0.55);
+
+  /* motion — restrained: snappy ease-out, no bounce */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --ease-spring: cubic-bezier(0.3, 0, 0, 1);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* sidebar: blends with the warm page so white content cards pop */
-  --sidebar: oklch(0.985 0.004 250);
-  --sidebar-foreground: oklch(0.21 0.02 256);
-  --sidebar-primary: oklch(0.62 0.19 256);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.95 0.01 256);
-  --sidebar-accent-foreground: oklch(0.3 0.02 256);
-  --sidebar-border: oklch(0.93 0.004 256);
-  --sidebar-ring: oklch(0.62 0.19 256);
+  /* sidebar: matches the cool page so bordered white content surfaces read cleanly */
+  --sidebar: oklch(0.985 0.0025 265);
+  --sidebar-foreground: oklch(0.2 0.015 265);
+  --sidebar-primary: oklch(0.54 0.2 269);
+  --sidebar-primary-foreground: oklch(0.99 0.005 269);
+  --sidebar-accent: oklch(0.955 0.006 265);
+  --sidebar-accent-foreground: oklch(0.28 0.02 265);
+  --sidebar-border: oklch(0.915 0.005 265);
+  --sidebar-ring: oklch(0.54 0.2 269);
 
   /* tnote tag palette values */
   --solid-red: rgba(255, 64, 53, 1);
@@ -245,74 +263,87 @@
 }
 
 .dark {
-  /* brand lifted for legibility on charcoal */
-  --primary: oklch(0.66 0.17 256);
-  --primary-foreground: oklch(0.99 0 0);
-  --primary-soft: oklch(0.3 0.06 256);
-  --primary-soft-foreground: oklch(0.82 0.1 256);
+  /* brand lifted for legibility on near-black */
+  --primary: oklch(0.64 0.18 268);
+  --primary-foreground: oklch(0.16 0.02 268);
+  --primary-soft: oklch(0.3 0.07 268);
+  --primary-soft-foreground: oklch(0.82 0.11 268);
 
-  /* soft near-black, blue-tinted; cards a step lighter = the float cue */
-  --background: oklch(0.17 0.01 256);
-  --foreground: oklch(0.97 0.003 256);
-  --card: oklch(0.215 0.012 256);
-  --card-foreground: oklch(0.97 0.003 256);
-  --popover: oklch(0.235 0.012 256);
-  --popover-foreground: oklch(0.97 0.003 256);
+  /* deep cool charcoal; cards a half-step lighter, defined by a faint light border */
+  --background: oklch(0.165 0.012 265);
+  --foreground: oklch(0.96 0.003 265);
+  --card: oklch(0.205 0.013 265);
+  --card-foreground: oklch(0.96 0.003 265);
+  --popover: oklch(0.215 0.014 265);
+  --popover-foreground: oklch(0.96 0.003 265);
 
-  --secondary: oklch(0.27 0.012 256);
-  --secondary-foreground: oklch(0.97 0.003 256);
-  --muted: oklch(0.27 0.012 256);
-  --muted-foreground: oklch(0.7 0.015 256);
-  --accent: oklch(0.3 0.015 256);
-  --accent-foreground: oklch(0.97 0.003 256);
+  --secondary: oklch(0.26 0.014 265);
+  --secondary-foreground: oklch(0.96 0.003 265);
+  --muted: oklch(0.255 0.014 265);
+  --muted-foreground: oklch(0.68 0.016 265);
+  --accent: oklch(0.29 0.016 265);
+  --accent-foreground: oklch(0.96 0.003 265);
 
-  --success: oklch(0.72 0.17 152);
-  --success-foreground: oklch(0.99 0 0);
-  --success-soft: oklch(0.32 0.06 152);
-  --warning: oklch(0.8 0.15 78);
-  --warning-foreground: oklch(0.2 0.03 78);
-  --warning-soft: oklch(0.33 0.06 85);
-  --destructive: oklch(0.7 0.2 22);
-  --destructive-foreground: oklch(0.99 0 0);
-  --destructive-soft: oklch(0.32 0.06 22);
+  --success: oklch(0.68 0.15 158);
+  --success-foreground: oklch(0.15 0.02 158);
+  --success-soft: oklch(0.32 0.07 158);
+  --warning: oklch(0.76 0.14 72);
+  --warning-foreground: oklch(0.18 0.03 72);
+  --warning-soft: oklch(0.34 0.07 75);
+  --destructive: oklch(0.68 0.2 25);
+  --destructive-foreground: oklch(0.15 0.02 25);
+  --destructive-soft: oklch(0.33 0.08 25);
 
-  --border: oklch(1 0 0 / 9%);
-  --border-strong: oklch(1 0 0 / 16%);
+  --border: oklch(1 0 0 / 10%);
+  --border-strong: oklch(1 0 0 / 18%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.66 0.17 256);
+  --ring: oklch(0.64 0.18 268);
 
-  --chart-5: oklch(0.7 0.02 256);
-  --sparkline-fill: oklch(0.66 0.17 256 / 0.15);
+  --chart-5: oklch(0.72 0.03 230);
+  --sparkline-fill: oklch(0.64 0.18 268 / 0.16);
 
-  /* feature accents stay vivid; *-soft become low-alpha dark wells */
-  --feature-calendar-soft: oklch(0.3 0.05 256);
-  --feature-messages-soft: oklch(0.3 0.05 200);
-  --feature-retakes-soft: oklch(0.3 0.05 50);
-  --feature-assignments-soft: oklch(0.3 0.05 300);
-  --feature-students-soft: oklch(0.3 0.05 256);
-  --feature-courses-soft: oklch(0.3 0.05 152);
-  --feature-clinics-soft: oklch(0.3 0.05 330);
-  --feature-admins-soft: oklch(0.3 0.01 256);
+  /* feature accents stay vivid; *-soft become low-chroma dark wells */
+  --feature-calendar: oklch(0.7 0.15 262);
+  --feature-calendar-soft: oklch(0.3 0.06 262);
+  --feature-messages: oklch(0.72 0.11 215);
+  --feature-messages-soft: oklch(0.3 0.05 215);
+  --feature-retakes: oklch(0.74 0.13 55);
+  --feature-retakes-soft: oklch(0.32 0.06 55);
+  --feature-assignments: oklch(0.72 0.14 302);
+  --feature-assignments-soft: oklch(0.31 0.06 302);
+  --feature-students: oklch(0.7 0.13 250);
+  --feature-students-soft: oklch(0.3 0.06 250);
+  --feature-courses: oklch(0.72 0.13 162);
+  --feature-courses-soft: oklch(0.3 0.06 162);
+  --feature-clinics: oklch(0.72 0.14 350);
+  --feature-clinics-soft: oklch(0.31 0.06 350);
+  --feature-admins: oklch(0.7 0.02 265);
+  --feature-admins-soft: oklch(0.3 0.01 265);
 
-  /* elevation — dark: deep black + faint top-highlight inset (brand shadow washes out on charcoal) */
+  /* elevation — dark: deep black + faint top-highlight inset (neutral shadows wash out on charcoal) */
   --elevation-xs: 0 1px 2px 0 oklch(0 0 0 / 0.4), inset 0 1px 0 0 oklch(1 0 0 / 0.04);
-  --elevation-sm: 0 2px 8px -2px oklch(0 0 0 / 0.5), 0 1px 3px -1px oklch(0 0 0 / 0.4), inset 0 1px 0 0 oklch(1 0 0 / 0.05);
-  --elevation-md: 0 8px 26px -6px oklch(0 0 0 / 0.6), 0 3px 8px -3px oklch(0 0 0 / 0.45),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.06);
-  --elevation-lg: 0 18px 44px -8px oklch(0 0 0 / 0.68), 0 6px 16px -6px oklch(0 0 0 / 0.5),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.07);
-  --elevation-brand: 0 6px 22px -4px oklch(0.66 0.17 256 / 0.45);
+  --elevation-sm: 0 1px 2px -1px oklch(0 0 0 / 0.5), 0 2px 6px -2px oklch(0 0 0 / 0.4), inset 0 1px 0 0 oklch(1 0 0 / 0.05);
+  --elevation-md: 0 6px 18px -4px oklch(0 0 0 / 0.6), 0 3px 8px -4px oklch(0 0 0 / 0.45), inset 0 1px 0 0 oklch(1 0 0 / 0.06);
+  --elevation-lg: 0 16px 40px -8px oklch(0 0 0 / 0.7), 0 6px 16px -6px oklch(0 0 0 / 0.5), inset 0 1px 0 0 oklch(1 0 0 / 0.07);
+  --elevation-brand: 0 4px 16px -3px oklch(0.64 0.18 268 / 0.4);
 
-  --sidebar: oklch(0.17 0.01 256);
-  --sidebar-foreground: oklch(0.97 0.003 256);
-  --sidebar-primary: oklch(0.66 0.17 256);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.3 0.015 256);
-  --sidebar-accent-foreground: oklch(0.97 0.003 256);
-  --sidebar-border: oklch(1 0 0 / 9%);
-  --sidebar-ring: oklch(0.66 0.17 256);
+  /* tactile control shadows — dark: faint top sheen + deep drop */
+  --sheen: inset 0 1px 0 0 oklch(1 0 0 / 0.08);
+  --elevation-btn: inset 0 1px 0 0 oklch(1 0 0 / 0.08), 0 1px 2px 0 oklch(0 0 0 / 0.5);
+  --elevation-btn-primary: inset 0 1px 0 0 oklch(1 0 0 / 0.14), 0 1px 2px 0 oklch(0 0 0 / 0.5), 0 2px 8px -1px oklch(0.64 0.18 268 / 0.45);
+  --elevation-well: inset 0 1px 2px 0 oklch(0 0 0 / 0.32);
+  --shimmer-highlight: oklch(1 0 0 / 0.06);
 
-  /* dark: the "black" tag (pure black) would be invisible on the near-black surface — render it light gray */
+  --sidebar: oklch(0.165 0.012 265);
+  --sidebar-foreground: oklch(0.96 0.003 265);
+  --sidebar-primary: oklch(0.64 0.18 268);
+  --sidebar-primary-foreground: oklch(0.16 0.02 268);
+  --sidebar-accent: oklch(0.29 0.016 265);
+  --sidebar-accent-foreground: oklch(0.96 0.003 265);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.64 0.18 268);
+
+  /* dark: the "black" tag (pure black) would be invisible on charcoal — render it light gray */
   --solid-black: rgba(228, 228, 231, 1);
 
   /* tag palette: brighter translucent tints in dark mode */
@@ -340,6 +371,9 @@
       "Wanted Sans Variable", "Wanted Sans", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
       "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
       sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.005em;
   }
 
   body::selection {
@@ -351,6 +385,27 @@
   table,
   input[type="number"] {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+/* crafted component motion: a sweeping shimmer for loading skeletons (replaces the flat pulse) */
+@keyframes tnote-shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -150% 0;
+  }
+}
+
+@layer components {
+  .skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+    background-image: linear-gradient(90deg, transparent 0%, var(--shimmer-highlight) 50%, transparent 100%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: tnote-shimmer 1.6s ease-in-out infinite;
   }
 }
 

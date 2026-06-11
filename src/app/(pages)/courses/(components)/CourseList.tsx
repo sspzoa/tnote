@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import Link from "next/link";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { Badge, Button } from "@/shared/components/ui";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
@@ -14,11 +14,13 @@ import { useCourseDelete } from "../(hooks)/useCourseDelete";
 
 interface CourseListProps {
   courses: Course[];
+  isLoading?: boolean;
+  empty?: ReactNode;
 }
 
 type CourseSortKey = "name" | "studentCount";
 
-export default function CourseList({ courses }: CourseListProps) {
+export default function CourseList({ courses, isLoading, empty }: CourseListProps) {
   const setSelectedCourse = useSetAtom(selectedCourseAtom);
   const setShowEditModal = useSetAtom(showEditModalAtom);
   const setShowEnrollModal = useSetAtom(showEnrollModalAtom);
@@ -80,13 +82,21 @@ export default function CourseList({ courses }: CourseListProps) {
       id: "name",
       header: "수업명",
       sortKey: "name",
-      cell: (course) => (
-        <Link
-          href={`/courses/${course.id}`}
-          className="font-medium text-foreground transition-colors hover:text-primary">
-          {course.name}
-        </Link>
-      ),
+      cell: (course) => {
+        const hasPeriod = course.start_date || course.end_date;
+        return (
+          <Link href={`/courses/${course.id}`} className="group flex min-w-0 flex-col gap-0.5 text-left">
+            <span className="font-medium text-foreground transition-colors group-hover:text-primary">
+              {course.name}
+            </span>
+            {hasPeriod && (
+              <span className="text-muted-foreground text-xs">
+                {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
+              </span>
+            )}
+          </Link>
+        );
+      },
     },
     {
       id: "studentCount",
@@ -134,6 +144,10 @@ export default function CourseList({ courses }: CourseListProps) {
 
   return (
     <DataTable
+      flush
+      isLoading={isLoading}
+      skeletonRows={8}
+      empty={empty}
       columns={columns}
       data={courses}
       getRowId={(course) => course.id}

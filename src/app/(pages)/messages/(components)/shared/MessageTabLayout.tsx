@@ -83,7 +83,7 @@ export default function MessageTabLayout({ selection, message, send, preview, is
           {selection.showPlaceholder ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
               {selection.placeholderIcon && (
-                <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+                <div className="flex size-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
                   {selection.placeholderIcon}
                 </div>
               )}

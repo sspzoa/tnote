@@ -76,7 +76,7 @@ export default function AdminInviteModal() {
         <p className="text-[10px] leading-4 text-muted-foreground">초기 비밀번호는 전화번호로 자동 설정됩니다.</p>
 
         {error && (
-          <div className="rounded-md border border-destructive/20 bg-solid-translucent-red px-4 py-3 font-medium text-destructive text-sm">
+          <div className="rounded-md border border-destructive/20 bg-destructive-soft px-4 py-3 font-medium text-destructive text-sm">
             {error}
           </div>
         )}

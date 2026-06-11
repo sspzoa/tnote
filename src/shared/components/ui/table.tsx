@@ -34,7 +34,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "focus-visible:-outline-offset-2 border-b transition-colors duration-150 hover:bg-primary-soft/40 focus-visible:outline-2 focus-visible:outline-ring data-[state=selected]:bg-primary-soft/60",
+        "focus-visible:-outline-offset-2 border-b transition-colors duration-150 hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring data-[state=selected]:bg-primary-soft",
         className,
       )}
       {...props}

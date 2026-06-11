@@ -1,8 +1,10 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { MessageSquareText, Trash2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
+import { EmptyState } from "@/shared/components/ui/emptyState";
+import { IconBadge } from "@/shared/components/ui/iconBadge";
 import { Modal } from "@/shared/components/ui/modal";
 import type { MessageTemplate } from "../(hooks)/useMessageTemplates";
 
@@ -40,20 +42,27 @@ export default function TemplateManageModal({ isOpen, onClose, templates, onDele
         </Button>
       }>
       {templates.length === 0 ? (
-        <p className="py-4 text-center text-muted-foreground text-sm">저장된 템플릿이 없습니다.</p>
+        <EmptyState
+          tone="messages"
+          icon={<MessageSquareText />}
+          message="저장된 템플릿이 없습니다."
+          subtitle="자주 쓰는 문구를 템플릿으로 저장해 두면 여기에서 관리할 수 있어요."
+        />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="-mx-1 divide-y divide-border overflow-hidden rounded-xl border border-border">
           {templates.map((template) => (
             <div
               key={template.id}
-              className="flex items-start justify-between gap-3 rounded-md border border-border bg-muted p-4">
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <span className="font-semibold text-foreground text-sm">{template.name}</span>
-                <p className="line-clamp-2 text-muted-foreground text-xs">{template.content}</p>
+              className="group flex items-center gap-3 px-3 py-3 transition-colors hover:bg-muted/50">
+              <IconBadge icon={MessageSquareText} tone="messages" size="md" />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="truncate font-semibold text-foreground text-sm">{template.name}</span>
+                <p className="line-clamp-1 text-muted-foreground text-xs">{template.content}</p>
               </div>
               <Button
-                variant="destructive"
-                size="sm"
+                variant="ghost"
+                size="icon-sm"
+                className="shrink-0 text-muted-foreground hover:bg-destructive-soft hover:text-destructive"
                 onClick={() => handleDelete(template.id, template.name)}
                 title="템플릿 삭제">
                 <Trash2 className="size-4" />

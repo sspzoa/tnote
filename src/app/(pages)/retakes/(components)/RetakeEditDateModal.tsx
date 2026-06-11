@@ -1,6 +1,9 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { CalendarClock, Info } from "lucide-react";
+import { TransitionChip } from "@/shared/components/common/FeedItem";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
@@ -15,6 +18,15 @@ import { useRetakeHistory } from "../(hooks)/useRetakeHistory";
 interface RetakeEditDateModalProps {
   onSuccess?: () => void;
 }
+
+const STATUS_BADGE: Record<
+  "pending" | "completed" | "absent",
+  { label: string; variant: "warning" | "success" | "danger" }
+> = {
+  pending: { label: "대기중", variant: "warning" },
+  completed: { label: "완료", variant: "success" },
+  absent: { label: "결석", variant: "danger" },
+};
 
 export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalProps) {
   const [isOpen, setIsOpen] = useAtom(showEditDateModalAtom);
@@ -51,7 +63,8 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
 
   if (!selectedRetake) return null;
 
-  const subtitle = `${selectedRetake.student.name} - ${selectedRetake.exam.course.name} - ${selectedRetake.exam.name} ${selectedRetake.exam.exam_number}회차`;
+  const status = STATUS_BADGE[selectedRetake.status];
+  const currentDate = selectedRetake.current_scheduled_date || "미지정";
 
   return (
     <Modal
@@ -59,7 +72,6 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
       onClose={handleClose}
       onSubmit={handleSave}
       title="날짜 수정"
-      subtitle={subtitle}
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} disabled={isEditing} className="flex-1">
@@ -70,23 +82,48 @@ export default function RetakeEditDateModal({ onSuccess }: RetakeEditDateModalPr
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="block font-semibold text-foreground text-sm">현재 예정일</label>
-          <div className="rounded-md border border-border bg-muted px-4 py-3 text-muted-foreground text-sm">
-            {selectedRetake.current_scheduled_date || "미지정"}
+      <div className="flex flex-col gap-5">
+        {/* 대상 재시험 요약 */}
+        <div className="rounded-xl border border-border bg-muted/40 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="truncate font-semibold text-foreground text-sm">{selectedRetake.student.name}</span>
+                <Badge variant={status.variant} size="sm">
+                  {status.label}
+                </Badge>
+              </div>
+              <span className="truncate text-muted-foreground text-xs">
+                {selectedRetake.exam.course.name} · {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+              </span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center justify-between border-border/70 border-t pt-3">
+            <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+              <CalendarClock className="size-3.5" />
+              현재 예정일
+            </span>
+            <span className="font-medium text-foreground text-sm tabular-nums">{currentDate}</span>
           </div>
         </div>
 
-        <FormInput
-          label="새로운 날짜"
-          required
-          type="date"
-          value={editDate}
-          onChange={(e) => setEditDate(e.target.value)}
-        />
+        {/* 새로운 날짜 */}
+        <div className="flex flex-col gap-3">
+          <FormInput
+            label="새로운 날짜"
+            required
+            type="date"
+            value={editDate}
+            onChange={(e) => setEditDate(e.target.value)}
+          />
 
-        <p className="text-muted-foreground text-xs">날짜 수정은 연기 횟수에 포함되지 않습니다.</p>
+          {editDate && <TransitionChip from={currentDate} to={editDate} />}
+
+          <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-muted-foreground text-xs">
+            <Info className="mt-px size-3.5 shrink-0" />
+            <span>날짜 수정은 연기 횟수에 포함되지 않습니다.</span>
+          </div>
+        </div>
       </div>
     </Modal>
   );

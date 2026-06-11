@@ -1,12 +1,16 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { CalendarClock } from "lucide-react";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { DateChip } from "@/shared/components/ui/dateChip";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/lib/utils/error";
+import type { AssignmentTaskStatus } from "@/shared/types";
 import { selectedTaskAtom } from "../(atoms)/useAssignmentTaskStore";
 import { postponeDateAtom, postponeNoteAtom } from "../(atoms)/useFormStore";
 import { showPostponeModalAtom } from "../(atoms)/useModalStore";
@@ -16,6 +20,14 @@ import { useAssignmentTaskPostpone } from "../(hooks)/useAssignmentTaskPostpone"
 interface AssignmentTaskPostponeModalProps {
   onSuccess?: () => void;
 }
+
+const STATUS_CONFIG: Record<AssignmentTaskStatus, { label: string; variant: BadgeVariant }> = {
+  pending: { label: "검사예정", variant: "warning" },
+  completed: { label: "완료", variant: "success" },
+  insufficient: { label: "미흡", variant: "danger" },
+  not_submitted: { label: "미제출", variant: "danger" },
+  absent: { label: "결석", variant: "danger" },
+};
 
 export default function AssignmentTaskPostponeModal({ onSuccess }: AssignmentTaskPostponeModalProps) {
   const [isOpen, setIsOpen] = useAtom(showPostponeModalAtom);
@@ -58,7 +70,8 @@ export default function AssignmentTaskPostponeModal({ onSuccess }: AssignmentTas
 
   if (!selectedTask) return null;
 
-  const subtitle = `${selectedTask.student.name} - ${selectedTask.assignment.course.name} - ${selectedTask.assignment.name}`;
+  const status = STATUS_CONFIG[selectedTask.status];
+  const subtitle = `${selectedTask.assignment.course.name} · ${selectedTask.assignment.name}`;
 
   return (
     <Modal
@@ -82,10 +95,30 @@ export default function AssignmentTaskPostponeModal({ onSuccess }: AssignmentTas
         </>
       }>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="block font-semibold text-foreground text-sm">현재 예정일</label>
-          <div className="rounded-md border border-border bg-muted px-4 py-3 text-muted-foreground text-sm">
-            {selectedTask.current_scheduled_date}
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="truncate font-semibold text-foreground text-sm">{selectedTask.student.name}</span>
+              <span className="truncate text-muted-foreground text-xs">
+                {selectedTask.assignment.course.name} · {selectedTask.assignment.name}
+              </span>
+            </div>
+            {status && (
+              <Badge variant={status.variant} size="sm">
+                {status.label}
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center justify-between border-border/60 border-t pt-3">
+            <span className="inline-flex items-center gap-1.5 text-muted-foreground text-xs">
+              <CalendarClock className="size-3.5" />
+              현재 예정일
+            </span>
+            {selectedTask.current_scheduled_date ? (
+              <DateChip>{selectedTask.current_scheduled_date}</DateChip>
+            ) : (
+              <span className="text-muted-foreground text-xs">미지정</span>
+            )}
           </div>
         </div>
 

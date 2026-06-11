@@ -15,7 +15,7 @@ interface SectionCardProps {
   className?: string;
 }
 
-/** Toss풍 section container — floating rounded card with a colored icon-well header. */
+/** Section container — crisp bordered card with a colored icon-well header. */
 export function SectionCard({
   title,
   icon: Icon,
@@ -30,13 +30,13 @@ export function SectionCard({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden rounded-2xl border border-transparent bg-card shadow-sm print:rounded-none print:border print:shadow-none",
+        "flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs print:rounded-none print:border print:shadow-none",
         className,
       )}>
       <div className="flex items-center justify-between gap-2 px-5 py-4">
         <div className="flex items-center gap-2.5">
           {Icon && (
-            <span className={cn("flex size-8 items-center justify-center rounded-xl [&_svg]:size-4", toneWell[tone])}>
+            <span className={cn("flex size-8 items-center justify-center rounded-lg [&_svg]:size-4", toneWell[tone])}>
               <Icon />
             </span>
           )}

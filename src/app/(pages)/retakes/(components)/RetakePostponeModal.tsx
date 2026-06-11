@@ -1,6 +1,9 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { CalendarClock } from "lucide-react";
+import { TransitionChip } from "@/shared/components/common/FeedItem";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
@@ -16,6 +19,12 @@ import { useRetakePostpone } from "../(hooks)/useRetakePostpone";
 interface RetakePostponeModalProps {
   onSuccess?: () => void;
 }
+
+const STATUS_CONFIG: Record<string, { label: string; variant: BadgeVariant }> = {
+  pending: { label: "대기중", variant: "warning" },
+  completed: { label: "완료", variant: "success" },
+  absent: { label: "결석", variant: "danger" },
+};
 
 export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalProps) {
   const [isOpen, setIsOpen] = useAtom(showPostponeModalAtom);
@@ -58,7 +67,8 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
 
   if (!selectedRetake) return null;
 
-  const subtitle = `${selectedRetake.student.name} - ${selectedRetake.exam.course.name} - ${selectedRetake.exam.name} ${selectedRetake.exam.exam_number}회차`;
+  const status = STATUS_CONFIG[selectedRetake.status];
+  const currentDate = selectedRetake.current_scheduled_date;
 
   return (
     <Modal
@@ -66,7 +76,7 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
       onClose={handleClose}
       onSubmit={handlePostpone}
       title="재시험 연기"
-      subtitle={subtitle}
+      subtitle="예정일을 새로운 날짜로 옮깁니다."
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} disabled={isPostponing} className="flex-1">
@@ -81,11 +91,50 @@ export default function RetakePostponeModal({ onSuccess }: RetakePostponeModalPr
           </Button>
         </>
       }>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="block font-semibold text-foreground text-sm">현재 예정일</label>
-          <div className="rounded-md border border-border bg-muted px-4 py-3 text-muted-foreground text-sm">
-            {selectedRetake.current_scheduled_date}
+      <div className="flex flex-col gap-5">
+        {/* 대상 레코드 요약 */}
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="truncate font-medium text-foreground">{selectedRetake.student.name}</span>
+                {status && (
+                  <Badge variant={status.variant} size="sm">
+                    {status.label}
+                  </Badge>
+                )}
+              </div>
+              <span className="truncate text-muted-foreground text-sm">
+                {selectedRetake.exam.course.name} · {selectedRetake.exam.name} {selectedRetake.exam.exam_number}회차
+              </span>
+              {(selectedRetake.postpone_count > 0 || selectedRetake.absent_count > 0) && (
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
+                  {selectedRetake.postpone_count > 0 && (
+                    <Badge variant="neutral" size="xs">
+                      연기 {selectedRetake.postpone_count}회
+                    </Badge>
+                  )}
+                  {selectedRetake.absent_count > 0 && (
+                    <Badge variant="neutral" size="xs">
+                      결석 {selectedRetake.absent_count}회
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 현재 예정일 → (선택 시) 새로운 날짜 미리보기 */}
+          <div className="flex items-center justify-between gap-3 border-border border-t pt-3">
+            <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+              <CalendarClock className="size-3.5" />
+              현재 예정일
+            </span>
+            {postponeDate ? (
+              <TransitionChip tone="warning" from={currentDate || "미지정"} to={postponeDate} />
+            ) : (
+              <span className="font-medium text-foreground text-sm tabular-nums">{currentDate || "미지정"}</span>
+            )}
           </div>
         </div>
 

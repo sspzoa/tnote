@@ -17,7 +17,7 @@ export default function Header({ title, subtitle, action, backLink }: HeaderProp
       {backLink && (
         <Link
           href={backLink.href}
-          className="group inline-flex h-8 w-fit items-center gap-1.5 rounded-full bg-muted/60 px-3 text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-foreground">
+          className="group inline-flex h-8 w-fit items-center gap-1.5 rounded-md bg-muted px-3 text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-foreground">
           <ArrowLeft className="group-hover:-translate-x-0.5 size-4 transition-transform" />
           <span>{backLink.label}</span>
         </Link>

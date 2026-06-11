@@ -3,8 +3,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Container from "@/shared/components/common/Container";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Button } from "@/shared/components/ui/button";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { EmptyState } from "@/shared/components/ui/emptyState";
@@ -244,7 +243,7 @@ export default function CourseDetailPage() {
 
   if (courseLoading || examsLoading || assignmentsLoading || !course) {
     return (
-      <Container>
+      <PageShell title="수업">
         <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-40" />
           <div className="flex items-end justify-between">
@@ -270,7 +269,7 @@ export default function CourseDetailPage() {
             "action",
           ]}
         />
-      </Container>
+      </PageShell>
     );
   }
 
@@ -283,14 +282,7 @@ export default function CourseDetailPage() {
     );
 
   return (
-    <Container>
-      <Header
-        title={course.name}
-        subtitle={subtitle}
-        backLink={{ href: "/courses", label: "수업 목록으로 돌아가기" }}
-        action={actionButton}
-      />
-
+    <PageShell title={course.name} subtitle={subtitle} crumb={course.name} actions={actionButton}>
       <SegmentedControl items={TABS} value={activeTab} onChange={setActiveTab} />
 
       {activeTab === "exams" ? (
@@ -372,6 +364,6 @@ export default function CourseDetailPage() {
         isLoading={loadingSubmissions}
         existingSubmissions={existingSubmissions}
       />
-    </Container>
+    </PageShell>
   );
 }

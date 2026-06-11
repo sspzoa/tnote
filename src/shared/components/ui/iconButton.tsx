@@ -20,9 +20,9 @@ const variantStyles: Record<IconButtonVariant, string> = {
 };
 
 const sizeStyles: Record<IconButtonSize, string> = {
-  sm: "p-1 rounded-sm",
-  md: "p-2 rounded-sm",
-  lg: "p-3 rounded-md",
+  sm: "p-1 rounded-md",
+  md: "p-2 rounded-md",
+  lg: "p-3 rounded-lg",
 };
 
 export function IconButton({ variant = "ghost", size = "md", children, className = "", ...props }: IconButtonProps) {

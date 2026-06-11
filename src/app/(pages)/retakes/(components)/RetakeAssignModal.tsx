@@ -258,7 +258,7 @@ export default function RetakeAssignModal({ onSuccess }: RetakeAssignModalProps)
                     highlighted={belowCutline}
                     badge={
                       belowCutline && (
-                        <span className="rounded-sm bg-solid-translucent-red px-2 py-0.5 text-destructive text-xs">
+                        <span className="rounded-sm bg-destructive-soft px-2 py-0.5 text-destructive text-xs">
                           재시험 대상
                         </span>
                       )

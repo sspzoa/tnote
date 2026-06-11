@@ -25,9 +25,9 @@ interface SelectProps {
 }
 
 const sizeStyles: Record<SelectSize, string> = {
-  sm: "h-8",
-  md: "h-9",
-  lg: "h-10",
+  sm: "h-9",
+  md: "h-10",
+  lg: "h-11",
 };
 
 /**

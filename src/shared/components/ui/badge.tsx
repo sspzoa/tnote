@@ -76,7 +76,7 @@ export const Badge = ({
   ...props
 }: BadgeProps) => {
   const combinedClassName = cn(
-    "inline-flex items-center rounded-full font-medium",
+    "inline-flex items-center rounded-md font-medium",
     getVariantStyle(variant),
     sizeStyles[size],
     interactive &&
@@ -122,7 +122,7 @@ export const MetricBadge = ({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-xs",
+        "inline-flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-xs",
         semanticStyles[variant],
       )}>
       <span className="font-bold tabular-nums">{value}</span>

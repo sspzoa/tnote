@@ -61,7 +61,7 @@ export default function WorkspaceDeleteModal() {
         </>
       }>
       <div className="flex flex-col gap-5">
-        <div className="flex flex-col gap-2 rounded-md border border-destructive/30 bg-solid-translucent-red p-4">
+        <div className="flex flex-col gap-2 rounded-md border border-destructive/30 bg-destructive-soft p-4">
           <p className="font-semibold text-destructive text-sm">경고: 이 작업은 되돌릴 수 없습니다!</p>
           <ul className="flex list-inside list-disc flex-col gap-1 text-muted-foreground text-sm">
             <li>모든 학생 데이터가 삭제됩니다</li>

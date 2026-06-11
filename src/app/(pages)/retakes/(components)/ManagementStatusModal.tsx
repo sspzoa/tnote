@@ -3,7 +3,8 @@
 import { useAtom, useAtomValue } from "jotai";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Button, IconButton, Modal, StatusBadge } from "@/shared/components/ui";
+import { TransitionChip } from "@/shared/components/common/FeedItem";
+import { Button, IconButton, Modal, SkeletonSpinner, StatusBadge } from "@/shared/components/ui";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/lib/utils/error";
@@ -66,6 +67,9 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
   if (!selectedRetake) return null;
 
   const offset = currentIndex * (ITEM_WIDTH + GAP);
+  const { student, exam, management_status: currentStatus } = selectedRetake;
+  const examMeta = `${exam.course.name} · ${exam.name} ${exam.exam_number}회차`;
+  const hasChange = Boolean(selectedStatus) && selectedStatus !== currentStatus;
 
   return (
     <Modal
@@ -88,74 +92,87 @@ export default function ManagementStatusModal({ onSuccess }: ManagementStatusMod
           </Button>
         </>
       }>
-      {isLoadingStatuses ? (
-        <div className="flex h-32 items-center justify-center">
-          <span className="text-muted-foreground">로딩 중...</span>
+      <div className="flex flex-col gap-5">
+        {/* 대상 재시험 요약 — 누구의/어떤 재시험을 바꾸는지 */}
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-3">
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate font-semibold text-sm">{student.name}</span>
+            <span className="truncate text-muted-foreground text-xs">{examMeta}</span>
+          </div>
         </div>
-      ) : (
-        <div className="flex flex-col items-center gap-5">
-          <div className="flex w-full items-center justify-center gap-3">
-            <IconButton
-              variant="outline"
-              size="lg"
-              onClick={handlePrev}
-              disabled={!hasPrev || isUpdating}
-              aria-label="이전 상태">
-              <ChevronLeft className="size-6" />
-            </IconButton>
 
-            <div className="relative h-16 flex-1 overflow-hidden rounded-lg border border-border bg-muted">
-              <div
-                className="absolute top-1/2 left-1/2 flex items-center transition-transform duration-300 ease-out"
-                style={{
-                  gap: GAP,
-                  transform: `translate(${-ITEM_WIDTH / 2 - offset}px, -50%)`,
-                }}>
-                {statuses.map((status, index) => (
-                  <div
-                    key={status.id}
-                    className="flex shrink-0 items-center justify-center whitespace-nowrap transition-all duration-300"
-                    style={{
-                      width: ITEM_WIDTH,
-                      opacity: index === currentIndex ? 1 : 0.4,
-                      transform: index === currentIndex ? "scale(1.1)" : "scale(1)",
-                    }}>
-                    <StatusBadge variant={status.color as StatusColor}>{status.name}</StatusBadge>
-                  </div>
-                ))}
+        {isLoadingStatuses ? (
+          <SkeletonSpinner className="h-32" size="md" />
+        ) : (
+          <div className="flex flex-col items-center gap-5">
+            <div className="flex w-full items-center justify-center gap-3">
+              <IconButton
+                variant="outline"
+                size="lg"
+                onClick={handlePrev}
+                disabled={!hasPrev || isUpdating}
+                aria-label="이전 상태">
+                <ChevronLeft className="size-6" />
+              </IconButton>
+
+              <div className="relative h-16 flex-1 overflow-hidden rounded-lg border border-border bg-muted">
+                <div
+                  className="absolute top-1/2 left-1/2 flex items-center transition-transform duration-300 ease-out"
+                  style={{
+                    gap: GAP,
+                    transform: `translate(${-ITEM_WIDTH / 2 - offset}px, -50%)`,
+                  }}>
+                  {statuses.map((status, index) => (
+                    <div
+                      key={status.id}
+                      className="flex shrink-0 items-center justify-center whitespace-nowrap transition-all duration-300"
+                      style={{
+                        width: ITEM_WIDTH,
+                        opacity: index === currentIndex ? 1 : 0.4,
+                        transform: index === currentIndex ? "scale(1.1)" : "scale(1)",
+                      }}>
+                      <StatusBadge variant={status.color as StatusColor}>{status.name}</StatusBadge>
+                    </div>
+                  ))}
+                </div>
               </div>
+
+              <IconButton
+                variant="outline"
+                size="lg"
+                onClick={handleNext}
+                disabled={!hasNext || isUpdating}
+                aria-label="다음 상태">
+                <ChevronRight className="size-6" />
+              </IconButton>
             </div>
 
-            <IconButton
-              variant="outline"
-              size="lg"
-              onClick={handleNext}
-              disabled={!hasNext || isUpdating}
-              aria-label="다음 상태">
-              <ChevronRight className="size-6" />
-            </IconButton>
-          </div>
+            <div className="flex items-center gap-2">
+              {statuses.map((status, index) => (
+                <button
+                  key={status.id}
+                  type="button"
+                  onClick={() => {
+                    if (!isUpdating) {
+                      setSelectedStatus(status.name);
+                    }
+                  }}
+                  disabled={isUpdating}
+                  className={`size-2 rounded-full transition-all duration-300 ${
+                    index === currentIndex ? "scale-125 bg-primary" : "bg-border hover:bg-muted-foreground/60"
+                  }`}
+                  aria-label={status.name}
+                />
+              ))}
+            </div>
 
-          <div className="flex items-center gap-2">
-            {statuses.map((status, index) => (
-              <button
-                key={status.id}
-                type="button"
-                onClick={() => {
-                  if (!isUpdating) {
-                    setSelectedStatus(status.name);
-                  }
-                }}
-                disabled={isUpdating}
-                className={`size-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex ? "scale-125 bg-primary" : "bg-border hover:bg-muted-foreground/60"
-                }`}
-                aria-label={status.name}
-              />
-            ))}
+            {/* 변경 전 → 후 — 커밋하려는 변화를 명시 */}
+            <div className="flex min-h-[1.75rem] items-center justify-center">
+              {hasChange && <TransitionChip tone="warning" from={currentStatus} to={selectedStatus} />}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </Modal>
   );
 }

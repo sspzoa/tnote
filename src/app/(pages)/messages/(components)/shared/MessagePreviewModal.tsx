@@ -1,7 +1,9 @@
 "use client";
 
+import { MessageSquareText } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
+import { StatStrip } from "@/shared/components/ui/statStrip";
 
 interface PreviewVariable {
   label: string;
@@ -28,27 +30,40 @@ export default function MessagePreviewModal({
       isOpen={isOpen}
       onClose={onClose}
       title="메시지 미리보기"
-      subtitle={recipientName ? `${recipientName} 학생에게 발송될 메시지입니다` : undefined}
       footer={
         <Button className="ml-auto" onClick={onClose}>
           확인
         </Button>
       }>
-      <div className="rounded-md border border-border bg-muted p-4">
-        <p className="whitespace-pre-wrap text-foreground text-sm">{previewMessage}</p>
-      </div>
-      {variables.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-md bg-solid-translucent-blue p-4">
-          <p className="font-semibold text-sm text-solid-blue">적용된 변수</p>
-          <div className="grid grid-cols-2 gap-2 text-muted-foreground text-xs">
-            {variables.map((variable) => (
-              <span key={variable.label}>
-                {variable.label}: {variable.value ?? "-"}
-              </span>
-            ))}
+      <div className="flex flex-col gap-5">
+        {recipientName && (
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate font-semibold text-base text-foreground">{recipientName} 학생</span>
+            <span className="text-muted-foreground text-xs">발송될 메시지</span>
           </div>
+        )}
+
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+          <div className="flex items-center gap-2 border-border border-b bg-feature-messages-soft px-4 py-2.5 text-feature-messages">
+            <MessageSquareText className="size-4" />
+            <span className="font-semibold text-xs">메시지 내용</span>
+          </div>
+          <p className="whitespace-pre-wrap p-4 text-[15px] text-foreground leading-relaxed">{previewMessage}</p>
         </div>
-      )}
+
+        {variables.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <p className="font-semibold text-muted-foreground text-xs">적용된 변수</p>
+            <StatStrip
+              orientation="vertical"
+              items={variables.map((variable) => ({
+                label: variable.label,
+                value: variable.value ?? "-",
+              }))}
+            />
+          </div>
+        )}
+      </div>
     </Modal>
   );
 }

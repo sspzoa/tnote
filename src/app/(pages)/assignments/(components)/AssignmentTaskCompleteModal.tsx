@@ -1,7 +1,10 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { CalendarClock } from "lucide-react";
+import { Badge, type BadgeVariant } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { DateChip } from "@/shared/components/ui/dateChip";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
 import { useToast } from "@/shared/hooks/useToast";
@@ -15,6 +18,22 @@ import { useAssignmentTaskHistory } from "../(hooks)/useAssignmentTaskHistory";
 interface AssignmentTaskCompleteModalProps {
   onSuccess?: () => void;
 }
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: "검사예정",
+  completed: "완료",
+  insufficient: "미흡",
+  not_submitted: "미제출",
+  absent: "결석",
+};
+
+const STATUS_VARIANT: Record<string, BadgeVariant> = {
+  pending: "warning",
+  completed: "success",
+  insufficient: "danger",
+  not_submitted: "danger",
+  absent: "danger",
+};
 
 export default function AssignmentTaskCompleteModal({ onSuccess }: AssignmentTaskCompleteModalProps) {
   const [isOpen, setIsOpen] = useAtom(showCompleteModalAtom);
@@ -48,7 +67,8 @@ export default function AssignmentTaskCompleteModal({ onSuccess }: AssignmentTas
 
   if (!selectedTask) return null;
 
-  const subtitle = `${selectedTask.student.name} - ${selectedTask.assignment.course.name} - ${selectedTask.assignment.name}`;
+  const statusKey = selectedTask.status;
+  const subtitle = `${selectedTask.assignment.course.name} · ${selectedTask.assignment.name}`;
 
   return (
     <Modal
@@ -73,10 +93,26 @@ export default function AssignmentTaskCompleteModal({ onSuccess }: AssignmentTas
         </>
       }>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="block font-semibold text-foreground text-sm">예정일</label>
-          <div className="rounded-md border border-border bg-muted px-4 py-3 text-muted-foreground text-sm">
-            {selectedTask.current_scheduled_date}
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <div className="flex items-center gap-2">
+                <span className="truncate font-semibold text-foreground text-sm">{selectedTask.student.name}</span>
+                <Badge variant={STATUS_VARIANT[statusKey] ?? "neutral"} size="xs">
+                  {STATUS_LABEL[statusKey] ?? statusKey}
+                </Badge>
+              </div>
+              <span className="truncate text-muted-foreground text-xs">
+                {selectedTask.assignment.course.name} · {selectedTask.assignment.name}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 border-border border-t pt-3">
+            <span className="text-muted-foreground text-xs">예정일</span>
+            <DateChip>
+              <CalendarClock className="mr-1 size-3" />
+              {selectedTask.current_scheduled_date ?? "미지정"}
+            </DateChip>
           </div>
         </div>
 

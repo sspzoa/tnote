@@ -2,12 +2,11 @@
 
 import { useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Button } from "@/shared/components/ui/button";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import { showEndedCoursesAtom } from "./(atoms)/useCoursesStore";
 import { showCreateModalAtom } from "./(atoms)/useModalStore";
 import CourseCreateModal from "./(components)/CourseCreateModal";
@@ -40,45 +39,48 @@ export default function CoursesPage() {
     });
   }, [courses, showEndedCourses]);
 
+  const subtitle = `전체 ${courses.length}개 수업 (${filteredCourses.length}개 표시)`;
+
+  const actions = (
+    <Button size="sm" onClick={() => setShowCreateModal(true)}>
+      + 수업 생성
+    </Button>
+  );
+
   if (error) {
-    return <ErrorComponent errorMessage="수업 목록을 불러오는데 실패했습니다." />;
+    return (
+      <PageShell title="수업 관리" subtitle={subtitle} actions={actions}>
+        <ErrorComponent errorMessage="수업 목록을 불러오는데 실패했습니다." />
+      </PageShell>
+    );
   }
 
-  return (
-    <Container>
-      <Header
-        title="수업 관리"
-        subtitle={`전체 ${courses.length}개 수업 (${filteredCourses.length}개 표시)`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        action={<Button onClick={() => setShowCreateModal(true)}>+ 수업 생성</Button>}
+  const emptyNode =
+    courses.length === 0 ? (
+      <EmptyState
+        tone="courses"
+        message="수업이 없습니다."
+        subtitle="첫 수업을 만들어 학생을 등록해 보세요."
+        actionLabel="첫 수업 만들기"
+        onAction={() => setShowCreateModal(true)}
       />
+    ) : (
+      <EmptyState
+        tone="courses"
+        message={showEndedCourses ? "조건에 맞는 수업이 없어요" : "진행 중인 수업이 없습니다."}
+        subtitle="필터를 조정해 보세요."
+      />
+    );
 
-      <CourseFilters />
-
-      {isLoading ? (
-        <SkeletonTable
-          rows={5}
-          columns={[
-            "w-24",
-            { width: "w-12", rounded: true },
-            "w-44",
-            { width: "w-32", buttons: ["w-32", "w-20"] },
-            "action",
-          ]}
-        />
-      ) : filteredCourses.length === 0 ? (
-        <EmptyState
-          message={showEndedCourses ? "수업이 없습니다." : "진행 중인 수업이 없습니다."}
-          actionLabel="첫 수업 만들기"
-          onAction={() => setShowCreateModal(true)}
-        />
-      ) : (
-        <CourseList courses={filteredCourses} />
-      )}
+  return (
+    <PageShell title="수업 관리" subtitle={subtitle} actions={actions}>
+      <CollectionView filters={<CourseFilters />}>
+        <CourseList courses={filteredCourses} isLoading={isLoading} empty={emptyNode} />
+      </CollectionView>
 
       <CourseCreateModal />
       <CourseEditModal />
       <EnrollmentModal />
-    </Container>
+    </PageShell>
   );
 }

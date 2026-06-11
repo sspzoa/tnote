@@ -2,7 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/shared/components/ui/badge";
+import { cn } from "@/shared/lib/utils/cn";
 import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 
 interface ConsultationInfo {
@@ -25,24 +25,36 @@ export const ConsultationCard = ({ consultation }: ConsultationCardProps) => {
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50 print:px-0 print:py-2">
-        <span className="min-w-0 flex-1 truncate font-medium text-foreground text-sm">{consultation.title}</span>
-        <div className="flex shrink-0 items-center gap-2">
-          {consultation.creator && <span className="text-muted-foreground text-xs">{consultation.creator.name}</span>}
-          <Badge variant="blue" size="xs">
-            {formatLocaleDateKorean(consultation.createdAt)}
-          </Badge>
-          <ChevronDown
-            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 print:hidden ${isExpanded ? "rotate-180" : ""}`}
-          />
+        aria-expanded={isExpanded}
+        className="flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted/40 print:px-0 print:py-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="truncate font-semibold text-foreground text-sm">{consultation.title}</span>
+          <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+            {consultation.creator && (
+              <span className="font-medium text-foreground/70">{consultation.creator.name}</span>
+            )}
+            {consultation.creator && <span className="text-muted-foreground/40">·</span>}
+            <span className="tabular-nums">{formatLocaleDateKorean(consultation.createdAt)}</span>
+          </span>
+          {!isExpanded && (
+            <p className="mt-1 line-clamp-1 text-muted-foreground/80 text-sm print:hidden">{consultation.content}</p>
+          )}
         </div>
+        <ChevronDown
+          className={cn(
+            "mt-1 size-4 shrink-0 text-muted-foreground transition-transform duration-200 print:hidden",
+            isExpanded && "rotate-180",
+          )}
+        />
       </button>
       <div
         className="print-expand grid transition-[grid-template-rows] duration-200 ease-out"
         style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}>
         <div className="overflow-hidden print:overflow-visible">
-          <div className="border-border border-t px-4 py-3 print:px-0 print:py-2">
-            <p className="whitespace-pre-wrap text-muted-foreground text-sm">{consultation.content}</p>
+          <div className="px-4 pb-4 print:px-0 print:py-2">
+            <p className="whitespace-pre-wrap rounded-lg bg-muted/50 p-3.5 text-foreground text-sm leading-relaxed print:bg-transparent print:p-0">
+              {consultation.content}
+            </p>
           </div>
         </div>
       </div>

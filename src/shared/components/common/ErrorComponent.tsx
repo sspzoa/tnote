@@ -5,7 +5,7 @@ interface ErrorComponentProps {
 export default function ErrorComponent({ errorMessage }: ErrorComponentProps) {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-5">
-      <div className="flex size-16 items-center justify-center rounded-full bg-solid-translucent-red">
+      <div className="flex size-16 items-center justify-center rounded-2xl bg-destructive-soft">
         <svg className="size-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"

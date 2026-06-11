@@ -1,13 +1,20 @@
 "use client";
 
-import { Save, X } from "lucide-react";
+import { AlertTriangle, Save, Smartphone, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { FormInput } from "@/shared/components/ui/formInput";
 import { Modal } from "@/shared/components/ui/modal";
+import { SectionCard } from "@/shared/components/ui/sectionCard";
 import { SkeletonSpinner } from "@/shared/components/ui/skeleton";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import { useSenderPhone } from "../(hooks)/useSenderPhone";
+
+const SOLAPI_NOTICES = [
+  "SOLAPI에 등록된 발신번호만 사용 가능합니다.",
+  "미등록 번호로 발송 시 실패할 수 있습니다.",
+  "발신번호 등록은 SOLAPI 콘솔에서 진행해주세요.",
+];
 
 interface SenderPhoneSettingsProps {
   isOpen: boolean;
@@ -69,38 +76,43 @@ export default function SenderPhoneSettings({ isOpen, onClose }: SenderPhoneSett
       footer={
         <div className="flex w-full justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>
-            <span className="flex items-center gap-2">
-              <X className="size-4" />
-              취소
-            </span>
+            <X />
+            취소
           </Button>
           <Button onClick={handleSave} isLoading={isUpdating} loadingText="저장 중...">
-            <span className="flex items-center gap-2">
-              <Save className="size-4" />
-              저장
-            </span>
+            <Save />
+            저장
           </Button>
         </div>
       }>
       {isLoading ? (
         <SkeletonSpinner className="py-7" size="md" />
       ) : (
-        <div className="flex flex-col gap-4">
-          <FormInput
-            label="발신번호"
-            value={phoneInput}
-            onChange={handlePhoneChange}
-            placeholder="010-1234-5678"
-            error={error || undefined}
-          />
-          <div className="flex flex-col gap-2 rounded-md bg-solid-translucent-yellow p-4">
-            <p className="font-semibold text-warning text-sm">주의사항</p>
-            <ul className="flex list-inside list-disc flex-col gap-1 text-muted-foreground text-xs">
-              <li>SOLAPI에 등록된 발신번호만 사용 가능합니다.</li>
-              <li>미등록 번호로 발송 시 실패할 수 있습니다.</li>
-              <li>발신번호 등록은 SOLAPI 콘솔에서 진행해주세요.</li>
-            </ul>
-          </div>
+        <div className="flex flex-col gap-5">
+          <SectionCard title="발신번호" icon={Smartphone} tone="messages">
+            <div className="flex flex-col gap-4">
+              <FormInput
+                value={phoneInput}
+                onChange={handlePhoneChange}
+                placeholder="010-1234-5678"
+                error={error || undefined}
+              />
+              <div className="flex flex-col gap-2.5 rounded-lg bg-warning-soft p-4">
+                <div className="flex items-center gap-2 font-semibold text-sm text-warning">
+                  <AlertTriangle className="size-4 shrink-0" />
+                  주의사항
+                </div>
+                <ul className="flex flex-col gap-1.5">
+                  {SOLAPI_NOTICES.map((notice) => (
+                    <li key={notice} className="flex items-start gap-2 text-muted-foreground text-xs leading-relaxed">
+                      <span className="mt-1.5 size-1 shrink-0 rounded-full bg-warning/60" aria-hidden />
+                      {notice}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </SectionCard>
         </div>
       )}
     </Modal>

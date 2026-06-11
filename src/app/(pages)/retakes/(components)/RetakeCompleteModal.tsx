@@ -1,6 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { CircleCheck } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { FormTextarea } from "@/shared/components/ui/formTextarea";
 import { Modal } from "@/shared/components/ui/modal";
@@ -11,6 +12,7 @@ import { showCompleteModalAtom } from "../(atoms)/useModalStore";
 import { selectedRetakeAtom } from "../(atoms)/useRetakesStore";
 import { useRetakeComplete } from "../(hooks)/useRetakeComplete";
 import { useRetakeHistory } from "../(hooks)/useRetakeHistory";
+import { RetakeRecordSummary } from "./RetakeRecordSummary";
 
 interface RetakeCompleteModalProps {
   onSuccess?: () => void;
@@ -48,15 +50,13 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
 
   if (!selectedRetake) return null;
 
-  const subtitle = `${selectedRetake.student.name} - ${selectedRetake.exam.course.name} - ${selectedRetake.exam.name} ${selectedRetake.exam.exam_number}회차`;
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
       onSubmit={handleComplete}
       title="완료 처리"
-      subtitle={subtitle}
+      subtitle="재시험을 완료로 처리합니다"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose} disabled={isCompleting} className="flex-1">
@@ -73,12 +73,7 @@ export default function RetakeCompleteModal({ onSuccess }: RetakeCompleteModalPr
         </>
       }>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="block font-semibold text-foreground text-sm">예정일</label>
-          <div className="rounded-md border border-border bg-muted px-4 py-3 text-muted-foreground text-sm">
-            {selectedRetake.current_scheduled_date}
-          </div>
-        </div>
+        <RetakeRecordSummary retake={selectedRetake} accentIcon={CircleCheck} accentTone="success" />
 
         <FormTextarea
           label="메모 (선택사항)"

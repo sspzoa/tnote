@@ -10,6 +10,10 @@ export interface HomeStats {
   activeClinicCount: number;
 }
 
+/**
+ * Workspace count summary — shared by the dashboard (StatStrip + cards) and the nav rail count
+ * pills (one cached query, keyed QUERY_KEYS.home.stats, so the two surfaces dedupe and agree).
+ */
 export const useHomeStats = (enabled: boolean) => {
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.home.stats,

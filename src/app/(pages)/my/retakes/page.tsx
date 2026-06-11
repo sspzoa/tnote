@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import Container from "@/shared/components/common/Container";
 import ErrorComponent from "@/shared/components/common/ErrorComponent";
-import Header from "@/shared/components/common/Header";
+import { PageShell } from "@/shared/components/common/PageShell";
 import { Badge } from "@/shared/components/ui/badge";
+import { CollectionView } from "@/shared/components/ui/collectionView";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { EmptyState } from "@/shared/components/ui/emptyState";
-import { SkeletonTable } from "@/shared/components/ui/skeleton";
 import type { MyRetake } from "./(hooks)/useMyRetakes";
 import { useMyRetakes } from "./(hooks)/useMyRetakes";
 
@@ -85,48 +84,29 @@ export default function MyRetakesPage() {
 
   if (error) {
     return (
-      <Container>
-        <Header
-          title="재시험 현황"
-          subtitle="나의 재시험 현황을 확인합니다"
-          backLink={{ href: "/", label: "홈으로 돌아가기" }}
-        />
+      <PageShell title="재시험 현황" subtitle="나의 재시험 현황을 확인합니다" width="narrow">
         <ErrorComponent errorMessage={error.message} />
-      </Container>
+      </PageShell>
     );
   }
 
   const pendingCount = retakes.filter((r) => r.status === "pending").length;
 
   return (
-    <Container>
-      <Header
-        title="재시험 현황"
-        subtitle={`전체 ${retakes.length}건 (대기 ${pendingCount}건)`}
-        backLink={{ href: "/", label: "홈으로 돌아가기" }}
-      />
-
-      {isLoading ? (
-        <SkeletonTable
-          rows={5}
-          columns={[
-            { width: "w-24", stacked: ["w-24", "w-28"] },
-            { width: "w-24" },
-            { width: "w-14", rounded: true },
-            { width: "w-20" },
-          ]}
-        />
-      ) : retakes.length === 0 ? (
-        <EmptyState message="재시험이 없습니다." />
-      ) : (
+    <PageShell title="재시험 현황" subtitle={`전체 ${retakes.length}건 (대기 ${pendingCount}건)`} width="narrow">
+      <CollectionView>
         <DataTable
+          flush
+          isLoading={isLoading}
+          skeletonRows={8}
+          empty={<EmptyState message="재시험이 없습니다." />}
           columns={columns}
           data={retakes}
           getRowId={(retake) => retake.id}
           comparators={comparators}
           defaultSort={{ key: "exam", direction: "desc" }}
         />
-      )}
-    </Container>
+      </CollectionView>
+    </PageShell>
   );
 }

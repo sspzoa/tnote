@@ -2,7 +2,6 @@ import { useAtom, useAtomValue } from "jotai";
 import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { DateChip } from "@/shared/components/ui/dateChip";
 import { EmptyState } from "@/shared/components/ui/emptyState";
 import { Modal } from "@/shared/components/ui/modal";
 import { formatLocaleDateKorean, formatLocaleTimeKorean } from "@/shared/lib/utils/date";
@@ -65,7 +64,7 @@ export default function ConsultationListModal() {
             onAction={openAddModal}
           />
         ) : (
-          <div className="max-h-96 divide-y divide-border overflow-y-auto rounded-md border border-border">
+          <div className="max-h-96 divide-y divide-border overflow-y-auto rounded-xl border border-border">
             {(consultations as ConsultationWithCreator[]).map((log) => {
               const createdAt = new Date(log.created_at);
               const dateStr = formatLocaleDateKorean(createdAt);
@@ -73,21 +72,24 @@ export default function ConsultationListModal() {
 
               return (
                 <button
+                  type="button"
                   key={log.id}
                   onClick={() => setViewingConsultation(log)}
-                  className="flex w-full flex-col gap-1 px-5 py-4 text-left transition-colors hover:bg-accent">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-foreground text-sm">{log.title}</span>
-                    <DateChip className="shrink-0">{dateStr}</DateChip>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                    <span>{timeStr}</span>
-                    {log.creator?.name && (
-                      <>
-                        <span>·</span>
-                        <span>{log.creator.name}</span>
-                      </>
-                    )}
+                  className="flex w-full items-start px-4 py-3.5 text-left transition-colors hover:bg-muted/40">
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="truncate font-semibold text-foreground text-sm">{log.title}</span>
+                    <span className="flex flex-wrap items-center gap-1.5 text-muted-foreground text-xs">
+                      {log.creator?.name && (
+                        <>
+                          <span className="font-medium text-foreground/70">{log.creator.name}</span>
+                          <span className="text-muted-foreground/40">·</span>
+                        </>
+                      )}
+                      <span className="tabular-nums">{dateStr}</span>
+                      <span className="text-muted-foreground/40">·</span>
+                      <span className="tabular-nums">{timeStr}</span>
+                    </span>
+                    {log.content && <p className="mt-1 line-clamp-1 text-muted-foreground/80 text-sm">{log.content}</p>}
                   </div>
                 </button>
               );

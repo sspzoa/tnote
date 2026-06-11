@@ -6,6 +6,7 @@ export { Badge, MetricBadge, StatusBadge } from "./badge";
 export { Button, buttonVariants } from "./button";
 export * from "./card";
 export { Checkbox } from "./checkbox";
+export { CollectionView } from "./collectionView";
 export { ConfirmDialogProvider, useConfirm } from "./confirmDialog";
 export type { DataTableColumn, DataTableProps } from "./dataTable";
 export { DataTable } from "./dataTable";

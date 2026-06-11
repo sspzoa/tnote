@@ -16,7 +16,7 @@ const widthClass = {
 export default function Container({ children, className = "", width = "default" }: ContainerProps) {
   return (
     <div className={cn("min-h-screen p-5 pb-24 md:p-8 md:pb-8", className)}>
-      <div className={cn("mx-auto flex flex-col gap-7", widthClass[width])}>{children}</div>
+      <div className={cn("mx-auto flex flex-col gap-6", widthClass[width])}>{children}</div>
     </div>
   );
 }
