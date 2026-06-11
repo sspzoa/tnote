@@ -1,3 +1,5 @@
+"use client";
+
 import { useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
@@ -9,6 +11,7 @@ import {
   StudentListItem,
   StudentListSkeleton,
 } from "@/shared/components/ui/studentList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/lib/utils/error";
 import { hasActiveHiddenTag } from "@/shared/lib/utils/tags";
@@ -74,105 +77,97 @@ export default function EnrollmentModal() {
       onClose={() => setShowModal(false)}
       title="학생 관리"
       subtitle={selectedCourse.name}
-      size="xl"
+      size="md"
       footer={
         <Button variant="secondary" onClick={() => setShowModal(false)} className="w-full">
           닫기
         </Button>
       }>
       {isLoadingEnrolled ? (
-        <div className="flex h-96 gap-5">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            <div className="h-6 w-32 animate-pulse rounded-sm bg-muted" />
-            <div className="h-12 animate-pulse rounded-md bg-muted" />
-            <StudentListContainer className="flex-1">
-              <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
-            </StudentListContainer>
-          </div>
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            <div className="h-6 w-32 animate-pulse rounded-sm bg-muted" />
-            <div className="h-12 animate-pulse rounded-md bg-muted" />
-            <StudentListContainer className="flex-1">
-              <StudentListSkeleton count={4} showCheckbox={false} showRightContent />
-            </StudentListContainer>
-          </div>
+        <div className="flex flex-col gap-3">
+          <div className="h-10 animate-pulse rounded-lg bg-muted" />
+          <div className="h-9 animate-pulse rounded-md bg-muted" />
+          <StudentListContainer>
+            <StudentListSkeleton count={5} showCheckbox={false} showRightContent />
+          </StudentListContainer>
         </div>
       ) : (
-        <div className="flex h-96 gap-5">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">등록된 학생 ({enrolledStudents.length}명)</h3>
-            {enrolledStudents.length === 0 ? (
-              <StudentListContainer className="flex-1">
-                <StudentListEmpty message="등록된 학생이 없습니다." />
-              </StudentListContainer>
-            ) : (
-              <>
-                <SearchInput
-                  placeholder="학생 검색..."
-                  value={enrolledSearchQuery}
-                  onChange={(e) => setEnrolledSearchQuery(e.target.value)}
-                />
-                <StudentListContainer className="flex-1">
-                  {filteredEnrolledStudents.length === 0 ? (
-                    <StudentListEmpty message="검색 결과가 없습니다." />
-                  ) : (
-                    filteredEnrolledStudents.map((student) => (
-                      <StudentListItem
-                        key={student.id}
-                        student={student}
-                        rightContent={
-                          <button
-                            onClick={() => handleUnenroll(student.id)}
-                            disabled={loadingStudentId === student.id}
-                            className="rounded-sm bg-destructive-soft px-3 py-1.5 font-medium text-destructive text-xs transition-colors hover:bg-destructive-soft disabled:cursor-not-allowed disabled:opacity-50">
-                            {loadingStudentId === student.id ? "제거 중..." : "제거"}
-                          </button>
-                        }
-                      />
-                    ))
-                  )}
-                </StudentListContainer>
-              </>
-            )}
-          </div>
+        <Tabs defaultValue="enrolled" className="gap-3">
+          <TabsList className="w-full">
+            <TabsTrigger value="enrolled" className="flex-1">
+              등록된 학생
+              <span className="tabular-nums text-muted-foreground text-xs">({enrolledStudents.length}명)</span>
+            </TabsTrigger>
+            <TabsTrigger value="add" className="flex-1">
+              학생 추가
+              <span className="tabular-nums text-muted-foreground text-xs">({unenrolledStudents.length}명)</span>
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-            <h3 className="font-semibold text-foreground text-sm">학생 추가 ({unenrolledStudents.length}명)</h3>
-            {unenrolledStudents.length === 0 ? (
-              <StudentListContainer className="flex-1">
+          <TabsContent value="enrolled" className="flex flex-col gap-3">
+            <SearchInput
+              placeholder="이름으로 검색..."
+              value={enrolledSearchQuery}
+              onChange={(e) => setEnrolledSearchQuery(e.target.value)}
+            />
+            <StudentListContainer>
+              {enrolledStudents.length === 0 ? (
+                <StudentListEmpty message="등록된 학생이 없습니다." />
+              ) : filteredEnrolledStudents.length === 0 ? (
+                <StudentListEmpty message="검색 결과가 없습니다." />
+              ) : (
+                filteredEnrolledStudents.map((student) => (
+                  <StudentListItem
+                    key={student.id}
+                    student={student}
+                    rightContent={
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        onClick={() => handleUnenroll(student.id)}
+                        disabled={loadingStudentId === student.id}
+                        className="text-destructive hover:bg-destructive-soft hover:text-destructive">
+                        {loadingStudentId === student.id ? "제거 중..." : "제거"}
+                      </Button>
+                    }
+                  />
+                ))
+              )}
+            </StudentListContainer>
+          </TabsContent>
+
+          <TabsContent value="add" className="flex flex-col gap-3">
+            <SearchInput
+              placeholder="이름으로 검색..."
+              value={unenrolledSearchQuery}
+              onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
+            />
+            <StudentListContainer>
+              {unenrolledStudents.length === 0 ? (
                 <StudentListEmpty message="모든 학생이 등록되었습니다." />
-              </StudentListContainer>
-            ) : (
-              <>
-                <SearchInput
-                  placeholder="학생 검색..."
-                  value={unenrolledSearchQuery}
-                  onChange={(e) => setUnenrolledSearchQuery(e.target.value)}
-                />
-                <StudentListContainer className="flex-1">
-                  {filteredUnenrolledStudents.length === 0 ? (
-                    <StudentListEmpty message="검색 결과가 없습니다." />
-                  ) : (
-                    filteredUnenrolledStudents.map((student) => (
-                      <StudentListItem
-                        key={student.id}
-                        student={student}
-                        rightContent={
-                          <button
-                            onClick={() => handleEnroll(student.id)}
-                            disabled={loadingStudentId === student.id}
-                            className="rounded-sm bg-success-soft px-3 py-1.5 font-medium text-success text-xs transition-colors hover:bg-success-soft disabled:cursor-not-allowed disabled:opacity-50">
-                            {loadingStudentId === student.id ? "추가 중..." : "추가"}
-                          </button>
-                        }
-                      />
-                    ))
-                  )}
-                </StudentListContainer>
-              </>
-            )}
-          </div>
-        </div>
+              ) : filteredUnenrolledStudents.length === 0 ? (
+                <StudentListEmpty message="검색 결과가 없습니다." />
+              ) : (
+                filteredUnenrolledStudents.map((student) => (
+                  <StudentListItem
+                    key={student.id}
+                    student={student}
+                    rightContent={
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        onClick={() => handleEnroll(student.id)}
+                        disabled={loadingStudentId === student.id}
+                        className="text-success hover:bg-success-soft hover:text-success">
+                        {loadingStudentId === student.id ? "추가 중..." : "추가"}
+                      </Button>
+                    }
+                  />
+                ))
+              )}
+            </StudentListContainer>
+          </TabsContent>
+        </Tabs>
       )}
     </Modal>
   );
