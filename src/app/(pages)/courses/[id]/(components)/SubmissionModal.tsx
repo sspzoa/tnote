@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge, Button, Modal, SearchInput } from "@/shared/components/ui";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -141,7 +142,7 @@ export function SubmissionModal({
       }>
       {isLoading ? (
         <div className="flex flex-col gap-4">
-          <div className="h-9 animate-pulse rounded-lg bg-muted" />
+          <Skeleton className="h-9 w-full rounded-lg" />
           <StudentListContainer>
             <StudentListSkeleton count={6} showCheckbox={false} showRightContent />
           </StudentListContainer>

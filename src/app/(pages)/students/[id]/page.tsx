@@ -29,6 +29,7 @@ import { useStudentDetail } from "../(hooks)/useStudentDetail";
 import {
   ConsultationCard,
   DashboardCard,
+  DashboardHeaderSkeleton,
   DashboardSkeleton,
   formatDaysOfWeek,
   isTagActive,
@@ -376,7 +377,7 @@ export default function StudentDetailPage() {
 
   if (isLoading || !studentDetail) {
     return (
-      <PageShell title="학생 정보">
+      <PageShell header={<DashboardHeaderSkeleton />}>
         <DashboardSkeleton />
       </PageShell>
     );

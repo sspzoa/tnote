@@ -50,7 +50,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     const width = typeof col === "string" ? col : col.width;
     return (
       <th key={index} className="whitespace-nowrap px-4 py-2.5 text-left">
-        <Skeleton className={cn("h-6", width)} />
+        <Skeleton className={cn("h-4", width)} />
       </th>
     );
   };
@@ -59,7 +59,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     if (col === "action") {
       return (
         <td key={index} className="whitespace-nowrap px-4 py-2.5">
-          <Skeleton className="ml-auto h-9 w-11 rounded-sm" />
+          <Skeleton className="ml-auto size-9 rounded-lg" />
         </td>
       );
     }
@@ -67,7 +67,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     if (typeof col === "string") {
       return (
         <td key={index} className="whitespace-nowrap px-4 py-2.5">
-          <Skeleton className={cn("h-6", col)} />
+          <Skeleton className={cn("h-4", col)} />
         </td>
       );
     }
@@ -75,7 +75,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
     if ("rounded" in col && col.rounded) {
       return (
         <td key={index} className="whitespace-nowrap px-4 py-2.5">
-          <Skeleton className={cn("h-7 rounded-sm", col.width)} />
+          <Skeleton className={cn("h-6 rounded-md", col.width)} />
         </td>
       );
     }
@@ -84,8 +84,8 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
       return (
         <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <div className="flex flex-col gap-1">
-            <Skeleton className={cn("h-6", col.stacked[0])} />
-            <Skeleton className={cn("h-5", col.stacked[1])} />
+            <Skeleton className={cn("h-4", col.stacked[0])} />
+            <Skeleton className={cn("h-3.5", col.stacked[1])} />
           </div>
         </td>
       );
@@ -96,7 +96,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
         <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <div className="flex gap-1">
             {col.badges.map((w, i) => (
-              <Skeleton key={i} className={cn("h-6 rounded-sm", w)} />
+              <Skeleton key={i} className={cn("h-6 rounded-md", w)} />
             ))}
           </div>
         </td>
@@ -108,7 +108,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
         <td key={index} className="whitespace-nowrap px-4 py-2.5">
           <div className="flex gap-2">
             {col.buttons.map((w, i) => (
-              <Skeleton key={i} className={cn("h-9 rounded-md", w)} />
+              <Skeleton key={i} className={cn("h-9 rounded-lg", w)} />
             ))}
           </div>
         </td>
@@ -117,7 +117,7 @@ export function SkeletonTable({ rows = 5, columns }: SkeletonTableProps) {
 
     return (
       <td key={index} className="whitespace-nowrap px-4 py-2.5">
-        <Skeleton className={cn("h-6", col.width)} />
+        <Skeleton className={cn("h-4", col.width)} />
       </td>
     );
   };

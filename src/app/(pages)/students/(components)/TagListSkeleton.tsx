@@ -13,8 +13,8 @@ export function TagListSkeleton({ count = 4 }: TagListSkeletonProps) {
             <Skeleton className="h-7 w-16 rounded-sm" />
           </div>
           <div className="flex gap-2">
-            <Skeleton className="h-9 w-14 rounded-md" />
-            <Skeleton className="h-9 w-14 rounded-md" />
+            <Skeleton className="h-9 w-14 rounded-lg" />
+            <Skeleton className="h-9 w-14 rounded-lg" />
           </div>
         </div>
       ))}

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Modal } from "@/shared/components/ui/modal";
 import { SearchInput } from "@/shared/components/ui/searchInput";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import {
   StudentListContainer,
   StudentListEmpty,
@@ -85,8 +86,8 @@ export default function EnrollmentModal() {
       }>
       {isLoadingEnrolled ? (
         <div className="flex flex-col gap-3">
-          <div className="h-10 animate-pulse rounded-lg bg-muted" />
-          <div className="h-9 animate-pulse rounded-md bg-muted" />
+          <Skeleton className="h-10 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
           <StudentListContainer>
             <StudentListSkeleton count={5} showCheckbox={false} showRightContent />
           </StudentListContainer>

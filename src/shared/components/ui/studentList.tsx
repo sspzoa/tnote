@@ -2,6 +2,7 @@
 
 import { memo, type ReactNode } from "react";
 import { Badge } from "@/shared/components/ui/badge";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import { cn } from "@/shared/lib/utils/cn";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
 import type { StudentTagAssignment } from "@/shared/types";
@@ -137,12 +138,12 @@ export function StudentListSkeleton({
     <>
       {[...Array(count)].map((_, i) => (
         <div key={i} className="flex items-center gap-3 border-border border-b px-4 py-3 last:border-b-0">
-          {showCheckbox && <div className="size-4 shrink-0 animate-pulse rounded-sm bg-muted" />}
+          {showCheckbox && <Skeleton className="size-4 shrink-0 rounded-sm" />}
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="h-6 w-20 animate-pulse rounded-sm bg-muted" />
-            <div className="h-5 w-40 animate-pulse rounded-sm bg-muted" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3.5 w-36" />
           </div>
-          {showRightContent && <div className="h-8 w-16 shrink-0 animate-pulse rounded-sm bg-muted" />}
+          {showRightContent && <Skeleton className="h-8 w-16 shrink-0 rounded-md" />}
         </div>
       ))}
     </>

@@ -244,16 +244,7 @@ export default function CourseDetailPage() {
   if (courseLoading || examsLoading || assignmentsLoading || !course) {
     return (
       <PageShell title="수업">
-        <div className="flex flex-col gap-4">
-          <Skeleton className="h-6 w-40" />
-          <div className="flex items-end justify-between">
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-6 w-24" />
-            </div>
-            <Skeleton className="h-12 w-28 rounded-md" />
-          </div>
-        </div>
+        <Skeleton className="h-11 w-full rounded-lg" />
         <SkeletonTable
           rows={5}
           columns={[

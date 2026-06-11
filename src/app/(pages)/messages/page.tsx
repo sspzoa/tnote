@@ -200,18 +200,16 @@ export default function MessagesPage() {
         title="발송 이력"
         subtitle="최근 50건">
         {isLoading ? (
-          <div className="flex flex-col gap-3 p-7">
+          <div>
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex flex-col gap-2 border-border border-b pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-5 w-14 rounded-sm" />
-                  </div>
-                  <Skeleton className="h-5 w-16 rounded-sm" />
+              <div key={i} className="flex flex-col gap-1 border-border border-b px-5 py-4">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-10 rounded-md" />
                 </div>
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-3.5 w-40" />
               </div>
             ))}
           </div>

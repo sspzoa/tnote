@@ -149,15 +149,15 @@ export default function StudentsPage() {
         title="최근 상담 내역"
         subtitle={unreadCount > 0 ? `읽지 않은 상담 ${unreadCount}건` : "최근 50건"}>
         {consultationsLoading ? (
-          <div className="flex flex-col gap-3 p-7">
+          <div className="divide-y divide-border">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex flex-col gap-2 border-border border-b pb-3 last:border-b-0">
+              <div key={i} className="flex flex-col gap-1 px-6 py-3.5">
                 <div className="flex items-center justify-between">
-                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-4 w-20" />
                   <Skeleton className="h-5 w-16 rounded-sm" />
                 </div>
-                <Skeleton className="h-6 w-4/5" />
-                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3.5 w-28" />
               </div>
             ))}
           </div>
