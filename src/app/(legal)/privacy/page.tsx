@@ -1,304 +1,528 @@
 import type { Metadata } from "next";
+import { LegalDoc, type LegalSection } from "../(components)/LegalDoc";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침 - Tnote",
 };
 
+const sections: LegalSection[] = [
+  {
+    id: "article-1",
+    number: "제1조",
+    title: "개인정보의 수집 항목 및 수집 방법",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "서비스는 회원가입, 구성원 등록 및 서비스 이용 과정에서 다음과 같은 개인정보를 수집합니다. 소유자는 직접 회원가입을 통해, 관리자와 학생은 소유자 또는 관리자가 직접 입력하는 방식으로 정보가 수집됩니다.",
+      },
+      {
+        kind: "subheading",
+        text: "1. 소유자 (직접 회원가입)",
+      },
+      {
+        kind: "list",
+        items: [
+          "필수 항목: 이름, 전화번호, 비밀번호, 워크스페이스(학원) 이름",
+          "자동 수집 항목: 접속 로그, IP 주소, 서비스 이용 기록, 쿠키, 브라우저 정보(User-Agent)",
+        ],
+      },
+      {
+        kind: "subheading",
+        text: "2. 관리자 (소유자가 등록)",
+      },
+      {
+        kind: "list",
+        items: [
+          "필수 항목: 이름, 전화번호",
+          "초기 비밀번호는 등록된 전화번호로 자동 설정되며, 관리자로부터 별도로 비밀번호를 수집하지 않습니다.",
+        ],
+      },
+      {
+        kind: "subheading",
+        text: "3. 학생 (소유자 또는 관리자가 등록)",
+      },
+      {
+        kind: "list",
+        items: [
+          "필수 항목: 이름, 전화번호, 학부모 전화번호, 학교, 분원, 출생연도",
+          "선택 항목: 클리닉 필참 요일, 학생 분류 태그",
+          "초기 비밀번호는 등록된 전화번호로 자동 설정되며, 학생으로부터 별도로 비밀번호를 수집하지 않습니다.",
+        ],
+      },
+      {
+        kind: "subheading",
+        text: "4. 서비스 이용 과정에서 생성·축적되는 정보",
+      },
+      {
+        kind: "list",
+        items: [
+          "수강 등록 및 수업 정보",
+          "시험 성적 및 재시험 일정·상태 변경·출결 이력",
+          "과제 검사 일정·상태 변경 및 이력",
+          "클리닉 출석 기록(출결 상태, 재시험·과제·질의응답 수행 여부, 메모)",
+          "상담 기록(제목, 내용, 작성·수정자, 작성일)",
+          "문자 발송 이력(수신자 전화번호·이름, 수신자 구분, 발송 내용, 발송 결과, 발송자)",
+          "캘린더 일정(수업·재시험·과제·클리닉 정보로부터 생성)",
+          "처리 이력의 수행자(performed_by) 및 상담 읽음 기록 등 감사(audit) 정보",
+        ],
+      },
+      {
+        kind: "subheading",
+        text: "수집 방법",
+      },
+      {
+        kind: "list",
+        items: [
+          "소유자의 직접 회원가입 및 소유자·관리자의 구성원 정보 직접 입력",
+          "서비스 이용 과정에서의 자동 생성 및 수집",
+          "접속 로그·IP·브라우저 정보 등 자동 수집 도구를 통한 수집",
+        ],
+      },
+      {
+        kind: "callout",
+        text: "※ 관리자 및 학생의 개인정보는 소유자(또는 관리자)가 직접 등록합니다. 소유자는 등록 전에 해당 구성원(미성년자인 학생의 경우 그 법정대리인)으로부터 개인정보 수집·이용에 대한 동의를 받아야 합니다.",
+      },
+      {
+        kind: "callout",
+        text: "※ 학생 및 관리자 계정의 초기 비밀번호는 등록된 전화번호로 자동 설정되며, 인증 서비스(Supabase Auth)를 통해 단방향 해시 처리되어 저장됩니다. 학생·관리자는 최초 로그인 시 비밀번호 변경을 권장받으며(초기 비밀번호로 로그인하면 변경을 안내하는 메시지가 표시됩니다), 로그인 후 비밀번호를 변경할 수 있습니다.",
+      },
+      {
+        kind: "callout",
+        text: "※ 서비스는 주민등록번호 등 고유식별정보 및 「개인정보 보호법」상 민감정보(건강, 사상·신념, 정치적 견해 등)를 수집·처리하지 않습니다.",
+      },
+    ],
+  },
+  {
+    id: "article-2",
+    number: "제2조",
+    title: "개인정보의 수집 및 이용 목적",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "수집된 개인정보는 다음의 목적을 위해 이용되며, 목적이 변경되는 경우 관련 법령에 따라 별도의 동의를 받는 등 필요한 조치를 이행합니다.",
+      },
+      {
+        kind: "list",
+        items: [
+          "서비스 제공 및 운영: 학생 관리, 수업·시험 관리, 재시험·과제 관리, 클리닉 출석 관리, 상담 기록 관리, 캘린더 일정 제공",
+          "문자 발송: 시험 결과, 재시험·과제·클리닉 안내 등 학사 관련 정보 제공(학생 및 학부모 전화번호 이용)",
+          "본인 확인 및 인증: 로그인, 세션 유지, 비밀번호 변경 및 초기화",
+          "서비스 개선: 이용 통계 분석 및 서비스 품질 향상",
+          "서비스 안정성 확보: API 요청 로깅, 오류 추적, 접근 권한 관리, 보안 모니터링 및 부정 이용 방지",
+        ],
+      },
+    ],
+  },
+  {
+    id: "article-3",
+    number: "제3조",
+    title: "개인정보의 보유 및 이용 기간",
+    blocks: [
+      {
+        kind: "orderedList",
+        items: [
+          "이용자의 개인정보는 워크스페이스(학원)가 유지되는 동안 보유 및 이용됩니다.",
+          "소유자가 워크스페이스를 삭제하면 해당 워크스페이스에 속한 모든 구성원의 정보가 즉시 파기됩니다.",
+          "소유자 또는 관리자가 개별 학생·관리자를 삭제하면 해당 정보는 즉시 파기됩니다.",
+          "문자 발송 이력, 상담 기록, 출결·재시험·과제 이력 등 서비스 이용 과정에서 생성된 정보는 해당 워크스페이스 또는 관련 구성원·기록이 삭제될 때까지 보유되며, 삭제 시 함께 파기됩니다.",
+          "서비스 이용 로그(API 요청 기록)는 로그 모니터링 수탁사의 데이터 보관 정책에 따라 보관 후 삭제됩니다.",
+        ],
+      },
+      {
+        kind: "subheading",
+        text: "관련 법령에 따른 보존",
+      },
+      {
+        kind: "paragraph",
+        text: "관련 법령에 따라 보존이 필요한 경우, 서비스는 해당 법령에서 정한 기간 동안 정보를 보관합니다.",
+      },
+      {
+        kind: "table",
+        table: {
+          headers: ["보존 항목", "보존 근거", "보존 기간"],
+          rows: [
+            ["계약 또는 청약철회 등에 관한 기록", "전자상거래 등에서의 소비자 보호에 관한 법률", "5년"],
+            ["소비자의 불만 또는 분쟁처리에 관한 기록", "전자상거래 등에서의 소비자 보호에 관한 법률", "3년"],
+            ["로그인(접속) 기록", "통신비밀보호법", "3개월"],
+          ],
+        },
+      },
+      {
+        kind: "callout",
+        text: "※ 문자 발송 이력은 별도의 자동 삭제 절차 없이 해당 워크스페이스 또는 관련 기록이 삭제될 때까지 보관되며, 삭제 시 함께 파기됩니다. 서비스 이용 로그(API 요청 기록)의 보관 기간은 로그 모니터링 수탁사(Axiom)의 데이터 보관 정책(예: 90일)에 따라 운영되며, 서비스 자체의 코드로 일률적인 자동 삭제가 강제되지는 않습니다.",
+      },
+    ],
+  },
+  {
+    id: "third-party",
+    number: "제4조",
+    title: "개인정보의 제3자 제공",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "서비스는 원칙적으로 이용자의 개인정보를 제3자에게 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다.",
+      },
+      {
+        kind: "list",
+        items: [
+          "이용자가 사전에 동의한 경우",
+          "법령의 규정에 의하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우",
+        ],
+      },
+      {
+        kind: "callout",
+        text: "※ 학생·학부모 등 구성원의 개인정보는 해당 워크스페이스(학원) 내에서만 처리되며, 다른 워크스페이스와 격리됩니다. 학원이 자신의 구성원에게 학사 안내 문자를 발송하는 행위는 학원(소유자)이 처리 주체로서 수행하는 본래의 서비스 이용 목적 범위 내의 처리입니다.",
+      },
+    ],
+  },
+  {
+    id: "processing-delegation",
+    number: "제5조",
+    title: "개인정보 처리의 위탁",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "서비스는 원활한 서비스 운영을 위해 아래와 같이 개인정보 처리 업무를 외부 전문 업체에 위탁하고 있으며, 위탁 계약 시 개인정보가 안전하게 관리될 수 있도록 관련 사항을 규정하고 있습니다. 문자 메시지 발송에 필요한 발신 자격 정보는 각 워크스페이스(학원)가 보유한 자체 계정 정보를 통해 처리되며, 각 학원이 자신의 발신번호로 직접 발송합니다.",
+      },
+      {
+        kind: "table",
+        table: {
+          headers: ["수탁업체", "위탁 업무", "처리 정보", "보유 기간"],
+          rows: [
+            [
+              "Supabase",
+              "데이터베이스 호스팅 및 인증(계정·세션) 관리",
+              "이름, 전화번호(학생·학부모), 학교, 분원, 출생연도, 시험·재시험·과제·클리닉·상담 기록, 문자 발송 이력 등 서비스 전반의 개인정보 (비밀번호는 Supabase Auth가 자체적으로 단방향 해시하여 관리하며, 서비스는 평문·해시를 별도로 보관하지 않습니다)",
+              "위탁 계약 종료 또는 정보 삭제 시까지",
+            ],
+            [
+              "Solapi (코웍스)",
+              "문자 메시지 발송 대행",
+              "수신자 전화번호(학생·학부모), 수신자 이름, 발송 내용, 발신번호",
+              "발송 처리 시까지(전송 대행)",
+            ],
+            [
+              "Vercel, Inc.",
+              "웹·애플리케이션 호스팅",
+              "서비스 요청 데이터, 접속 로그, IP 주소, 쿠키, 브라우저 정보(User-Agent)",
+              "위탁 계약 종료 시까지",
+            ],
+            [
+              "Axiom, Inc.",
+              "서비스 로그 저장 및 모니터링",
+              "이용자 식별정보(ID, 이름, 역할), 워크스페이스 식별자, IP 주소, 브라우저 정보, 요청 경로·쿼리 파라미터(검색·필터어가 포함될 수 있음), 처리 결과·오류 기록(오류 메시지 및 스택 트레이스 포함)",
+              "수탁사의 데이터 보관 정책에 따른 기간(예: 90일)",
+            ],
+          ],
+        },
+      },
+      {
+        kind: "callout",
+        text: "※ 문자 발송 대행 시 사용되는 발신 자격 정보(API 키 등)는 각 워크스페이스(학원)별로 별도 보관·관리되며, 각 학원은 자신의 Solapi 계정과 발신번호를 사용하여 문자를 발송합니다.",
+      },
+    ],
+  },
+  {
+    id: "cross-border",
+    number: "제6조",
+    title: "개인정보의 국외 이전",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "서비스는 원활한 운영을 위해 아래와 같이 개인정보를 국외로 이전하고 있습니다. 데이터베이스 호스팅(Supabase)은 국내 리전(대한민국)에서 처리되며, 국내 SMS 발송 대행사(Solapi)는 국내에서 처리되므로 국외 이전에 해당하지 않습니다.",
+      },
+      {
+        kind: "table",
+        table: {
+          headers: ["이전받는 자", "이전 국가", "이전 항목", "이전 목적", "이전 일시·방법", "보유 기간"],
+          rows: [
+            [
+              "Vercel, Inc.",
+              "미국",
+              "서비스 요청 데이터, 접속 로그, IP 주소, 쿠키, 브라우저 정보",
+              "웹·애플리케이션 호스팅",
+              "서비스 이용 시 네트워크를 통한 전송",
+              "서비스 이용 종료 또는 위탁 계약 종료 시까지",
+            ],
+            [
+              "Axiom, Inc.",
+              "미국",
+              "이용자 식별정보(ID, 이름, 역할), 워크스페이스 식별자, IP 주소, 브라우저 정보, 요청 경로·쿼리 파라미터(검색·필터어가 포함될 수 있음), 처리 결과·오류 기록(오류 메시지 및 스택 트레이스 포함)",
+              "서비스 로그 저장 및 모니터링",
+              "서비스 이용 시 네트워크를 통한 전송",
+              "수탁사의 데이터 보관 정책에 따른 기간(예: 90일)",
+            ],
+          ],
+        },
+      },
+      {
+        kind: "paragraph",
+        text: "정보주체는 개인정보의 국외 이전을 거부할 권리가 있으며, 거부를 원하는 경우 제14조의 개인정보 보호책임자(me@sspzoa.io)에게 요청할 수 있습니다. 다만 국외로 이전되는 호스팅·로그 서비스는 본 서비스 제공에 필수적인 인프라이므로, 국외 이전을 거부하는 경우 서비스 이용이 제한되거나 불가능할 수 있습니다.",
+      },
+    ],
+  },
+  {
+    id: "destruction",
+    number: "제7조",
+    title: "개인정보의 파기 절차 및 방법",
+    blocks: [
+      {
+        kind: "orderedList",
+        items: [
+          "파기 절차: 보유 기간이 경과하였거나 처리 목적이 달성되어 불필요하게 된 개인정보는 지체 없이 파기합니다.",
+          "파기 방법: 전자적 파일 형태로 저장된 개인정보는 복구가 불가능한 방법으로 영구 삭제합니다.",
+          "워크스페이스 삭제 시 해당 워크스페이스에 속한 모든 구성원의 개인정보가 일괄 파기되며, 개별 구성원·기록 삭제 시 해당 정보가 즉시 파기됩니다.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "cookies",
+    number: "제8조",
+    title: "개인정보 자동 수집 장치(쿠키)의 설치·운영 및 거부",
+    blocks: [
+      {
+        kind: "orderedList",
+        items: [
+          "서비스는 이용자 인증 및 로그인 세션 유지를 위해 쿠키를 사용합니다. 인증 세션 쿠키는 인증 서비스(Supabase Auth)가 발급·관리하며, httpOnly 속성으로 저장되어 JavaScript를 통한 접근이 차단됩니다.",
+          "쿠키는 로그인 상태 유지 및 보안 목적으로만 사용되며, 마케팅·광고 목적의 추적에는 사용되지 않습니다.",
+          "이용자는 웹 브라우저 설정을 통해 쿠키 저장을 거부할 수 있습니다. 다만, 쿠키 저장을 거부할 경우 로그인이 필요한 서비스 이용에 제한이 있을 수 있습니다.",
+          "쿠키 설정 변경 방법: 이용하는 웹 브라우저의 설정 메뉴에서 쿠키 허용 여부를 변경할 수 있습니다(브라우저별로 메뉴 경로가 다를 수 있습니다).",
+          "접속 로그·IP 주소 등은 서비스의 보안 및 안정적 운영을 위해 자동으로 생성·수집되며, 이는 쿠키와 달리 거부의 대상이 되지 않습니다.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "sms-consent",
+    number: "제9조",
+    title: "문자 메시지 발송 및 수신 동의",
+    blocks: [
+      {
+        kind: "orderedList",
+        items: [
+          "서비스는 시험 결과, 재시험·과제·클리닉 안내 등 학사 관련 정보를 학생 및 학부모에게 문자 메시지로 발송할 수 있습니다.",
+          "소유자(학원)는 문자 발송 전 수신자(학생, 학부모)로부터 정보성 문자 수신에 대한 동의를 받아야 할 책임이 있습니다.",
+          "수신자는 소유자에게 문자 수신 거부를 요청할 수 있으며, 소유자는 이를 즉시 반영하여야 합니다.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "rights",
+    number: "제10조",
+    title: "정보주체의 권리·의무 및 행사 방법",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "정보주체(이용자)는 언제든지 다음의 개인정보 보호 관련 권리를 행사할 수 있습니다.",
+      },
+      {
+        kind: "list",
+        items: ["개인정보 열람 요구", "오류 등이 있을 경우 정정 요구", "삭제 요구", "처리정지 요구"],
+      },
+      {
+        kind: "paragraph",
+        text: "학생 및 관리자는 자신의 정보를 등록·관리하는 소유자(학원)에게 자신의 개인정보 열람·정정·삭제·처리정지를 요청할 수 있으며, 소유자는 정당한 사유 없이 이를 거부할 수 없습니다. 또한 미성년자인 학생의 법정대리인은 학생의 개인정보에 대한 권리를 대리하여 행사할 수 있습니다.",
+      },
+      {
+        kind: "paragraph",
+        text: "서비스 또는 소유자(학원)는 권리를 행사하는 자가 정보주체 본인이거나 정당한 대리인인지를 확인할 수 있습니다. 또한 다른 법령에 따라 보존 의무가 있는 개인정보(제3조의 법정 보존 항목 등)는 해당 보존 기간 동안 열람·삭제 요구가 제한될 수 있습니다.",
+      },
+      {
+        kind: "definitions",
+        terms: [
+          {
+            term: "접수처(이메일)",
+            desc: "me@sspzoa.io",
+          },
+          {
+            term: "처리 기한",
+            desc: "요청 접수 후 10일 이내에 처리 결과를 통지합니다.",
+          },
+          {
+            term: "지연 시 안내",
+            desc: "정당한 사유로 처리가 지연될 경우 그 사유와 처리 예정일을 별도로 안내합니다.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "owner-responsibility",
+    number: "제11조",
+    title: "소유자의 개인정보 관리 책임",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "본 서비스는 각 학원(워크스페이스)이 자신의 구성원 개인정보를 직접 등록·관리하는 구조로, 소유자는 해당 구성원 개인정보의 처리 주체로서 다음의 책임을 부담합니다.",
+      },
+      {
+        kind: "orderedList",
+        items: [
+          "소유자는 워크스페이스에 등록하는 구성원의 개인정보에 대한 관리 책임이 있습니다.",
+          "소유자는 학생 등록 시 해당 학생(미성년자의 경우 그 법정대리인)에게 개인정보 수집·이용 목적, 항목, 보유 기간을 고지하고 동의를 받아야 합니다.",
+          "소유자는 구성원의 개인정보를 서비스 목적 외로 활용하거나 제3자에게 무단으로 제공하여서는 안 됩니다.",
+          "소유자가 본 조의 의무를 위반하여 발생하는 법적 책임은 소유자에게 있습니다.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "children",
+    number: "제12조",
+    title: "14세 미만 아동의 개인정보 처리",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "본 서비스는 학원의 학생 관리를 위한 서비스로서 14세 미만 아동의 개인정보가 포함될 수 있습니다. 서비스 운영자(플랫폼)는 14세 미만 아동의 개인정보를 직접 수집하지 않으며, 학원(소유자 또는 관리자)이 등록 주체로서 아동의 개인정보를 입력하는 경우 「개인정보 보호법」 제22조의2에 따라 사전에 법정대리인의 동의를 받아야 합니다.",
+      },
+      {
+        kind: "orderedList",
+        items: [
+          "소유자(학원)는 14세 미만 아동의 개인정보를 등록하기 전에 그 법정대리인의 동의를 받아야 하며, 동의를 확인하기 위하여 아동에게 법정대리인의 성명·연락처 등 최소한의 정보를 요구할 수 있습니다.",
+          "법정대리인은 아동의 개인정보에 대한 열람·정정·삭제·처리정지를 아동을 대리하여 요구할 수 있습니다.",
+          "서비스는 14세 미만 아동에게 개인정보 처리에 관한 사항을 고지할 때 아동이 이해하기 쉬운 양식과 명확하고 알기 쉬운 언어를 사용하도록 노력합니다.",
+          "소유자가 법정대리인의 동의를 받지 아니하고 14세 미만 아동의 개인정보를 등록·이용하여 발생하는 책임은 해당 소유자에게 있습니다.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "security-measures",
+    number: "제13조",
+    title: "개인정보의 안전성 확보 조치",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "서비스는 개인정보의 안전성 확보를 위해 다음과 같은 기술적·관리적·물리적 조치를 취하고 있습니다.",
+      },
+      {
+        kind: "list",
+        items: [
+          "비밀번호의 단방향 해시 저장: 비밀번호는 인증 서비스(Supabase Auth)를 통해 단방향 해시 처리되어 안전하게 저장되며, 서비스는 평문 비밀번호를 저장하지 않습니다.",
+          "전송 구간 암호화: SSL/TLS를 통해 모든 데이터 전송 구간을 암호화합니다.",
+          "인증 세션 보호: 인증 세션은 인증 서비스(Supabase Auth)가 발급·관리하며, 세션 토큰은 httpOnly 쿠키로 저장되어 JavaScript의 접근이 차단됩니다.",
+          "접근 권한 관리: 역할 기반 접근 제어(소유자, 관리자, 학생)를 적용하여 권한에 따라 접근 가능한 데이터와 기능을 제한합니다.",
+          "워크스페이스 간 데이터 격리: 모든 데이터는 워크스페이스 단위로 격리되어 다른 학원의 데이터에 접근할 수 없습니다.",
+          "접속 기록 보관 및 점검: 서비스 요청에 대한 접속·이용 로그를 보관하여 위·변조를 방지하고 이상 접근 여부를 점검합니다.",
+          "인증 요청에 대한 접근 통제: 로그인·회원가입 등 인증 관련 요청에 대해 요청 빈도 제한(rate limiting)을 적용하여 무차별 대입 공격 등을 방지합니다.",
+          "접근 권한의 최소화 및 점검: 개인정보 처리 목적과 역할에 따라 접근 권한을 차등 부여하고, 권한 및 접근 내역을 주기적으로 점검합니다.",
+          "물리적 보호 조치: 서비스는 자체 물리적 저장 매체를 운영하지 않으며, 인프라의 물리적 보안은 클라우드 수탁사(Supabase, Vercel)의 물리적 보호 조치에 따릅니다.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "privacy-officer",
+    number: "제14조",
+    title: "개인정보 보호책임자",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "서비스는 개인정보 처리에 관한 업무를 총괄하여 책임지고, 개인정보 처리와 관련한 정보주체의 불만 처리 및 피해 구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.",
+      },
+      {
+        kind: "definitions",
+        terms: [
+          {
+            term: "성명",
+            desc: "서승표",
+          },
+          {
+            term: "직위",
+            desc: "운영자",
+          },
+          {
+            term: "이메일",
+            desc: "me@sspzoa.io",
+          },
+        ],
+      },
+      {
+        kind: "paragraph",
+        text: "정보주체는 서비스 이용 중 발생하는 모든 개인정보 보호 관련 문의, 불만 처리, 피해 구제 등에 관한 사항을 개인정보 보호책임자에게 문의할 수 있으며, 서비스는 정보주체의 문의에 대해 지체 없이 답변 및 처리하겠습니다.",
+      },
+    ],
+  },
+  {
+    id: "remedies",
+    number: "제15조",
+    title: "권익침해 구제 방법",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "정보주체는 개인정보 침해로 인한 구제를 받기 위하여 개인정보분쟁조정위원회, 한국인터넷진흥원 개인정보침해신고센터 등에 분쟁 해결이나 상담 등을 신청할 수 있습니다. 아래 기관은 개인정보 침해 신고·상담을 위한 기관이니 참고하시기 바랍니다.",
+      },
+      {
+        kind: "table",
+        table: {
+          headers: ["기관명", "전화", "웹사이트"],
+          rows: [
+            ["개인정보분쟁조정위원회", "(국번없이) 1833-6972", "www.kopico.go.kr"],
+            ["개인정보침해신고센터", "(국번없이) 118", "privacy.kisa.or.kr"],
+            ["대검찰청 사이버수사과", "(국번없이) 1301", "www.spo.go.kr"],
+            ["경찰청 사이버수사국", "(국번없이) 182", "ecrm.police.go.kr"],
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "policy-changes",
+    number: "제16조",
+    title: "개인정보처리방침의 변경",
+    blocks: [
+      {
+        kind: "orderedList",
+        items: [
+          "본 개인정보처리방침은 법령, 정책 또는 보안 기술의 변경에 따라 내용이 추가, 삭제 및 수정될 수 있습니다.",
+          "변경 사항은 시행일자 7일 전부터 서비스 내에 공지합니다.",
+          "이용자에게 불리한 변경의 경우 시행일자 30일 전부터 공지합니다.",
+        ],
+      },
+      {
+        kind: "subheading",
+        text: "개정 이력",
+      },
+      {
+        kind: "table",
+        table: {
+          headers: ["버전", "시행일", "주요 변경 사항"],
+          rows: [
+            ["v1", "2026년 1월 24일", "개인정보처리방침 제정"],
+            [
+              "v2",
+              "2026년 6월 12일",
+              "인증·보안 조치 현행화(Supabase Auth 기반 단방향 해시 저장 및 세션 쿠키로 정정), 학생 수집 항목 현행화(학부모 전화번호·학교·분원·출생연도를 필수로, 클리닉 필참 요일·태그를 선택 항목으로 명시), 위탁·국외이전 처리 정보 구체화, 보유 기간 표현 정정",
+            ],
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "supplementary",
+    title: "부칙",
+    blocks: [
+      {
+        kind: "paragraph",
+        text: "본 개인정보처리방침은 2026년 6월 12일부터 시행합니다. 종전의 개인정보처리방침(2026년 1월 24일 시행)은 본 방침으로 대체됩니다.",
+      },
+    ],
+  },
+];
+
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-7 px-7 py-10">
-      <h1 className="font-semibold text-5xl text-foreground tracking-tight">개인정보처리방침</h1>
-
-      <div className="flex flex-col gap-7 text-muted-foreground text-sm leading-relaxed">
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제1조 (개인정보의 수집 항목 및 수집 방법)</h2>
-          <p>서비스는 다음과 같은 개인정보를 수집합니다:</p>
-
-          <h3 className="font-medium text-foreground text-sm">1. 소유자 (직접 회원가입)</h3>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>필수 항목: 이름, 전화번호, 비밀번호, 워크스페이스 이름</li>
-            <li>자동 수집 항목: 접속 로그, IP 주소, 서비스 이용 기록, 쿠키, 브라우저 정보(User-Agent)</li>
-          </ul>
-
-          <h3 className="font-medium text-foreground text-sm">2. 관리자 (소유자가 등록)</h3>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>필수 항목: 이름, 전화번호, 비밀번호</li>
-          </ul>
-
-          <h3 className="font-medium text-foreground text-sm">3. 학생 (소유자 또는 관리자가 등록)</h3>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>필수 항목: 이름, 전화번호</li>
-            <li>선택 항목: 학부모 전화번호, 학교, 분원, 출생연도</li>
-          </ul>
-
-          <h3 className="font-medium text-foreground text-sm">4. 서비스 이용 과정에서 생성되는 정보</h3>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>시험 성적 및 재시험 이력 (일정, 상태 변경, 출결 기록)</li>
-            <li>상담 기록 (제목, 내용, 작성일)</li>
-            <li>클리닉 출석 기록</li>
-            <li>문자 발송 이력 (수신자 정보, 발송 내용, 발송 결과)</li>
-          </ul>
-
-          <p className="rounded-md bg-muted p-4 text-muted-foreground text-xs">
-            ※ 관리자 및 학생의 개인정보는 소유자가 직접 등록합니다. 소유자는 등록 전에 해당 구성원(미성년자의 경우
-            법정대리인)으로부터 개인정보 수집·이용에 대한 동의를 받아야 합니다.
-          </p>
-          <p className="rounded-md bg-muted p-4 text-muted-foreground text-xs">
-            ※ 학생 계정의 초기 비밀번호는 등록된 전화번호로 자동 설정되며, 암호화하여 저장됩니다. 학생은 로그인 후
-            비밀번호를 변경할 수 있습니다.
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제2조 (개인정보의 수집 및 이용 목적)</h2>
-          <p>수집된 개인정보는 다음의 목적을 위해 이용됩니다:</p>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>서비스 제공 및 운영: 학생 관리, 수업/시험 관리, 재시험 관리, 출석 관리, 상담 기록</li>
-            <li>문자 발송: 시험 결과, 재시험 안내 등 학사 관련 알림 (학생 및 학부모 전화번호 이용)</li>
-            <li>서비스 개선: 이용 통계 분석, 서비스 품질 향상</li>
-            <li>본인 확인 및 인증: 로그인, 비밀번호 변경</li>
-            <li>서비스 안정성 확보: API 요청 로깅, 오류 추적, 보안 모니터링</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제3조 (개인정보의 보유 및 이용 기간)</h2>
-          <ul className="flex list-decimal flex-col gap-2 pl-5">
-            <li>이용자의 개인정보는 워크스페이스가 유지되는 동안 보유 및 이용됩니다.</li>
-            <li>소유자가 워크스페이스를 삭제하면 해당 워크스페이스의 모든 구성원 정보가 즉시 파기됩니다.</li>
-            <li>소유자 또는 관리자가 개별 학생/관리자를 삭제하면 해당 정보는 즉시 파기됩니다.</li>
-            <li>문자 발송 이력은 발송일로부터 1년간 보관 후 파기합니다.</li>
-            <li>서비스 이용 로그(API 요청 기록)는 수집일로부터 90일간 보관 후 자동 삭제됩니다.</li>
-            <li>
-              단, 관련 법령에 따라 보존이 필요한 경우 해당 기간 동안 보관합니다:
-              <ul className="flex list-disc flex-col gap-1 pl-5">
-                <li>전자상거래 등에서의 소비자 보호에 관한 법률에 따른 계약 또는 청약철회 기록: 5년</li>
-                <li>전자상거래 등에서의 소비자 보호에 관한 법률에 따른 소비자 불만 또는 분쟁처리 기록: 3년</li>
-                <li>통신비밀보호법에 따른 로그인 기록: 3개월</li>
-              </ul>
-            </li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제4조 (개인정보의 제3자 제공)</h2>
-          <p>
-            서비스는 원칙적으로 이용자의 개인정보를 제3자에게 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다:
-          </p>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>이용자가 사전에 동의한 경우</li>
-            <li>법령의 규정에 의하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제5조 (개인정보 처리의 위탁)</h2>
-          <p>서비스는 원활한 운영을 위해 다음과 같이 개인정보 처리를 위탁하고 있습니다:</p>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-border text-xs">
-              <thead>
-                <tr className="bg-muted">
-                  <th className="border border-border px-4 py-2 text-left">수탁업체</th>
-                  <th className="border border-border px-4 py-2 text-left">위탁 업무</th>
-                  <th className="border border-border px-4 py-2 text-left">보유 기간</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-border px-4 py-2">Supabase (한국 리전)</td>
-                  <td className="border border-border px-4 py-2">데이터베이스 호스팅</td>
-                  <td className="border border-border px-4 py-2">위탁 계약 종료 시까지</td>
-                </tr>
-                <tr>
-                  <td className="border border-border px-4 py-2">Solapi</td>
-                  <td className="border border-border px-4 py-2">문자 메시지 발송</td>
-                  <td className="border border-border px-4 py-2">발송 완료 시까지</td>
-                </tr>
-                <tr>
-                  <td className="border border-border px-4 py-2">Vercel</td>
-                  <td className="border border-border px-4 py-2">웹 서비스 호스팅</td>
-                  <td className="border border-border px-4 py-2">위탁 계약 종료 시까지</td>
-                </tr>
-                <tr>
-                  <td className="border border-border px-4 py-2">Axiom</td>
-                  <td className="border border-border px-4 py-2">서비스 로그 저장 및 모니터링</td>
-                  <td className="border border-border px-4 py-2">수집일로부터 90일</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제6조 (개인정보의 국외 이전)</h2>
-          <p>서비스는 원활한 운영을 위해 다음과 같이 개인정보를 국외로 이전하고 있습니다:</p>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-border text-xs">
-              <thead>
-                <tr className="bg-muted">
-                  <th className="border border-border px-4 py-2 text-left">이전받는 자</th>
-                  <th className="border border-border px-4 py-2 text-left">이전 국가</th>
-                  <th className="border border-border px-4 py-2 text-left">이전 항목</th>
-                  <th className="border border-border px-4 py-2 text-left">이전 목적</th>
-                  <th className="border border-border px-4 py-2 text-left">보유 기간</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-border px-4 py-2">Vercel, Inc.</td>
-                  <td className="border border-border px-4 py-2">미국</td>
-                  <td className="border border-border px-4 py-2">접속 로그, IP 주소, 쿠키</td>
-                  <td className="border border-border px-4 py-2">웹 서비스 호스팅</td>
-                  <td className="border border-border px-4 py-2">서비스 이용 종료 시까지</td>
-                </tr>
-                <tr>
-                  <td className="border border-border px-4 py-2">Axiom, Inc.</td>
-                  <td className="border border-border px-4 py-2">미국</td>
-                  <td className="border border-border px-4 py-2">
-                    이용자 식별정보(ID, 이름, 역할), IP 주소, 브라우저 정보, API 요청 기록
-                  </td>
-                  <td className="border border-border px-4 py-2">서비스 로그 저장 및 모니터링</td>
-                  <td className="border border-border px-4 py-2">수집일로부터 90일</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p className="text-muted-foreground text-xs">이전 방법: 서비스 이용 과정에서 네트워크를 통한 전송</p>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제7조 (개인정보의 파기 절차 및 방법)</h2>
-          <ul className="flex list-decimal flex-col gap-2 pl-5">
-            <li>파기 절차: 보유 기간이 경과하거나 처리 목적이 달성된 개인정보는 즉시 파기합니다.</li>
-            <li>파기 방법: 전자적 파일 형태의 정보는 복구할 수 없는 방법으로 영구 삭제합니다.</li>
-            <li>워크스페이스 삭제 시 해당 워크스페이스에 속한 모든 구성원의 개인정보가 일괄 파기됩니다.</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제8조 (쿠키의 사용)</h2>
-          <ul className="flex list-decimal flex-col gap-2 pl-5">
-            <li>
-              서비스는 이용자 인증 및 세션 유지를 위해 쿠키를 사용합니다. 쿠키는 로그인 상태 유지 및 보안 목적으로만
-              사용됩니다.
-            </li>
-            <li>
-              이용자는 웹 브라우저 설정을 통해 쿠키 저장을 거부할 수 있습니다. 다만, 쿠키를 거부할 경우 로그인이 필요한
-              서비스 이용에 제한이 있을 수 있습니다.
-            </li>
-            <li>
-              쿠키 설정 변경 방법: 브라우저 상단의 설정 &gt; 개인정보 &gt; 쿠키 설정에서 쿠키 허용 여부를 선택할 수
-              있습니다.
-            </li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제9조 (문자 메시지 발송 및 수신 동의)</h2>
-          <ul className="flex list-decimal flex-col gap-2 pl-5">
-            <li>
-              서비스는 시험 결과, 재시험 안내 등 학사 관련 정보를 학생 및 학부모에게 문자 메시지로 발송할 수 있습니다.
-            </li>
-            <li>
-              소유자는 문자 발송 전 수신자(학생, 학부모)로부터 정보성 문자 수신에 대한 동의를 받아야 할 책임이 있습니다.
-            </li>
-            <li>수신자는 소유자에게 문자 수신 거부를 요청할 수 있으며, 소유자는 이를 즉시 반영하여야 합니다.</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제10조 (이용자의 권리와 행사 방법)</h2>
-          <p>이용자는 언제든지 다음의 권리를 행사할 수 있습니다:</p>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>개인정보 열람 요구</li>
-            <li>오류 등이 있을 경우 정정 요구</li>
-            <li>삭제 요구</li>
-            <li>처리정지 요구</li>
-          </ul>
-          <p>
-            학생 및 관리자는 소유자에게 자신의 정보 열람, 정정, 삭제를 요청할 수 있으며, 소유자는 정당한 사유 없이 이를
-            거부할 수 없습니다.
-          </p>
-          <div className="rounded-md bg-muted p-4">
-            <p className="font-medium text-foreground text-xs">권리 행사 방법 및 접수처</p>
-            <ul className="flex list-disc flex-col gap-1 pl-5 text-xs">
-              <li>이메일: me@sspzoa.io</li>
-              <li>요청 후 10일 이내에 처리 결과를 통지합니다.</li>
-              <li>정당한 사유로 처리가 지연될 경우 사유와 처리 예정일을 별도 안내합니다.</li>
-            </ul>
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제11조 (소유자의 개인정보 관리 책임)</h2>
-          <ul className="flex list-decimal flex-col gap-2 pl-5">
-            <li>소유자는 워크스페이스에 등록하는 구성원의 개인정보에 대한 관리 책임이 있습니다.</li>
-            <li>
-              소유자는 학생 등록 시 해당 학생(미성년자의 경우 법정대리인)에게 개인정보 수집·이용 목적, 항목, 보유 기간을
-              고지하고 동의를 받아야 합니다.
-            </li>
-            <li>소유자는 구성원의 개인정보를 서비스 목적 외로 활용하거나 제3자에게 무단 제공하여서는 안 됩니다.</li>
-            <li>소유자가 본 조의 의무를 위반하여 발생하는 법적 책임은 소유자에게 있습니다.</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제12조 (개인정보의 안전성 확보 조치)</h2>
-          <p>서비스는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다:</p>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>비밀번호의 암호화 저장 (bcrypt)</li>
-            <li>SSL/TLS를 통한 데이터 전송 암호화</li>
-            <li>인증 토큰의 httpOnly 쿠키 저장 (JavaScript 접근 차단)</li>
-            <li>접근 권한 관리 (역할 기반 접근 제어: 소유자, 관리자, 학생)</li>
-            <li>워크스페이스 간 데이터 격리</li>
-            <li>접속 로그의 보관 및 위변조 방지</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제13조 (개인정보 보호책임자)</h2>
-          <p>
-            서비스는 개인정보 처리에 관한 업무를 총괄하고, 이용자의 불만 처리 및 피해 구제를 위하여 아래와 같이 개인정보
-            보호책임자를 지정하고 있습니다:
-          </p>
-          <div className="rounded-md bg-muted p-4">
-            <ul className="flex list-disc flex-col gap-1 pl-5 text-xs">
-              <li>성명: 서승표</li>
-              <li>직위: 운영자</li>
-              <li>이메일: me@sspzoa.io</li>
-            </ul>
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제14조 (권익침해 구제 방법)</h2>
-          <p>
-            이용자는 개인정보 침해로 인한 구제를 받기 위하여 아래의 기관에 분쟁 해결이나 상담 등을 신청할 수 있습니다:
-          </p>
-          <ul className="flex list-disc flex-col gap-2 pl-5">
-            <li>개인정보분쟁조정위원회: (국번없이) 1833-6972 (www.kopico.go.kr)</li>
-            <li>개인정보침해신고센터: (국번없이) 118 (privacy.kisa.or.kr)</li>
-            <li>대검찰청 사이버수사과: (국번없이) 1301 (www.spo.go.kr)</li>
-            <li>경찰청 사이버수사국: (국번없이) 182 (ecrm.police.go.kr)</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">제15조 (개인정보처리방침의 변경)</h2>
-          <ul className="flex list-decimal flex-col gap-2 pl-5">
-            <li>
-              본 개인정보처리방침은 법령, 정책 또는 보안 기술의 변경에 따라 내용이 추가, 삭제 및 수정될 수 있습니다.
-            </li>
-            <li>변경 사항은 시행일자 7일 전부터 서비스 내에 공지합니다.</li>
-            <li>이용자에게 불리한 변경의 경우 시행일자 30일 전부터 공지합니다.</li>
-          </ul>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-2xl text-foreground">부칙</h2>
-          <p>본 개인정보처리방침은 2026년 1월 24일부터 시행합니다.</p>
-        </section>
-      </div>
-    </div>
+    <LegalDoc
+      title="개인정보처리방침"
+      effectiveDate="2026년 6월 12일"
+      intro={
+        'Tnote(이하 "서비스")는 학원의 학생 관리를 위한 다중 워크스페이스(multi-tenant) SaaS로서, 「개인정보 보호법」 등 관련 법령을 준수하여 이용자의 개인정보를 보호하고 권익을 보장하기 위해 본 개인정보처리방침을 수립·공개합니다. 본 서비스는 각 학원(워크스페이스)이 자신의 구성원(관리자·학생·학부모) 개인정보를 직접 등록·관리하는 구조입니다. 이때 각 학원의 소유자는 해당 구성원 개인정보의 처리 주체(개인정보처리자)에 해당하며, 서비스 운영자는 학원을 대신하여 개인정보를 저장·처리하는 수탁자(플랫폼 제공자)의 지위에 있습니다.'
+      }
+      sections={sections}
+      sibling={{ href: "/terms", label: "이용약관" }}
+    />
   );
 }
