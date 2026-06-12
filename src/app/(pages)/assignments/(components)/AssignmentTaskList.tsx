@@ -1,9 +1,11 @@
 "use client";
 
+import { ClipboardList } from "lucide-react";
 import { type ReactNode, useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
+import { IconBadge } from "@/shared/components/ui/iconBadge";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { AssignmentTask } from "@/shared/types";
 
@@ -112,7 +114,8 @@ export default function AssignmentTaskList({
           <button
             type="button"
             onClick={() => onViewStudent(task.student.id)}
-            className="group flex items-center gap-2.5 text-left">
+            className="group flex items-center gap-3 text-left">
+            <IconBadge icon={ClipboardList} tone="assignments" size="sm" />
             <div className="flex min-w-0 flex-col gap-0.5">
               <span className="font-medium text-foreground transition-colors group-hover:text-primary">
                 {task.student.name}

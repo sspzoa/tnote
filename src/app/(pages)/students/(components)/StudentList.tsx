@@ -1,9 +1,11 @@
 import { useAtom } from "jotai";
+import { Users } from "lucide-react";
 import { type ReactNode, useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
+import { IconBadge } from "@/shared/components/ui/iconBadge";
 import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/lib/utils/error";
 import { formatPhoneNumber } from "@/shared/lib/utils/phone";
@@ -177,11 +179,14 @@ export default function StudentList({ students, isLoading, empty }: StudentListP
           <button
             type="button"
             onClick={() => openInfoModal(student)}
-            className="group flex min-w-0 flex-col gap-0.5 text-left">
-            <span className="font-medium text-foreground transition-colors group-hover:text-primary">
-              {student.name}
+            className="group flex min-w-0 items-center gap-3 text-left">
+            <IconBadge icon={Users} tone="students" size="sm" />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate font-medium text-foreground transition-colors group-hover:text-primary">
+                {student.name}
+              </span>
+              {secondary && <span className="truncate text-muted-foreground text-xs">{secondary}</span>}
             </span>
-            {secondary && <span className="truncate text-muted-foreground text-xs">{secondary}</span>}
           </button>
         );
       },

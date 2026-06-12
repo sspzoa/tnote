@@ -1,9 +1,11 @@
 "use client";
 
+import { RefreshCw } from "lucide-react";
 import { type ReactNode, useCallback, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
+import { IconBadge } from "@/shared/components/ui/iconBadge";
 import { useManagementStatuses } from "@/shared/hooks/useManagementStatuses";
 import { isTagActive } from "@/shared/lib/utils/tags";
 import type { StatusColor } from "@/shared/types";
@@ -118,19 +120,22 @@ export default function RetakeList({
           <button
             type="button"
             onClick={() => onViewStudent(retake.student.id)}
-            className="group flex min-w-0 flex-col gap-0.5 text-left">
-            <span className="font-medium text-foreground transition-colors group-hover:text-primary">
-              {retake.student.name}
-            </span>
-            {activeTags.length > 0 && (
-              <div className="flex flex-nowrap gap-1">
-                {activeTags.map((assignment) => (
-                  <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
-                    {assignment.tag?.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            className="group flex min-w-0 items-center gap-3 text-left">
+            <IconBadge icon={RefreshCw} tone="retakes" size="sm" />
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-medium text-foreground transition-colors group-hover:text-primary">
+                {retake.student.name}
+              </span>
+              {activeTags.length > 0 && (
+                <div className="flex flex-nowrap gap-1">
+                  {activeTags.map((assignment) => (
+                    <Badge key={assignment.id} variant={assignment.tag?.color ?? "neutral"} size="xs">
+                      {assignment.tag?.name}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
           </button>
         );
       },

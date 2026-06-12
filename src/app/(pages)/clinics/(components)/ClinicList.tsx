@@ -1,7 +1,8 @@
 "use client";
 
+import { Stethoscope } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
-import { Badge, Button } from "@/shared/components/ui";
+import { Badge, Button, IconBadge } from "@/shared/components/ui";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
 import { formatDateDotYMD } from "@/shared/lib/utils/date";
@@ -42,11 +43,16 @@ export default function ClinicList({ clinics, isLoading, empty, onEdit, onDelete
       cell: (clinic) => {
         const sortedDays = [...clinic.operating_days].sort();
         return (
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <span className="font-medium text-foreground">{clinic.name}</span>
-            {sortedDays.length > 0 && (
-              <span className="text-muted-foreground text-xs">{sortedDays.map((day) => dayNames[day]).join("·")}</span>
-            )}
+          <div className="flex min-w-0 items-center gap-3">
+            <IconBadge icon={Stethoscope} tone="clinics" size="sm" />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate font-medium text-foreground">{clinic.name}</span>
+              {sortedDays.length > 0 && (
+                <span className="text-muted-foreground text-xs">
+                  {sortedDays.map((day) => dayNames[day]).join("·")}
+                </span>
+              )}
+            </span>
           </div>
         );
       },

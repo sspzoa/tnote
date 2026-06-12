@@ -1,7 +1,8 @@
 import { useSetAtom } from "jotai";
+import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useMemo } from "react";
-import { Badge, Button } from "@/shared/components/ui";
+import { Badge, Button, IconBadge } from "@/shared/components/ui";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
@@ -85,15 +86,18 @@ export default function CourseList({ courses, isLoading, empty }: CourseListProp
       cell: (course) => {
         const hasPeriod = course.start_date || course.end_date;
         return (
-          <Link href={`/courses/${course.id}`} className="group flex min-w-0 flex-col gap-0.5 text-left">
-            <span className="font-medium text-foreground transition-colors group-hover:text-primary">
-              {course.name}
-            </span>
-            {hasPeriod && (
-              <span className="text-muted-foreground text-xs">
-                {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
+          <Link href={`/courses/${course.id}`} className="group flex min-w-0 items-center gap-3 text-left">
+            <IconBadge icon={BookOpen} tone="courses" size="sm" />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate font-medium text-foreground transition-colors group-hover:text-primary">
+                {course.name}
               </span>
-            )}
+              {hasPeriod && (
+                <span className="text-muted-foreground text-xs">
+                  {formatDateDotYMD(course.start_date)} ~ {formatDateDotYMD(course.end_date)}
+                </span>
+              )}
+            </span>
           </Link>
         );
       },

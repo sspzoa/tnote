@@ -1,8 +1,10 @@
+import { UserRound } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { Badge } from "@/shared/components/ui/badge";
 import { useConfirm } from "@/shared/components/ui/confirmDialog";
 import { DataTable, type DataTableColumn } from "@/shared/components/ui/dataTable";
 import { DropdownMenu, type DropdownMenuItem } from "@/shared/components/ui/dropdownMenu";
+import { IconBadge } from "@/shared/components/ui/iconBadge";
 import { useToast } from "@/shared/hooks/useToast";
 import { formatLocaleDateKorean } from "@/shared/lib/utils/date";
 import { getErrorMessage } from "@/shared/lib/utils/error";
@@ -84,11 +86,14 @@ export default function AdminList({ admins, isOwner, isLoading, empty }: AdminLi
       header: "이름",
       sortKey: "name",
       cell: (admin) => (
-        <div className="group flex min-w-0 flex-col gap-0.5">
-          <span className="font-medium text-foreground transition-colors group-hover:text-primary">{admin.name}</span>
-          <span className="text-muted-foreground text-xs">
-            {admin.role === "owner" ? "소유자" : "관리자"} · {formatPhoneNumber(admin.phone_number)}
-          </span>
+        <div className="flex min-w-0 items-center gap-3">
+          <IconBadge icon={UserRound} tone="neutral" size="sm" />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate font-medium text-foreground">{admin.name}</span>
+            <span className="text-muted-foreground text-xs">
+              {admin.role === "owner" ? "소유자" : "관리자"} · {formatPhoneNumber(admin.phone_number)}
+            </span>
+          </div>
         </div>
       ),
     },
