@@ -78,6 +78,9 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/" onClick={() => setOpenMobile(false)}>
+                <span className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary font-bold text-base text-primary-foreground shadow-brand">
+                  T
+                </span>
                 <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-bold text-base tracking-[-0.01em]">Tnote</span>
                   {isLoading ? (
